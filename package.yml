@@ -8,3 +8,4 @@ page:
     perm: admin
     hasLayout: false
     icon: rex-icon fa-database
+    linkAttr: { target: _blank }
