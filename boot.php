@@ -1,5 +1,6 @@
 <?php
 
+// Handle adminer redirects with missing page parameter
 if (
     rex::isBackend() && rex::getUser() && rex::getUser()->isAdmin() &&
     !rex_be_controller::getCurrentPage() &&
