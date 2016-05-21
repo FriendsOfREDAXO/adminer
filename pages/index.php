@@ -12,7 +12,7 @@ $GLOBALS['rg'] = &$_SESSION['translations'];
 rex_response::cleanOutputBuffers();
 
 ob_start(function ($output) {
-    return str_replace('index.php?', 'index.php?page=adminer&amp;', $output);
+    return preg_replace('#(?<==(?:"|\'))index\.php\?(?=username=&amp;db=|file=[^&]*&amp;version=)#', 'index.php?page=adminer&amp;', $output);
 });
 
 include __DIR__ .'/../vendor/adminer.php';
