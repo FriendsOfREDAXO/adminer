@@ -13,9 +13,6 @@ function adminer_object()
 $_GET['username'] = '';
 $_GET['db'] = rex::getProperty('db')[1]['name'];
 
-// becaause adminer is not included in global scope this var must be made global
-$GLOBALS['rg'] = &$_SESSION['translations'];
-
 rex_response::cleanOutputBuffers();
 
 // add page param to all adminer urls
