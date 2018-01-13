@@ -4,22 +4,29 @@ class rex_adminer extends Adminer
 {
     function credentials()
     {
-        $db = rex::getProperty('db')[1];
-        return [$db['host'], $db['login'], $db['password']];
-    }
+        $db = rex_addon::get('adminer')->getProperty('database');
 
-    function database()
-    {
-        return rex::getProperty('db')[1]['name'];
+        return [$db['host'], $db['login'], $db['password']];
     }
 
     function databases($flush = true)
     {
-        return [];
+        $databases = [];
+
+        foreach (rex_addon::get('adminer')->getProperty('databases') as $db) {
+            $databases[$db['name']] = 'DB '.$db['id'].': '.$db['name'];
+        }
+
+        return $databases;
     }
 
     function databasesPrint($missing)
     {
+        if (count(rex_addon::get('adminer')->getProperty('databases')) <= 1) {
+            return;
+        }
+
+        parent::databasesPrint($missing);
     }
 
     function tableStructurePrint($fields)
