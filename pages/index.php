@@ -1,5 +1,7 @@
 <?php
 
+/** @var rex_addon $this */
+
 // Adminer extension, the function is called automatically by adminer
 function adminer_object()
 {
@@ -9,9 +11,31 @@ function adminer_object()
     return new rex_adminer();
 }
 
+$databases = [];
+
+foreach (rex::getProperty('db') as $id => $db) {
+    if (empty($db['host']) || empty($db['name'])) {
+        continue;
+    }
+
+    // multiple databases with same name are not supported
+    if (isset($databases[$db['name']])) {
+        continue;
+    }
+
+    $db['id'] = $id;
+    $databases[$db['name']] = $db;
+}
+
+$database = rex_get('db', 'string');
+$database = isset($databases[$database]) ? $databases[$database] : reset($databases);
+
+$this->setProperty('databases', $databases);
+$this->setProperty('database', $database);
+
 // auto login and db selection
 $_GET['username'] = '';
-$_GET['db'] = rex::getProperty('db')[1]['name'];
+$_GET['db'] = $database['name'];
 
 rex_response::cleanOutputBuffers();
 
