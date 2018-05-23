@@ -67,6 +67,7 @@ class rex_adminer extends Adminer
                         oncut="return false"
                         onpaste="return false"
                         onkeydown="return event.metaKey"
+                        spellcheck="false"
                     >
                         '.$code.'
                     </div>
