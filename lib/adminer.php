@@ -9,6 +9,11 @@ class rex_adminer extends Adminer
         return [$db['host'], $db['login'], $db['password']];
     }
 
+    function login($login, $password)
+    {
+        return true;
+    }
+
     function databases($flush = true)
     {
         $databases = [];
@@ -43,7 +48,7 @@ class rex_adminer extends Adminer
 
             echo '
                 <div style="margin-top: 10px;">
-                    <a href="#" onclick="return !toggle(\'rex-sql-table-code\')" style="display: block">rex_sql_table code</a>
+                    <a id="rex-sql-table-code-link" href="#" style="display: block">rex_sql_table code</a>
                     
                     <style type="text/css">
                         #rex-sql-table-code {
@@ -62,16 +67,30 @@ class rex_adminer extends Adminer
                         }
                     </style>
                     
-                    <div id="rex-sql-table-code" class="hidden" 
-                        contenteditable="true"
-                        oncut="return false"
-                        onpaste="return false"
-                        onkeydown="return event.metaKey"
-                        spellcheck="false"
-                    >
+                    <div id="rex-sql-table-code" class="hidden" contenteditable="true" spellcheck="false">
                         '.$code.'
                     </div>
-                </p>';
+                    
+                    <script '.nonce().'>
+                        document.getElementById("rex-sql-table-code-link").addEventListener("click", function () {
+                            toggle("rex-sql-table-code");
+                            return false;
+                        });
+                        
+                        var code = document.getElementById("rex-sql-table-code");
+                        code.addEventListener("cut", function (event) { 
+                            event.preventDefault(); 
+                        });
+                        code.addEventListener("paste", function (event) { 
+                            event.preventDefault(); 
+                        });
+                        code.addEventListener("keydown", function (event) { 
+                            if (!event.metaKey) {
+                                event.preventDefault();
+                            } 
+                        });
+                    </script>
+                </div>';
         }
 
         parent::tableStructurePrint($fields);
