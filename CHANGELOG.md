@@ -1,6 +1,12 @@
 Changelog
 =========
 
+Version 1.4.0 – 29.06.2018
+--------------------------
+
+* Update adminer auf 4.6.3: https://github.com/vrana/adminer/blob/v4.6.3/changes.txt
+
+
 Version 1.3.0 – 14.01.2018
 --------------------------
 
