@@ -1,6 +1,13 @@
 Changelog
 =========
 
+Version 1.5.0 – 10.12.2018
+--------------------------
+
+* Update adminer auf 4.7.0: https://github.com/vrana/adminer/blob/v4.7.0/changes.txt
+* Wenn die REDAXO-Debug-Option `throw_always_exception` aktiviert ist, kam es zu Whoops aufgrund von Notices in Adminer
+
+
 Version 1.4.0 – 29.06.2018
 --------------------------
 
