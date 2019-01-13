@@ -2,14 +2,7 @@
 
 /** @var rex_addon $this */
 
-// Adminer extension, the function is called automatically by adminer
-function adminer_object()
-{
-    // adminer throws warning "A non-numeric value encountered" in PHP 7
-    error_reporting(error_reporting() & ~E_WARNING & ~E_NOTICE);
-
-    return new rex_adminer();
-}
+require_once __DIR__.'/../functions/function_adminer.php';
 
 $databases = [];
 
