@@ -4,6 +4,9 @@ Changelog
 Version 1.5.0 – 10.12.2018
 --------------------------
 
+Dieses Update aktualisiert adminer um eine kritische Sicherheitslücke zu schließen.
+Ein Update wird dringend Empfohlen - siehe auch https://gwillem.gitlab.io/2019/01/17/adminer-4.6.2-file-disclosure-vulnerability/
+
 * Update adminer auf 4.7.0: https://github.com/vrana/adminer/blob/v4.7.0/changes.txt
 * Wenn die REDAXO-Debug-Option `throw_always_exception` aktiviert ist, kam es zu Whoops aufgrund von Notices in Adminer
 
