@@ -31,9 +31,11 @@ $_GET['username'] = '';
 $_GET['db'] = $database['name'];
 
 // deactive `throw_always_exception` debug option, because adminer is throwing some notices
-$debug = rex::getDebugFlags();
-$debug['throw_always_exception'] = false;
-rex::setProperty('debug', $debug);
+if (method_exists(rex::class, 'getDebugFlags')) {
+    $debug = rex::getDebugFlags();
+    $debug['throw_always_exception'] = false;
+    rex::setProperty('debug', $debug);
+}
 
 rex_response::cleanOutputBuffers();
 
