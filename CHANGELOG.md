@@ -1,6 +1,13 @@
 Changelog
 =========
 
+Version 1.6.0 – 15.07.2019
+--------------------------
+
+* Update adminer auf 4.7.1: https://github.com/vrana/adminer/blob/v4.7.1/changes.txt
+* Kompatibilität zu REDAXO < 5.6 wieder hergestellt
+
+
 Version 1.5.0 – 10.12.2018
 --------------------------
 
