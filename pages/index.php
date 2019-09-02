@@ -30,6 +30,9 @@ $this->setProperty('database', $database);
 $_GET['username'] = '';
 $_GET['db'] = $database['name'];
 
+// workaround against https://github.com/vrana/adminer/commit/15900301eeef0cf22e51f57ed0b7d55b3e822feb
+$_SESSION['pwds']['server'][''][$_GET["username"]] = '';
+
 // deactive `throw_always_exception` debug option, because adminer is throwing some notices
 if (method_exists(rex::class, 'getDebugFlags')) {
     $debug = rex::getDebugFlags();
