@@ -1,6 +1,13 @@
 Changelog
 =========
 
+Version 1.8.0 – 18.12.2019
+--------------------------
+
+* Update adminer auf 4.7.5: https://github.com/vrana/adminer/blob/v4.7.5/changes.txt
+* Fremdschlüssel konnten nicht angelegt werden
+
+
 Version 1.7.0 – 02.09.2019
 --------------------------
 
