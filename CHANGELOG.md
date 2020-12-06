@@ -1,6 +1,12 @@
 Changelog
 =========
 
+Version 1.8.2 – 06.12.2020
+--------------------------
+
+* Update adminer auf 4.7.8: https://github.com/vrana/adminer/blob/v4.7.8/changes.txt
+
+
 Version 1.8.1 – 02.02.2020
 --------------------------
 
