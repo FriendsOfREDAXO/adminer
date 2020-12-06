@@ -9,3 +9,7 @@ page:
     hasLayout: false
     icon: rex-icon fa-database
     linkAttr: { target: _blank }
+
+requires:
+    php: '>=5.5'
+    redaxo: '^5.0'
