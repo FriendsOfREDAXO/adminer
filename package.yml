@@ -12,4 +12,5 @@ page:
 
 requires:
     php: '>=5.5'
+    php: '<8'
     redaxo: '^5.0'
