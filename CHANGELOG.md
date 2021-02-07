@@ -1,6 +1,13 @@
 Changelog
 =========
 
+Version 1.8.3 – 07.02.2021
+--------------------------
+
+* Update adminer auf 4.7.9: https://github.com/vrana/adminer/blob/v4.7.9/changes.txt
+* PHP 8: In der Datenansicht kam es zu einem `TypeError`
+
+
 Version 1.8.2 – 06.12.2020
 --------------------------
 
