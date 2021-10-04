@@ -6,7 +6,7 @@ if (
     isset($_GET['username']) && isset($_GET['db'])
 ) {
     $page = rex_be_controller::getCurrentPage();
-    if (!$page || $page === (string) (int) $page) {
+    if (!$page || $page === (string) (int) $page || $page === 'last') {
         rex_be_controller::setCurrentPage('adminer');
     }
 }
