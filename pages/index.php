@@ -33,7 +33,9 @@ $_GET['db'] = $database['name'];
 // adminer uses `page` parameter for pagination (int), but redaxo initially sets `page=adminer`
 // so we remove the page parameter if it is not a numeric string
 if (isset($_GET['page']) && $_GET['page'] !== (string) (int) $_GET['page']) {
-    unset($_GET['page']);
+    if ($_GET['page'] !== 'last') {
+        unset($_GET['page']);
+    }
 }
 
 // workaround against https://github.com/vrana/adminer/commit/15900301eeef0cf22e51f57ed0b7d55b3e822feb
