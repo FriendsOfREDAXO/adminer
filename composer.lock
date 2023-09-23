@@ -4,8 +4,62 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "470a649c3cc65ceaacbaa03beecfaf12",
-    "packages": [],
+    "content-hash": "f790a164e7856605cb0f5a1cfa36c3d4",
+    "packages": [
+        {
+            "name": "vrana/adminer",
+            "version": "v4.8.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/vrana/adminer.git",
+                "reference": "1f173e18bdf0be29182e0d67989df56eadea4754"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/vrana/adminer/zipball/1f173e18bdf0be29182e0d67989df56eadea4754",
+                "reference": "1f173e18bdf0be29182e0d67989df56eadea4754",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "plugins/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0",
+                "GPL-2.0-only"
+            ],
+            "authors": [
+                {
+                    "name": "Jakub Vrána",
+                    "homepage": "https://www.vrana.cz/"
+                }
+            ],
+            "description": "Database management in a single PHP file.",
+            "homepage": "https://www.adminer.org/",
+            "keywords": [
+                "database"
+            ],
+            "support": {
+                "forum": "https://sourceforge.net/p/adminer/discussion/",
+                "issues": "https://sourceforge.net/p/adminer/bugs-and-features/",
+                "source": "https://github.com/vrana/adminer/"
+            },
+            "funding": [
+                {
+                    "url": "https://sourceforge.net/p/adminer/donate/",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://www.patreon.com/jakubvrana",
+                    "type": "patreon"
+                }
+            ],
+            "time": "2021-05-14T05:39:59+00:00"
+        }
+    ],
     "packages-dev": [
         {
             "name": "composer/pcre",
