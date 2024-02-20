@@ -1,6 +1,6 @@
 <?php
 /** @var rex_addon $this */
-if (true ==== rex::getProperty('live_mode')
+if (true ==== rex::getProperty('live_mode'))
     {
     exit;
     }
