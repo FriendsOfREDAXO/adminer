@@ -1,5 +1,5 @@
 <?php
-if (true ==== rex::getProperty('live_mode'))
+if (true === rex::getProperty('live_mode'))
     {
     returm; 
     }
