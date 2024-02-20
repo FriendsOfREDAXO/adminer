@@ -1,4 +1,4 @@
-# [Adminer](https://www.adminer.org) als REDAXO-Addon
+# [AdminerEvo]([https://www.adminer.org](https://docs.adminerevo.org)) als REDAXO-Addon
 
 Datenbank-Verwaltung in REDAXO, ohne dass dafür Login-Daten eingegeben werden müssen.
 
