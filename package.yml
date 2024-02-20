@@ -1,11 +1,11 @@
 package: adminer
-version: '1.10.0'
+version: '2.0.0'
 vendor: '4.8.3 adminerevo'
 author: Friends Of REDAXO
 supportpage: https://github.com/FriendsOfREDAXO/adminer
 
 page:
-    title: Adminer
+    title: AdminerEvo
     perm: admin
     hasLayout: false
     icon: rex-icon fa-database
