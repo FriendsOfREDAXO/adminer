@@ -1,7 +1,7 @@
 Changelog
 =========
 
-Version 1.10.0 – XX.12.2023
+Version 2.0.0 – 20.02.2024
 --------------------------
 
 * Update adminer auf adminerevo 4.8.3: https://github.com/adminerevo/adminerevo/blob/v4.8.3/changes.txt
