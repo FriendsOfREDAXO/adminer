@@ -1,7 +1,9 @@
 <?php
-
 /** @var rex_addon $this */
-
+if (true === rex::getProperty('live_mode'))
+    {
+    exit;
+    }
 require_once __DIR__.'/../functions/function_adminer.php';
 
 $databases = [];
@@ -61,5 +63,4 @@ include __DIR__ .'/../vendor/adminer.php';
 while (ob_get_level()) {
     ob_end_flush();
 }
-
 exit;
