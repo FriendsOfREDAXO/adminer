@@ -1,7 +1,7 @@
 <?php
 if (true === rex::getProperty('live_mode',false))
     {
-    returm; 
+    return; 
     }
 // Handle adminer calls with missing page parameter
 if (rex::isBackend() && rex::getUser() && rex::getUser()->isAdmin() && isset($_GET['username']) && isset($_GET['db'])) {
