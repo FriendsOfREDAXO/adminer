@@ -57,7 +57,7 @@ ob_start(function ($output) {
     return preg_replace('#(?<==(?:"|\'))index\.php\?(?=username=&amp;db=|file=[^&]*&amp;version=)#', 'index.php?page=adminer&amp;', $output);
 });
 
-include __DIR__ .'/../vendor/adminer.php';
+include __DIR__ .'/../vendor/adminerevo.php';
 
 // make sure the output buffer callback is called
 while (ob_get_level()) {
