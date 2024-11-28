@@ -19,7 +19,7 @@ class rex_adminer extends Adminer
         $databases = [];
 
         foreach (rex_addon::get('adminer')->getProperty('databases') as $db) {
-            $databases[$db['name']] = $db['name'];
+            $databases[$db['name']] = $db['name'].' ('. $db['host'] .')';
         }
 
         return $databases;
