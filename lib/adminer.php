@@ -71,7 +71,7 @@ class rex_adminer extends Adminer
                         '.$code.'
                     </div>
 
-                    <script '.nonce().'>
+                    <script '.\nonce().'>
                         document.getElementById("rex-sql-table-code-link").addEventListener("click", function () {
                             toggle("rex-sql-table-code");
                             return false;
