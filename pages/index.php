@@ -50,6 +50,11 @@ if (method_exists(rex::class, 'getDebugFlags')) {
     rex::setProperty('debug', $debug);
 }
 
+// CSP für die Adminer-Seite anpassen, um inline-scripts zu erlauben
+if (method_exists('rex_response', 'setHeader')) {
+    rex_response::setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';");
+}
+
 rex_response::cleanOutputBuffers();
 
 // add page param to all adminer urls
