@@ -50,7 +50,7 @@ class rex_adminer extends \Adminer\Adminer
                 <div style="margin-top: 10px;">
                     <a id="rex-sql-table-code-link" href="#" style="display: block">rex_sql_table code</a>
 
-                    <style type="text/css" nonce="' . rex_response::getNonce() . '">
+                    <style type="text/css"'.\Adminer\nonce().'>
                         #rex-sql-table-code {
                             border: 1px solid #999;
                             background: #eee;
@@ -71,7 +71,7 @@ class rex_adminer extends \Adminer\Adminer
                         '.$code.'
                     </div>
 
-                    <script type="text/javascript" nonce="' . rex_response::getNonce() . '">
+                    '.\Adminer\script('
                         document.getElementById("rex-sql-table-code-link").addEventListener("click", function () {
                             toggle("rex-sql-table-code");
                             return false;
@@ -89,7 +89,7 @@ class rex_adminer extends \Adminer\Adminer
                                 event.preventDefault();
                             }
                         });
-                    </script>
+                    ').'
                 </div>';
         }
 
