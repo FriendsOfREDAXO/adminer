@@ -1,6 +1,6 @@
 <?php
 
-class rex_adminer extends Adminer
+class rex_adminer extends \Adminer\Adminer
 {
     function credentials()
     {

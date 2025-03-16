@@ -8,3 +8,21 @@ function adminer_object()
 
     return new rex_adminer();
 }
+
+// Für Namespace-Kompatibilität die Funktionsaufrufe einbinden
+namespace Adminer;
+
+// Die Klasse rex_adminer wird im globalen Namespace definiert
+// Kein use-Statement nötig, da wir mit vollqualifizierten Namen arbeiten
+
+function connection() {
+    return \connection();
+}
+
+function adminer() {
+    return \adminer();
+}
+
+function version() {
+    return \version();
+}
