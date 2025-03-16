@@ -46,10 +46,10 @@ class rex_adminer extends \Adminer\Adminer
             $code = rex_string::highlight($code);
             $code = str_replace('&lt;?php&nbsp;<br /><br />', '', $code);
 
-            // REDAXO nonce aus rex_response verwenden
-            $nonceAttribute = '';
-            if (class_exists('rex_response') && method_exists('rex_response', 'getNonce')) {
-                $nonceAttribute = ' nonce="' . rex_response::getNonce() . '"';
+            // Verwende die korrekte Syntax für das CSP nonce in REDAXO
+            $nonceTag = '';
+            if (method_exists('rex_response', 'getRequestNonce')) {
+                $nonceTag = ' nonce="' . rex_response::getRequestNonce() . '"';
             }
 
             echo '
@@ -77,7 +77,7 @@ class rex_adminer extends \Adminer\Adminer
                         '.$code.'
                     </div>
 
-                    <script'.$nonceAttribute.'>
+                    <script'.$nonceTag.'>
                         document.getElementById("rex-sql-table-code-link").addEventListener("click", function () {
                             toggle("rex-sql-table-code");
                             return false;
