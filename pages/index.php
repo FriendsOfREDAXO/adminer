@@ -4,7 +4,6 @@ if (true === rex::getProperty('live_mode',false))
     {
     exit;
     }
-require_once __DIR__.'/../functions/adminer_namespace_functions.php';
 require_once __DIR__.'/../functions/function_adminer.php';
 
 $databases = [];
