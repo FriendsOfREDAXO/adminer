@@ -1,5 +1,5 @@
 <?php
-/* Adminer 5.x */
+
 class rex_adminer extends \Adminer\Adminer
 {
     function credentials()
@@ -46,6 +46,12 @@ class rex_adminer extends \Adminer\Adminer
             $code = rex_string::highlight($code);
             $code = str_replace('&lt;?php&nbsp;<br /><br />', '', $code);
 
+            // REDAXO nonce aus rex_response verwenden
+            $nonceAttribute = '';
+            if (class_exists('rex_response') && method_exists('rex_response', 'getNonce')) {
+                $nonceAttribute = ' nonce="' . rex_response::getNonce() . '"';
+            }
+
             echo '
                 <div style="margin-top: 10px;">
                     <a id="rex-sql-table-code-link" href="#" style="display: block">rex_sql_table code</a>
@@ -71,7 +77,7 @@ class rex_adminer extends \Adminer\Adminer
                         '.$code.'
                     </div>
 
-                    <script '.\nonce().'>
+                    <script'.$nonceAttribute.'>
                         document.getElementById("rex-sql-table-code-link").addEventListener("click", function () {
                             toggle("rex-sql-table-code");
                             return false;
