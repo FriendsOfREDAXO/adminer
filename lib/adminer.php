@@ -1,5 +1,5 @@
 <?php
-
+/* Adminer 5.x */
 class rex_adminer extends \Adminer\Adminer
 {
     function credentials()
