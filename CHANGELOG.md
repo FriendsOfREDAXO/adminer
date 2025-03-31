@@ -1,6 +1,11 @@
 Changelog
 =========
 
+Version: 3.0.0 - 3.1.0
+-----------------------
+Adminer Vendor 5.1
+
+
 Version: 2.1.0 - 2.1.1
 --------------------------
 Back to adminerer by vrana 4.17.1
