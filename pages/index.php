@@ -28,6 +28,10 @@ $database = isset($databases[$database]) ? $databases[$database] : reset($databa
 $this->setProperty('databases', $databases);
 $this->setProperty('database', $database);
 
+// Set custom paths for Adminer themes and plugins
+define('ADMINER_THEMES_PATH', rex_path::addonAssets('adminer', 'themes/'));
+define('ADMINER_PLUGINS_PATH', rex_path::addonData('adminer', 'plugins/'));
+
 // auto login and db selection
 $_GET['username'] = '';
 $_GET['db'] = $database['name'];
