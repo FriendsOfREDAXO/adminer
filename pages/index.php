@@ -55,6 +55,14 @@ if (method_exists('rex_response', 'setHeader')) {
     rex_response::setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';");
 }
 
+// Eigene CSS-Datei laden, wenn vorhanden
+$cssPath = $this->getPath('assets/adminer.css');
+if (file_exists($cssPath)) {
+    // Define constants that Adminer uses to find the adminer.css file
+    define('ADMINER_DESIGN_VERSION', 'custom');
+    define('ADMINER_DESIGN', '../' . str_replace(rex_path::base(), '', $cssPath));
+}
+
 rex_response::cleanOutputBuffers();
 
 // add page param to all adminer urls
