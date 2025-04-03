@@ -47,7 +47,7 @@ class rex_adminer extends \Adminer\Adminer
                 // for easier copy (ctrl/cmd + A) we remove the start tag from result
                 $code = "<?php \n\n".$schema;
                 $code = rex_string::highlight($code);
-                $code = str_replace('<?php <br /><br />', '', $code);
+                $code = str_replace('<?php <br /><br />', '', $code);
 
                 echo '
                     <div style="margin-top: 10px;">
@@ -175,5 +175,102 @@ class rex_adminer extends \Adminer\Adminer
         // <<< FIX: Call the parent method with the correct arguments >>>
         // This ensures the default Adminer structure is still printed after your custom code.
         parent::tableStructurePrint($p, $ih);
+    }
+    
+    // New dark mode functions
+    function head($dark = null) {
+        ?>
+<style <?php echo Adminer\nonce(); ?>>
+#dark-mode-toggle {
+    position: fixed;
+    bottom: 1.5em;
+    right: 1.5em;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #f0f0f0;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 1000;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+#dark-mode-toggle:hover {
+    transform: scale(1.1);
+}
+
+.dark-mode-active #dark-mode-toggle {
+    background-color: #333;
+}
+
+#dark-mode-toggle .icon {
+    font-size: 24px;
+    transition: opacity 0.3s;
+}
+
+#dark-mode-toggle .dark-icon {
+    display: none;
+    }
+
+    .dark-mode-active #dark-mode-toggle .light-icon {
+        display: none;
+    }
+
+    .dark-mode-active #dark-mode-toggle .dark-icon {
+        display: block;
+    }
+</style>
+<script <?php echo Adminer\nonce(); ?>>
+    let adminerDark;
+    function adminerDarkSwitch() {
+        adminerDark = !adminerDark;
+        adminerDarkSet();
+    }
+    function adminerDarkSet() {
+        qsa('link[href*="dark.css"]').forEach(link => link.media = (adminerDark ? '' : 'never'));
+        qs('meta[name="color-scheme"]').content = (adminerDark ? 'dark' : 'light');
+        cookie('adminer_dark=' + (adminerDark ? 1 : 0), 30);
+
+        // Toggle body class for our dark mode toggle styles
+        if (adminerDark) {
+            document.body.classList.add('dark-mode-active');
+        } else {
+            document.body.classList.remove('dark-mode-active');
+        }
+    }
+    const saved = document.cookie.match(/adminer_dark=(\d)/);
+    if (saved) {
+        adminerDark = +saved[1];
+        adminerDarkSet();
+    }
+</script>
+<?php
+        // Call parent method if it exists
+        if (method_exists(get_parent_class($this), 'head')) {
+            parent::head($dark);
+        }
+    }
+
+    function navigation($missing) {
+        echo '<div id="dark-mode-toggle">
+                <span class="icon light-icon">☀️</span>
+                <span class="icon dark-icon">🌙</span>
+              </div>'
+            . Adminer\script("
+                if (adminerDark != null) {
+                    adminerDarkSet();
+                }
+
+                qs('#dark-mode-toggle').onclick = function() {
+                    adminerDarkSwitch();
+                };
+            ") . "\n"
+            ;
+
+        // Call parent method to ensure default navigation is still displayed
+        parent::navigation($missing);
     }
 }
