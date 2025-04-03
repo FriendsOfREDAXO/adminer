@@ -55,19 +55,22 @@ if (method_exists('rex_response', 'setHeader')) {
     rex_response::setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';");
 }
 
-// Eigene CSS-Datei laden, wenn vorhanden
-$cssPath = $this->getPath('assets/adminer.css');
-if (file_exists($cssPath)) {
-    // Define constants that Adminer uses to find the adminer.css file
-    define('ADMINER_DESIGN_VERSION', 'custom');
-    define('ADMINER_DESIGN', '../' . str_replace(rex_path::base(), '', $cssPath));
-}
-
 rex_response::cleanOutputBuffers();
 
-// add page param to all adminer urls
-ob_start(function ($output) {
-    return preg_replace('#(?<==(?:"|\'))index\.php\?(?=username=&amp;db=|file=[^&]*&amp;version=)#', 'index.php?page=adminer&amp;', $output);
+// Pfad zur benutzerdefinierten CSS-Datei im assets-Ordner
+$customCssUrl = $this->getAssetsUrl('adminer.css');
+
+// add page param to all adminer urls and replace the CSS link
+ob_start(function ($output) use ($customCssUrl) {
+    // Standard URL-Anpassung
+    $output = preg_replace('#(?<==(?:"|\'))index\.php\?(?=username=&amp;db=|file=[^&]*&amp;version=)#', 'index.php?page=adminer&amp;', $output);
+    
+    // CSS-Link ersetzen, aber nur wenn unsere benutzerdefinierte CSS-Datei existiert
+    if (file_exists(rex_path::base(str_replace(rex_url::base(), '', $customCssUrl)))) {
+        $output = preg_replace('#<link rel="stylesheet" href="adminer\.css\?v=([^"]*)">#', '<link rel="stylesheet" href="' . $customCssUrl . '">', $output);
+    }
+    
+    return $output;
 });
 
 include __DIR__ .'/../vendor/adminer.php';
