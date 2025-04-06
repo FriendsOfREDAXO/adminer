@@ -3,7 +3,7 @@
 $addon = rex_addon::get('adminer');
 
 /**
- * Addon in Setup-Addons mit aufnehmen der config.yml in dieser Installation aufnehmen.
+ * Addon in die Setup-Addons in der config.yml dieser Installation hinzufügen.
  */
 $config_file = rex_path::coreData('config.yml');
 $data = rex_file::getConfig($config_file);
