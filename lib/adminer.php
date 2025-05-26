@@ -85,22 +85,33 @@ class rex_adminer extends \Adminer\Adminer
                                 font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
                             }
 
-                            /* Dark Mode Toggler */
-                            #rex-sql-table-theme-toggle {
+                            /* Button Container */
+                            .rex-sql-table-buttons {
                                 position: absolute;
                                 top: 10px;
                                 right: 10px;
-                                background: none;
-                                border: 1px solid var(--code-border-light);
-                                border-radius: 4px;
-                                padding: 3px 8px;
-                                font-size: 12px;
-                                cursor: pointer;
-                                transition: all 0.3s ease;
+                                display: flex;
+                                gap: 5px;
                             }
 
-                            #rex-sql-table-theme-toggle:hover {
-                                background-color: rgba(0, 0, 0, 0.05);
+                            /* Button Styles */
+                            #rex-sql-table-theme-toggle,
+                            #rex-sql-table-copy-button {
+                                background: #1e3a8a;
+                                border: 1px solid #1e40af;
+                                border-radius: 4px;
+                                padding: 5px 10px;
+                                font-size: 12px;
+                                color: #ffffff;
+                                cursor: pointer;
+                                transition: all 0.3s ease;
+                                font-weight: 500;
+                            }
+
+                            #rex-sql-table-theme-toggle:hover,
+                            #rex-sql-table-copy-button:hover {
+                                background: #1e40af;
+                                transform: translateY(-1px);
                             }
 
                             /* Dark Mode Class */
@@ -110,18 +121,32 @@ class rex_adminer extends \Adminer\Adminer
                                 color: var(--code-text-dark);
                             }
 
-                            #rex-sql-table-code.dark-mode #rex-sql-table-theme-toggle {
-                                border-color: var(--code-border-dark);
+                            #rex-sql-table-code.dark-mode pre {
                                 color: var(--code-text-dark);
                             }
 
-                            #rex-sql-table-code.dark-mode #rex-sql-table-theme-toggle:hover {
-                                background-color: rgba(255, 255, 255, 0.1);
+                            #rex-sql-table-code.dark-mode code {
+                                color: var(--code-text-dark);
+                            }
+
+                            #rex-sql-table-code.dark-mode #rex-sql-table-theme-toggle,
+                            #rex-sql-table-code.dark-mode #rex-sql-table-copy-button {
+                                background: #3b82f6;
+                                border-color: #60a5fa;
+                                color: #ffffff;
+                            }
+
+                            #rex-sql-table-code.dark-mode #rex-sql-table-theme-toggle:hover,
+                            #rex-sql-table-code.dark-mode #rex-sql-table-copy-button:hover {
+                                background: #60a5fa;
                             }
                         </style>
 
                         <div id="rex-sql-table-code" class="hidden" contenteditable="true" spellcheck="false">
-                            <button id="rex-sql-table-theme-toggle" type="button">Toggle Dark Mode</button>
+                            <div class="rex-sql-table-buttons">
+                                <button id="rex-sql-table-copy-button" type="button" title="Code in Zwischenablage kopieren">📋 Kopieren</button>
+                                <button id="rex-sql-table-theme-toggle" type="button" title="Dark/Light Mode umschalten">🌙 Dark</button>
+                            </div>
                             '.$code.'
                         </div>
 
@@ -154,10 +179,12 @@ class rex_adminer extends \Adminer\Adminer
                                     event.stopPropagation();
                                     code.classList.toggle("dark-mode");
 
-                                    // Speichern der Präferenz in localStorage
+                                    // Button Text und Icon anpassen
                                     if (code.classList.contains("dark-mode")) {
+                                        themeToggle.innerHTML = "☀️ Light";
                                         localStorage.setItem("rex_sql_table_theme", "dark");
                                     } else {
+                                        themeToggle.innerHTML = "🌙 Dark";
                                         localStorage.setItem("rex_sql_table_theme", "light");
                                     }
                                 });
@@ -165,7 +192,88 @@ class rex_adminer extends \Adminer\Adminer
                                 // Überprüfen gespeicherter Präferenzen
                                 if (localStorage.getItem("rex_sql_table_theme") === "dark") {
                                     code.classList.add("dark-mode");
+                                    themeToggle.innerHTML = "☀️ Light";
+                                } else {
+                                    themeToggle.innerHTML = "🌙 Dark";
                                 }
+                            }
+
+                            // Copy Button
+                            var copyButton = document.getElementById("rex-sql-table-copy-button");
+                            if (copyButton) {
+                                copyButton.addEventListener("click", function (event) {
+                                    event.preventDefault();
+                                    event.stopPropagation();
+                                    
+                                    try {
+                                        // Text aus dem Code-Bereich extrahieren (ohne HTML)
+                                        var codeElement = code.querySelector("pre");
+                                        if (!codeElement) {
+                                            // Fallback: gesamten Text-Inhalt verwenden
+                                            var tempDiv = document.createElement("div");
+                                            tempDiv.innerHTML = code.innerHTML;
+                                            // Buttons entfernen
+                                            var buttons = tempDiv.querySelector(".rex-sql-table-buttons");
+                                            if (buttons) {
+                                                buttons.remove();
+                                            }
+                                            var textContent = tempDiv.textContent || tempDiv.innerText;
+                                        } else {
+                                            var textContent = codeElement.textContent || codeElement.innerText;
+                                        }
+                                        
+                                        // In Zwischenablage kopieren
+                                        if (navigator.clipboard && window.isSecureContext) {
+                                            navigator.clipboard.writeText(textContent).then(function() {
+                                                // Erfolgsmeldung
+                                                var originalText = copyButton.innerHTML;
+                                                copyButton.innerHTML = "✅ Kopiert!";
+                                                copyButton.style.background = "#10b981";
+                                                setTimeout(function() {
+                                                    copyButton.innerHTML = originalText;
+                                                    copyButton.style.background = "";
+                                                }, 2000);
+                                            }).catch(function(err) {
+                                                console.error("Fehler beim Kopieren: ", err);
+                                                fallbackCopy(textContent);
+                                            });
+                                        } else {
+                                            // Fallback für ältere Browser
+                                            fallbackCopy(textContent);
+                                        }
+                                        
+                                        function fallbackCopy(text) {
+                                            var textArea = document.createElement("textarea");
+                                            textArea.value = text;
+                                            textArea.style.position = "fixed";
+                                            textArea.style.left = "-999999px";
+                                            textArea.style.top = "-999999px";
+                                            document.body.appendChild(textArea);
+                                            textArea.focus();
+                                            textArea.select();
+                                            
+                                            try {
+                                                document.execCommand("copy");
+                                                var originalText = copyButton.innerHTML;
+                                                copyButton.innerHTML = "✅ Kopiert!";
+                                                copyButton.style.background = "#10b981";
+                                                setTimeout(function() {
+                                                    copyButton.innerHTML = originalText;
+                                                    copyButton.style.background = "";
+                                                }, 2000);
+                                            } catch (err) {
+                                                console.error("Fallback Kopieren fehlgeschlagen: ", err);
+                                                alert("Kopieren fehlgeschlagen. Bitte manuell markieren und kopieren.");
+                                            } finally {
+                                                document.body.removeChild(textArea);
+                                            }
+                                        }
+                                        
+                                    } catch (error) {
+                                        console.error("Fehler beim Kopieren: ", error);
+                                        alert("Fehler beim Kopieren. Bitte manuell markieren und kopieren.");
+                                    }
+                                });
                             }
                         ').'
                     </div>';
