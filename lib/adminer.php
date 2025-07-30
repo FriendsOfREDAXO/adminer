@@ -1,33 +1,40 @@
 <?php
 
-class rex_adminer extends \Adminer\Adminer
+namespace FriendsOfRedaxo\Adminer;
+
+use rex_addon;
+use rex_sql_schema_dumper;
+use rex_sql_table;
+use rex_string;
+
+class Adminer extends \Adminer\Adminer
 {
-    function credentials()
+    public function credentials()
     {
         $db = rex_addon::get('adminer')->getProperty('database');
 
         return [$db['host'], $db['login'], $db['password']];
     }
 
-    function login($login, $password)
+    public function login($login, $password)
     {
         return true;
     }
 
-    function databases($flush = true)
+    public function databases($flush = true)
     {
         $databases = [];
 
         foreach (rex_addon::get('adminer')->getProperty('databases') as $db) {
-            $databases[$db['name']] = $db['name'].' ('. $db['host'] .')';
+            $databases[$db['name']] = $db['name'] . ' (' . $db['host'] . ')';
         }
 
         return $databases;
     }
 
-    function databasesPrint($missing)
+    public function databasesPrint($missing)
     {
-        if (count(rex_addon::get('adminer')->getProperty('databases')) <= 1) {
+        if (\count(rex_addon::get('adminer')->getProperty('databases')) <= 1) {
             return;
         }
 
@@ -35,7 +42,7 @@ class rex_adminer extends \Adminer\Adminer
     }
 
     // <<< FIX: Corrected method signature >>>
-    function tableStructurePrint($p, $ih = null)
+    public function tableStructurePrint($p, $ih = null)
     {
         // Your custom logic to display rex_sql_table code
         if (class_exists(rex_sql_schema_dumper::class) && isset($_GET['table'])) { // Added isset check for safety
@@ -45,7 +52,7 @@ class rex_adminer extends \Adminer\Adminer
 
                 // the hightlight() function needs <?php start tag
                 // for easier copy (ctrl/cmd + A) we remove the start tag from result
-                $code = "<?php \n\n".$schema;
+                $code = "<?php \n\n" . $schema;
                 $code = rex_string::highlight($code);
                 $code = str_replace('<?php <br /><br />', '', $code);
 
@@ -53,7 +60,7 @@ class rex_adminer extends \Adminer\Adminer
                     <div style="margin-top: 10px;">
                         <a id="rex-sql-table-code-link" href="#" style="display: block">rex_sql_table code</a>
 
-                        <style type="text/css"'.\Adminer\nonce().'>
+                        <style type="text/css"' . \Adminer\nonce() . '>
                             :root {
                                 --code-bg-light: #f5f5f5;
                                 --code-border-light: #ddd;
@@ -147,10 +154,10 @@ class rex_adminer extends \Adminer\Adminer
                                 <button id="rex-sql-table-copy-button" type="button" title="Code in Zwischenablage kopieren">📋 Kopieren</button>
                                 <button id="rex-sql-table-theme-toggle" type="button" title="Dark/Light Mode umschalten">🌙 Dark</button>
                             </div>
-                            '.$code.'
+                            ' . $code . '
                         </div>
 
-                        '.\Adminer\script('
+                        ' . \Adminer\script('
                             document.getElementById("rex-sql-table-code-link").addEventListener("click", function () {
                                 toggle("rex-sql-table-code");
                                 return false;
@@ -204,7 +211,7 @@ class rex_adminer extends \Adminer\Adminer
                                 copyButton.addEventListener("click", function (event) {
                                     event.preventDefault();
                                     event.stopPropagation();
-                                    
+
                                     try {
                                         // Text aus dem Code-Bereich extrahieren (ohne HTML)
                                         var codeElement = code.querySelector("pre");
@@ -221,7 +228,7 @@ class rex_adminer extends \Adminer\Adminer
                                         } else {
                                             var textContent = codeElement.textContent || codeElement.innerText;
                                         }
-                                        
+
                                         // In Zwischenablage kopieren
                                         if (navigator.clipboard && window.isSecureContext) {
                                             navigator.clipboard.writeText(textContent).then(function() {
@@ -241,7 +248,7 @@ class rex_adminer extends \Adminer\Adminer
                                             // Fallback für ältere Browser
                                             fallbackCopy(textContent);
                                         }
-                                        
+
                                         function fallbackCopy(text) {
                                             var textArea = document.createElement("textarea");
                                             textArea.value = text;
@@ -251,7 +258,7 @@ class rex_adminer extends \Adminer\Adminer
                                             document.body.appendChild(textArea);
                                             textArea.focus();
                                             textArea.select();
-                                            
+
                                             try {
                                                 document.execCommand("copy");
                                                 var originalText = copyButton.innerHTML;
@@ -268,14 +275,14 @@ class rex_adminer extends \Adminer\Adminer
                                                 document.body.removeChild(textArea);
                                             }
                                         }
-                                        
+
                                     } catch (error) {
                                         console.error("Fehler beim Kopieren: ", error);
                                         alert("Fehler beim Kopieren. Bitte manuell markieren und kopieren.");
                                     }
                                 });
                             }
-                        ').'
+                        ') . '
                     </div>';
             }
         }
@@ -284,11 +291,12 @@ class rex_adminer extends \Adminer\Adminer
         // This ensures the default Adminer structure is still printed after your custom code.
         parent::tableStructurePrint($p, $ih);
     }
-    
+
     // New dark mode functions
-    function head($dark = null) {
+    public function head($dark = null)
+    {
         ?>
-<style <?php echo Adminer\nonce(); ?>>
+<style <?= \Adminer\nonce() ?>>
 #dark-mode-toggle {
     position: fixed;
     bottom: 1.5em;
@@ -331,7 +339,7 @@ class rex_adminer extends \Adminer\Adminer
         display: block;
     }
 </style>
-<script <?php echo Adminer\nonce(); ?>>
+<script <?= \Adminer\nonce() ?>>
     let adminerDark;
     function adminerDarkSwitch() {
         adminerDark = !adminerDark;
@@ -362,12 +370,13 @@ class rex_adminer extends \Adminer\Adminer
         }
     }
 
-    function navigation($missing) {
+    public function navigation($missing)
+    {
         echo '<div id="dark-mode-toggle">
                 <span class="icon light-icon">☀️</span>
                 <span class="icon dark-icon">🌙</span>
               </div>'
-            . Adminer\script("
+            . \Adminer\script("
                 if (adminerDark != null) {
                     adminerDarkSet();
                 }

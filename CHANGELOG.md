@@ -1,6 +1,13 @@
 Changelog
 =========
 
+Version x.x.x
+-----------------------
+
+* Implemented Namespace "FriendsOfRedaxo\Adminer".
+  - class `rex_adminer` -> 'FriendsOfRedaxo\Adminer'
+  - This change is expected to have no side effect as long as the class `rex_adminer` is not used autside this addon.
+  
 Version: 3.3.0 
 -----------------------
 Adminer Vendor 5.3
