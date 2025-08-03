@@ -1,7 +1,7 @@
 Changelog
 =========
 
-Version x.x.x
+Version 3.4.0
 -----------------------
 
 * Implemented Namespace "FriendsOfRedaxo\Adminer".
