@@ -166,55 +166,32 @@ jobs:
           OLD_VENDOR: ${{ steps.current.outputs.vendor_version }}
           NEW_ADDON:  ${{ steps.bump.outputs.new_addon_version }}
 
-      - name: Branch erstellen und PR öffnen
+      - name: Pull Request erstellen
         if: steps.check.outputs.needed == 'true'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          NEW_VENDOR="${{ steps.latest.outputs.version }}"
-          OLD_VENDOR="${{ steps.current.outputs.vendor_version }}"
-          NEW_ADDON="${{ steps.bump.outputs.new_addon_version }}"
-          OLD_ADDON="${{ steps.current.outputs.addon_version }}"
-          BRANCH="chore/update-adminer-${NEW_VENDOR}"
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore: Adminer vendor ${{ steps.current.outputs.vendor_version }} -> ${{ steps.latest.outputs.version }} (AddOn ${{ steps.current.outputs.addon_version }} -> ${{ steps.bump.outputs.new_addon_version }})"
+          branch: chore/update-adminer-${{ steps.latest.outputs.version }}
+          delete-branch: true
+          title: "chore: Adminer vendor ${{ steps.current.outputs.vendor_version }} -> ${{ steps.latest.outputs.version }} (AddOn ${{ steps.current.outputs.addon_version }} -> ${{ steps.bump.outputs.new_addon_version }})"
+          body: |
+            ## Automatisches Vendor-Update
 
-          git config user.name  "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+            Aktualisiert [Adminer](https://github.com/vrana/adminer) von `${{ steps.current.outputs.vendor_version }}` auf `${{ steps.latest.outputs.version }}`.
 
-          git checkout -b "$BRANCH"
-          git add vendor/adminer.php package.yml CHANGELOG.md
-          git commit -m "chore: Adminer vendor ${OLD_VENDOR} -> ${NEW_VENDOR} (AddOn ${OLD_ADDON} -> ${NEW_ADDON})"
-          git push origin "$BRANCH"
+            **Aenderungen:**
+            - `vendor/adminer.php`: Adminer ${{ steps.current.outputs.vendor_version }} -> ${{ steps.latest.outputs.version }} (mysql-build)
+            - `package.yml` vendor: `${{ steps.current.outputs.vendor_version }} adminer` -> `${{ steps.latest.outputs.version }} adminer`
+            - `package.yml` version: `${{ steps.current.outputs.addon_version }}` -> `${{ steps.bump.outputs.new_addon_version }}` (Patch-Bump)
+            - `CHANGELOG.md`: Eintrag fuer ${{ steps.bump.outputs.new_addon_version }} hinzugefuegt
 
-          OLD_VENDOR="$OLD_VENDOR" NEW_VENDOR="$NEW_VENDOR" OLD_ADDON="$OLD_ADDON" NEW_ADDON="$NEW_ADDON" \
-          python3 - <<'PYEOF'
-          import os
-          ov = os.environ['OLD_VENDOR']
-          nv = os.environ['NEW_VENDOR']
-          oa = os.environ['OLD_ADDON']
-          na = os.environ['NEW_ADDON']
-          body = f"""## Automatisches Vendor-Update
+            **Bitte pruefen:**
+            - [ ] [Adminer ${{ steps.latest.outputs.version }} Release-Notes](https://github.com/vrana/adminer/releases/tag/v${{ steps.latest.outputs.version }})
+            - [ ] Breaking Changes pruefen
+            - [ ] CHANGELOG.md ggf. anpassen
 
-Aktualisiert [Adminer](https://github.com/vrana/adminer) von `{ov}` auf `{nv}`.
-
-### Aenderungen
-| Datei | Vorher | Nachher |
-|---|---|---|
-| `vendor/adminer.php` | Adminer {ov} | Adminer {nv} (mysql-build) |
-| `package.yml` - `vendor` | {ov} adminer | {nv} adminer |
-| `package.yml` - `version` | {oa} | {na} (Patch-Bump) |
-| `CHANGELOG.md` | - | Eintrag fuer {na} hinzugefuegt |
-
-### Links
-- [Adminer {nv} Release-Notes](https://github.com/vrana/adminer/releases/tag/v{nv})
-
-> Automatisch erstellt von [update-adminer-vendor](.github/workflows/update-adminer-vendor.yml)
-"""
-          open('/tmp/pr_body.md', 'w').write(body)
-          PYEOF
-
-          gh pr create \
-            --title "chore: Adminer vendor ${OLD_VENDOR} -> ${NEW_VENDOR} (AddOn ${OLD_ADDON} -> ${NEW_ADDON})" \
-            --body-file /tmp/pr_body.md \
-            --base main \
-            --head "$BRANCH" \
-            --label "dependencies"
+            ---
+            *Automatisch erstellt von [update-adminer-vendor](.github/workflows/update-adminer-vendor.yml)*
+          labels: |
+            dependencies
