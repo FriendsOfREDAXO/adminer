@@ -185,24 +185,32 @@ jobs:
           git commit -m "chore: Adminer vendor ${OLD_VENDOR} -> ${NEW_VENDOR} (AddOn ${OLD_ADDON} -> ${NEW_ADDON})"
           git push origin "$BRANCH"
 
-          cat > /tmp/pr_body.md << PREOF
-## Automatisches Vendor-Update
+          OLD_VENDOR="$OLD_VENDOR" NEW_VENDOR="$NEW_VENDOR" OLD_ADDON="$OLD_ADDON" NEW_ADDON="$NEW_ADDON" \
+          python3 - <<'PYEOF'
+          import os
+          ov = os.environ['OLD_VENDOR']
+          nv = os.environ['NEW_VENDOR']
+          oa = os.environ['OLD_ADDON']
+          na = os.environ['NEW_ADDON']
+          body = f"""## Automatisches Vendor-Update
 
-Aktualisiert [Adminer](https://github.com/vrana/adminer) von \`${OLD_VENDOR}\` auf \`${NEW_VENDOR}\`.
+Aktualisiert [Adminer](https://github.com/vrana/adminer) von `{ov}` auf `{nv}`.
 
 ### Aenderungen
 | Datei | Vorher | Nachher |
 |---|---|---|
-| \`vendor/adminer.php\` | Adminer ${OLD_VENDOR} | Adminer ${NEW_VENDOR} (mysql-build) |
-| \`package.yml\` - \`vendor\` | ${OLD_VENDOR} adminer | ${NEW_VENDOR} adminer |
-| \`package.yml\` - \`version\` | ${OLD_ADDON} | ${NEW_ADDON} (Patch-Bump) |
-| \`CHANGELOG.md\` | - | Eintrag fuer ${NEW_ADDON} hinzugefuegt |
+| `vendor/adminer.php` | Adminer {ov} | Adminer {nv} (mysql-build) |
+| `package.yml` - `vendor` | {ov} adminer | {nv} adminer |
+| `package.yml` - `version` | {oa} | {na} (Patch-Bump) |
+| `CHANGELOG.md` | - | Eintrag fuer {na} hinzugefuegt |
 
 ### Links
-- [Adminer ${NEW_VENDOR} Release-Notes](https://github.com/vrana/adminer/releases/tag/v${NEW_VENDOR})
+- [Adminer {nv} Release-Notes](https://github.com/vrana/adminer/releases/tag/v{nv})
 
 > Automatisch erstellt von [update-adminer-vendor](.github/workflows/update-adminer-vendor.yml)
-PREOF
+"""
+          open('/tmp/pr_body.md', 'w').write(body)
+          PYEOF
 
           gh pr create \
             --title "chore: Adminer vendor ${OLD_VENDOR} -> ${NEW_VENDOR} (AddOn ${OLD_ADDON} -> ${NEW_ADDON})" \
