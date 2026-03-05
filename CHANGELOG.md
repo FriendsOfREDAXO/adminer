@@ -1,6 +1,16 @@
 Changelog
 =========
 
+Version 3.5.2
+-----------------------
+
+Vendor-Update 5.4.1 → 5.4.2
+
+Version 3.5.1
+-----------------------
+
+GitHub Action für automatisches Vendor-Update hinzugefügt
+
 Version 3.5.0
 -----------------------
 

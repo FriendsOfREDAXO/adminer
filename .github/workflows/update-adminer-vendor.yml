@@ -1,0 +1,208 @@
+name: Update Adminer vendor
+
+on:
+  schedule:
+    # Jeden Montag um 06:00 UTC
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+    inputs:
+      force:
+        description: 'Update erzwingen, auch wenn Version identisch ist'
+        required: false
+        default: 'false'
+        type: boolean
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Aktuelle Versionen aus package.yml auslesen
+        id: current
+        run: |
+          # vendor: '5.4.1 adminer' → "5.4.1"
+          VENDOR=$(python3 -c "
+          import re
+          content = open('package.yml').read()
+          m = re.search(r\"vendor: '([\d.]+) adminer'\", content)
+          print(m.group(1) if m else '')
+          ")
+          # version: '3.5.1' → "3.5.1"
+          ADDON=$(python3 -c "
+          import re
+          content = open('package.yml').read()
+          m = re.search(r\"^version: '([\d.]+)'\", content, re.MULTILINE)
+          print(m.group(1) if m else '')
+          ")
+          echo "vendor_version=$VENDOR" >> "$GITHUB_OUTPUT"
+          echo "addon_version=$ADDON" >> "$GITHUB_OUTPUT"
+          echo "Aktuelle Vendor-Version: $VENDOR | AddOn-Version: $ADDON"
+
+      - name: Neueste Adminer-Release von GitHub ermitteln
+        id: latest
+        run: |
+          curl -sf https://api.github.com/repos/vrana/adminer/releases/latest \
+            > /tmp/adminer_release.json
+          python3 - <<'PYEOF'
+          import json, os
+          data = json.load(open('/tmp/adminer_release.json'))
+          tag = data['tag_name']
+          version = tag.lstrip('v')
+          assets = [a for a in data['assets']
+                    if a['name'].endswith('-mysql.php') and '-mysql-' not in a['name']]
+          url = assets[0]['browser_download_url'] if assets else ''
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+              f.write(f"version={version}\n")
+              f.write(f"tag={tag}\n")
+              f.write(f"download_url={url}\n")
+          print(f"Neueste Adminer-Version: {version}")
+          print(f"Download-URL: {url}")
+          PYEOF
+
+      - name: Prüfen ob Update notwendig
+        id: check
+        run: |
+          CURRENT="${{ steps.current.outputs.vendor_version }}"
+          LATEST="${{ steps.latest.outputs.version }}"
+          FORCE="${{ inputs.force }}"
+
+          if [ "$CURRENT" = "$LATEST" ] && [ "$FORCE" != "true" ]; then
+            echo "Keine neue Version verfügbar ($CURRENT = $LATEST). Abbruch."
+            echo "needed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "Update von $CURRENT auf $LATEST erforderlich."
+            echo "needed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Neue adminer.php herunterladen
+        if: steps.check.outputs.needed == 'true'
+        run: |
+          URL="${{ steps.latest.outputs.download_url }}"
+          if [ -z "$URL" ]; then
+            echo "Keine Download-URL gefunden. Abbruch."
+            exit 1
+          fi
+          curl -fL "$URL" -o vendor/adminer.php
+          echo "Download abgeschlossen."
+          head -3 vendor/adminer.php
+
+      - name: AddOn-Version (Patch) und vendor in package.yml bumpen
+        if: steps.check.outputs.needed == 'true'
+        id: bump
+        env:
+          OLD_ADDON: ${{ steps.current.outputs.addon_version }}
+          NEW_VENDOR: ${{ steps.latest.outputs.version }}
+        run: |
+          # Patch-Bump: 3.5.1 → 3.5.2
+          NEW_ADDON=$(python3 -c "
+          parts = '$OLD_ADDON'.split('.')
+          parts[-1] = str(int(parts[-1]) + 1)
+          print('.'.join(parts))
+          ")
+          echo "new_addon_version=$NEW_ADDON" >> "$GITHUB_OUTPUT"
+          echo "AddOn-Version: $OLD_ADDON → $NEW_ADDON"
+
+          OLD_ADDON="$OLD_ADDON" NEW_ADDON="$NEW_ADDON" NEW_VENDOR="$NEW_VENDOR" \
+          python3 - <<'PYEOF'
+          import re, os
+          content = open('package.yml').read()
+          old_addon  = os.environ['OLD_ADDON']
+          new_addon  = os.environ['NEW_ADDON']
+          new_vendor = os.environ['NEW_VENDOR']
+
+          content = re.sub(
+              r"^(version: ')[^']+(')",
+              lambda m: f"{m.group(1)}{new_addon}{m.group(2)}",
+              content, flags=re.MULTILINE
+          )
+          content = re.sub(
+              r"^(vendor: ')[\d.]+ adminer(')",
+              lambda m: f"{m.group(1)}{new_vendor} adminer{m.group(2)}",
+              content, flags=re.MULTILINE
+          )
+          open('package.yml', 'w').write(content)
+          print("package.yml aktualisiert:")
+          [print(l) for l in content.splitlines() if 'version' in l or 'vendor' in l]
+          PYEOF
+
+      - name: CHANGELOG.md aktualisieren
+        if: steps.check.outputs.needed == 'true'
+        run: |
+          python3 - <<'PYEOF'
+          import os
+          from datetime import date
+
+          new_vendor  = os.environ['NEW_VENDOR']
+          old_vendor  = os.environ['OLD_VENDOR']
+          new_addon   = os.environ['NEW_ADDON']
+
+          entry = (
+              f"Version {new_addon}\n"
+              f"-----------------------\n\n"
+              f"Vendor-Update {old_vendor} → {new_vendor}\n\n"
+          )
+
+          content = open('CHANGELOG.md').read()
+          # Nach der =========-Zeile einfügen
+          insert_after = "=========\n"
+          idx = content.find(insert_after)
+          if idx == -1:
+              raise RuntimeError("'=========' nicht in CHANGELOG.md gefunden")
+          insert_pos = idx + len(insert_after)
+          content = content[:insert_pos] + "\n" + entry + content[insert_pos:]
+          open('CHANGELOG.md', 'w').write(content)
+          print("CHANGELOG.md aktualisiert. Erste 25 Zeilen:")
+          print('\n'.join(content.splitlines()[:25]))
+          PYEOF
+        env:
+          NEW_VENDOR: ${{ steps.latest.outputs.version }}
+          OLD_VENDOR: ${{ steps.current.outputs.vendor_version }}
+          NEW_ADDON:  ${{ steps.bump.outputs.new_addon_version }}
+
+      - name: Branch erstellen und PR öffnen
+        if: steps.check.outputs.needed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          NEW_VENDOR="${{ steps.latest.outputs.version }}"
+          OLD_VENDOR="${{ steps.current.outputs.vendor_version }}"
+          NEW_ADDON="${{ steps.bump.outputs.new_addon_version }}"
+          OLD_ADDON="${{ steps.current.outputs.addon_version }}"
+          BRANCH="chore/update-adminer-${NEW_VENDOR}"
+
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git checkout -b "$BRANCH"
+          git add vendor/adminer.php package.yml CHANGELOG.md
+          git commit -m "chore: Adminer vendor ${OLD_VENDOR} → ${NEW_VENDOR} (AddOn ${OLD_ADDON} → ${NEW_ADDON})"
+          git push origin "$BRANCH"
+
+          gh pr create \
+            --title "chore: Adminer vendor ${OLD_VENDOR} → ${NEW_VENDOR} (AddOn ${OLD_ADDON} → ${NEW_ADDON})" \
+            --body "## Automatisches Vendor-Update
+
+Aktualisiert [Adminer](https://github.com/vrana/adminer) von \`${OLD_VENDOR}\` auf \`${NEW_VENDOR}\`.
+
+### Änderungen
+| Datei | Vorher | Nachher |
+|---|---|---|
+| \`vendor/adminer.php\` | Adminer ${OLD_VENDOR} | Adminer ${NEW_VENDOR} (mysql-build) |
+| \`package.yml\` – \`vendor\` | ${OLD_VENDOR} adminer | ${NEW_VENDOR} adminer |
+| \`package.yml\` – \`version\` | ${OLD_ADDON} | ${NEW_ADDON} (Patch-Bump) |
+| \`CHANGELOG.md\` | – | Eintrag für ${NEW_ADDON} hinzugefügt |
+
+### Links
+- [Adminer ${NEW_VENDOR} Release-Notes](https://github.com/vrana/adminer/releases/tag/v${NEW_VENDOR})
+
+> Automatisch erstellt von [update-adminer-vendor](.github/workflows/update-adminer-vendor.yml)" \
+            --base main \
+            --head "$BRANCH" \
+            --label "dependencies"
