@@ -43,6 +43,14 @@ if (isset($_GET['page']) && $_GET['page'] !== (string) (int) $_GET['page']) {
 // workaround against https://github.com/vrana/adminer/commit/15900301eeef0cf22e51f57ed0b7d55b3e822feb
 $_SESSION['pwds']['server'][''][$_GET["username"]] = '';
 
+// Adminer starts and manages its own session (incl. session ini settings).
+// Close REDAXO's session first, as recommended by Adminer when embedding it
+// into an application that already has an active session, to avoid
+// "ini_set(): Session ini settings cannot be changed when a session is active".
+if (PHP_SESSION_ACTIVE === session_status()) {
+    session_write_close();
+}
+
 // deactive `throw_always_exception` debug option, because adminer is throwing some notices
 if (method_exists(rex::class, 'getDebugFlags')) {
     $debug = rex::getDebugFlags();
