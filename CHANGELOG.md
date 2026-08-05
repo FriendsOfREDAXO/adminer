@@ -1,6 +1,15 @@
 Changelog
 =========
 
+Version 3.5.4
+-----------------------
+
+* Fix: PHP-Warning "ini_set(): Session ini settings cannot be changed when a session is active" beim Aufruf von Adminer behoben, indem die REDAXO-Session im Seiten-Wrapper vor dem Einbinden von Adminer geschlossen wird (`session_write_close()`), bevor Adminer seine eigene Session startet.
+* Vendor bleibt unverändert bei 5.5.1 (letztes Vendor-Update 5.4.2 → 5.5.1, siehe Version 3.5.3).
+* Sicherheits-Review durchgeführt: `$_GET['table']` in `tableStructurePrint()` durch `rex_get('table', 'string', '')` ersetzt; RexStan (Level 8) auf dem gesamten AddOn (ohne Vendor) ohne Befunde durchgelaufen.
+* Eigene Klassendatei umbenannt: `lib/adminer.php` → `lib/rex_adminer.php`, um Verwechslungen mit dem Vendor-File `vendor/adminer.php` zu vermeiden (keine funktionale Änderung).
+* Aufräumen in `functions/function_adminer.php`: die PHP-7-spezifische `error_reporting()`-Unterdrückung in `adminer_object()` entfernt, da sie unter dem unterstützten PHP 8.x nicht mehr benötigt wird (getestet ohne Warnungen/Notices in Listen-, Struktur- und Datenansicht).
+
 Version 3.5.3
 -----------------------
 
