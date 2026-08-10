@@ -1,10 +1,11 @@
 Changelog
 =========
 
-Version 3.6.0
+Version 3.5.5
 -----------------------
 
-Vendor-Update 5.5.1 → 6.0.0
+Vendor-Update 5.5.1 → 6.0.0 
+Release zurückgzogen
 
 
 Version 3.5.4
