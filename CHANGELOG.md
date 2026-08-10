@@ -11,8 +11,8 @@ Version 3.6.0
 Version 3.5.5
 -----------------------
 
-Vendor-Update 5.5.1 → 6.0.0 
-Release zurückgzogen
+* Vendor-Update 5.5.1 → 6.0.0
+* Release zurückgezogen.
 
 
 Version 3.5.4
