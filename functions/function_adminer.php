@@ -7,8 +7,18 @@ use FriendsOfRedaxo\Adminer\Adminer;
 
 function adminer_object()
 {
-    // adminer throws warning "A non-numeric value encountered" in PHP 7
-    error_reporting(error_reporting() & ~E_WARNING & ~E_NOTICE);
+    $currentErrorReporting = error_reporting();
 
-    return new Adminer();
+    // Workaround for legacy PHP 7 warnings during Adminer bootstrap.
+    if (PHP_VERSION_ID < 80000) {
+        error_reporting($currentErrorReporting & ~E_WARNING & ~E_NOTICE);
+    }
+
+    try {
+        return new Adminer();
+    } finally {
+        if (PHP_VERSION_ID < 80000) {
+            error_reporting($currentErrorReporting);
+        }
+    }
 }

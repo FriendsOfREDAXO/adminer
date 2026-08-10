@@ -60,7 +60,6 @@ if (method_exists(rex::class, 'getDebugFlags')) {
 }
 
 $adminerErrorReporting = error_reporting();
-error_reporting($adminerErrorReporting & ~E_WARNING & ~E_NOTICE & ~E_DEPRECATED);
 
 // CSP für die Adminer-Seite anpassen, um inline-scripts zu erlauben
 if (method_exists('rex_response', 'setHeader')) {
