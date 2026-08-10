@@ -32,6 +32,11 @@ $this->setProperty('database', $database);
 $_GET['username'] = '';
 $_GET['db'] = $database['name'];
 
+// Adminer expects an entry in the password/session map for embedded usage.
+// Without it, the wrapper may fall back to the login form even though the
+// REDAXO backend user is already authenticated.
+$_SESSION['pwds']['server'][''][$_GET['username']] = '';
+
 // adminer uses `page` parameter for pagination (int), but redaxo initially sets `page=adminer`
 // so we remove the page parameter if it is not a numeric string
 if (isset($_GET['page']) && $_GET['page'] !== (string) (int) $_GET['page']) {
@@ -40,13 +45,9 @@ if (isset($_GET['page']) && $_GET['page'] !== (string) (int) $_GET['page']) {
     }
 }
 
-// workaround against https://github.com/vrana/adminer/commit/15900301eeef0cf22e51f57ed0b7d55b3e822feb
-$_SESSION['pwds']['server'][''][$_GET["username"]] = '';
-
-// Adminer starts and manages its own session (incl. session ini settings).
-// Close REDAXO's session first, as recommended by Adminer when embedding it
-// into an application that already has an active session, to avoid
-// "ini_set(): Session ini settings cannot be changed when a session is active".
+// Adminer adjusts session settings during bootstrap. If REDAXO already has an
+// active session, this can trigger a warning from the bundled Adminer file.
+// Closing the current session before including Adminer avoids the warning.
 if (PHP_SESSION_ACTIVE === session_status()) {
     session_write_close();
 }
@@ -57,6 +58,9 @@ if (method_exists(rex::class, 'getDebugFlags')) {
     $debug['throw_always_exception'] = false;
     rex::setProperty('debug', $debug);
 }
+
+$adminerErrorReporting = error_reporting();
+error_reporting($adminerErrorReporting & ~E_WARNING & ~E_NOTICE & ~E_DEPRECATED);
 
 // CSP für die Adminer-Seite anpassen, um inline-scripts zu erlauben
 if (method_exists('rex_response', 'setHeader')) {
@@ -71,6 +75,7 @@ ob_start(function ($output) {
 });
 
 include __DIR__ .'/../vendor/adminer.php';
+error_reporting($adminerErrorReporting);
 
 // make sure the output buffer callback is called
 while (ob_get_level()) {

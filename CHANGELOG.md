@@ -1,10 +1,18 @@
 Changelog
 =========
 
-Version 3.5.6
+Version 3.6.0
 -----------------------
 
-Vendor-Update 5.5.1 → 6.0.0
+* Fix: Adminer-Start im REDAXO-Backend stabilisiert, weil der aktualisierte Vendor-Stand im Vergleich zur älteren Basis eine strengere Session-/Bootstrap-Initialisierung verwendet. Die Integration wird nun über den Wrapper sauber vorbereitet, ohne den Vendor selbst zu patchen, wodurch die Warnung beim Start entfällt.
+* Fix: Automatischer Login im Backend wiederhergestellt.
+* UI: Darstellung von `rex_sql_table code` wieder auf den bewährten 3.5.5-Stand zurückgeführt (Kopier-Box und Dark-Mode-Anbindung an den globalen Adminer-Schalter).
+
+Version 3.5.5
+-----------------------
+
+Vendor-Update 5.5.1 → 6.0.0 
+Release zurückgzogen
 
 
 Version 3.5.4
