@@ -1,7 +1,7 @@
 Changelog
 =========
 
-Version 3.5.6
+Version 3.6.0
 -----------------------
 
 Vendor-Update 5.5.1 → 6.0.0
