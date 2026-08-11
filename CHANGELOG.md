@@ -1,28 +1,6 @@
 Changelog
 =========
 
-Version 3.6.0
------------------------
-
-* Fix: Adminer-Start im REDAXO-Backend stabilisiert, weil der aktualisierte Vendor-Stand im Vergleich zur älteren Basis eine strengere Session-/Bootstrap-Initialisierung verwendet. Die Integration wird nun über den Wrapper sauber vorbereitet, ohne den Vendor selbst zu patchen, wodurch die Warnung beim Start entfällt.
-* Fix: Automatischer Login im Backend wiederhergestellt.
-* UI: Darstellung von `rex_sql_table code` wieder auf den bewährten 3.5.5-Stand zurückgeführt (Kopier-Box und Dark-Mode-Anbindung an den globalen Adminer-Schalter).
-
-Version 3.5.5
------------------------
-
-* Vendor-Update 5.5.1 → 6.0.0
-* Release zurückgezogen.
-
-
-Version 3.5.4
------------------------
-
-* Fix: PHP-Warning "ini_set(): Session ini settings cannot be changed when a session is active" beim Aufruf von Adminer behoben, indem die REDAXO-Session im Seiten-Wrapper vor dem Einbinden von Adminer geschlossen wird (`session_write_close()`), bevor Adminer seine eigene Session startet.
-* Vendor 5.5.1 ( Vendor-Update 5.4.2 → 5.5.1).
-* Sicherheits-Review durchgeführt: `$_GET['table']` in `tableStructurePrint()` durch `rex_get('table', 'string', '')` ersetzt; RexStan (Level 8) auf dem gesamten AddOn (ohne Vendor) ohne Befunde durchgelaufen.
-* Aufräumen in `functions/function_adminer.php`: die PHP-7-spezifische `error_reporting()`-Unterdrückung in `adminer_object()` entfernt, da sie unter dem unterstützten PHP 8.x nicht mehr benötigt wird (getestet ohne Warnungen/Notices in Listen-, Struktur- und Datenansicht).
-
 Version 3.5.2
 -----------------------
 

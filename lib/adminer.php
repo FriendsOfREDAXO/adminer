@@ -45,9 +45,8 @@ class Adminer extends \Adminer\Adminer
     public function tableStructurePrint($p, $ih = null)
     {
         // Your custom logic to display rex_sql_table code
-        $tableName = rex_get('table', 'string', '');
-        if (class_exists(rex_sql_schema_dumper::class) && '' !== $tableName) { // Added isset check for safety
-            $table = rex_sql_table::get($tableName);
+        if (class_exists(rex_sql_schema_dumper::class) && isset($_GET['table'])) { // Added isset check for safety
+            $table = rex_sql_table::get($_GET['table']);
             if ($table) { // Check if table object was successfully retrieved
                 $schema = (new rex_sql_schema_dumper())->dumpTable($table);
 
@@ -62,14 +61,24 @@ class Adminer extends \Adminer\Adminer
                         <a id="rex-sql-table-code-link" href="#" style="display: block">rex_sql_table code</a>
 
                         <style type="text/css"' . \Adminer\nonce() . '>
+                            :root {
+                                --code-bg-light: #f5f5f5;
+                                --code-border-light: #ddd;
+                                --code-text-light: #333;
+                                --code-bg-dark: #2d2d2d;
+                                --code-border-dark: #555;
+                                --code-text-dark: #f0f0f0;
+                            }
+
                             #rex-sql-table-code {
-                                border: 1px solid #ddd;
-                                background: #f5f5f5;
-                                color: #333;
+                                border: 1px solid var(--code-border-light);
+                                background: var(--code-bg-light);
+                                color: var(--code-text-light);
                                 padding: 1px 10px 5px 5px;
                                 margin-top: 5px;
                                 border-radius: 4px;
                                 box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+                                transition: all 0.3s ease;
                                 position: relative;
                             }
 
@@ -93,6 +102,7 @@ class Adminer extends \Adminer\Adminer
                             }
 
                             /* Button Styles */
+                            #rex-sql-table-theme-toggle,
                             #rex-sql-table-copy-button {
                                 background: #1e3a8a;
                                 border: 1px solid #1e40af;
@@ -105,32 +115,36 @@ class Adminer extends \Adminer\Adminer
                                 font-weight: 500;
                             }
 
+                            #rex-sql-table-theme-toggle:hover,
                             #rex-sql-table-copy-button:hover {
                                 background: #1e40af;
                                 transform: translateY(-1px);
                             }
 
-                            /* Adminers globaler Dark-Mode-Schalter (body.dark-mode-active).
-                               highlight_string() liefert Inline-Farben je Token, die im Light-Mode
-                               unveraendert bleiben. Im Dark-Mode erzwingen wir eine einzige helle
-                               Textfarbe, da die Original-Farben auf dunklem Grund nicht lesbar waeren. */
-                            body.dark-mode-active #rex-sql-table-code {
-                                border-color: #0e416d;
-                                background: #11385a;
-                                color: #f0f0f0;
+                            /* Dark Mode Class */
+                            #rex-sql-table-code.dark-mode {
+                                background: var(--code-bg-dark);
+                                border-color: var(--code-border-dark);
+                                color: var(--code-text-dark);
                             }
 
-                            body.dark-mode-active #rex-sql-table-code,
-                            body.dark-mode-active #rex-sql-table-code * {
-                                color: #f0f0f0 !important;
+                            #rex-sql-table-code.dark-mode pre {
+                                color: var(--code-text-dark);
                             }
 
-                            body.dark-mode-active #rex-sql-table-copy-button {
+                            #rex-sql-table-code.dark-mode code {
+                                color: var(--code-text-dark);
+                            }
+
+                            #rex-sql-table-code.dark-mode #rex-sql-table-theme-toggle,
+                            #rex-sql-table-code.dark-mode #rex-sql-table-copy-button {
                                 background: #3b82f6;
                                 border-color: #60a5fa;
+                                color: #ffffff;
                             }
 
-                            body.dark-mode-active #rex-sql-table-copy-button:hover {
+                            #rex-sql-table-code.dark-mode #rex-sql-table-theme-toggle:hover,
+                            #rex-sql-table-code.dark-mode #rex-sql-table-copy-button:hover {
                                 background: #60a5fa;
                             }
                         </style>
@@ -138,6 +152,7 @@ class Adminer extends \Adminer\Adminer
                         <div id="rex-sql-table-code" class="hidden" contenteditable="true" spellcheck="false">
                             <div class="rex-sql-table-buttons">
                                 <button id="rex-sql-table-copy-button" type="button" title="Code in Zwischenablage kopieren">📋 Kopieren</button>
+                                <button id="rex-sql-table-theme-toggle" type="button" title="Dark/Light Mode umschalten">🌙 Dark</button>
                             </div>
                             ' . $code . '
                         </div>
@@ -162,6 +177,33 @@ class Adminer extends \Adminer\Adminer
                                     event.preventDefault();
                                 }
                             });
+
+                            // Dark Mode Toggle
+                            var themeToggle = document.getElementById("rex-sql-table-theme-toggle");
+                            if (themeToggle) {
+                                themeToggle.addEventListener("click", function (event) {
+                                    event.preventDefault();
+                                    event.stopPropagation();
+                                    code.classList.toggle("dark-mode");
+
+                                    // Button Text und Icon anpassen
+                                    if (code.classList.contains("dark-mode")) {
+                                        themeToggle.innerHTML = "☀️ Light";
+                                        localStorage.setItem("rex_sql_table_theme", "dark");
+                                    } else {
+                                        themeToggle.innerHTML = "🌙 Dark";
+                                        localStorage.setItem("rex_sql_table_theme", "light");
+                                    }
+                                });
+
+                                // Überprüfen gespeicherter Präferenzen
+                                if (localStorage.getItem("rex_sql_table_theme") === "dark") {
+                                    code.classList.add("dark-mode");
+                                    themeToggle.innerHTML = "☀️ Light";
+                                } else {
+                                    themeToggle.innerHTML = "🌙 Dark";
+                                }
+                            }
 
                             // Copy Button
                             var copyButton = document.getElementById("rex-sql-table-copy-button");
