@@ -1,6 +1,13 @@
 Changelog
 =========
 
+Version 3.6.1
+-----------------------
+
+* Fix: Warning `ini_set(): Session ini settings cannot be changed when a session is active` im Backend-Einbettungsmodus behoben, indem die REDAXO-Session unmittelbar vor dem Adminer-Include geschlossen wird.
+* Fix: CSRF-Verhalten beim Bearbeiten/Speichern im eingebetteten Adminer stabilisiert (Header- und Token-Fallback für Adminer-POSTs).
+* Fix: Adminer-URLs mit fremden `rex-api-call`/`_csrf_token`-Parametern werden beim Einstieg bereinigt, um falsche CSRF-Fehlpfade zu vermeiden.
+
 Version 3.6.0
 -----------------------
 

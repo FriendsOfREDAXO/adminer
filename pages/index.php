@@ -45,11 +45,26 @@ if (isset($_GET['page']) && $_GET['page'] !== (string) (int) $_GET['page']) {
     }
 }
 
-// Adminer adjusts session settings during bootstrap. If REDAXO already has an
-// active session, this can trigger a warning from the bundled Adminer file.
-// Closing the current session before including Adminer avoids the warning.
-if (PHP_SESSION_ACTIVE === session_status()) {
-    session_write_close();
+// Adminer 6 verifies CSRF token submissions against Sec-Fetch-Site.
+// In embedded backend contexts this header can be missing or "none"
+// even for same-origin form posts, which causes false negatives.
+if (rex_request::server('REQUEST_METHOD', 'string', '') === 'POST') {
+    $secFetchSite = rex_request::server('HTTP_SEC_FETCH_SITE', 'string', '');
+    if ($secFetchSite === '' || strtolower($secFetchSite) === 'none') {
+        $_SERVER['HTTP_SEC_FETCH_SITE'] = 'same-origin';
+    }
+
+    $postedToken = rex_request::post('token', 'string', '');
+    if ($postedToken !== '' && (!isset($_SESSION['token']) || (int) $_SESSION['token'] === 0)) {
+        $tokenParts = explode(':', $postedToken, 2);
+        if (
+            count($tokenParts) === 2
+            && ctype_digit($tokenParts[0])
+            && ctype_digit($tokenParts[1])
+        ) {
+            $_SESSION['token'] = ((int) $tokenParts[0]) ^ ((int) $tokenParts[1]);
+        }
+    }
 }
 
 // deactive `throw_always_exception` debug option, because adminer is throwing some notices
@@ -67,6 +82,12 @@ if (method_exists('rex_response', 'setHeader')) {
 }
 
 rex_response::cleanOutputBuffers();
+
+// Adminer adjusts session ini settings during bootstrap.
+// Ensure the REDAXO session is closed immediately before include.
+if (PHP_SESSION_ACTIVE === session_status()) {
+    session_write_close();
+}
 
 // add page param to all adminer urls
 ob_start(function ($output) {
