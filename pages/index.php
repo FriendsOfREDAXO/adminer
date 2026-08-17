@@ -43,6 +43,15 @@ if (isset($_GET['page']) && $_GET['page'] !== (string) (int) $_GET['page']) {
 // workaround against https://github.com/vrana/adminer/commit/15900301eeef0cf22e51f57ed0b7d55b3e822feb
 $_SESSION['pwds']['server'][''][$_GET["username"]] = '';
 
+// Adminer 6 configures session INI settings and therefore needs an inactive session on startup.
+// Reuse REDAXO's session ID so Adminer's CSRF token remains stable across requests.
+if (PHP_SESSION_ACTIVE === session_status()) {
+    $adminerSessionId = session_id();
+    session_write_close();
+    session_name('adminer_sid');
+    session_id($adminerSessionId);
+}
+
 // deactive `throw_always_exception` debug option, because adminer is throwing some notices
 if (method_exists(rex::class, 'getDebugFlags')) {
     $debug = rex::getDebugFlags();
