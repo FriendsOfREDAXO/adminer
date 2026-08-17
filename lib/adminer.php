@@ -67,7 +67,7 @@ class Adminer extends \Adminer\Adminer
                                 --code-text-light: #333;
                                 --code-bg-dark: #2d2d2d;
                                 --code-border-dark: #555;
-                                --code-text-dark: #f0f0f0;
+                                --code-text-dark: #eee;
                             }
 
                             #rex-sql-table-code {
@@ -128,12 +128,10 @@ class Adminer extends \Adminer\Adminer
                                 color: var(--code-text-dark);
                             }
 
-                            #rex-sql-table-code.dark-mode pre {
-                                color: var(--code-text-dark);
-                            }
-
-                            #rex-sql-table-code.dark-mode code {
-                                color: var(--code-text-dark);
+                            #rex-sql-table-code.dark-mode pre,
+                            #rex-sql-table-code.dark-mode code,
+                            #rex-sql-table-code.dark-mode code * {
+                                color: var(--code-text-dark) !important;
                             }
 
                             #rex-sql-table-code.dark-mode #rex-sql-table-theme-toggle,

@@ -1,11 +1,13 @@
 Changelog
 =========
 
-Version 3.5.3
+Version 3.7.0
 -----------------------
 
-Vendor-Update 5.4.2 → 6.0.1
-
+* Vendor-Update 5.4.2 → 6.0.1
+* Session-Kompatibilität mit Adminer 6.0.1 korrigiert
+* Ungültige CSRF-Token beim Speichern von Datensätzen behoben
+* Textdarstellung des rex_sql_table-Codes im Dark Mode verbessert
 
 Version 3.5.2
 -----------------------
