@@ -1,13 +1,18 @@
 Changelog
 =========
 
-Version 3.7.0
+Version 4.0.0
 -----------------------
 
 * Vendor-Update 5.4.2 → 6.0.1
 * Session-Kompatibilität mit Adminer 6.0.1 korrigiert
 * Ungültige CSRF-Token beim Speichern von Datensätzen behoben
-* Textdarstellung des rex_sql_table-Codes im Dark Mode verbessert
+* rex_sql_table-Codefeld an den globalen Dark-/Light-Modus angebunden
+* Eigene Bedienelemente an REDAXOs Farbpalette angepasst und Theme-Symbole verbessert
+* `drop()`-Code für die `uninstall.php` im rex_sql_table-Codefeld ergänzt
+* Registrierte YForm-Tabellen in der Seitenleiste markiert und mit ihrer Feldkonfiguration verlinkt
+* Offizielle Vendorquelle und SHA-256-Prüfsumme in `vendor-checksum.yml` dokumentiert
+* AddOn-Oberflächentexte auf REDAXO-i18n umgestellt
 
 Version 3.5.2
 -----------------------

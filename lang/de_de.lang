@@ -1,0 +1,12 @@
+adminer_yform_badge_title = Diese Tabelle wird mit YForm verwaltet
+adminer_yform_notice = Dies ist eine YForm-Tabelle. Führe bitte Strukturänderungen nur in YForm durch.
+adminer_yform_config_open = YForm-Konfiguration öffnen
+adminer_sql_table_code = rex_sql_table-Code
+adminer_copy = Kopieren
+adminer_copied = Kopiert!
+adminer_copy_title = Code in die Zwischenablage kopieren
+adminer_copy_error = Kopieren fehlgeschlagen. Bitte manuell markieren und kopieren.
+adminer_copy_console_error = Fehler beim Kopieren:
+adminer_copy_fallback_console_error = Fallback-Kopieren fehlgeschlagen:
+adminer_code_mode_title = Zwischen Installations- und Uninstall-Code wechseln
+adminer_theme_toggle_title = Dark-/Light-Modus umschalten

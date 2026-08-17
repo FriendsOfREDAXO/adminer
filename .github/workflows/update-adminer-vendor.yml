@@ -9,7 +9,7 @@ on:
       force:
         description: 'Update erzwingen, auch wenn Version identisch ist'
         required: false
-        default: 'false'
+        default: false
         type: boolean
 
 permissions:
@@ -81,6 +81,20 @@ jobs:
             echo "needed=true" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Vorhandene Vendor-Prüfsumme validieren
+        run: |
+          EXPECTED=$(python3 -c "
+          import re
+          content = open('vendor-checksum.yml').read()
+          match = re.search(r'^    sha256: ([a-f0-9]{64})$', content, re.MULTILINE)
+          print(match.group(1) if match else '')
+          ")
+          if [ -z "$EXPECTED" ]; then
+            echo "Keine gültige SHA-256-Prüfsumme in vendor-checksum.yml gefunden."
+            exit 1
+          fi
+          echo "$EXPECTED  vendor/adminer.php" | sha256sum --check --strict
+
       - name: Neue adminer.php herunterladen
         if: steps.check.outputs.needed == 'true'
         run: |
@@ -92,6 +106,30 @@ jobs:
           curl -fL "$URL" -o vendor/adminer.php
           echo "Download abgeschlossen."
           head -3 vendor/adminer.php
+
+      - name: Vendor-Prüfsumme aktualisieren
+        if: steps.check.outputs.needed == 'true'
+        env:
+          NEW_VENDOR: ${{ steps.latest.outputs.version }}
+          DOWNLOAD_URL: ${{ steps.latest.outputs.download_url }}
+        run: |
+          SHA256=$(sha256sum vendor/adminer.php | cut -d' ' -f1)
+          SIZE=$(wc -c < vendor/adminer.php | tr -d ' ')
+          CHECKED_AT=$(date -u +%F)
+          cat > vendor-checksum.yml <<EOF
+          vendor:
+              name: Adminer
+              edition: mysql
+              version: '$NEW_VENDOR'
+              path: vendor/adminer.php
+              source: $DOWNLOAD_URL
+              release: https://github.com/vrana/adminer/releases/tag/v$NEW_VENDOR
+              sha256: $SHA256
+              size: $SIZE
+              latest_stable_checked_at: '$CHECKED_AT'
+              byte_identical_to_source: true
+          EOF
+          echo "$SHA256  vendor/adminer.php" | sha256sum --check --strict
 
       - name: AddOn-Version (Patch) und vendor in package.yml bumpen
         if: steps.check.outputs.needed == 'true'
@@ -182,6 +220,7 @@ jobs:
 
             **Aenderungen:**
             - `vendor/adminer.php`: Adminer ${{ steps.current.outputs.vendor_version }} -> ${{ steps.latest.outputs.version }} (mysql-build)
+            - `vendor-checksum.yml`: Offizielle Quelle, SHA-256 und Dateigroesse aktualisiert
             - `package.yml` vendor: `${{ steps.current.outputs.vendor_version }} adminer` -> `${{ steps.latest.outputs.version }} adminer`
             - `package.yml` version: `${{ steps.current.outputs.addon_version }}` -> `${{ steps.bump.outputs.new_addon_version }}` (Patch-Bump)
             - `CHANGELOG.md`: Eintrag fuer ${{ steps.bump.outputs.new_addon_version }} hinzugefuegt

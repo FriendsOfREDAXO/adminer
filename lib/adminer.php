@@ -9,6 +9,10 @@ use rex_string;
 
 class Adminer extends \Adminer\Adminer
 {
+    private $markYFormTables = false;
+
+    private $yformTableNames = [];
+
     public function credentials()
     {
         $db = rex_addon::get('adminer')->getProperty('database');
@@ -41,6 +45,32 @@ class Adminer extends \Adminer\Adminer
         parent::databasesPrint($missing);
     }
 
+    public function tablesPrint(array $tables)
+    {
+        $user = \rex::getUser();
+        $this->markYFormTables = rex_addon::get('yform')->isAvailable()
+            && $user
+            && $user->isAdmin()
+            && class_exists(\rex_yform_manager_table::class);
+
+        if ($this->markYFormTables) {
+            $this->yformTableNames = array_fill_keys(array_keys(\rex_yform_manager_table::getAll()), true);
+        }
+
+        parent::tablesPrint($tables);
+        $this->markYFormTables = false;
+    }
+
+    public function tableName(array $tableStatus)
+    {
+        $name = parent::tableName($tableStatus);
+        if ($this->markYFormTables && isset($this->yformTableNames[$tableStatus['Name']])) {
+            $name = '<span class="rex-adminer-yform-badge" title="' . \rex_escape(\rex_i18n::msg('adminer_yform_badge_title')) . '">YForm</span> ' . $name;
+        }
+
+        return $name;
+    }
+
     // <<< FIX: Corrected method signature >>>
     public function tableStructurePrint($p, $ih = null)
     {
@@ -56,9 +86,40 @@ class Adminer extends \Adminer\Adminer
                 $code = rex_string::highlight($code);
                 $code = str_replace('<?php <br /><br />', '', $code);
 
+                $tableName = $table->getName();
+                $tableReference = var_export($tableName, true);
+                if (0 === strpos($tableName, \rex::getTablePrefix())) {
+                    $tableReference = 'rex::getTable(' . var_export(substr($tableName, strlen(\rex::getTablePrefix())), true) . ')';
+                }
+
+                $dropCode = "<?php \n\nrex_sql_table::get(" . $tableReference . ")->drop();\n";
+                $dropCode = rex_string::highlight($dropCode);
+                $dropCode = str_replace('<?php <br /><br />', '', $dropCode);
+
+                $copyLabel = \rex_i18n::msg('adminer_copy');
+                $copiedLabel = json_encode(\rex_i18n::msg('adminer_copied'));
+                $copyError = json_encode(\rex_i18n::msg('adminer_copy_error'));
+                $copyConsoleError = json_encode(\rex_i18n::msg('adminer_copy_console_error'));
+                $copyFallbackConsoleError = json_encode(\rex_i18n::msg('adminer_copy_fallback_console_error'));
+
+                $yformNotice = '';
+                $user = \rex::getUser();
+                if (rex_addon::get('yform')->isAvailable() && $user && $user->isAdmin() && class_exists(\rex_yform_manager_table::class)) {
+                    $yformTable = \rex_yform_manager_table::get($tableName);
+                    if ($yformTable) {
+                        $yformConfigUrl = \rex_url::backendPage('yform/manager/table_field', ['table_name' => $tableName], false);
+                        $yformNotice = '
+                            <div class="rex-adminer-yform-notice" role="note">
+                                <div>' . \rex_escape(\rex_i18n::msg('adminer_yform_notice')) . '</div>
+                                <a class="rex-adminer-yform-button" href="' . \rex_escape($yformConfigUrl) . '" target="_blank" rel="noopener">' . \rex_escape(\rex_i18n::msg('adminer_yform_config_open')) . '</a>
+                            </div>';
+                    }
+                }
+
                 echo '
                     <div style="margin-top: 10px;">
-                        <a id="rex-sql-table-code-link" href="#" style="display: block">rex_sql_table code</a>
+                        ' . $yformNotice . '
+                        <div><a id="rex-sql-table-code-link" href="#">' . \rex_escape(\rex_i18n::msg('adminer_sql_table_code')) . '</a></div>
 
                         <style type="text/css"' . \Adminer\nonce() . '>
                             :root {
@@ -78,8 +139,69 @@ class Adminer extends \Adminer\Adminer
                                 margin-top: 5px;
                                 border-radius: 4px;
                                 box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-                                transition: all 0.3s ease;
+                                transition: box-shadow 0.3s ease;
                                 position: relative;
+                            }
+
+                            .rex-adminer-yform-notice {
+                                display: flex;
+                                align-items: center;
+                                justify-content: space-between;
+                                gap: 16px;
+                                margin: 0 0 10px;
+                                padding: 10px 12px;
+                                border: 1px solid rgb(75, 154, 217);
+                                border-left-width: 4px;
+                                border-radius: 4px;
+                                background: #2f78b1;
+                                color: #fff;
+                            }
+
+                            .rex-adminer-yform-button {
+                                display: inline-block;
+                                flex: 0 0 auto;
+                                padding: 7px 10px;
+                                border: 1px solid #2d3a48;
+                                border-radius: 4px;
+                                background: #3c4d60;
+                                color: #fff !important;
+                                font-weight: 700;
+                                text-decoration: none;
+                                white-space: nowrap;
+                            }
+
+                            .rex-adminer-yform-button:hover,
+                            .rex-adminer-yform-button:focus {
+                                background: #293746;
+                                color: #fff !important;
+                            }
+
+                            .dark-mode-active .rex-adminer-yform-notice {
+                                border-color: rgb(75, 154, 217);
+                                background: #244a68;
+                                color: #e7f4ff;
+                            }
+
+                            .dark-mode-active .rex-adminer-yform-button {
+                                border-color: #7893ad;
+                                background: #536a83;
+                            }
+
+                            .dark-mode-active .rex-adminer-yform-button:hover,
+                            .dark-mode-active .rex-adminer-yform-button:focus {
+                                background: #67819b;
+                            }
+
+                            @media (max-width: 700px) {
+                                .rex-adminer-yform-notice {
+                                    align-items: stretch;
+                                    flex-direction: column;
+                                }
+
+                                .rex-adminer-yform-button {
+                                    text-align: center;
+                                    white-space: normal;
+                                }
                             }
 
                             #rex-sql-table-code pre {
@@ -102,57 +224,62 @@ class Adminer extends \Adminer\Adminer
                             }
 
                             /* Button Styles */
-                            #rex-sql-table-theme-toggle,
+                            #rex-sql-table-mode-toggle,
                             #rex-sql-table-copy-button {
-                                background: #1e3a8a;
-                                border: 1px solid #1e40af;
+                                background: #3c4d60;
+                                border: 1px solid #2d3a48;
                                 border-radius: 4px;
                                 padding: 5px 10px;
                                 font-size: 12px;
                                 color: #ffffff;
                                 cursor: pointer;
-                                transition: all 0.3s ease;
+                                transition: transform 0.2s ease;
                                 font-weight: 500;
                             }
 
-                            #rex-sql-table-theme-toggle:hover,
+                            #rex-sql-table-mode-toggle:hover,
                             #rex-sql-table-copy-button:hover {
-                                background: #1e40af;
+                                background: #293746;
                                 transform: translateY(-1px);
                             }
 
                             /* Dark Mode Class */
-                            #rex-sql-table-code.dark-mode {
-                                background: var(--code-bg-dark);
-                                border-color: var(--code-border-dark);
+                            .dark-mode-active #rex-sql-table-code {
+                                background-color: var(--code-bg-dark) !important;
+                                border-color: var(--code-border-dark) !important;
                                 color: var(--code-text-dark);
                             }
 
-                            #rex-sql-table-code.dark-mode pre,
-                            #rex-sql-table-code.dark-mode code,
-                            #rex-sql-table-code.dark-mode code * {
+                            .dark-mode-active #rex-sql-table-code pre,
+                            .dark-mode-active #rex-sql-table-code code,
+                            .dark-mode-active #rex-sql-table-code code * {
                                 color: var(--code-text-dark) !important;
                             }
 
-                            #rex-sql-table-code.dark-mode #rex-sql-table-theme-toggle,
-                            #rex-sql-table-code.dark-mode #rex-sql-table-copy-button {
-                                background: #3b82f6;
-                                border-color: #60a5fa;
+                            .dark-mode-active #rex-sql-table-code #rex-sql-table-mode-toggle,
+                            .dark-mode-active #rex-sql-table-code #rex-sql-table-copy-button {
+                                background: #536a83;
+                                border-color: #7893ad;
                                 color: #ffffff;
                             }
 
-                            #rex-sql-table-code.dark-mode #rex-sql-table-theme-toggle:hover,
-                            #rex-sql-table-code.dark-mode #rex-sql-table-copy-button:hover {
-                                background: #60a5fa;
+                            .dark-mode-active #rex-sql-table-code #rex-sql-table-mode-toggle:hover,
+                            .dark-mode-active #rex-sql-table-code #rex-sql-table-copy-button:hover {
+                                background: #67819b;
+                            }
+
+                            .rex-sql-table-snippet.hidden {
+                                display: none;
                             }
                         </style>
 
                         <div id="rex-sql-table-code" class="hidden" contenteditable="true" spellcheck="false">
                             <div class="rex-sql-table-buttons">
-                                <button id="rex-sql-table-copy-button" type="button" title="Code in Zwischenablage kopieren">📋 Kopieren</button>
-                                <button id="rex-sql-table-theme-toggle" type="button" title="Dark/Light Mode umschalten">🌙 Dark</button>
+                                <button id="rex-sql-table-copy-button" type="button" title="' . \rex_escape(\rex_i18n::msg('adminer_copy_title')) . '">📋 ' . \rex_escape($copyLabel) . '</button>
+                                <button id="rex-sql-table-mode-toggle" type="button" title="' . \rex_escape(\rex_i18n::msg('adminer_code_mode_title')) . '">uninstall.php</button>
                             </div>
-                            ' . $code . '
+                            <div id="rex-sql-table-install-code" class="rex-sql-table-snippet">' . $code . '</div>
+                            <div id="rex-sql-table-uninstall-code" class="rex-sql-table-snippet hidden">' . $dropCode . '</div>
                         </div>
 
                         ' . \Adminer\script('
@@ -176,31 +303,18 @@ class Adminer extends \Adminer\Adminer
                                 }
                             });
 
-                            // Dark Mode Toggle
-                            var themeToggle = document.getElementById("rex-sql-table-theme-toggle");
-                            if (themeToggle) {
-                                themeToggle.addEventListener("click", function (event) {
+                            // Install/Uninstall Toggle
+                            var modeToggle = document.getElementById("rex-sql-table-mode-toggle");
+                            var installCode = document.getElementById("rex-sql-table-install-code");
+                            var uninstallCode = document.getElementById("rex-sql-table-uninstall-code");
+                            if (modeToggle) {
+                                modeToggle.addEventListener("click", function (event) {
                                     event.preventDefault();
                                     event.stopPropagation();
-                                    code.classList.toggle("dark-mode");
-
-                                    // Button Text und Icon anpassen
-                                    if (code.classList.contains("dark-mode")) {
-                                        themeToggle.innerHTML = "☀️ Light";
-                                        localStorage.setItem("rex_sql_table_theme", "dark");
-                                    } else {
-                                        themeToggle.innerHTML = "🌙 Dark";
-                                        localStorage.setItem("rex_sql_table_theme", "light");
-                                    }
+                                    installCode.classList.toggle("hidden");
+                                    uninstallCode.classList.toggle("hidden");
+                                    modeToggle.textContent = uninstallCode.classList.contains("hidden") ? "uninstall.php" : "install.php";
                                 });
-
-                                // Überprüfen gespeicherter Präferenzen
-                                if (localStorage.getItem("rex_sql_table_theme") === "dark") {
-                                    code.classList.add("dark-mode");
-                                    themeToggle.innerHTML = "☀️ Light";
-                                } else {
-                                    themeToggle.innerHTML = "🌙 Dark";
-                                }
                             }
 
                             // Copy Button
@@ -212,16 +326,12 @@ class Adminer extends \Adminer\Adminer
 
                                     try {
                                         // Text aus dem Code-Bereich extrahieren (ohne HTML)
-                                        var codeElement = code.querySelector("pre");
+                                        var activeSnippet = code.querySelector(".rex-sql-table-snippet:not(.hidden)");
+                                        var codeElement = activeSnippet.querySelector("pre");
                                         if (!codeElement) {
                                             // Fallback: gesamten Text-Inhalt verwenden
                                             var tempDiv = document.createElement("div");
-                                            tempDiv.innerHTML = code.innerHTML;
-                                            // Buttons entfernen
-                                            var buttons = tempDiv.querySelector(".rex-sql-table-buttons");
-                                            if (buttons) {
-                                                buttons.remove();
-                                            }
+                                            tempDiv.innerHTML = activeSnippet.innerHTML;
                                             var textContent = tempDiv.textContent || tempDiv.innerText;
                                         } else {
                                             var textContent = codeElement.textContent || codeElement.innerText;
@@ -232,14 +342,14 @@ class Adminer extends \Adminer\Adminer
                                             navigator.clipboard.writeText(textContent).then(function() {
                                                 // Erfolgsmeldung
                                                 var originalText = copyButton.innerHTML;
-                                                copyButton.innerHTML = "✅ Kopiert!";
-                                                copyButton.style.background = "#10b981";
+                                                copyButton.innerHTML = "✅ " + ' . $copiedLabel . ';
+                                                copyButton.style.background = "#2f78b1";
                                                 setTimeout(function() {
                                                     copyButton.innerHTML = originalText;
                                                     copyButton.style.background = "";
                                                 }, 2000);
                                             }).catch(function(err) {
-                                                console.error("Fehler beim Kopieren: ", err);
+                                                console.error(' . $copyConsoleError . ', err);
                                                 fallbackCopy(textContent);
                                             });
                                         } else {
@@ -260,23 +370,23 @@ class Adminer extends \Adminer\Adminer
                                             try {
                                                 document.execCommand("copy");
                                                 var originalText = copyButton.innerHTML;
-                                                copyButton.innerHTML = "✅ Kopiert!";
-                                                copyButton.style.background = "#10b981";
+                                                copyButton.innerHTML = "✅ " + ' . $copiedLabel . ';
+                                                copyButton.style.background = "#2f78b1";
                                                 setTimeout(function() {
                                                     copyButton.innerHTML = originalText;
                                                     copyButton.style.background = "";
                                                 }, 2000);
                                             } catch (err) {
-                                                console.error("Fallback Kopieren fehlgeschlagen: ", err);
-                                                alert("Kopieren fehlgeschlagen. Bitte manuell markieren und kopieren.");
+                                                console.error(' . $copyFallbackConsoleError . ', err);
+                                                alert(' . $copyError . ');
                                             } finally {
                                                 document.body.removeChild(textArea);
                                             }
                                         }
 
                                     } catch (error) {
-                                        console.error("Fehler beim Kopieren: ", error);
-                                        alert("Fehler beim Kopieren. Bitte manuell markieren und kopieren.");
+                                        console.error(' . $copyConsoleError . ', error);
+                                        alert(' . $copyError . ');
                                     }
                                 });
                             }
@@ -301,41 +411,72 @@ class Adminer extends \Adminer\Adminer
     right: 1.5em;
     width: 40px;
     height: 40px;
+    padding: 0;
+    border: 1px solid rgb(75, 154, 217);
     border-radius: 50%;
-    background-color: #f0f0f0;
+    background-color: #3c4d60;
+    color: #fff;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     z-index: 1000;
-    transition: background-color 0.3s, transform 0.2s;
+    transition: transform 0.2s;
 }
 
 #dark-mode-toggle:hover {
+    background-color: #2f78b1;
     transform: scale(1.1);
 }
 
 .dark-mode-active #dark-mode-toggle {
-    background-color: #333;
+    border-color: #7893ad;
+    background-color: #536a83;
+}
+
+.dark-mode-active #dark-mode-toggle:hover {
+    background-color: #67819b;
+}
+
+#tables .rex-adminer-yform-badge {
+    display: inline-block;
+    margin-right: 4px;
+    padding: 1px 4px;
+    border-radius: 3px;
+    background: #2f78b1;
+    box-shadow: inset 0 0 0 1px rgb(75, 154, 217);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1.3;
+    vertical-align: 1px;
+}
+
+.dark-mode-active #tables .rex-adminer-yform-badge {
+    background: #536a83;
+    color: #fff;
 }
 
 #dark-mode-toggle .icon {
-    font-size: 24px;
+    display: block;
+    font-family: Georgia, serif;
+    font-size: 25px;
+    line-height: 1;
     transition: opacity 0.3s;
 }
 
-#dark-mode-toggle .dark-icon {
+#dark-mode-toggle .theme-icon-light {
     display: none;
-    }
+}
 
-    .dark-mode-active #dark-mode-toggle .light-icon {
-        display: none;
-    }
+.dark-mode-active #dark-mode-toggle .theme-icon-dark {
+    display: none;
+}
 
-    .dark-mode-active #dark-mode-toggle .dark-icon {
-        display: block;
-    }
+.dark-mode-active #dark-mode-toggle .theme-icon-light {
+    display: block;
+}
 </style>
 <script <?= \Adminer\nonce() ?>>
     let adminerDark;
@@ -348,11 +489,9 @@ class Adminer extends \Adminer\Adminer
         qs('meta[name="color-scheme"]').content = (adminerDark ? 'dark' : 'light');
         cookie('adminer_dark=' + (adminerDark ? 1 : 0), 30);
 
-        // Toggle body class for our dark mode toggle styles
-        if (adminerDark) {
-            document.body.classList.add('dark-mode-active');
-        } else {
-            document.body.classList.remove('dark-mode-active');
+        // The initial call runs in <head>; navigation calls it again after <body> exists.
+        if (document.body) {
+            document.body.classList.toggle('dark-mode-active', !!adminerDark);
         }
     }
     const saved = document.cookie.match(/adminer_dark=(\d)/);
@@ -370,10 +509,11 @@ class Adminer extends \Adminer\Adminer
 
     public function navigation($missing)
     {
-        echo '<div id="dark-mode-toggle">
-                <span class="icon light-icon">☀️</span>
-                <span class="icon dark-icon">🌙</span>
-              </div>'
+        $themeToggleTitle = \rex_escape(\rex_i18n::msg('adminer_theme_toggle_title'));
+        echo '<button id="dark-mode-toggle" type="button" title="' . $themeToggleTitle . '" aria-label="' . $themeToggleTitle . '">
+            <span class="icon theme-icon-dark" aria-hidden="true">☾</span>
+            <span class="icon theme-icon-light" aria-hidden="true">☼</span>
+              </button>'
             . \Adminer\script("
                 if (adminerDark != null) {
                     adminerDarkSet();
