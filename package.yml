@@ -1,6 +1,6 @@
 package: adminer
-version: '4.0.0'
-vendor: '6.0.1 adminer'
+version: '4.0.1'
+vendor: '6.0.2 adminer'
 author: Friends Of REDAXO
 supportpage: https://github.com/FriendsOfREDAXO/adminer
 
