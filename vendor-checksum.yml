@@ -1,11 +1,11 @@
 vendor:
     name: Adminer
     edition: mysql
-    version: '6.0.2'
+    version: '6.1.1'
     path: vendor/adminer.php
-    source: https://github.com/vrana/adminer/releases/download/v6.0.2/adminer-6.0.2-mysql.php
-    release: https://github.com/vrana/adminer/releases/tag/v6.0.2
-    sha256: 8552fcfa20d5d69d1432f4e5d44e5610a5ef961fa7b3878a6c2418f198ecb5c5
-    size: 415645
-    latest_stable_checked_at: '2026-09-14'
+    source: https://github.com/vrana/adminer/releases/download/v6.1.1/adminer-6.1.1-mysql.php
+    release: https://github.com/vrana/adminer/releases/tag/v6.1.1
+    sha256: 2d092e713717c8106ae276ca5780b77970d3378817a792c6bc584651d4039cc6
+    size: 431267
+    latest_stable_checked_at: '2026-10-05'
     byte_identical_to_source: true
