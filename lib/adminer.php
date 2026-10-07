@@ -36,6 +36,24 @@ class Adminer extends \Adminer\Adminer
         return $databases;
     }
 
+    /**
+     * Kein Service Worker: Adminer registriert ihn unter index.php?file=worker.js (ohne page=adminer),
+     * REDAXO leitet um und der Browser meldet auf jeder Seite einen Fehler. Sein Scope wäre zudem
+     * das ganze Backend (location.pathname = /redaxo/index.php).
+     */
+    public function serviceWorker()
+    {
+    }
+
+    /**
+     * Kein Web-App-Manifest (seit Adminer 6.1): index.php?manifest= landet ebenfalls im Backend,
+     * und "installieren" würde das REDAXO-Backend als App "Adminer" anbieten.
+     */
+    public function manifest()
+    {
+        return [];
+    }
+
     public function databasesPrint($missing)
     {
         if (\count(rex_addon::get('adminer')->getProperty('databases')) <= 1) {

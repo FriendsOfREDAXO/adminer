@@ -4,7 +4,8 @@ Changelog
 Version 4.0.2
 -----------------------
 
-Vendor-Update 6.0.2 → 6.1.1
+* Vendor-Update 6.0.2 → 6.1.1 (u. a. große Zahlen in JSON-Spalten werden beim Speichern nicht mehr gerundet, Suche nach IS NULL / IS NOT NULL ohne Wert, Treffer werden in der Datenansicht hervorgehoben, MySQL-Export entfernt den Definer von Views/Events nur noch beim eigenen Account)
+* Adminers Service Worker und Web-App-Manifest abgeschaltet: Beide zeigten auf `index.php?file=worker.js` bzw. `index.php?manifest=` ohne `page=adminer`. REDAXO leitete um, und der Browser meldete auf jeder Adminer-Seite einen Fehler. Der Scope des Service Workers wäre außerdem das ganze Backend gewesen.
 
 
 Version 4.0.1
