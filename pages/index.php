@@ -66,9 +66,15 @@ if (method_exists('rex_response', 'setHeader')) {
 
 rex_response::cleanOutputBuffers();
 
-// add page param to all adminer urls
+// add page param to all adminer urls: html attributes (&amp;) as well as js strings (&), e.g. ajaxSetHtml('index.php?username=&db=…&script=db')
 ob_start(function ($output) {
-    return preg_replace('#(?<==(?:"|\'))index\.php\?(?=username=&amp;db=|file=[^&]*&amp;version=)#', 'index.php?page=adminer&amp;', $output);
+    $output = preg_replace_callback(
+        '#(?<=["\'])index\.php\?(?=username=(&amp;|&|["\'])|file=[^&"\']*(&amp;|&)version=)#',
+        static fn (array $m) => 'index.php?page=adminer' . ('&' === ($m[1] ?? '') || '&' === ($m[2] ?? '') ? '&' : '&amp;'),
+        $output,
+    );
+
+    return preg_replace('#(?<=href=["\'])index\.php(?=["\'])#', 'index.php?page=adminer', $output);
 });
 
 include __DIR__ .'/../vendor/adminer.php';

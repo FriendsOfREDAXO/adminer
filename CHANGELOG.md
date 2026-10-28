@@ -1,6 +1,14 @@
 Changelog
 =========
 
+Version 4.0.4
+-----------------------
+
+* Vendor-Update 6.1.2 → 6.2.0 (u. a. SQL-Befehl markiert die Zeile des ersten Fehlers, Default-Werte lassen sich als SQL-Ausdruck setzen, Präzision von `ON UPDATE CURRENT_TIMESTAMP` bleibt erhalten, Fremdschlüssel lassen sich benennen, führende Zeilenumbrüche in Textfeldern bleiben erhalten, JavaScript-Fehler bei nullbaren Boolean-Spalten behoben)
+* Datenbankübersicht: Engine, Kollation, Größe und Zeilenzahl der Tabellen werden wieder nachgeladen. Der Aufruf (`script=db`) ging ohne `page=adminer` raus und wurde von REDAXO umgeleitet.
+* Tabellenlinks im SQL-Editor und die Breadcrumb-Links „MariaDB/MySQL“ und „Server“ bleiben jetzt in Adminer, statt auf der REDAXO-Startseite zu landen.
+
+
 Version 4.0.3
 -----------------------
 

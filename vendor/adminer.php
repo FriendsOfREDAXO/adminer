@@ -5,18 +5,18 @@
 * @copyright 2007 Jakub Vrana
 * @license https://www.apache.org/licenses/LICENSE-2.0 Apache License, Version 2.0
 * @license https://www.gnu.org/licenses/gpl-2.0.html GNU General Public License, version 2 (one or other)
-* @version 6.1.2
+* @version 6.2.0
 */namespace
 Adminer;if(isset($_GET["status"]))$_GET["variables"]=$_GET["status"];if(isset($_GET["import"]))$_GET["sql"]=$_GET["import"];const
-VERSION="6.1.2";error_reporting(24575);set_error_handler(function($ad,$cd){return!!preg_match('~^Undefined (array key|offset|index)~',$cd);},E_WARNING|E_NOTICE);$Ed=!preg_match('~^(unsafe_raw)?$~',ini_get("filter.default"));if($Ed||ini_get("filter.default_flags")){foreach(array('_GET','_POST','_COOKIE','_SERVER')as$X){$Fl=filter_input_array(constant("INPUT$X"),FILTER_UNSAFE_RAW);if($Fl)$$X=$Fl;}}$_COOKIE=array_filter($_COOKIE,'is_scalar');if(function_exists("mb_internal_encoding"))mb_internal_encoding("8bit");function
+VERSION="6.2.0";error_reporting(24575);set_error_handler(function($cd,$fd){return!!preg_match('~^Undefined (array key|offset|index)~',$fd);},E_WARNING|E_NOTICE);$Hd=!preg_match('~^(unsafe_raw)?$~',ini_get("filter.default"));if($Hd||ini_get("filter.default_flags")){foreach(array('_GET','_POST','_COOKIE','_SERVER')as$X){$Ol=filter_input_array(constant("INPUT$X"),FILTER_UNSAFE_RAW);if($Ol)$$X=$Ol;}}$_COOKIE=array_filter($_COOKIE,'is_scalar');if(function_exists("mb_internal_encoding"))mb_internal_encoding("8bit");function
 connection($f=null){return($f?:Db::$instance);}function
 adminer(){return
 Adminer::$instance;}function
 driver(){return
 Driver::$instance;}function
 connect(){$Pb=adminer()->credentials();$J=Driver::connect($Pb[0],$Pb[1],$Pb[2]);return(is_object($J)?$J:null);}function
-idf_unescape($t){if(!preg_match('~^[`\'"[]~',$t))return$t;$Df=substr($t,-1);return
-str_replace($Df.$Df,$Df,substr($t,1,-1));}function
+idf_unescape($t){if(!preg_match('~^[`\'"[]~',$t))return$t;$Ff=substr($t,-1);return
+str_replace($Ff.$Ff,$Ff,substr($t,1,-1));}function
 q($Q){return
 connection()->quote($Q);}function
 idx($Aa,$w,$i=null){return($Aa&&array_key_exists($w,$Aa)?$Aa[$w]:$i);}function
@@ -30,114 +30,115 @@ in_array($U,idx(driver()->structuredTypes(),lang(0),array()));}function
 full_type_sql(array$k){$U=$k["type"];return(is_user_type($U)?idf_escape($U).substr($k["full_type"],strlen($U)):$k["full_type"]);}function
 is_searchable(array$k,array$X){if(!isset($k["privileges"]["where"]))return
 false;if(preg_match('~NULL$~',$X["op"]))return
-true;$U=$k["type"];$Aj=$X["val"];$Ra='binary$|bytea|raw|image|bfile|^vector$'.(JUSH=="mssql"?'|^timestamp$':'|^bit').(JUSH=="oracle"?'|^blob|^long|rowid':'');if(preg_match("~$Ra~",$U))return
-false;if(preg_match(number_type(),$U)){$dh='-?\d+(\.\d+)?';$Fg='';if(preg_match('~IN$~',$X["op"])){$Aj=preg_replace('~^\s*\(\s*(.*?)\s*\)\s*$~s','\1',$Aj);$Fg="( *, *$dh)*";}elseif($X["op"]=="BETWEEN")$Fg="\\s+AND\\s+$dh";return(bool)preg_match('~^'.$dh.$Fg.'$~i',$Aj);}if(preg_match('~^(small)?date|^timestamp~',$U))return(bool)preg_match('~^\d+-\d+-\d+~',$Aj);if(preg_match('~^time~',$U))return(bool)preg_match('~^\d+:\d+~',$Aj);if(preg_match('~^bool~',$U)||(JUSH=="mssql"&&$U=="bit"))return(bool)preg_match('~^(t|f|true|false|[01])$~i',$Aj);return
+true;$U=$k["type"];$Hj=$X["val"];$Ra='binary$|bytea|raw|image|bfile|^vector$'.(JUSH=="mssql"?'|^timestamp$':'|^bit').(JUSH=="oracle"?'|^blob|^long|rowid':'');if(preg_match("~$Ra~",$U))return
+false;if(preg_match(number_type(),$U)){$gh='-?\d+(\.\d+)?';$Ig='';if(preg_match('~IN$~',$X["op"])){$Hj=preg_replace('~^\s*\(\s*(.*?)\s*\)\s*$~s','\1',$Hj);$Ig="( *, *$gh)*";}elseif($X["op"]=="BETWEEN")$Ig="\\s+AND\\s+$gh";return(bool)preg_match('~^'.$gh.$Ig.'$~i',$Hj);}if(preg_match('~^(small)?date|^timestamp~',$U))return(bool)preg_match('~^\d+-\d+-\d+~',$Hj);if(preg_match('~^time~',$U))return(bool)preg_match('~^\d+:\d+~',$Hj);if(preg_match('~^bool~',$U)||(JUSH=="mssql"&&$U=="bit"))return(bool)preg_match('~^(t|f|true|false|[01])$~i',$Hj);return
 true;}function
-remove_slashes(array$bm,$Ed=false){$J=array();foreach($bm
-as$w=>$X)$J[stripslashes($w)]=(is_array($X)?remove_slashes($X,$Ed):($Ed?$X:stripslashes($X)));return$J;}function
-bracket_escape($t,$Ka=false){static$nl=array(':'=>':1',']'=>':2','['=>':3','"'=>':4','='=>':5');return
-strtr($t,($Ka?array_flip($nl):$nl));}function
-url_escape($Q){static$nl=array();if(!$nl){$nl=array(' '=>'+');foreach(str_split("\"'<>#%&+=?".ini_get("arg_separator.input"))as$db)$nl[$db]=sprintf('%%%02X',ord($db));for($r=0;$r<256;$r++){if($r<32||$r>126)$nl[chr($r)]=sprintf('%%%02X',$r);}}return
-strtr((string)$Q,$nl);}function
-min_version($em,$Yf="",$f=null){$f=connection($f);$Pj=$f->server_info;if($Yf&&preg_match('~([\d.]+)-MariaDB~',$Pj,$A)){$Pj=$A[1];$em=$Yf;}return$em&&version_compare($Pj,$em)>=0;}function
+remove_slashes(array$km,$Hd=false){$J=array();foreach($km
+as$w=>$X)$J[stripslashes($w)]=(is_array($X)?remove_slashes($X,$Hd):($Hd?$X:stripslashes($X)));return$J;}function
+bracket_escape($t,$Ka=false){static$wl=array(':'=>':1',']'=>':2','['=>':3','"'=>':4','='=>':5');return
+strtr($t,($Ka?array_flip($wl):$wl));}function
+url_escape($Q){static$wl=array();if(!$wl){$wl=array(' '=>'+');foreach(str_split("\"'<>#%&+=?".ini_get("arg_separator.input"))as$db)$wl[$db]=sprintf('%%%02X',ord($db));for($r=0;$r<256;$r++){if($r<32||$r>126)$wl[chr($r)]=sprintf('%%%02X',$r);}}return
+strtr((string)$Q,$wl);}function
+min_version($nm,$ag="",$f=null){$f=connection($f);$Wj=$f->server_info;if($ag&&preg_match('~([\d.]+)-MariaDB~',$Wj,$A)){$Wj=$A[1];$nm=$ag;}return$nm&&version_compare($Wj,$nm)>=0;}function
 charset(Db$e){return(min_version("5.5.3",0,$e)?"utf8mb4":"utf8");}function
-ini_set($zh,$Y){return(function_exists('ini_set')?\ini_set($zh,$Y):false);}function
-ini_bool($We){$X=ini_get($We);return(preg_match('~^(on|true|yes)$~i',$X)||(int)$X);}function
-ini_bytes($We){$X=ini_get($We);switch(strtolower(substr($X,-1))){case'g':$X=(int)$X*1024;case'm':$X=(int)$X*1024;case'k':$X=(int)$X*1024;}return$X;}function
-max_input_vars($K,$Lh){$bg=(int)ini_get("max_input_vars");return($bg?(int)floor(($bg-$Lh)/$K):0);}function
-max_input_vars_error(){$We="max_input_vars";return
-lang(1,"<b>$We = ".ini_get($We)."</b>");}function
+ini_set($Bh,$Y){return(function_exists('ini_set')?\ini_set($Bh,$Y):false);}function
+ini_bool($Ze){$X=ini_get($Ze);return(preg_match('~^(on|true|yes)$~i',$X)||(int)$X);}function
+ini_bytes($Ze){$X=ini_get($Ze);switch(strtolower(substr($X,-1))){case'g':$X=(int)$X*1024;case'm':$X=(int)$X*1024;case'k':$X=(int)$X*1024;}return$X;}function
+max_input_vars($K,$Ph){$dg=(int)ini_get("max_input_vars");return($dg?(int)floor(($dg-$Ph)/$K):0);}function
+max_input_vars_error(){$Ze="max_input_vars";return
+lang(1,"<b>$Ze = ".ini_get($Ze)."</b>");}function
 sid(){static$J;if($J===null)$J=(SID&&!($_COOKIE&&ini_bool("session.use_cookies")));return$J;}function
-set_password($dm,$O,$V,$F){$_SESSION["pwds"][$dm][$O][$V]=($_COOKIE["adminer_key"]&&is_string($F)?array(encrypt_string($F,$_COOKIE["adminer_key"])):$F);}function
+set_password($mm,$O,$V,$F){$_SESSION["pwds"][$mm][$O][$V]=($_COOKIE["adminer_key"]&&is_string($F)?array(encrypt_string($F,$_COOKIE["adminer_key"])):$F);}function
 get_password(){$J=get_session("pwds");if(is_array($J))$J=($_COOKIE["adminer_key"]?decrypt_string($J[0],$_COOKIE["adminer_key"]):false);return$J;}function
 get_val($H,$k=0,$Bb=null){$Bb=connection($Bb);$I=$Bb->query($H);if(!is_object($I))return
 false;$K=$I->fetch_row();return($K?$K[$k]:false);}function
 get_vals($H,$c=0){$J=array();$I=connection()->query($H);if(is_object($I)){while($K=$I->fetch_row())$J[]=$K[$c];}return$J;}function
-get_key_vals($H,$f=null,$Sj=true){$f=connection($f);$J=array();$I=$f->query($H);if(is_object($I)){while($K=$I->fetch_row()){if($Sj)$J[$K[0]]=$K[1];else$J[]=$K[0];}}return$J;}function
+get_key_vals($H,$f=null,$Zj=true){$f=connection($f);$J=array();$I=$f->query($H);if(is_object($I)){while($K=$I->fetch_row()){if($Zj)$J[$K[0]]=$K[1];else$J[]=$K[0];}}return$J;}function
 get_rows($H,$f=null,$j="<p class='error'>"){$Bb=connection($f);$J=array();$I=$Bb->query($H);if(is_object($I)){while($K=$I->fetch_assoc())$J[]=$K;}elseif(!$I&&!$f&&$j&&(defined('Adminer\PAGE_HEADER')||$j=="-- "))echo$j.adminer()->error()."\n";return$J;}function
 unique_array($K,array$v){foreach($v
-as$u){if(preg_match("~^(PRIMARY|UNIQUE)$~",$u["type"])&&!$u["partial"]){$J=array();foreach($u["columns"]as$w){if(!isset($K[$w]))continue
+as$u){if(preg_match("~^(PRIMARY|UNIQUE)$~",$u["type"])&&!$u["partial"]&&!$u["invalid"]){$J=array();foreach($u["columns"]as$w){if(!isset($K[$w]))continue
 2;$J[$w]=$K[$w];}return$J;}}}function
-where_function($Wd,$c,array$k){if($Wd=="md5")return
-driver()->md5($c,$k)?:$c;return(in_array($Wd,driver()->functions)||in_array($Wd,driver()->grouping)?apply_sql_function($Wd,$c):$c);}function
-where(array$Z,array$l=array()){$J=array();foreach((array)$Z["where"]as$w=>$X){$w=bracket_escape($w,true);$c=idf_escape($w);$k=idx($l,$w,array());$zd=$k["type"];$jf=$k&&(is_blob($k)||preg_match('~binary~',$zd));$J[]=$c.($jf&&!is_utf8($X)?" = ".driver()->quoteBinary($X):(JUSH=="sql"&&$zd=="json"?" = CAST(".q($X)." AS JSON)":(JUSH=="pgsql"&&preg_match('~^jsonb?$~',$k["full_type"])?"::jsonb = ".q($X)."::jsonb":(JUSH=="sql"&&is_numeric($X)&&preg_match('~\.~',$X)?" LIKE ".q($X):(JUSH=="mssql"&&strpos($zd,"datetime")===false?" LIKE ".q(preg_replace('~[_%[]~','[\0]',$X)):" = ".unconvert_field($k,q($X)))))));if(JUSH=="sql"&&preg_match('~char|text~',$zd)&&preg_match("~[^ -@]~",$X))$J[]="$c = ".q($X)." COLLATE ".charset(connection())."_bin";}foreach((array)$Z["null"]as$w)$J[]=idf_escape($w)." IS NULL";foreach((array)$Z["col"]as$r=>$qb){$X=idx($Z["val"],$r);$J[]=where_function(idx($Z["fun"],$r),idf_escape($qb),idx($l,$qb,array())).($X!==null?" = ".q($X):" IS NULL");}return
+where_function($Zd,$c,array$k){if($Zd=="md5")return
+driver()->md5($c,$k)?:$c;return(in_array($Zd,driver()->functions)||in_array($Zd,driver()->grouping)?apply_sql_function($Zd,$c):$c);}function
+where(array$Z,array$l=array()){$J=array();foreach((array)$Z["where"]as$w=>$X){$w=bracket_escape($w,true);$c=idf_escape($w);$k=idx($l,$w,array());$Bd=$k["type"];$mf=$k&&(is_blob($k)||preg_match('~binary~',$Bd));$J[]=$c.($mf&&!is_utf8($X)?" = ".driver()->quoteBinary($X):(JUSH=="sql"&&$Bd=="json"?" = CAST(".q($X)." AS JSON)":(JUSH=="pgsql"&&preg_match('~^jsonb?$~',$k["full_type"])?"::jsonb = ".q($X)."::jsonb":(JUSH=="pgsql"&&preg_match('~\.~',$Bd)?"::text = ".q($X):(JUSH=="sql"&&is_numeric($X)&&preg_match('~\.~',$X)?" LIKE ".q($X):(JUSH=="mssql"&&strpos($Bd,"datetime")===false?" LIKE ".q(preg_replace('~[_%[]~','[\0]',$X)):" = ".unconvert_field($k,q($X))))))));if(JUSH=="sql"&&preg_match('~char|text~',$Bd)&&preg_match("~[^ -@]~",$X))$J[]="$c = ".q($X)." COLLATE ".charset(connection())."_bin";}foreach((array)$Z["null"]as$w)$J[]=idf_escape($w)." IS NULL";foreach((array)$Z["col"]as$r=>$qb){$X=idx($Z["val"],$r);$J[]=where_function(idx($Z["fun"],$r),idf_escape($qb),idx($l,$qb,array())).($X!==null?" = ".q($X):" IS NULL");}return
 implode(" AND ",$J);}function
 where_columns(array$l){$J=array();foreach((array)$_GET["null"]as$w)$J[$w]=true;foreach(array_keys((array)$_GET["where"])as$w)$J[bracket_escape($w,true)]=true;foreach((array)$_GET["col"]as$qb)$J[$qb]=true;return
 array_intersect_key($J,$l);}function
 where_check($X,array$l=array()){parse_str($X,$gb);remove_slashes(array(&$gb));return
 where($gb,$l);}function
-where_link($r,$c,$Y,$wh="="){$th=($Y!==null?$wh:"IS NULL");return"&where[$r][col]=".url_escape($c).($th!=first(adminer()->operators())?"&where[$r][op]=".url_escape($th):"")."&where[$r][val]=".url_escape($Y);}function
+where_link($r,$c,$Y,$zh="="){$wh=($Y!==null?$zh:"IS NULL");return"&where[$r][col]=".url_escape($c).($wh!=first(adminer()->operators())?"&where[$r][op]=".url_escape($wh):"")."&where[$r][val]=".url_escape($Y);}function
 convert_fields(array$d,array$l,array$N=array()){$J="";foreach($d
 as$w=>$X){if($N&&!in_array(idf_escape($w),$N))continue;$Ba=convert_field($l[$w]);if($Ba)$J
 .=", $Ba AS ".idf_escape($w);}return$J;}function
 cookie_path(){return
 strtr(preg_replace('~\?.*~','',$_SERVER["REQUEST_URI"]),array(";"=>"%3B",","=>"%2C"));}function
-cookie($B,$Y,$Nf=2592000){header("Set-Cookie: $B=".rawurlencode($Y).($Nf?"; expires=".gmdate("D, d M Y H:i:s",time()+$Nf)." GMT":"")."; path=".cookie_path().(HTTPS?"; secure":"").($B=="adminer_import"?"":"; HttpOnly")."; SameSite=lax",false);}function
-get_url($Ol,$Gb){$http_response_header=null;$bd=array();set_error_handler(function($ad,$j)use(&$bd){$bd[]=preg_replace('~^file_get_contents\([^)]*\):\s*~','',$j);return
-true;});$J=file_get_contents($Ol,false,$Gb);restore_error_handler();$se=(function_exists('http_get_last_response_headers')?http_get_last_response_headers():$http_response_header);return
-array($J,(preg_match('~^HTTP/[\d.]+ (\d+)~',idx($se,0,''),$A)?$A[1]:''),(array)$se,($J===false?implode("\n",$bd):''),);}function
-json_decode_exact($sf){$sf=preg_replace('~"(\\\\u0001(?:[^"\\\\]|\\\\.)*+")|"(?:[^"\\\\]|\\\\.)*+"(*SKIP)(*FAIL)~','"\\\\u0001$1',$sf);return
-json_decode(preg_replace('~"(?:[^"\\\\]|\\\\.)*+"(*SKIP)(*FAIL)|-?\d[-+.\deE]*+~','"\\\\u0001$0"',$sf));}function
+cookie($B,$Y,$Pf=2592000){header("Set-Cookie: $B=".rawurlencode($Y).($Pf?"; expires=".gmdate("D, d M Y H:i:s",time()+$Pf)." GMT":"")."; path=".cookie_path().(HTTPS?"; secure":"").($B=="adminer_import"?"":"; HttpOnly")."; SameSite=lax",false);}function
+php_error_text($j){return(ini_bool("html_errors")?html_entity_decode(strip_tags($j)):$j);}function
+get_url($Xl,$Gb){$http_response_header=null;$ed=array();set_error_handler(function($cd,$j)use(&$ed){$ed[]=preg_replace('~^file_get_contents\([^)]*\)( \[[^]]*\])?:\s*~','',php_error_text($j));return
+true;});$J=file_get_contents($Xl,false,$Gb);restore_error_handler();$ve=(function_exists('http_get_last_response_headers')?http_get_last_response_headers():$http_response_header);return
+array($J,(preg_match('~^HTTP/[\d.]+ (\d+)~',idx($ve,0,''),$A)?$A[1]:''),(array)$ve,($J===false?implode("\n",$ed):''),);}function
+json_decode_exact($uf){$uf=preg_replace('~"(\\\\u0001(?:[^"\\\\]|\\\\.)*+")|"(?:[^"\\\\]|\\\\.)*+"(*SKIP)(*FAIL)~','"\\\\u0001$1',$uf);return
+json_decode(preg_replace('~"(?:[^"\\\\]|\\\\.)*+"(*SKIP)(*FAIL)|-?\d[-+.\deE]*+~','"\\\\u0001$0"',$uf));}function
 json_scalar($X){return(is_string($X)&&substr($X,0,1)=="\1"?substr($X,1):$X);}function
-json_encode_exact($X,$Hd=0){return
-preg_replace('~"\\\\u0001(-?\d[^"\\\\]*)"|(")\\\\u0001(\\\\u0001(?:[^"\\\\]|\\\\.)*+")|"(?:[^"\\\\]|\\\\.)*+"(*SKIP)(*FAIL)~','$1$2$3',json_encode($X,$Hd));}function
-get_settings($Jb){parse_str($_COOKIE[$Jb],$Tj);return$Tj;}function
+json_encode_exact($X,$Kd=0){return
+preg_replace('~"\\\\u0001(-?\d[^"\\\\]*)"|(")\\\\u0001(\\\\u0001(?:[^"\\\\]|\\\\.)*+")|"(?:[^"\\\\]|\\\\.)*+"(*SKIP)(*FAIL)~','$1$2$3',json_encode($X,$Kd));}function
+get_settings($Jb){parse_str($_COOKIE[$Jb],$ak);return$ak;}function
 get_setting($w,$Jb="adminer_settings",$i=null){return
 idx(get_settings($Jb),$w,$i);}function
-save_settings(array$Tj,$Jb="adminer_settings"){$Y=http_build_query($Tj+get_settings($Jb));cookie($Jb,$Y);$_COOKIE[$Jb]=$Y;}function
+save_settings(array$ak,$Jb="adminer_settings"){$Y=http_build_query($ak+get_settings($Jb));cookie($Jb,$Y);$_COOKIE[$Jb]=$Y;}function
 restart_session(){if(!ini_bool("session.use_cookies")&&(!function_exists('session_status')||session_status()==PHP_SESSION_NONE))session_start();}function
-stop_session($Kd=false){$Rl=ini_bool("session.use_cookies");if(!$Rl||$Kd){session_write_close();if($Rl&&ini_set("session.use_cookies",'0')===false)session_start();}}function&get_session($w){return$_SESSION[$w][DRIVER][SERVER][$_GET["username"]];}function
+stop_session($Nd=false){$am=ini_bool("session.use_cookies");if(!$am||$Nd){session_write_close();if($am&&ini_set("session.use_cookies",'0')===false)session_start();}}function&get_session($w){return$_SESSION[$w][DRIVER][SERVER][$_GET["username"]];}function
 set_session($w,$X){$_SESSION[$w][DRIVER][SERVER][$_GET["username"]]=$X;}function
-auth_url($dm,$O,$V,$h=null){$Nl=remove_from_uri(implode("|",array_keys(SqlDriver::$drivers))."|username|ext|".($h!==null?"db|":"").($dm=='mssql'||$dm=='pgsql'?"":"ns|").session_name());preg_match('~([^?]*)\??(.*)~',$Nl,$A);return"$A[1]?".(sid()?SID."&":"").($_GET["ext"]?"ext=".url_escape($_GET["ext"])."&":"").($dm!="server"||$O!=""?url_escape($dm)."=".url_escape($O)."&":"")."username=".url_escape($V).($h!=""?"&db=".url_escape($h):"").($A[2]?"&$A[2]":"");}function
+auth_url($mm,$O,$V,$h=null){$Wl=remove_from_uri(implode("|",array_keys(SqlDriver::$drivers))."|username|ext|".($h!==null?"db|":"").($mm=='mssql'||$mm=='pgsql'?"":"ns|").session_name());preg_match('~([^?]*)\??(.*)~',$Wl,$A);return"$A[1]?".(sid()?SID."&":"").($_GET["ext"]?"ext=".url_escape($_GET["ext"])."&":"").($mm!="server"||$O!=""?url_escape($mm)."=".url_escape($O)."&":"")."username=".url_escape($V).($h!=""?"&db=".url_escape($h):"").($A[2]?"&$A[2]":"");}function
 is_ajax(){return($_SERVER["HTTP_X_REQUESTED_WITH"]=="XMLHttpRequest");}function
-redirect($_,$rg=null){if($rg!==null){restart_session();$_SESSION["messages"][preg_replace('~^[^?]*~','',($_!==null?$_:$_SERVER["REQUEST_URI"]))][]=$rg;}if($_!==null){if($_=="")$_=".";header("Location: $_");exit;}}function
-query_redirect($H,$_,$rg,$Si=true,$jd=true,$ud=false,$al=""){if($jd){$mk=microtime(true);$ud=!connection()->query($H);$al=format_time($mk);}$gk=($H?adminer()->messageQuery($H,$al,$ud):"");if($ud){adminer()->error
-.=adminer()->error().$gk.script("messagesPrint();")."<br>";return
-false;}if($Si)redirect($_,$rg.$gk);return
+redirect($_,$tg=null){if($tg!==null){restart_session();$_SESSION["messages"][preg_replace('~^[^?]*~','',($_!==null?$_:$_SERVER["REQUEST_URI"]))][]=$tg;}if($_!==null){if($_=="")$_=".";header("Location: $_");exit;}}function
+query_redirect($H,$_,$tg,$Zi=true,$md=true,$xd=false,$jl=""){if($md){$tk=microtime(true);$xd=!connection()->query($H);$jl=format_time($tk);}$nk=($H?adminer()->messageQuery($H,$jl,$xd):"");if($xd){adminer()->error
+.=adminer()->error().$nk.script("messagesPrint();")."<br>";return
+false;}if($Zi)redirect($_,$tg.$nk);return
 true;}class
 Queries{static$queries=array();static$start=0;}function
 remember_query($H){if(!Queries::$start)Queries::$start=microtime(true);Queries::$queries[]=(driver()->delimiter!=';'?$H:(preg_match('~;$~',$H)?"DELIMITER ;;\n$H;\nDELIMITER ":$H).";");}function
 queries($H){remember_query($H);return
 connection()->query($H);}function
-apply_queries($H,array$T,$dd='Adminer\table'){foreach($T
-as$R){if(!queries("$H ".$dd($R)))return
+apply_queries($H,array$T,$gd='Adminer\table'){foreach($T
+as$R){if(!queries("$H ".$gd($R)))return
 false;}return
 true;}function
-queries_redirect($_,$rg,$Si){$Li=implode("\n",Queries::$queries);$al=format_time(Queries::$start);return
-query_redirect($Li,$_,$rg,$Si,false,!$Si,$al);}function
-format_time($mk){return
-lang(2,max(0,microtime(true)-$mk));}function
-relative_uri($Nl=''){return
+queries_redirect($_,$tg,$Zi){$Ri=implode("\n",Queries::$queries);$jl=format_time(Queries::$start);return
+query_redirect($Ri,$_,$tg,$Zi,false,!$Zi,$jl);}function
+format_time($tk){return
+lang(2,max(0,microtime(true)-$tk));}function
+relative_uri($Wl=''){return
 preg_replace_callback('~^[^?]*~',function($A){return
-str_replace(":","%3A",$A[0]);},preg_replace('~^[^?]*/([^?]*)~','\1',($Nl?:$_SERVER["REQUEST_URI"])));}function
-remove_from_uri($Qh=""){return
-substr(preg_replace("~(?<=[?&])($Qh".(SID?"":"|".session_name()).")=[^&]*&~",'',relative_uri()."&"),0,-1);}function
-get_files($B,$ec=false){$Ad=$_FILES[$B];if(!$Ad)return
-null;foreach($Ad
-as$w=>$X)$Ad[$w]=(array)$X;$J=array();foreach($Ad["error"]as$w=>$j){if($j)return$j;$m=$Ad["name"][$w];$il=$Ad["tmp_name"][$w];$Eb=file_get_contents($ec&&preg_match('~\.gz$~',$m)?"compress.zlib://$il":$il);if($ec){$mk=substr($Eb,0,3);if(function_exists("iconv")&&preg_match("~^\xFE\xFF|^\xFF\xFE~",$mk))$Eb=iconv("utf-16","utf-8",$Eb);elseif($mk=="\xEF\xBB\xBF")$Eb=substr($Eb,3);}$J[]=array($m,$Eb);}return$J;}function
-get_file($w,$ec=false,$lc=""){$Dd=get_files($w,$ec);if(!is_array($Dd))return$Dd;$J='';foreach($Dd
-as$Ad){$Eb=$Ad[1];$J
-.=$Eb;if($lc)$J
-.=(preg_match("($lc\\s*\$)",$Eb)?"":$lc)."\n\n";}return$J;}function
-upload_error($j){$jg=($j==UPLOAD_ERR_INI_SIZE?ini_get("upload_max_filesize"):0);return($j?lang(3).($jg?" ".lang(4,$jg):""):lang(5));}function
+str_replace(":","%3A",$A[0]);},preg_replace('~^[^?]*/([^?]*)~','\1',($Wl?:$_SERVER["REQUEST_URI"])));}function
+remove_from_uri($Uh=""){return
+substr(preg_replace("~(?<=[?&])($Uh".(SID?"":"|".session_name()).")=[^&]*&~",'',relative_uri()."&"),0,-1);}function
+get_files($B,$ec=false){$Dd=$_FILES[$B];if(!$Dd)return
+null;foreach($Dd
+as$w=>$X)$Dd[$w]=(array)$X;$J=array();foreach($Dd["error"]as$w=>$j){if($j)return$j;$m=$Dd["name"][$w];$rl=$Dd["tmp_name"][$w];$Eb=file_get_contents($ec&&preg_match('~\.gz$~',$m)?"compress.zlib://$rl":$rl);if($ec){$tk=substr($Eb,0,3);if(function_exists("iconv")&&preg_match("~^\xFE\xFF|^\xFF\xFE~",$tk))$Eb=iconv("utf-16","utf-8",$Eb);elseif($tk=="\xEF\xBB\xBF")$Eb=substr($Eb,3);}$J[]=array($m,$Eb);}return$J;}function
+get_file($w,$ec=false,$mc=""){$Gd=get_files($w,$ec);if(!is_array($Gd))return$Gd;$J='';foreach($Gd
+as$Dd){$Eb=$Dd[1];$J
+.=$Eb;if($mc)$J
+.=(preg_match("($mc\\s*\$)",$Eb)?"":$mc)."\n\n";}return$J;}function
+upload_error($j){$lg=($j==UPLOAD_ERR_INI_SIZE?ini_get("upload_max_filesize"):0);return($j?lang(3).($lg?" ".lang(4,$lg):""):lang(5));}function
 is_utf8($X){return(preg_match('~~u',$X)&&!preg_match('~[\0-\x8\xB\xC\xE-\x1F]~',$X));}function
 utf8_length($X){return
 strlen(preg_replace('~[\x80-\xBF]~','',$X));}function
-format_number($X){preg_match('~^#+([^#0]+)(?:(#+)\1)?(#*0)$~u',lang(6),$A);$Xj=strlen($A[3]);$J=number_format($X,0,".","");$J=preg_replace('~\B(?=(\d{'.(strlen($A[2])?:$Xj).'})*\d{'.$Xj.'}$)~',$A[1],$J);return
+format_number($X){preg_match('~^#+([^#0]+)(?:(#+)\1)?(#*0)$~u',lang(6),$A);$ek=strlen($A[3]);$J=number_format($X,0,".","");$J=preg_replace('~\B(?=(\d{'.(strlen($A[2])?:$ek).'})*\d{'.$ek.'}$)~',$A[1],$J);return
 strtr($J,preg_split('~~u',lang(7),-1,PREG_SPLIT_NO_EMPTY));}function
 format_status(array$S,$w){$X=idx($S,$w,'?');if(!is_numeric($X))return
 h($X);if($X<0)return'?';$ya=($w=="Rows"&&(JUSH=="sqlite"||$S["Engine"]==(JUSH=="pgsql"?"table":"InnoDB")));$X=in_array($w,array("Data_length","Index_length","Data_free"))?adminer()->formatSizeValue($X):format_number($X);return($ya?"~ ":"").$X;}function
 friendly_url($X){return
 preg_replace('~\W~i','-',$X);}function
-table_status1($R,$vd=false){$J=table_status($R,$vd);return($J?reset($J):array("Name"=>$R));}function
+table_status1($R,$yd=false){$J=table_status($R,$yd);return($J?reset($J):array("Name"=>$R));}function
 column_foreign_keys($R){$J=array();foreach(adminer()->foreignKeys($R)as$n){foreach($n["source"]as$X)$J[$X][]=$n;}return$J;}function
 fields_from_edit(){$J=array();foreach((array)$_POST["field_keys"]as$w=>$X){if($X!=""){$X=bracket_escape($X);$_POST["function"][$X]=$_POST["field_funs"][$w];$_POST["fields"][$X]=$_POST["field_vals"][$w];}}foreach((array)$_POST["fields"]as$w=>$X){$B=bracket_escape($w,true);$J[$B]=array("field"=>$B,"full_type"=>"","type"=>"","privileges"=>array("insert"=>1,"update"=>1,"where"=>1,"order"=>1),"null"=>true,"auto_increment"=>($B==driver()->primary),);}return$J;}function
-dump_headers($Fe,$Ig=false){$J=adminer()->dumpHeaders($Fe,$Ig);$Nh=$_POST["output"];if($Nh!="text"||$J=="tar"){$_b=($Nh!="text"&&$Nh!="file"&&preg_match('~^[0-9a-z]+$~',$Nh)?".$Nh":"");header("Content-Disposition: attachment; filename=".adminer()->dumpFilename($Fe).".$J$_b");}session_write_close();if(!ob_get_level())ob_start(null,4096);ob_flush();flush();return$J;}function
-dump_csv(array$K){$wl=$_POST["format"]=="tsv";foreach($K
-as$w=>$X){if(preg_match('~["\n]|^0[^.]|\.\d*0$|'.($wl?'\t':'[,;]|^$').'~',$X))$K[$w]='"'.str_replace('"','""',$X).'"';}echo
-implode(($_POST["format"]=="csv"?",":($wl?"\t":";")),$K)."\r\n";}function
-parse_csv($Sb,$Jj){$J=array();preg_match_all('~(?>"[^"]*"|[^"\r\n]+)+~',$Sb,$Zf);foreach($Zf[0]as$K){preg_match_all("~((?>\"[^\"]*\")+|[^$Jj]*)$Jj~",$K.$Jj,$ag);$J[]=$ag[1];}return$J;}function
-csv_value($X){return(preg_match('~^".*"$~s',$X)?str_replace('""','"',substr($X,1,-1)):$X);}function
+dump_headers($Ie,$Lg=false){$J=adminer()->dumpHeaders($Ie,$Lg);$Rh=$_POST["output"];if($Rh!="text"||$J=="tar"){$_b=($Rh!="text"&&$Rh!="file"&&preg_match('~^[0-9a-z]+$~',$Rh)?".$Rh":"");header("Content-Disposition: attachment; filename=".adminer()->dumpFilename($Ie).".$J$_b");}session_write_close();if(!ob_get_level())ob_start(null,4096);ob_flush();flush();return$J;}function
+dump_csv(array$K){$El=$_POST["format"]=="tsv";foreach($K
+as$w=>$X){if(preg_match('~["\n]|^0[^.]|\.\d*0$|'.($El?'\t':'[,;]|^$').'~',$X))$K[$w]='"'.str_replace('"','""',$X).'"';}echo
+implode(($_POST["format"]=="csv"?",":($El?"\t":";")),$K)."\r\n";}function
+parse_csv($Sb,$Qj){$J=array();preg_match_all('~(?>"[^"]*"|[^"\r\n]+)+~',$Sb,$bg);foreach($bg[0]as$K){preg_match_all("~((?>\"[^\"]*\")+|[^$Qj]*)$Qj~",$K.$Qj,$cg);$J[]=$cg[1];}return$J;}function
+csv_value($X){return(preg_match('~^".*"$~s',$X)?idf_unescape($X):$X);}function
 apply_sql_function($p,$c){return($p?($p=="unixepoch"?"DATETIME($c, '$p')":($p=="count distinct"?"COUNT(DISTINCT ":strtoupper("$p("))."$c)"):$c);}function
 get_temp_dir(){return
 ini_get("upload_tmp_dir")?:sys_get_temp_dir();}function
@@ -149,55 +150,55 @@ reset($Aa);}function
 password_file($Mb){$m=get_temp_dir()."/adminer.key";if(!$Mb&&!file_exists($m))return'';$o=file_open_lock($m);if(!$o)return'';$J=stream_get_contents($o);if(!$J){$J=rand_string();file_write_unlock($o,$J);}else
 file_unlock($o);return$J;}function
 rand_string(){return(function_exists('random_bytes')?bin2hex(random_bytes(16)):md5(uniqid(strval(mt_rand()),true)));}function
-select_value($X,$z,array$k,$Yk,array$ji=array()){if(is_array($X)){$J="";if(array_filter($X,'is_array')==array_values($X)){$wf=array();foreach($X
-as$W)$wf+=array_fill_keys(array_keys($W),null);foreach(array_keys($wf)as$uf)$J
-.="<th>".h($uf);foreach($X
+select_value($X,$z,array$k,$hl,array$oi=array()){if(is_array($X)){$J="";if(array_filter($X,'is_array')==array_values($X)){$yf=array();foreach($X
+as$W)$yf+=array_fill_keys(array_keys($W),null);foreach(array_keys($yf)as$wf)$J
+.="<th>".h($wf);foreach($X
 as$W){$J
-.="<tr>";foreach(array_merge($wf,$W)as$Xl)$J
-.="<td>".select_value($Xl,$z,$k,$Yk,$ji);}}else{foreach($X
-as$uf=>$W)$J
-.="<tr>".($X!=array_values($X)?"<th>".h($uf):"")."<td>".select_value($W,$z,$k,$Yk,$ji);}return"<table>$J</table>";}if(!$z)$z=adminer()->selectLink($X,$k);if($z===null){if(is_mail($X))$z="mailto:$X";if(is_url($X))$z=$X;}$X=driver()->value($X,$k);$J=adminer()->editVal($X,$k);if($J!==null){if(!is_utf8($J))$J="\0";elseif($Yk!=""&&is_shortable($k))$J=shorten_utf8($J,max(0,+$Yk),"",$ji);else$J=highlight_matches($J,$ji);}return
+.="<tr>";foreach(array_merge($yf,$W)as$gm)$J
+.="<td>".select_value($gm,$z,$k,$hl,$oi);}}else{foreach($X
+as$wf=>$W)$J
+.="<tr>".($X!=array_values($X)?"<th>".h($wf):"")."<td>".select_value($W,$z,$k,$hl,$oi);}return"<table>$J</table>";}if(!$z)$z=adminer()->selectLink($X,$k);if($z===null){if(is_mail($X))$z="mailto:$X";if(is_url($X))$z=$X;}$X=driver()->value($X,$k);$J=adminer()->editVal($X,$k);if($J!==null){if(!is_utf8($J))$J="\0";elseif($hl!=""&&is_shortable($k))$J=shorten_utf8($J,max(0,+$hl),"",$oi);else$J=highlight_matches($J,$oi);}return
 adminer()->selectVal($J,$z,$k,$X);}function
 is_blob(array$k){return
 preg_match('~blob|bytea|raw|file'.(JUSH=="mssql"?'|binary|image':'').'~',$k["type"])&&!in_array($k["type"],idx(driver()->structuredTypes(),lang(0),array()));}function
 is_identity_always(array$k){return$k["auto_increment"]&&(JUSH=="mssql"||$k["default"]=="GENERATED ALWAYS AS IDENTITY");}function
-is_mail($Qc){$Da='[-a-z0-9!#$%&\'*+/=?^_`{|}~]';$Cc='[a-z0-9]([-a-z0-9]{0,61}[a-z0-9])';$ii="$Da+(\\.$Da+)*@($Cc?\\.)+$Cc";return
-is_string($Qc)&&preg_match("(^$ii(,\\s*$ii)*\$)i",$Qc);}function
-is_url($Q){$Cc='[a-z0-9]([-a-z0-9]{0,61}[a-z0-9])';return
-preg_match("~^((https?):)?//($Cc?\\.)+$Cc(:\\d+)?(/.*)?(\\?.*)?(#.*)?\$~i",$Q);}function
-is_ipv6($ka){$q='[\da-f]{1,4}';$if='\d{1,3}(\.\d{1,3}){3}';return(bool)preg_match("~^(($q:){7}$q|($q:){6}$if|(($q:)*$q)?::(($q:)*($q|$if))?)$~iD",$ka);}function
+is_mail($Rc){$Da='[-a-z0-9!#$%&\'*+/=?^_`{|}~]';$Dc='[a-z0-9]([-a-z0-9]{0,61}[a-z0-9])';$ni="$Da+(\\.$Da+)*@($Dc?\\.)+$Dc";return
+is_string($Rc)&&preg_match("(^$ni(,\\s*$ni)*\$)i",$Rc);}function
+is_url($Q){$Dc='[a-z0-9]([-a-z0-9]{0,61}[a-z0-9])';return
+preg_match("~^((https?):)?//($Dc?\\.)+$Dc(:\\d+)?(/\\S*)?(\\?\\S*)?(#\\S*)?\$~iD",$Q);}function
+is_ipv6($ka){$q='[\da-f]{1,4}';$lf='\d{1,3}(\.\d{1,3}){3}';return(bool)preg_match("~^(($q:){7}$q|($q:){6}$lf|(($q:)*$q)?::(($q:)*($q|$lf))?)$~iD",$ka);}function
 is_shortable(array$k){return!preg_match('~'.number_type().'|date|time|year~',$k["type"]);}function
-url_host($Be){return(strpos($Be,":")!==false?"[$Be]":$Be);}function
-server_parts(array$ci){return
-array("scheme"=>(string)$ci["scheme"],"host"=>(string)$ci["host"],"port"=>(string)$ci["port"],"socket"=>(string)$ci["socket"],"path"=>(string)$ci["path"],);}function
+url_host($Ee){return(strpos($Ee,":")!==false?"[$Ee]":$Ee);}function
+server_parts(array$hi){return
+array("scheme"=>(string)$hi["scheme"],"host"=>(string)$hi["host"],"port"=>(string)$hi["port"],"socket"=>(string)$hi["socket"],"path"=>(string)$hi["path"],);}function
 parse_server($O){if($O=="")return
-server_parts(array());if($O[0]==":"&&!is_ipv6($O)){$fj=substr($O,1);if(preg_match('~^\d+$~D',$fj))return
-server_parts(array("port"=>$fj));return(preg_match('~^/[-\w.:/]*$~D',$fj)?server_parts(array("socket"=>$fj)):null);}$zj="";if(preg_match('~^([-+.\w]+)://~',$O,$A)){$zj=strtolower($A[1]);$O=substr($O,strlen($A[0]));}if(preg_match('~^\[(.+)](:(\d+))?(/[-\w./]*)?$~D',$O,$A))return(is_ipv6($A[1])?server_parts(array("scheme"=>$zj,"host"=>$A[1],"port"=>$A[3],"path"=>$A[4])):null);if(is_ipv6($O))return
-server_parts(array("scheme"=>$zj,"host"=>$O));if(preg_match('~^(/[-\w./]*)(:(\d+))?$~D',$O,$A))return
-server_parts(array("scheme"=>$zj,"host"=>$A[1],"port"=>$A[3]));return(preg_match('~^([-\w.]*)(:(\d+))?(/[-\w./]*)?$~D',$O,$A)?server_parts(array("scheme"=>$zj,"host"=>$A[1],"port"=>$A[3],"path"=>$A[4])):null);}function
-count_rows($R,array$Z,$kf,array$q){$H=" FROM ".table($R).($Z?" WHERE ".implode(" AND ",$Z):"");return($kf&&(JUSH=="sql"||count($q)==1)?"SELECT COUNT(DISTINCT ".implode(", ",$q).")$H":"SELECT COUNT(*)".($kf?" FROM (SELECT 1$H GROUP BY ".implode(", ",$q).") x":$H));}function
-slow_query($H){$h=adminer()->database();$bl=adminer()->queryTimeout();$Yj=driver()->slowQuery($H,$bl);$f=null;if(!$Yj&&support("kill")){$f=connect();if($f&&($h==""||$f->select_db($h))){$xf=number(get_val(connection_id(),0,$f));echo
-script("const timeout = setTimeout(() => { ajax('".js_escape(ME)."script=kill', function () {}, 'kill=$xf&token=".get_token()."'); }, 1000 * $bl);");}}ob_flush();flush();$J=@get_key_vals(($Yj?:$H),$f,false);if($f){echo
+server_parts(array());if($O[0]==":"&&!is_ipv6($O)){$mj=substr($O,1);if(preg_match('~^\d+$~D',$mj))return
+server_parts(array("port"=>$mj));return(preg_match('~^/[-\w.:/]*$~D',$mj)?server_parts(array("socket"=>$mj)):null);}$Fj="";if(preg_match('~^([-+.\w]+)://~',$O,$A)){$Fj=strtolower($A[1]);$O=substr($O,strlen($A[0]));}if(preg_match('~^\[(.+)](:(\d+))?(/[-\w./]*)?$~D',$O,$A))return(is_ipv6($A[1])?server_parts(array("scheme"=>$Fj,"host"=>$A[1],"port"=>$A[3],"path"=>$A[4])):null);if(is_ipv6($O))return
+server_parts(array("scheme"=>$Fj,"host"=>$O));if(preg_match('~^(/[-\w./]*)(:(\d+))?$~D',$O,$A))return
+server_parts(array("scheme"=>$Fj,"host"=>$A[1],"port"=>$A[3]));return(preg_match('~^([-\w.]*)(:(\d+))?(/[-\w./]*)?$~D',$O,$A)?server_parts(array("scheme"=>$Fj,"host"=>$A[1],"port"=>$A[3],"path"=>$A[4])):null);}function
+count_rows($R,array$Z,$nf,array$q){$H=" FROM ".table($R).($Z?" WHERE ".implode(" AND ",$Z):"");return($nf&&(JUSH=="sql"||count($q)==1)?"SELECT COUNT(DISTINCT ".implode(", ",$q).")$H":"SELECT COUNT(*)".($nf?" FROM (SELECT 1$H GROUP BY ".implode(", ",$q).") x":$H));}function
+slow_query($H){$h=adminer()->database();$kl=adminer()->queryTimeout();$fk=driver()->slowQuery($H,$kl);$f=null;if(!$fk&&support("kill")){$f=connect();if($f&&($h==""||$f->select_db($h))){$zf=number(get_val(connection_id(),0,$f));echo
+script("const timeout = setTimeout(() => { ajax('".js_escape(ME)."script=kill', function () {}, 'kill=$zf&token=".get_token()."'); }, 1000 * $kl);");}}ob_flush();flush();$J=@get_key_vals(($fk?:$H),$f,false);if($f){echo
 script("clearTimeout(timeout);");ob_flush();flush();}return$J;}function
-get_token(){$Pi=rand(1,1e6);return($Pi^$_SESSION["token"]).":$Pi";}function
-verify_token(){list($jl,$Pi)=explode(":",$_POST["token"]);return($Pi^$_SESSION["token"])==$jl&&in_array($_SERVER["HTTP_SEC_FETCH_SITE"],array("","same-origin"));}function
+get_token(){$Wi=rand(1,1e6);return($Wi^$_SESSION["token"]).":$Wi";}function
+verify_token(){list($sl,$Wi)=explode(":",$_POST["token"]);return($Wi^$_SESSION["token"])==$sl&&in_array($_SERVER["HTTP_SEC_FETCH_SITE"],array("","same-origin"));}function
 compress_alphabet(){return
 strtr(implode(range('"','~')),"'\\","!\n");}function
-decompress_string($Q,$rc=""){$ua=array_flip(str_split(compress_alphabet()));$x=strlen($Q);$Zl=($x?13*($x-1)/2-$ua[$Q[0]]:0);$Ra="";$fj=0;$gj=0;for($r=1;$r<$x;$r+=2){$fj=($fj<<13)+$ua[$Q[$r]]*93+$ua[$Q[$r+1]];$gj+=13;while($gj>=8&&$Zl>=8){$gj-=8;$Zl-=8;$Ra
-.=chr($fj>>$gj);$fj&=(1<<$gj)-1;}}if($Ra=="")return"";if($rc!=""&&function_exists('inflate_init'))return
-inflate_add(inflate_init(ZLIB_ENCODING_RAW,array('dictionary'=>$rc)),$Ra,ZLIB_FINISH);return($rc==""&&function_exists('gzinflate')?gzinflate($Ra):inflate($Ra,$rc));}function
-inflate($Ra,$rc=""){$Kf=array(3,4,5,6,7,8,9,10,11,13,15,17,19,23,27,31,35,43,51,59,67,83,99,115,131,163,195,227,258);$Lf=array(0,0,0,0,0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,0);$vc=array(1,2,3,4,5,7,9,13,17,25,33,49,65,97,129,193,257,385,513,769,1025,1537,2049,3073,4097,6145,8193,12289,16385,24577);$xc=array(0,0,0,0,1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9,10,10,11,11,12,12,13,13);$J=$rc;$G=0;do{$Fd=inflate_bits($Ra,$G,1);$U=inflate_bits($Ra,$G,2);if(!$U){$G=($G+7)&~7;$x=inflate_bits($Ra,$G,16);$G+=16;$J
-.=substr($Ra,$G>>3,$x);$G+=$x<<3;}else{if($U==1){$Tf=array_merge(array_fill(0,144,8),array_fill(0,112,9),array_fill(0,24,7),array_fill(0,8,8));$yc=array_fill(0,30,5);}else{$Sf=inflate_bits($Ra,$G,5)+257;$wc=inflate_bits($Ra,$G,5)+1;$D=array(16,17,18,0,8,7,9,6,10,5,11,4,12,3,13,2,14,1,15);$xg=array_fill(0,19,0);$wg=inflate_bits($Ra,$G,4)+4;for($r=0;$r<$wg;$r++)$xg[$D[$r]]=inflate_bits($Ra,$G,3);$yg=inflate_table($xg);$Mf=array();while(count($Mf)<$Sf+$wc){$_k=inflate_symbol($Ra,$G,$yg);if($_k==16)$Mf=array_merge($Mf,array_fill(0,inflate_bits($Ra,$G,2)+3,end($Mf)));elseif($_k==17)$Mf=array_merge($Mf,array_fill(0,inflate_bits($Ra,$G,3)+3,0));elseif($_k==18)$Mf=array_merge($Mf,array_fill(0,inflate_bits($Ra,$G,7)+11,0));else$Mf[]=$_k;}$Tf=array_slice($Mf,0,$Sf);$yc=array_slice($Mf,$Sf);}$Uf=inflate_table($Tf);$_c=inflate_table($yc);while(($_k=inflate_symbol($Ra,$G,$Uf))!=256){if($_k<256)$J
-.=chr($_k);else{$x=$Kf[$_k-257]+inflate_bits($Ra,$G,$Lf[$_k-257]);$zc=inflate_symbol($Ra,$G,$_c);$kh=strlen($J)-$vc[$zc]-inflate_bits($Ra,$G,$xc[$zc]);for($r=0;$r<$x;$r++)$J
-.=$J[$kh+$r];}}}}while(!$Fd);return($rc==""?$J:substr($J,strlen($rc)));}function
+decompress_string($Q,$sc=""){$ua=array_flip(str_split(compress_alphabet()));$x=strlen($Q);$im=($x?13*($x-1)/2-$ua[$Q[0]]:0);$Ra="";$mj=0;$nj=0;for($r=1;$r<$x;$r+=2){$mj=($mj<<13)+$ua[$Q[$r]]*93+$ua[$Q[$r+1]];$nj+=13;while($nj>=8&&$im>=8){$nj-=8;$im-=8;$Ra
+.=chr($mj>>$nj);$mj&=(1<<$nj)-1;}}if($Ra=="")return"";if($sc!=""&&function_exists('inflate_init'))return
+inflate_add(inflate_init(ZLIB_ENCODING_RAW,array('dictionary'=>$sc)),$Ra,ZLIB_FINISH);return($sc==""&&function_exists('gzinflate')?gzinflate($Ra):inflate($Ra,$sc));}function
+inflate($Ra,$sc=""){$Mf=array(3,4,5,6,7,8,9,10,11,13,15,17,19,23,27,31,35,43,51,59,67,83,99,115,131,163,195,227,258);$Nf=array(0,0,0,0,0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,0);$wc=array(1,2,3,4,5,7,9,13,17,25,33,49,65,97,129,193,257,385,513,769,1025,1537,2049,3073,4097,6145,8193,12289,16385,24577);$yc=array(0,0,0,0,1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9,10,10,11,11,12,12,13,13);$J=$sc;$G=0;do{$Id=inflate_bits($Ra,$G,1);$U=inflate_bits($Ra,$G,2);if(!$U){$G=($G+7)&~7;$x=inflate_bits($Ra,$G,16);$G+=16;$J
+.=substr($Ra,$G>>3,$x);$G+=$x<<3;}else{if($U==1){$Vf=array_merge(array_fill(0,144,8),array_fill(0,112,9),array_fill(0,24,7),array_fill(0,8,8));$zc=array_fill(0,30,5);}else{$Uf=inflate_bits($Ra,$G,5)+257;$xc=inflate_bits($Ra,$G,5)+1;$D=array(16,17,18,0,8,7,9,6,10,5,11,4,12,3,13,2,14,1,15);$_g=array_fill(0,19,0);$zg=inflate_bits($Ra,$G,4)+4;for($r=0;$r<$zg;$r++)$_g[$D[$r]]=inflate_bits($Ra,$G,3);$Ag=inflate_table($_g);$Of=array();while(count($Of)<$Uf+$xc){$Ik=inflate_symbol($Ra,$G,$Ag);if($Ik==16)$Of=array_merge($Of,array_fill(0,inflate_bits($Ra,$G,2)+3,end($Of)));elseif($Ik==17)$Of=array_merge($Of,array_fill(0,inflate_bits($Ra,$G,3)+3,0));elseif($Ik==18)$Of=array_merge($Of,array_fill(0,inflate_bits($Ra,$G,7)+11,0));else$Of[]=$Ik;}$Vf=array_slice($Of,0,$Uf);$zc=array_slice($Of,$Uf);}$Wf=inflate_table($Vf);$Ac=inflate_table($zc);while(($Ik=inflate_symbol($Ra,$G,$Wf))!=256){if($Ik<256)$J
+.=chr($Ik);else{$x=$Mf[$Ik-257]+inflate_bits($Ra,$G,$Nf[$Ik-257]);$_c=inflate_symbol($Ra,$G,$Ac);$nh=strlen($J)-$wc[$_c]-inflate_bits($Ra,$G,$yc[$_c]);for($r=0;$r<$x;$r++)$J
+.=$J[$nh+$r];}}}}while(!$Id);return($sc==""?$J:substr($J,strlen($sc)));}function
 inflate_bits($Ra,&$G,$Lb){$J=0;for($r=0;$r<$Lb;$r++){$J+=((ord($Ra[$G>>3])>>($G&7))&1)<<$r;$G++;}return$J;}function
-inflate_table(array$Mf){$R=array();$pb=0;for($Sa=1;$Sa<=max($Mf);$Sa++){foreach($Mf
-as$_k=>$x){if($x==$Sa){$R[$Sa][$pb]=$_k;$pb++;}}$pb<<=1;}return$R;}function
+inflate_table(array$Of){$R=array();$pb=0;for($Sa=1;$Sa<=max($Of);$Sa++){foreach($Of
+as$Ik=>$x){if($x==$Sa){$R[$Sa][$pb]=$Ik;$pb++;}}$pb<<=1;}return$R;}function
 inflate_symbol($Ra,&$G,array$R){$pb=0;$Sa=0;do{$pb=($pb<<1)+inflate_bits($Ra,$G,1);$Sa++;}while(!isset($R[$Sa][$pb]));return$R[$Sa][$pb];}function
-script($dk,$ml="\n"){return"<script".nonce().">$dk</script>$ml";}function
-script_src($Ol,$hc=false){return"<script src='".h($Ol)."'".nonce().($hc?" defer":"")."></script>\n";}function
+script($kk,$vl="\n"){return"<script".nonce().">$kk</script>$vl";}function
+script_src($Xl,$ic=false){return"<script src='".h($Xl)."'".nonce().($ic?" defer":"")."></script>\n";}function
 nonce(){return' nonce="'.get_nonce().'"';}function
-on($ed,$ke,$za=null){$_a=array();foreach(array_slice(func_get_args(),2)as$X)$_a[]=json_encode($X,256);return" data-on$ed='".str_replace(array('&','<',"'"),array('&amp;','&lt;','&#039;'),"$ke(".implode(", ",$_a).")")."'";}function
+on($hd,$ne,$za=null){$_a=array();foreach(array_slice(func_get_args(),2)as$X)$_a[]=json_encode($X,256);return" data-on$hd='".str_replace(array('&','<',"'"),array('&amp;','&lt;','&#039;'),"$ne(".implode(", ",$_a).")")."'";}function
 input_hidden($B,$Y=""){return"<input type='hidden' name='".h($B)."' value='".h($Y)."'>\n";}function
 input_token(){return
 input_hidden("token",get_token());}function
@@ -206,22 +207,22 @@ h($Q){return
 str_replace(array('&','<','"',"'","\0"),array('&amp;','&lt;','&quot;','&#039;','&#0;'),$Q);}function
 nl_br($Q){return
 str_replace("\n","<br>",$Q);}function
-checkbox($B,$Y,$ib,$zf="",$b="",$ob="",$Af=""){$J="<input type='checkbox' name='$B' value='".h($Y)."'".($ib?" checked":"").($zf==""&&$ob?" class='$ob'":"").($Af?" aria-labelledby='$Af'":"").$b.">";return($zf!=""?"<label".($ob?" class='$ob'":"").">$J".h($zf)."</label>":$J);}function
-optionlist($C,$Gj=null,$Sl=false){$J="";foreach($C
-as$uf=>$W){$Ah=array($uf=>$W);if(is_array($W)){$J
-.='<optgroup label="'.h($uf).'">';$Ah=$W;}foreach($Ah
+checkbox($B,$Y,$ib,$Af="",$b="",$ob="",$Cf=""){$J="<input type='checkbox' name='$B' value='".h($Y)."'".($ib?" checked":"").($Af==""&&$ob?" class='$ob'":"").($Cf?" aria-labelledby='$Cf'":"").$b.">";return($Af!=""?"<label".($ob?" class='$ob'":"").">$J".h($Af)."</label>":$J);}function
+optionlist($C,$Nj=null,$bm=false){$J="";foreach($C
+as$wf=>$W){$Eh=array($wf=>$W);if(is_array($W)){$J
+.='<optgroup label="'.h($wf).'">';$Eh=$W;}foreach($Eh
 as$w=>$X)$J
-.='<option'.($Sl||is_string($w)?' value="'.h($w).'"':'').($Gj!==null&&($Sl||is_string($w)?(string)$w:$X)===$Gj?' selected':'').'>'.h($X);if(is_array($W))$J
+.='<option'.($bm||is_string($w)?' value="'.h($w).'"':'').($Nj!==null&&($bm||is_string($w)?(string)$w:$X)===$Nj?' selected':'').'>'.h($X);if(is_array($W))$J
 .='</optgroup>';}return$J;}function
-group_system(array$Qg,$yj=false){$J=array();$Ak=array();foreach($Qg
-as$B){if($yj?driver()->isSystem(DB,$B):driver()->isSystem($B))$Ak[]=$B;else$J[]=$B;}if($Ak)$J[lang(8,'')]=$Ak;return$J;}function
-html_select($B,array$C,$Y="",$b="",$Af=""){static$zf=0;$_f="";if(!$Af&&substr($C[""],0,1)=="("){$zf++;$Af="label-$zf";$_f="<option value='' id='$Af'>".h($C[""]);unset($C[""]);}return"<select name='".h($B)."'".($Af?" aria-labelledby='$Af'":"")."$b>".$_f.optionlist($C,$Y)."</select>";}function
-html_radios($B,array$C,$Y="",$Jj=""){$J="";foreach($C
+group_system(array$Tg,$Ej=false){$J=array();$Jk=array();foreach($Tg
+as$B){if($Ej?driver()->isSystem(DB,$B):driver()->isSystem($B))$Jk[]=$B;else$J[]=$B;}if($Jk)$J[lang(8,'')]=$Jk;return$J;}function
+html_select($B,array$C,$Y="",$b="",$Cf=""){static$Af=0;$Bf="";if(!$Cf&&substr($C[""],0,1)=="("){$Af++;$Cf="label-$Af";$Bf="<option value='' id='$Cf'>".h($C[""]);unset($C[""]);}return"<select name='".h($B)."'".($Cf?" aria-labelledby='$Cf'":"")."$b>".$Bf.optionlist($C,$Y)."</select>";}function
+html_radios($B,array$C,$Y="",$Qj=""){$J="";foreach($C
 as$w=>$X)$J
-.="<label><input type='radio' name='".h($B)."' value='".h($w)."'".($w==$Y?" checked":"").">".h($X)."</label>$Jj";return$J;}function
-confirm($rg=""){return
-on('click','confirmClick',$rg?:lang(9));}function
-print_fieldset($s,$Jf,$hm=false){echo"<fieldset><legend>","<a href='#fieldset-$s' class='toggle'>$Jf</a>","</legend>","<div id='fieldset-$s'".($hm?"":" class='hidden'").">\n";}function
+.="<label><input type='radio' name='".h($B)."' value='".h($w)."'".($w==$Y?" checked":"").">".h($X)."</label>$Qj";return$J;}function
+confirm($tg=""){return
+on('click','confirmClick',$tg?:lang(9));}function
+print_fieldset($s,$Lf,$qm=false){echo"<fieldset><legend>","<a href='#fieldset-$s' class='toggle'>$Lf</a>","</legend>","<div id='fieldset-$s'".($qm?"":" class='hidden'").">\n";}function
 bold($Ta,$ob=""){return($Ta?" class='active $ob'":($ob?" class='$ob'":""));}function
 js_escape($Q){return
 str_replace("<","\\x3C",addcslashes($Q,"\r\n'\\"));}function
@@ -230,2027 +231,2132 @@ addcslashes(preg_quote($Q,"/"),"\r\n");}function
 pagination_href($E){return
 remove_from_uri("page|next").($E?"&page=$E".($_GET["next"]!=""?"&next=".url_escape($_GET["next"]):""):"");}function
 pagination($E,$Tb){return" ".($E==$Tb?($E?"<b>".($E+1)."</b>":$E+1):'<a href="'.h(pagination_href($E)).'">'.($E+1)."</a>");}function
-hidden_fields(array$Hi,array$Je=array(),$zi=''){$J=false;foreach($Hi
-as$w=>$X){if(!in_array($w,$Je)){if(is_array($X))hidden_fields($X,array(),$w);else{$J=true;echo
-input_hidden(($zi?$zi."[$w]":$w),$X);}}}return$J;}function
+hidden_fields(array$Mi,array$Me=array(),$Di=''){$J=false;foreach($Mi
+as$w=>$X){if(!in_array($w,$Me)){if(is_array($X))hidden_fields($X,array(),$w);else{$J=true;echo
+input_hidden(($Di?$Di."[$w]":$w),$X);}}}return$J;}function
 hidden_fields_get(){echo(sid()?input_hidden(session_name(),session_id()):''),($_GET["ext"]?input_hidden("ext",$_GET["ext"]):""),(isset($_GET[DRIVER])?input_hidden(DRIVER,SERVER):""),input_hidden("username",$_GET["username"]);}function
-on_upload_progress(&$Ml){$Ml=(ini_bool("session.upload_progress.enabled")&&ini_get("session.upload_progress.name")?rand_string():"");return($Ml?on('submit','uploadProgress',ME."upload=$Ml",SESSION_NAME."=$Ml"):"");}function
-file_input($b,$fj=""){$dg="max_file_uploads";$eg=ini_get($dg);$jg="upload_max_filesize";$kg=ini_bytes($jg);$vi=ini_bytes("post_max_size");if($vi&&$vi<$kg){$jg="post_max_size";$kg=$vi;}$lg=ini_get($jg);return(ini_bool("file_uploads")?"<input type='file'$b".on('change','fileChange',(int)$eg,lang(10,"$dg = $eg"),$kg,lang(10,"$jg = $lg")).">$fj":lang(11));}function
-enum_input($U,$b,array$k,$Y,$Tc=""){preg_match_all("~".driver()->enumLength."~",$k["length"],$Zf);$zi=($k["type"]=="enum"?"val-":"");$ib=(is_array($Y)?in_array("null",$Y):$Y===null);$J=($k["null"]&&$zi?"<label><input type='$U'$b value='null'".($ib?" checked":"")."><i>$Tc</i></label>":"");foreach($Zf[0]as$X){$X=stripcslashes(idf_unescape($X));$ib=(is_array($Y)?in_array($zi.$X,$Y):$Y===$X);$J
-.=" <label><input type='$U'$b value='".h($zi.$X)."'".($ib?' checked':'').'>'.h(adminer()->editVal($X,$k)).'</label>';}return$J;}function
-input(array$k,$Y,$p,$Ia=false,$Jl=false){$B=h(bracket_escape($k["field"]));echo"<td class='function'>";$Zc=driver()->enumLength($k);if($Zc){$k["type"]="enum";$k["length"]=$Zc;}$C=($k["type"]=="enum"||$k["type"]=="set");if(is_array($Y)&&!$p&&!$C)$p="json";$sf=($p=="json"||preg_match('~^jsonb?$~',$k["full_type"]));if($sf&&$Y!=''&&(JUSH!="pgsql"||$k["type"]!="json")&&(is_array($Y)||!$_POST["save"]))$Y=(is_array($Y)?json_encode($Y,128|64|256):json_encode_exact(json_decode_exact($Y),128|64|256));$ej=($Jl&&is_identity_always($k));if($ej&&!$_POST["save"])$p=null;$Xd=(isset($_GET["select"])||$ej?array("orig"=>lang(12)):array())+adminer()->editFunctions($k);$b=" name='fields[$B]".($C?"[]":"")."'".($Ia?" autofocus":"");echo
+on_upload_progress(&$Vl){$Vl=(ini_bool("session.upload_progress.enabled")&&ini_get("session.upload_progress.name")?rand_string():"");return($Vl?on('submit','uploadProgress',ME."upload=$Vl",SESSION_NAME."=$Vl"):"");}function
+file_input($b,$mj=""){$fg="max_file_uploads";$gg=ini_get($fg);$lg="upload_max_filesize";$mg=ini_bytes($lg);$_i=ini_bytes("post_max_size");if($_i&&$_i<$mg){$lg="post_max_size";$mg=$_i;}$ng=ini_get($lg);return(ini_bool("file_uploads")?"<input type='file'$b".on('change','fileChange',(int)$gg,lang(10,"$fg = $gg"),$mg,lang(10,"$lg = $ng")).">$mj":lang(11));}function
+enum_input($U,$b,array$k,$Y,$Uc=""){preg_match_all("~".driver()->enumLength."~",$k["length"],$bg);$Di=($k["type"]=="enum"?"val-":"");$ib=(is_array($Y)?in_array("null",$Y):$Y===null);$J=($k["null"]&&$Di?"<label><input type='$U'$b value='null'".($ib?" checked":"")."><i>$Uc</i></label>":"");foreach($bg[0]as$X){$X=stripcslashes(idf_unescape($X));$ib=(is_array($Y)?in_array($Di.$X,$Y):$Y===$X);$J
+.=" <label><input type='$U'$b value='".h($Di.$X)."'".($ib?' checked':'').'>'.h(adminer()->editVal($X,$k)).'</label>';}return$J;}function
+input(array$k,$Y,$p,$Ia=false,$Sl=false){$B=h(bracket_escape($k["field"]));echo"<td class='function'>";$bd=driver()->enumLength($k);if($bd){$k["type"]="enum";$k["length"]=$bd;}$C=($k["type"]=="enum"||$k["type"]=="set");if(is_array($Y)&&!$p&&!$C)$p="json";$uf=($p=="json"||preg_match('~^jsonb?$~',$k["full_type"]));if($uf&&$Y!=''&&(JUSH!="pgsql"||$k["type"]!="json")&&(is_array($Y)||!$_POST["save"]))$Y=(is_array($Y)?json_encode($Y,128|64|256):json_encode_exact(json_decode_exact($Y),128|64|256));$lj=($Sl&&is_identity_always($k));if($lj&&!$_POST["save"])$p=null;$ae=(isset($_GET["select"])||$lj?array("orig"=>lang(12)):array())+adminer()->editFunctions($k);$b=" name='fields[$B]".($C?"[]":"")."'".($Ia?" autofocus":"");echo
 driver()->unconvertFunction($k)." ";$R=$_GET["edit"]?:$_GET["select"];if($k["type"]=="enum")echo
-h($Xd[""])."<td>".adminer()->editInput($R,$k,$b,$Y);else{$me=(in_array($p,$Xd)||isset($Xd[$p]));$Gd=0;foreach($Xd
-as$w=>$X){if($w===""||!$X)break;$Gd++;}echo(count($Xd)>1?"<select name='function[$B]'".on('change','functionChange').on_help_value('^SQL$').">".optionlist($Xd,$p===null||$me?$p:"")."</select>":h(reset($Xd)))."<td".($Gd&&count($Xd)>1?on('input','skipOriginal',$Gd):"").">";$Ye=adminer()->editInput($R,$k,$b,$Y);if($Ye!="")echo$Ye;elseif(preg_match('~bool~',$k["type"]))echo"<input type='hidden'$b value='0'>"."<input type='checkbox'".(preg_match('~^(1|t|true|y|yes|on)$~i',$Y)?" checked":"")."$b value='1'>";elseif($k["type"]=="set")echo
-enum_input("checkbox",$b,$k,(is_string($Y)?explode(",",$Y):$Y));elseif(is_blob($k)&&ini_bool("file_uploads"))echo"<input type='file' name='fields-$B'>";elseif($sf)echo"<textarea$b cols='50' rows='12' class='jush-json'>".h($Y).'</textarea>';elseif(($Xk=preg_match('~text|lob|memo~i',$k["type"]))||preg_match("~\n~",$Y)){if($Xk&&JUSH!="sqlite")$b
+h($ae[""])."<td>".adminer()->editInput($R,$k,$b,$Y);else{$pe=(in_array($p,$ae)||isset($ae[$p]));$Jd=0;foreach($ae
+as$w=>$X){if($w===""||!$X)break;$Jd++;}echo(count($ae)>1?"<select name='function[$B]'".on('change','functionChange').on_help_value('^SQL$').">".optionlist($ae,$p===null||$pe?$p:"")."</select>":h(reset($ae)))."<td".($Jd&&count($ae)>1?on('input','skipOriginal',$Jd):"").">";$bf=adminer()->editInput($R,$k,$b,$Y);if($bf!="")echo$bf;elseif(preg_match('~bool~',$k["type"]))echo"<input type='hidden'$b value='0'>"."<input type='checkbox'".(preg_match('~^(1|t|true|y|yes|on)$~i',$Y)?" checked":"")."$b value='1'>";elseif($k["type"]=="set")echo
+enum_input("checkbox",$b,$k,(is_string($Y)?explode(",",$Y):$Y));elseif(is_blob($k)&&ini_bool("file_uploads"))echo"<input type='file' name='fields-$B'>";elseif($uf)echo"<textarea$b cols='50' rows='12' class='jush-json'>\n".h($Y).'</textarea>';elseif(($gl=preg_match('~text|lob|memo~i',$k["type"]))||preg_match("~\n~",$Y)){if($gl&&JUSH!="sqlite")$b
 .=" cols='50' rows='12'";else{$L=min(12,substr_count($Y,"\n")+1);$b
-.=" cols='30' rows='$L'";}echo"<textarea$b>".h($Y).'</textarea>';}else{$_l=driver()->types();$yl=$_l[$k["type"]];$Aa=preg_match('~\[]~',$k["full_type"]);if($Aa)$mg=0;elseif(preg_match('~date|time|year~',$k["type"])){$yi=($k["length"]==""&&JUSH=="pgsql"?6:$k["length"]);$Rd=(preg_match('~time~',$k["type"])&&preg_match('~^[1-9]\d*$~',$yi)?$yi+1:0);$mg=($yl?$yl+$Rd:0);}elseif(!preg_match('~int|vector~',$k["type"])&&preg_match('~^(\d+)(,(\d+))?$~',$k["length"],$A))$mg=(preg_match("~binary~",$k["type"])?2:1)*$A[1]+($A[3]?1:0)+($A[2]&&!$k["unsigned"]?1:0);else$mg=($yl?$yl+($k["unsigned"]?0:1):0);echo"<input".((!$me||$p==="")&&preg_match('~^'.int_type().'$~',$k["type"])&&!$Aa?" type='number'":"")." value='".h($Y)."'".($mg?" data-maxlength='$mg'":"").(preg_match('~char|binary~',$k["type"])&&$mg>20?" size='".($mg>99?60:40)."'":"")."$b>";}echo
-adminer()->editHint($R,$k,$Y),(count($Xd)>1?script("fire(qs('select', qsl('td').previousSibling), 'change');",""):"");}}function
-process_input(array$k){$t=bracket_escape($k["field"]);$p=idx($_POST["function"],$t);if($p=="orig")return(preg_match('~^CURRENT_TIMESTAMP~i',$k["on_update"])?idf_escape($k["field"]):false);if($p=="NULL")return"NULL";if(is_blob($k)&&ini_bool("file_uploads")){$Ad=get_file("fields-$t");if(!is_string($Ad))return
+.=" cols='30' rows='$L'";}echo"<textarea$b>\n".h($Y).'</textarea>';}else{$Il=driver()->types();$Gl=$Il[$k["type"]];$Aa=preg_match('~\[]~',$k["full_type"]);if($Aa)$og=0;elseif(preg_match('~date|time|year~',$k["type"])){$Ci=($k["length"]==""&&JUSH=="pgsql"?6:$k["length"]);$Ud=(preg_match('~time~',$k["type"])&&preg_match('~^[1-9]\d*$~',$Ci)?$Ci+1:0);$og=($Gl?$Gl+$Ud:0);}elseif(!preg_match('~int|vector~',$k["type"])&&preg_match('~^(\d+)(,(\d+))?$~',$k["length"],$A))$og=(preg_match("~binary~",$k["type"])?2:1)*$A[1]+($A[3]?1:0)+($A[2]&&!$k["unsigned"]?1:0);else$og=($Gl?$Gl+($k["unsigned"]?0:1):0);echo"<input".((!$pe||$p==="")&&preg_match('~^'.int_type().'$~',$k["type"])&&!$Aa?" type='number'":"")." value='".h($Y)."'".($og?" data-maxlength='$og'":"").(preg_match('~char|binary~',$k["type"])&&$og>20?" size='".($og>99?60:40)."'":"")."$b>";}echo
+adminer()->editHint($R,$k,$Y),(count($ae)>1?script("fire(qs('select', qsl('td').previousSibling), 'change');",""):"");}}function
+process_input(array$k){$t=bracket_escape($k["field"]);$p=idx($_POST["function"],$t);if($p=="orig")return(preg_match('~^CURRENT_TIMESTAMP~i',$k["on_update"])?idf_escape($k["field"]):false);if($p=="NULL")return"NULL";if(is_blob($k)&&ini_bool("file_uploads")){$Dd=get_file("fields-$t");if(!is_string($Dd))return
 false;return
-driver()->quoteBinary($Ad);}$Y=idx($_POST["fields"],$t);if($Y===null)return
+driver()->quoteBinary($Dd);}$Y=idx($_POST["fields"],$t);if($Y===null)return
 false;if($k["type"]=="enum"||driver()->enumLength($k)){$Y=idx($Y,0);if($Y=="orig"||!$Y)return
 false;if($Y=="null")return"NULL";$Y=substr($Y,4);}if($k["auto_increment"]&&$Y=="")return
 null;if($k["type"]=="set")$Y=implode(",",(array)$Y);if($p=="json"){$Y=json_decode($Y,true);if(!is_array($Y))return
 false;return$Y;}return
 adminer()->processInput($k,$Y,$p);}function
-search_tables(){$_GET["where"][0]["val"]=$_POST["query"];$Ij="<ul>\n";foreach(table_status('',true)as$R=>$S){$B=adminer()->tableName($S);if(isset($S["Engine"])&&$B!=""&&(!$_POST["tables"]||in_array($R,$_POST["tables"]))){$I=connection()->query("SELECT".limit("1 FROM ".table($R)," WHERE ".implode(" AND ",adminer()->selectSearchProcess(fields($R),array(),$S)),1));if(!$I||$I->fetch_row()){$Di="<a href='".h(ME."select=".url_escape($R)."&where[0][op]=".url_escape($_GET["where"][0]["op"])."&where[0][val]=".url_escape($_GET["where"][0]["val"]))."'>$B</a>";echo"$Ij<li>".($I?$Di:"<p class='error'>$Di: ".adminer()->error())."\n";$Ij="";}}}echo($Ij?"<p class='message'>".lang(13):"</ul>")."\n";}function
-on_help($Xk,$Wj=0){return
-on('mouseover','helpMouseover',$Xk,$Wj).on('mouseout','helpMouseout');}function
-on_help_value($Zi="",$dj=""){return
-on('mouseover','helpValueMouseover',$Zi,$dj).on('mouseout','helpMouseout');}function
-edit_form($R,array$l,$K,$Jl,$j='',$H='',$al=''){$Gk=adminer()->tableName(table_status1($R,true));page_header(($Jl?lang(14):lang(15)),$j,array("select"=>array($R,$Gk)),$Gk);adminer()->editRowPrint($R,$l,$K,$Jl,$H,$al);if($K===false){echo"<p class='error'>".lang(16)."\n";return;}echo"<form action='' method='post' enctype='multipart/form-data' id='form'>\n";$Oc=false;$nm=($Jl&&!isset($_GET["select"])?where_columns($l):array());$Hb=(count($nm)!=count($l));if(!$Hb)$nm=array();if(!$l)echo"<p class='error'>".lang(17)."\n";else{echo"<table class='layout nowrap'".on('keydown','editingKeydown').">\n";$Ia=!$_POST;foreach($l
-as$B=>$k){echo"<tr".($nm[$B]?on('change','whereChange'):"")."><th>".adminer()->fieldName($k);$i=idx($_GET["set"],bracket_escape($B));if($i===null){$i=$k["default"];if($k["type"]=="bit"&&preg_match("~^b'([01]*)'\$~",$i,$bj))$i=$bj[1];if(JUSH=="sql"&&preg_match('~binary~',$k["type"]))$i=bin2hex($i);}$Y=($K!==null?($k["type"]=="set"&&is_array($K[$B])?implode(",",$K[$B]):(is_bool($K[$B])?+$K[$B]:$K[$B])):(!$Jl&&$k["auto_increment"]?"":(isset($_GET["select"])?false:$i)));if(!$_POST["save"]&&is_string($Y))$Y=adminer()->editVal($Y,$k);if(($Jl&&!isset($k["privileges"]["update"]))||$k["generated"])echo"<td class='function'><td>".select_value($Y,'',$k,null);else{$Oc=true;$p=($_POST["save"]?idx($_POST["function"],bracket_escape($B),""):($Jl&&preg_match('~^CURRENT_TIMESTAMP~i',$k["on_update"])?"now":($Y===false?null:($Y!==null?'':'NULL'))));if(!$_POST&&!$Jl&&$Y==$k["default"]&&preg_match('~^[\w.]+\(~',$Y))$p="SQL";if(preg_match("~time~",$k["type"])&&preg_match('~^CURRENT_TIMESTAMP~i',$Y)){$Y="";$p="now";}if($k["type"]=="uuid"&&$Y=="uuid()"){$Y="";$p="uuid";}if($Ia!==false)$Ia=($k["auto_increment"]||$p=="now"||$p=="uuid"?null:true);input($k,$Y,$p,$Ia,$Jl);if($Ia)$Ia=false;}}if(!fields($R)&&driver()->primary!="")echo"<tr>"."<th><input name='field_keys[]'".on('input','fieldChange').">"."<td class='function'>".html_select("field_funs[]",adminer()->editFunctions(array("null"=>isset($_GET["select"]))))."<td><input name='field_vals[]'>";echo"</table>\n";}echo"<p>\n";if($Oc){echo"<input type='submit' value='".lang(18)."'>\n";if(!isset($_GET["select"])&&$Hb){$sc=($nm&&($j!=""||adminer()->error!="")?" disabled":"");echo"<input type='submit' name='insert' value='".($Jl?lang(19):lang(20))."' title='Ctrl+Shift+Enter'$sc".($Jl?on('click','ajaxForm',lang(21)):"").">\n";}}echo($Jl?"<input type='submit' name='delete' value='".lang(22)."'".confirm().">\n":"");if(isset($_GET["select"]))hidden_fields(array("check"=>(array)$_POST["check"],"clone"=>$_POST["clone"],"all"=>$_POST["all"]));echo
+search_tables(){$_GET["where"][0]["val"]=$_POST["query"];$Pj="<ul>\n";foreach(table_status('',true)as$R=>$S){$B=adminer()->tableName($S);if(isset($S["Engine"])&&$B!=""&&(!$_POST["tables"]||in_array($R,$_POST["tables"]))){$I=connection()->query("SELECT".limit("1 FROM ".table($R)," WHERE ".implode(" AND ",adminer()->selectSearchProcess(fields($R),array(),$S)),1));if(!$I||$I->fetch_row()){$Ii="<a href='".h(ME."select=".url_escape($R)."&where[0][op]=".url_escape($_GET["where"][0]["op"])."&where[0][val]=".url_escape($_GET["where"][0]["val"]))."'>$B</a>";echo"$Pj<li>".($I?$Ii:"<p class='error'>$Ii: ".adminer()->error())."\n";$Pj="";}}}echo($Pj?"<p class='message'>".lang(13):"</ul>")."\n";}function
+on_help($gl,$dk=0){return
+on('mouseover','helpMouseover',$gl,$dk).on('mouseout','helpMouseout');}function
+on_help_value($gj="",$kj=""){return
+on('mouseover','helpValueMouseover',$gj,$kj).on('mouseout','helpMouseout');}function
+edit_form($R,array$l,$K,$Sl,$j='',$H='',$jl=''){$Pk=adminer()->tableName(table_status1($R,true));page_header(($Sl?lang(14):lang(15)),$j,array("select"=>array($R,$Pk)),$Pk);adminer()->editRowPrint($R,$l,$K,$Sl,$H,$jl);if($K===false){echo"<p class='error'>".lang(16)."\n";return;}echo"<form action='' method='post' enctype='multipart/form-data' id='form'>\n";$Pc=false;$wm=($Sl&&!isset($_GET["select"])?where_columns($l):array());$Hb=(count($wm)!=count($l));if(!$Hb)$wm=array();if(!$l)echo"<p class='error'>".lang(17)."\n";else{echo"<table class='layout nowrap'".on('keydown','editingKeydown').">\n";$Ia=!$_POST;foreach($l
+as$B=>$k){echo"<tr".($wm[$B]?on('change','whereChange'):"")."><th>".adminer()->fieldName($k);$i=idx($_GET["set"],bracket_escape($B));if($i===null){$i=$k["default"];if($k["type"]=="bit"&&preg_match("~^b'([01]*)'\$~",$i,$ij))$i=$ij[1];if(JUSH=="sql"&&preg_match('~binary~',$k["type"]))$i=bin2hex($i);}$Y=($K!==null?($k["type"]=="set"&&is_array($K[$B])?implode(",",$K[$B]):(is_bool($K[$B])?+$K[$B]:$K[$B])):(!$Sl&&$k["auto_increment"]?"":(isset($_GET["select"])?false:$i)));if(!$_POST["save"]&&is_string($Y))$Y=adminer()->editVal($Y,$k);if(($Sl&&!isset($k["privileges"]["update"]))||$k["generated"])echo"<td class='function'><td>".select_value($Y,'',$k,null);else{$Pc=true;$p=($_POST["save"]?idx($_POST["function"],bracket_escape($B),""):($Sl&&preg_match('~^CURRENT_TIMESTAMP~i',$k["on_update"])?"now":($Y===false?null:($Y!==null?'':'NULL'))));if(!$_POST&&!$Sl&&$Y==$k["default"]&&($k["default_sql"]||preg_match('~^[\w.]+\(~',$Y)))$p="SQL";if(preg_match("~time~",$k["type"])&&preg_match('~^CURRENT_TIMESTAMP~i',$Y)){$Y="";$p=(in_array("now",adminer()->editFunctions($k))?"now":"current_timestamp");}if(preg_match("~date~",$k["type"])&&preg_match('~^CURRENT_DATE~i',$Y)){$Y="";$p=(in_array("now",adminer()->editFunctions($k))?"now":"current_date");}if($k["type"]=="uuid"&&$Y=="uuid()"){$Y="";$p="uuid";}if($Ia!==false)$Ia=($k["auto_increment"]||$p=="now"||$p=="uuid"?null:true);input($k,$Y,$p,$Ia,$Sl);if($Ia)$Ia=false;}}if(!fields($R)&&driver()->primary!="")echo"<tr>"."<th><input name='field_keys[]'".on('input','fieldChange').">"."<td class='function'>".html_select("field_funs[]",adminer()->editFunctions(array("null"=>isset($_GET["select"]))))."<td><input name='field_vals[]'>";echo"</table>\n";}echo"<p>\n";if($Pc){echo"<input type='submit' value='".lang(18)."'>\n";if(!isset($_GET["select"])&&$Hb){$tc=($wm&&($j!=""||adminer()->error!="")?" disabled":"");echo"<input type='submit' name='insert' value='".($Sl?lang(19):lang(20))."' title='Ctrl+Shift+Enter'$tc".($Sl?on('click','ajaxForm',lang(21)):"").">\n";}}echo($Sl?"<input type='submit' name='delete' value='".lang(22)."'".confirm().">\n":"");if(isset($_GET["select"]))hidden_fields(array("check"=>(array)$_POST["check"],"clone"=>$_POST["clone"],"all"=>$_POST["all"]));echo
 input_hidden("referer",(isset($_POST["referer"])?$_POST["referer"]:$_SERVER["HTTP_REFERER"])),input_hidden("save",1),input_token(),"</form>\n";}function
-repeat_pattern($ii,$x){return
-str_repeat("$ii{0,65535}",$x/65535)."$ii{0,".($x%65535)."}";}function
-shorten_utf8($Q,$x=80,$wk="",array$ji=array()){if(!preg_match("(^(".repeat_pattern("[\t\r\n -\x{10FFFF}]",$x).")($)?)u",$Q,$A))preg_match("(^(".repeat_pattern("[\t\r\n -~]",$x).")($)?)",$Q,$A);$x=strlen(isset($A[2])?$A[1]:preg_replace('~\n[^\n]*\z~',"\n",$A[1]));return
-highlight_matches($Q,$ji,$x).$wk.(isset($A[2])?"":"<i>…</i>");}function
-highlight_matches($Q,array$ji,$x=null){if($x===null)$x=strlen($Q);$J="";$G=0;if($ji&&@preg_match_all("((?|".implode("|",$ji)."))su",$Q,$Zf,PREG_OFFSET_CAPTURE)){foreach($Zf[0]as$A){list($Xk,$mk)=$A;if($Xk!=""&&$mk<$x){$Uc=min($mk+strlen($Xk),$x);$J
-.=h(substr($Q,$G,$mk-$G))."<mark>".h(substr($Q,$mk,$Uc-$mk))."</mark>";$G=$Uc;}}}return$J.h(substr($Q,$G,$x-$G));}function
-icon($Ee,$B,$De,$dl,$b=""){return"<button ".($B?"type='submit' name='$B'":"draggable='true' tabindex='-1'")." title='".h($dl)."' class='icon icon-$Ee".($B?"":" jsonly")."'$b><span>$De</span></button>";}function
+repeat_pattern($ni,$x){return
+str_repeat("$ni{0,65535}",$x/65535)."$ni{0,".($x%65535)."}";}function
+shorten_utf8($Q,$x=80,$Dk="",array$oi=array()){if(!preg_match("(^(".repeat_pattern("[\t\r\n -\x{10FFFF}]",$x).")($)?)u",$Q,$A))preg_match("(^(".repeat_pattern("[\t\r\n -~]",$x).")($)?)",$Q,$A);$x=strlen(isset($A[2])?$A[1]:preg_replace('~\n[^\n]*\z~',"\n",$A[1]));return
+highlight_matches($Q,$oi,$x).$Dk.(isset($A[2])?"":"<i>…</i>");}function
+highlight_matches($Q,array$oi,$x=null){if($x===null)$x=strlen($Q);$J="";$G=0;if($oi&&@preg_match_all("((?|".implode("|",$oi)."))su",$Q,$bg,PREG_OFFSET_CAPTURE)){foreach($bg[0]as$A){list($gl,$tk)=$A;if($gl!=""&&$tk<$x){$Wc=min($tk+strlen($gl),$x);$J
+.=h(substr($Q,$G,$tk-$G))."<mark>".h(substr($Q,$tk,$Wc-$tk))."</mark>";$G=$Wc;}}}return$J.h(substr($Q,$G,$x-$G));}function
+icon($He,$B,$Ge,$ml,$b=""){return"<button ".($B?"type='submit' name='$B'":"draggable='true' tabindex='-1'")." title='".h($ml)."' class='icon icon-$He".($B?"":" jsonly")."'$b><span>$Ge</span></button>";}function
 copy_icon(){$Kb=lang(23);return"<a href='' class='jsonly icon-copy' title='$Kb'><span>$Kb</span></a>";}if(isset($_GET["file"])){if($_SERVER["HTTP_IF_MODIFIED_SINCE"]){header("HTTP/1.1 304 Not Modified");exit;}header("Expires: ".gmdate("D, d M Y H:i:s",time()+365*24*60*60)." GMT");header("Last-Modified: ".gmdate("D, d M Y H:i:s")." GMT");header("Cache-Control: immutable");ini_set("zlib.output_compression",'1');if($_GET["file"]=="default.css"){header("Content-Type: text/css; charset=utf-8");echo
-decompress_string('*c(<]iDp;+<8]XG-X#ETBP{IAOo`HAD0Z,$t2FfTr3g#Vd(TV$)k.Y.Mza.nf=/#EsSP{RNA{M`c@a0tg&9-nc;72Wy&XvI>dmHD*qF#w3sU4N@=|&JHw3xBmwvnkq<ydKh3e?rW3UW8c6iorbru~-xFWKSUq)z05WLa*7(Z6q_k
->fA~ZVU{Y8%+yFYE(^i;T$03;v)}SxAXNo<2/|a&hF.tk8g=mh`&V[Y+Jg@kV{Sqq*QTq`Pdg~jopx-(Vm;9h^8LO"b79T*xOZYLrw`W*by*"9E8;y3*Q"%:"cM#I?Nm)g"HjH]t<XaA1o(r3Jbt:+q>5y
-hEWT0t;QeU+eKbfA)dYUoNbi2I$`BJhLgr:&V-v0b"$EN89Id8>
-n)ARt5TpU8NE}!G^/#!6z%BI)xMGGS)M8f+*2HyhUQ+_oMQF2EQi"&/g>W2yT(IE96sGrq+Z`yDc96$8=2UJ+S`$0tt,suyEps:Z-C1+P,@IL[3H3poVy;_1=sg><#+v{"+lM&vrPd{fIErRru1$V5gIRRet>oSi83]?]VZp0C-`G"*EJ`bK6rcS#pSTs^selWAVk+["M;ix#il8A]a52R7R@rGN9BM=C%<x4>Vi4<y<#Xf`)Q382VesHPT84b5.c%I!6vZ+qZK4Yc+3jfA"DS%8zxXru
-,Efd5hE+Q&`koWtBokKfC*o<l)_3Mcd!D9H1!M&*SqAXaT]@9yHV!&Lv?owU9lu%,nFFj0q@wfQ!,ovAoG&y+Y$0`?^M,(Z"WKChD*!<qxg5_tzOJ?Y`dNzA:j~qOS7C"AzCc"PX"-xjlFJM5Su[vo/JKyP..nNNxa`-54e<&OCM3<0N~]U"h*kA$HI;N#fiySXADi9muuVRtrYcEs~-YZy"CTBm/dk&lEz2G`mx:X@ii%=3AL"4lv{tN[X)VsoN?:`MMRKfZPX=&q/(0[F%lKJHrT-53p.r{l<1ua
-.%*Q/uEk]Z.lo@dy?Rk6Z9y%sk/zDlAqC?s=f2cHx0hd6gEo<))#>1vfZ;xf+!QU<9ls1m4<HR.4.nSkVahA3iWCMDnnDrf{;"&Va_kK-d1_]_<c<w3a*<K]m_OKTH-n0~:}fI>btB8ZG,Vwo*urg6f3OP&-`d*M0ktSkc%{1Nxi)_v#(
+decompress_string(',c(<UcrZ9FloAdLIHT,e^12P>vJpDt~s)jpQ5n*/jNlpj4]q19=eVp+w8a%oBQUTAw)IeW/u7lvs|iu0YUhhis?by`^2y`w^^.@t-OS(=WOR|CP&H43h,8fIox:9}+Dr41T<m4m%{PjoXQ&uX>x]gL$Cv>O&?K0e2t6KKZc]hR1[7PmhM1DHfTAWT:%[6bp<T/81fB
+.r29*O)#Tst!3PTs7R./CjgEHA#(jbnyfb<iJlUvk{igwY622G;UTZa%AjWa=un-JD;P"b3c<*O>GW;|by+@<eF.,aIW0o9w#7A?P6hx<(,;THCs"hN+JLZ8"S8uS$H?@Mn-Ex6P@.*Y"8*e4u2{IWt{GJ`8QH/*!]T>-TFc9G$kOi9`vgYxwn
+c%g)X-E
+)EzoS79gZ,B^(JY>CV+i%U#DXw(U!jShr7E.,O/H=?y_RTf@C
+um+TP6JsRX*6UHOW)XH&`0uU-%[B_5b/PGK%V6F"*VOYlO%r~e%7r4zIiZe)OGZ+6pFLA:V,Br4Lp[>S/$K&z12m)VZY9)vPI5?F%YP7Ogq>&-5];3(c`Imh^fc!C3hse,H43n$0!iXAQqbf`(tm1orwwDZb+`#pZ;K#kLB(y*uQDg@<,=2_=(-jcNo-p6l/mQFggd1JnOB>B-p/=ZD<=<t;t.KXa4sgH)Ltuj>H,".5g`>k8G`jTY]_-$T]X^Ytg4B+4Pe5dn[0Jmv0vEi+(l~M}[
+k-y`fw,^#?q2G;jQ#Se!4D;B@:uF+ui]U<[N^fhhFUN5c%$N+yT,Q9)A"}di>"HNulNmg7&eH$fncswB:21#8WH~dZ.B4u[RQYCj17"f:w(Ftt+[2v*CdE?AKm]3XAUA/"$*$Hx-`6G@)skomr,jBx3je[fAY!+&;z7"<6tq,{mH[(s
+CZ.eg*0.$Z[ctG`C;2yvj};T_:TBs[DdMHH;"3prfxZj3
+U3e%Z"
+N>j@wO55C[8"f&k2gZj[Q:m;xHD7ZJQBzlbSC;1B87#?eSY06Y65k!fOU6_!*Wx:h2q-(T&.*g0OSNSp]kAIgfoTd7i*{J1gg
+0YX[M%&kFnF!owS$[QI4)#U=a"[;5oLjT;#D[I1sFRw#|h/g4eM:m%T,SUdq_rWvCQ+@=3hZVZUnr82v==?Rh?#bz&o4$U_6N6)0WPGCy>@WB2tyW9Rvy4j3+.nL(0e:5hy9?UE[27WG9ri*kXwFC-:iQ$"0?d!DJ_A5FHzo<^X+//:a;o|-:)5067zUG^N#rr$qI"K3Q0Xdjg_CG:s(Arl+%Hr)}I5K}9[CJw8qYgb"JY|H#,CZd;l8ef/9hi$fBrt3InM_uo+%kThD;YF5R-(i$n2Q6WR3DTRd|b"9d;7y~"Gt0x]NewuUp^RT$]H8?OEUD4t1{>B?u3"c&.2So29(`lG5I0F?J]*Ai?TgR)%y}q:BvlK%7lqi8N8aATIByV*OrWO,U-__]e!Ts(.tI!v[=1g-0$D:2Zl^e_7PF>e?,FN4_&RsZ=]c-:?ICbC&Zk+vq2F3iEN9cq*##I=Fy@N>$2/={hUbQ[Q%
+9XvUvMh<Njh(4i^u_0%RI(<Q-([F
+JO39W9H8brm;?_!1ov4P:i,suDlpy`5!*.#@`/c
+*=R>+2ZO$IAog/083.+hmP;I|sToi7w=1k},|0v&jyZf8,e[cHgD[^S,#pE
+O7O6$7bWPM&P
+#{mOOuY<0N=0/}8;_1*pPz`fF;d*^Xs~E`I$,E.eJh-}gkVW#(ZgifL&ku5^Um"P9?lD/t%YRj1`>H)-*Z(uqlXTp{l|6#"JT_-Glw*koUuh"1oVQ3c:q`e(Ou;1f.ML1?
++s*ZYj[Qyz!@k10A9>P?:uQy3r5lp6SS5Cw&bAcsPdf-?4Pn/lw(zfj$CIY**c+;#Ey#G%A#-LO9qG`;!Q$d?g/RT;.;#Jg-&5#c4+xKX>3aOGIOK5g.1&i1qC=5ctCP5w*GWOJJ3nBlcOUQ&ghC^]Lfk>[1IvfA+@Qnx7x-2e`=V->-`sATlbT;jm&Av`@(2b)[HuUYwi.d@B;[+5H-g?od@X?Ftr1dMb{L5LqO5[MV~]!0.@ZTZ+x,,Q$BARIm
+h@hLPR&jgL+kr;%KQu*a&qK*s5;#"v?e%lK;`wo+J_/6Zl%Ks>:|B6rsAu]AJb,A8>>u^neEbPK8e%q{,OYFf,eK2W,e;=Sj&DsZ;rd*+-(ISV"Z<#!
+I3)4(/n($*PXlC3"juk.,g[eCju"B]4)(!8
+VPkw&`](PnO=i*dE[v51@.@.;&1oaqDR?T09$atN?[#E!0dVODQL/,
+BQ{+-4SPW1y""2?.e_JUNua[{yx/]wYvW.gva;M5Kjr^0`w34l^Fz5"HnDC["&M_MH;x3H((+I1?qfqFaH^Dkrty?ZJ]cxZUg3sjkeU/hBvu7)bV^l}^}FKH}:=V)3p;X]T&5ez"GU-^zA@e}K.0,*0/MI^*Lju
+2LFaQ"h$(F8fG[_UE)@YLWTw|G=t#[$0E"T)@B=ic;G+?K(Tp$Cn,XyT=ksXNR%A?9z@CSo2]8jb8X>VC#r$}hCoey#e?#n4J-XScK<=W4(k"xtQ`4/kEOsp;H%"k%)8^D2Z123^V%v7=.^EUBwvU:u^Vxlfbtq8-iQ-]7HTcxYjtn?y-u0GTq
+wp]^pen
+U99`GHj#xFV5MZ%|Mb1:f!McteBgmGctX_uWcZh0yj
+-BagRa~aVtIohyF!<DR4Vi8I-a%1FHOiTx1G{?,a.vqBUSHCcy2]/_8k_pB:)0i:h27GmUes4E5LO7V[{uza]nh0MRLc$S<l1/^fkBxj;[)z(DAz$#351rq/r;rEdyx2F/-7%HgbAO#PQvW"HJ1j928ZIG]H:j9g0R#t!ylx;w>w>L/D^.}Gec,dWBgw}i{:}6J+JWK!J2<WI
+jx*7H]F[_LodM&3e2V9ClhnH=,#m^MrXCK$==0"+vs,8Fu2^iB}Df1uf5g]2:3tw$x#Mcb{0uCjJ}DGbxZefXH0v
+VmmzSOrX?`2%D;)2HK,D9HsXy/-D(@kw?LL*1mf1]TQJ&K-.G)37rIQtuaI&!EF]MjyB5L4k$
+sA){bj
+SJ$<v0gaAU*Z+=*N`"$xR]y/jlpTj5%6Z0
+Z2N[+17YTn!;Btc8Lgk/Siv[hI&on{4Vq)h`rM%LC#x2qih>Lttn-b$b^H
+G?G-BFJ,i^
+WoKzKO*9JgIyk+#V8.tNx~lh-rc`^4:OIv7=TQyc[8s!wP$IEcfCO$oHtQq+y
+5m]^w@4}xOw=jqWP62c1Yl){GG6!Cy"::&FxJInJ-ngn5wksWC48^r;7AcS6KoKne(t)HbCElAdGR$V.3)=[y]Ow#_ai]R$*a}Hz7Ofy"J^l)bw"&@bpAh$F/NKht0@|)zwKoE`)N<O32$?-BgND[uv#=Q-ZoYD|cjeCZ@
+|AfVIMj1/+o*,ta,vh;0fWp<eP|%rr<5%105iU]AbU25gR=Q9hCO1thcwVPosG8aOCG*]*d7gu5n4?Yuz_Uxn7t>#yZM.3t38D~Bl5TLlUC?p3tkj2/o-^l(?=zxU
+&cpoJ7w4RD;0*X"eL8Bkw^MGYA,[w(YEZ>3>Z)qJ->CJx4V19I]wRubX
+_w0Ie3OfT/-9";*19V@l0I-/J/LAym^m&Esv!b9r;rDh[Dm.&a1%fvQ|BYH;`@Tk4!n
 
-V;_RNE>UWBOhds*U0e8t{ZnGaYDJ3>
-"e`mW+vNx3)]lct,8m^Mbg9g;pF
-6X]}*;u.Gjf*L0ye9GxZfsQ/%)ovdoEhI?)=GvdLMIh:nYyv2+Br9"i|Qc))DM)0ORVRd,ShD#kZk%oa1|y]G/84-$z"q8gn&N-<MjLPUAYyl{o)NKedIl:1_{l}+-Cno1O}"@Er=&<7_XE82CJw$yZnti$xV[8ndG-4@76_KYxqE(Gj:3_i8h_*
-n0f:7ki(??jX^=bX(
-Nqcn/403Q`G[8()ZxS{"MD/D"RWvrmtX{3uHa]S`8=PqZ"G,0)[G=Kj.n
-]r:G+CeI`YBi_58@k.^<(7;<Q#YqF/wN@lFh?8tDtk0HL2gZP_kl+M9ipj>;^xMkz]OO[k3.Z,K_I=f:C61UU
-RgNd%Hb:p:,^}u{nEcO6_Nf;-Z/$Pj}_9Yk
-9qWn_hqI%K}W(FuK<"T_KQi.Jp]KkYyY|GRy>_Hq.42Vwc.t(4h1;`#-_*6H!D*<Eedoly,F
-y"jys2p}"0R$;wx=ls6e,sh<db
-uBY9(o*Fdg3Ke0vOUD/)_?!K?4I!#^+<h3J#"&y)-Ul3H%HqQ1]Wj&NJTS2%*VU2EDT+?,]NgNVE<^`aKZ$Rs3P0,qzR.v)4GILUC<|Ud:p[2Q7i:Xl.5%uA3&=La!];v8G_>_B]wfZoU/!lB;cNp_`DJqA[3JubAy:.MMDd>+^a-`-SnxP#EbXIrFth5YEd$/:a_Pr+e$%DC1?<P!5XQ]lb?#??)St=Ztc__DzH{2kDpc_eQH=eNqC-xh[53f$pq<7N2Jn?jLw?/@g=nfRGXV@/~$&Iz%xt.0!*s)naS(fkLwr,)#5.Pixx?K$FstcJFT->afBGQSBu94W`%*Fr4G?lZBU[M0ekQ*M6{E0,D-WLLkL(7bxoyNCI{0_)u(76[ZgDvbeBxvQ*pG3@BT`,NbVey"-Hq-++QiE&v2TW2D~;dX.I7s}Q)_M2d%<2#_mwza(g}ptHZY*%2t9N-G#pibhL0fJ6YmkqW.88^?
-On;%1sB%>6YZ//nv81N|?JS=<bNnkVE?<?R/aIeo7Ju9oxbFMl#$+GVX*hpdVvYe5^Aops?Q5ib2WBE+D*T8s#+fk15|m.FEH<2]$r$bBB6$sZu~t/fs^ciBGt0_]3N,D"M{P6iRA[H?t!iFC+p_fa&3NT2&u(R_b}M/5haEWeF@t+n$MHjAY"D~>jy?r|D,"w11?7:Df-I@"MCWry3NxD<G/lT_kUuz4dSAPJ:DL=+nfPkyx6ptdo!BBB0s:?!UV,g<egPzl^Z@40U~n1(7(H8%%H-S
-Csxg;]5f>XPi5JE(oV!t"%KpQ?0!?!u+jev]~!T,fN}V(5+m20qhqIiRV,I
-HGRt5A.
-X#G_})=,Pjv&`Aa`4g(?:l{yPit95/V?`:%,C]2
-a]gxe[=F.s3
-aU9Pd-$0%tlHg
-?sR>~Br$^80iPo2Z$Z=_qJaBu?_^Qy}ChV61:nhk{bm,}7hk,)XDJXv;L/fp"/Lx=cXV/%KkY@sR1gPcJR-KTR0v{P(M76[xTMr1rxcK[cp]NphX7Y~FQHsb}l7l<U55jMp,:cD)Zw95rWHu!H9?2v/?Lu:aVW@I&5*/Jr.6+r
-j]xaW<URw9vVx078rA//Y~H1Bm!Pyb*yN0l/4bud;<G0gn*yNNGm(EP*xFJ(5!;S/VDKMBL!uU#wDKvOy.,DxRMqLOXkl7v!#$M.rsHNvZBuR_?J(jhkKsSr`:*iTO^F9CI?6m[gq2ig<5F=!)@Ug}phXQEGGaVe0l8rfcn.SMg)<[rDxKPW%0Hs80yN^>w}O(O;e3Kgw^y.Ud+MpQl_c(2F@-L<XNfSTrL"A,a&O]#(_mC!0q(-`m9uX/.7PW9)&u*~[GuO<jHHh0<P27wI2Aqm]kfqI)KKb_IBE%Y^9kD"]9NO$^<drZ&R#4_fCW8^s9U,uC/Q>+L%Q>k&q1ULx^pctS-T_!%z,Xx5z)t=LiJ<0JIKN}yF+f`SZRBzA39JF`64g"M3#|u*P
-$54:q+;xZ@3|*.!]Rrl!QukvN`,=ntjA^8t}tnnDJVBbV0IE=Id>bbn!d!nkq,
-MpzBIrIhoo(swnSZg)stY)"l6KR1`bbgRrr_#cp>GHIISPwA.Q)dp%1
-~([OkfpfSImq!0>Ph$P%/g
-od={Z5;Ob#A3Y~GT&&wElNH"BC.f
-&,O@<T7OU@>wlQt:Re78?]/3e-}4XAHR=ea/~;|c/(3&yxeHLKAr=h+H|sclPSCUz1~-!ZOD|oQw</L<
-7"J/G)1I
-_Wu]5(?:uHtSqJO6-<;0Ctkx.ufZ5NMtw-dY2)#k+xCb-:(Me=1h+Qi21Inqty>RV
-YbAKfX7rL4yL;1jlbPb$*8~@=YBQykY,LIXcW#>E]vR-=$
-tmyBFQ3"9%ai:W@1<@+-6+;"L]_aD;
-C[<w]veXu0z+"[YRq"R$9[(7;m2TH$?;ZbPuV6+hU!b<?0e;8gRJ@dcC^,r8tljexN#K^0}:WDFcfon7#P|!@rJn#BE!Zw&qg08AIw#l9uVpEgW@}hlY`BO!L6?l-bCt$4284Ao@r$4klc3`!y3
-F%:HS$,7;B2+rGmC=UcW[&<hh%hBPe%l^mN(>rdbT0e+lu1f=SKEquxI-hg#5rTKn.=*:^;a<ni8.qg9E@"UG
-_KGb<@-+6C)cPwS<QaUh(bJF9TaWOF%ZE6ei83sUyt[auyW
-%x5JBoBh5:PB5sG#Zn5;mh?@HH**FCNQ
-F!+m?p/qpS/wTIq6<J5EChnxwq-vUr<Ng;yG%(#,J.F?AI]X&ImB>/t)@+V@S&ZYbA0UT{2kT_VCZM?7C8GK#Gp]=mWdSy4.*zJUqFVv%?lK$1EK&yB-O)wi%yKZ"%:5ZVg>3[9/F745SQ?3.10DI`t0Ip-zN"kA#f%64{ybdLZ&MAf*ZbQ<fqP6:SWg3^K{ih$gLIT{y@"
-v5<(7hjguju)hrhotTyAx3n%_%nxOg@N`{euSPt/e`4L!gq0];4h9r`MhuR"3~XEH^Jq*@<i2_rgX%^?a%W2=xM;r+!h`:"&wfZ-d)$o$8X/1`KtUaZ9p"m{(M<6cplN2O,]Y4cUG*^PZ$nS7:`!I8RA2zk9t4<M$QurHC4v-pges|H1/6gi8;w/Mwd.s8b1eZf=2=1O@-$Q/ZEv-kun+zX]MfJ9GpF8Z1d-/nIQl#Yw&:@I#rj?cRdNBz_&M-
-
-I$#,IpFTje_drQ*0+3DbuW!t@bJ#s_/93e
-u@1>G>_.8rYPaNP,;+G2OC;Z"(Y"8R+=<+U](g3i;G$M3y2j}qfwi3"FgQC(<@(Ex3]u0eqmJlGIlHt,%r@HJ7|:2nQ;k?UAKv]LQ_f2G1,&)Mts#<90u"YMcMTK=');}elseif($_GET["file"]=="dark.css"){header("Content-Type: text/css; charset=utf-8");echo
-decompress_string('$Osc2b7V>fj0U7tCw8TNfbT`5e<0!4x49EeL1n%e,E<_WZ?>@wWMzpUD:UubAB^u7,;ZJ.!U!ODBJ$p,I?B8.F[0L@ZP|U.08;>OMB~NvqOKctbeXn{?PG0IyC%OS?)r=jqOH2M?hb}k!R/`..+tcti.<c<RYfU_-K2A
-vCxFn<6{L^r&8pu@R.[?Y;Q%DJhl3UE#:f_^Gy.{7^;|fNj6ajaX/-y3:kA
-^e)ZU{TubDn#S5p^*>QuANxT;&o~2R.180pfCDp{Af#.9i9,-(*Y&"#eJu7R(uH>BnL38{cb_!.Xt`+GTj["w]mNugo|W%7muWs%-r2M[*vyw`Oi6fN"fuoOa;Cx<jivJ:1;k/yuSo;e7`7Ib+sTqL`5Z!<_Msdu^T1o?NxnfVqUcZ(31mO1mW&?l3hyqkSs<KDz)JOYNX.qcbw.a-hF9!u8),&16yAnEfk#`",*pieSR"^
-:QnVS6*:q5["XTfNZdqS`4.wq&WqR$ff;}))8p/))?(NoZ>?`%8E(L)Qbr/mvjYq3odVYIZmt];gErx>%}pw8jHUEMo^U6FzrG6!>r%.Fl,i8GQ7.)96y=aANQAV
-I&mM@=8CtkDDN#eQ><"PT&0&"
-MqJq.V[OT-W:;AFl}kzYka3jtFJR2
-a(@dy4=2dZ`=+P>(`R1E_t2_SsXn^QTobmely7V_<d>rQWl@v,kyf0vur:xH._r2kS"fa0O7^l]f4?(
->1U6U+VK-57o7x8oQWpsfb%dt4*EQPSa_B
-R5pEdml@-Xb&>I"-^*scQ1=E/ctCOk5vsYn%D90P*?o@rb?
-W?IHCMCI&bJI9sK8]T5bt76}rq_*)G[9K2;FAd)taZI^BtuBX+sK60V2H]NeE|*vCruwDpOK^kn6m6f6&1s^Ucs*]9vP^6+%wutWM/66l4Fj)WO0?_+RGg2|jW.*v?W?ZXyua"T+&(XWj;>M!:kHFApzq<`|]GHW(vkK32!q%[A`AHO1`}O*ZI?@w}[)');}elseif($_GET["file"]=="functions.js"){header("Content-Type: text/javascript; charset=utf-8");echo
-decompress_string(',]bcjnsZ323o!;f/.e+fx8n;[f71r0pc]giW`oV!D5mSIO;.F)#>?N&/uKRvUtUkWix^XgjX;sS9{(3
-eB-
-eJD[z_=IA3FpiUH:=MZ3k@qANy
-,pQ[T_3Z)Wvk_gT[Jd2khOG[lbtSJi%Xc~x,$3rQ`e7zs`9hczx~5/)NGI&}cu=mR0U@T!doS{^#,i$18TPKy|Ut2;;<LDrZ*rx?t3j]uV0wBhgRMVF+5rB"o&w`p]@K$P3@jPh+.?b}q$QhMV-w*DRoP)N{L2JTta*c.*>bWJuFy>FjBaYa^O=]J40HjoD4_^T?rw%#V3SaEJ,@haT<%p+hZz%2WiK*x/Ujaht!%qA^VCZ%24?IYc7SxrR/#P0:US@|Fn%2c_mX-0TL`9<sF_kip3+A]LVm4i_B)GKtx"@.D*hh<7$~]-CYZwFt@Oa4x]vbQ|`u+7g+B6IsXQ3H9^K]$9EnvPx3cO;lKlZbjaFHFIy,ncrDLW[Tn<w@a^MaXrb^LUyM7x^;r12)nqu8iDuIM(&I)|_X"Ta}5J+vE8Uf0-m`=4yNV{@ctgiirE-<
-?TDx$]G!:iP](g0Z*9Tox-iN*VRy5Z>W|@*CdPh,qgPeFeMj{gObW[)Bvq#<xTo_E9Ma8.QeBgQwGwbq:@%v*h-K?(EG6roY+s6+fSd4qJe8ihH3!oX$R%<=8sjBnS#^E#;AmlT"iBvkm.HK$!dmmiw(<TJiS*Fu)T`tfj)T
-@N%}vxH6(]h%)|`r.SEbR&c(LU&vpH"+5`VMV)-ZbIT#<fD?n>8n2J%va!Mv$m.^hRe%-X-j8i^ltxz"+|(/%&CpSH2U#0L{*B3d4
-_yY.,rLR)Vu[*cHPfLnsT%2)YL*l"Qrl)l]e?}*q</a6L:)^n}&4kh
-$76?e_vQYFJn_$lIesca`%Ewhj%@RVQhWxqp+.jV5;r-HtRBw:=<Sk)v"OJJtc%O%sO:
-ZZ&+Q1[:U&fw2;M5@lX{[^,8rZPTbc9_#(EBnTtG;ck;)R4J&Zs.JeIACX?%N(wf_FTvYw0/xQqtaLx0CKViZm]I1+UWX/z$S9P&84YP;E=~j^9RosV!7zfSE#83?W&67RHN5rXJPDCS2Gyv;d!O@S#*/Uo2_|#Mu=br..K!3_K;71(Uy~vxanxZS)w%e;THdO(#U)!#!GJB^&t[rKBocXn!w<n)YgNp!K#5tt=Q,r#DG:?&t8?)!?"%DU_7IMM7ZkymqVXhSO*|CkdoTA3Uncu[!&/UNEkv$d-~Q*Y<41A./WpZv1ekD>a6K,o&o{FA<,hX="<85cJg1"q`ACg$xfbTN^G(18VLq|V^0zEub|d9kf63V>g9m>$"Zen)a{$+a[j><8U7*GC%x99n>"T[6}?,bk*,q-nZ9yH=^Sqtfqs+*[fgu)b>FMLo[`a<HAX%w/b<L.xjMB]jfV,Ar6qJ-IvMed8h$K;tjyg2&/*Iq[?l-Gu<2MghB>KoD{5rWJrFV]bxI9H:=zbb7Td4o7a.Ga2ZLG`$+KgEw@fGI~tV,k-Nd=YwM{)h61ry(c(L/g5$-cWtXw=Q4,CNs`:|aRsFGM+*-V_`%rI/YL@:?n(>E
-/n2exjX%P[Dq]yI,HU[R3mauTku
-0AA+R`a:Co6f388ML#DT)"c(m-FoQw:%p0
-PG&r"LiSMarC.JWx4eaW//o9%OUE[0S6z&C/p4(Bg2oXd8!##.{#w]{VW@hQ7fU7o:tbCrEEJbz:6(cZrU0Xda`4xVx!+Sr@c2&GQ]F):Yb?,oH$K=2j2W%07YqKDDoSheV3Kw.3@aW+w*B#4Z36q<!qp1PyQkpGS9Q<-V(^VFyG;w.H_s5LVHIY&/6]::OcSEM!@>EdFKirB$BjXBihOE=7tX"fY"#JZ?@Rym;[F@lmHfkJOU*h/!MXOdxLq`d<FUof^^.We>/tP!
-oZuZPZ8^WdOIo#ty^2XU`|0/.trk[&21Vcp<:iH=NZ0ja;jtf&gI8o]iT]vsA^G)4V5//@E%tfMjh6j$+8wQs:Pc&6-_w^U&]In#`fvwt6#4:&L0:}G^TL=USoe%m{FH;,kcYR@`?q:)8pQ7H?c^Ua;GAk9K%p"fbcHuJ?<=6AT2(R*xu?bcvJKK1j@|g0`v(s$PNT=Z#L,%Q_C/a)6W+41|JQs:,1-J=t%2n.5cAt6l1AiKxX5xDG-iTXMpZBT=_X:=C4WdkI&-`(.GobZFC9!yC%C%/Q(V*k-!uQ?f5>Nt#36)EAcL2%Sn0e]E^+Gd]E4%Ci@ycI9C7j"@kRwz%J5W;$ioW;Co2:4g`/lcCnj@1G*py6%(m?I
->n6Y!F]B-&^2@,;/Y(Rnu%
-]vb+wc+CKNq3w+w0D(]GoV^?fNN?,[+?;,"XGP<!b!&aS!S>`Ef:XW`PJXr>)1K&i;)lNuL!uR7/(<lxsGy137GOLb]Fnb{Q0;?J!6cGsEYr"Y?Ub0,cG9p8(2YP]j]KZ&QBDC/"2WjK>"/S&o8b2Fb6wZ]L)+<w7iPj#)yu#L"[sr`cp/__ynn$Cp^DHqvP(DXD^N?;~EeOS.aI-,bRWxnj54PhTJ)tt)hTKpj85%TlGg/JD"Br_)C3*Niig;Pp+XAIn(ilG0HITlWiG-!Giqi#F0nRZt&"Cm:`qUNeim?P-gE#PI/
-a"/;T^g$lh(6(/gH;^mRQ/GJh
-?ypWph-5Q:YV0biLHp}BJA[;=f#6io7b2@)3<Q8:h[ha$a3u%YhD2pVtC+)Sxldu`/!Dco{+*5mmGR^S[<=QShX]M[{NRMC$p3YYLT:T7)%uAc/"dRz"d%df`,&kOKUrG"u%=Q8G4_+YgWmeiBeyG<RMbn@!=7A.:b<i.=k.4WVYNE&4C"l.8GqVU"^Y]!G=d7hP]C69ADn
-Wvsg{r$C!a"K(/onhFLaJ=$R.Omru/!cNR{Ooj)>;Cw:](`AVamlBKN@J8hW@15F-MR>V<FN2r^I9#6t}@=#@acn%tdDD"J
-jpU3@l{VIqpQo0V`%op*XE&Lk,D0D
-
-xn"@?(c%ua3"y(U2U=!R[OD9?CRH.z?t>VQgh~gFpv#DLi
-rg]W*rmj~c0w(QWr]HbdnZmi(6!ICUX5JR~5cMVF[m#Qtrp5BW#D6_#CyQe+;$$JaCk<"0#RWu?mJ2elz9{U%lCxJ6F"_DDRtG:Jnx}[i,fyXsGHmF8UVDO`@S)o`gCQMbROQmJl=C>a~.lq1gJm;O(U/!3L68.#0p4fp$@"cnV^$=!/?+HnGA0M)H.ssyic]=86rn.GSyW_`->;8v_xbD>+FQ+o|L8"<8-(ZuuE9PW)yN{)X<EngGTo*0.4"3RC*.VZjOz!b=euS;fZE/Uetny/pO2!2%KpoP".NQ"NA`s?Kf|&5CgUEOd=$AZj_B~6KCL<?vOt(+_k9VS;CFPjo`)3~l~N3L0gGDe+kMp$.,mUzFUNp3}u0F!DH+X`WMNZ_Tz*-t<qT.KE|IuL`q+3Cp_lS%3)a89,c,CT{e@6*nB/zH;ZHCa:(!1S%OtQ&R^f{!
-^QLkh"pVN&/P1b1>*q7m1}PW4&s3U+]#uBPF@$;OO3T#
-sy8Asm^:7
-.&2_JP:Zk0,-qW"dl:9lo/(+iR)/|6$-%O1L-_G.71L_1jmYO_G$M<Uk16H8X
-=]T<Fo]>#cRYqT{Yr,0,E_L)0Y/QcWT1;!z[;l[6JU5C2MY]wI}iWg^UuP-I@&T10s+$S)aK_0m,[*`;2@C!iZ|MbG!qE@xVbEw,>[8dN^_ARv1jovPT^D6KryM]+`&3:;Rbf"i"4QJV+jD_>b
-e+TEhH4xm{QetCK4)U"Wy#P
-CF2dl*3MdJ(Y56KS(+A.KD>Hr!S:pYGV8P=q+|FytW]ODoEIY>#Ut6(8d}x6.0%7vdw)PA1XK&P]X">6vF3OG];77oJPUeDZ(^$LaYE/N-.[rgAc-ONe4X]erTeM_0I-R*Mq$DeNl.IQ^bW!nj")IX
-4h;YvZ/)vK|4lc1d~Sm<*jR`tl=$0YId.ql+BvBm[^"&u^4XqY%a7!;OWLtD6t
-<)3NxSodAe*,C+Jo:+E^@
-p:U]-M524?An6KVr<@&{nisr]f4`BRkwr>X
-9#6x@&AT07WL-Vfq3ICz)xH3?C,Z8a[.j-Fa@6e2B:9II#kYW+yFy_`4iwrIJ#c>2)A.6sz(47V[I|VWm-H{08eRMvh|Ue&>,k]pMVaN%}IUkC=w0Dn:Gh2j<CB<rnp-XkyNN6*H-k
-7Y7.#Q6w5;0K(D;)%SVu[(<("XR=33Er56;X.Vb&9>ffFUlVix_PMv"W!i,V+7O3Lj5%Wr}mX7yE{7m-=:Zlr/|L-%_)IPL%+_&_*)W3p&0cY5Hr%ii0Yg!qrD[>%%zG9-C$ah<?yhwhJ_
-4~<G;4wbi#
-_?s*bjy*<qq$,$k8WU(82b8U0J+x58D`?X0f:XuGd11."XVNnW:5_u&9`^8wv;Iw_#Rjns
-^kTfy?neqpfC&/jGD:J="unu"I;;ADlJX4&_a}V&"x%<#[+0shKLl(f/m]WRKl)
--"gS&
-[Tw$DHe!(zWMA8#{umF4
-a^F@b
-#*Qg34SRcmn^];K,~_/[IK+K^qxFaN]y|@{s=6N+):#KJ<5r0jR.tq{c$0Y$Og^v=rU.V8OuwVheIa:hFu:*Cq
-<|/n"h,U,-s.J]5#?;pI-UR%$PFF
-e/Oo=*_m(EOAt)f.d#5,XDG(J0I*{LIP5UE8.;V]Yeoag4ja:s1+JEzFj+
-k^g)U|EAT[BY3a>|+4Tv[nBD9]60W_?*,a+7"f0(p/>O>n_E0DYVMrMjQS
-
-AXlsf(ihDZ3nm]kUyHmug|B4<22u_PJGZ]Wl)jd0x7&xZuMncLL|?n5kCeI:$Ga}jXL-PP"wW.mDnb3Rj2m{=Q;TouoX(e)t/dgh&l5S9bvQSU&[T`Kk3]`6X"DFCd#k+{A@@]57d^LUSIt"E)A2L^I@"AZ;KJUVTmQk5hpTrKFEs0h?w}2HV8C<]hJMG(Oj&cTNkPqcBK<1+=h-vxsKmQjU-dE8@lEr:5O2Lrpdvdb,fM_Jan-@y+FtWF)WH>!D43b>9Ukf:WA5OR"JO{A(M(AdbR6_lSe8;d@rUuW9VgNybLac57af@mT!Mc<MBvYS],c_
-|!F?|k,A#k:Yve$dxkHh))p[M!}+P9lLF,[.*1E*1w:pK.{Uxb~.
-5aBOr66GW]$7k>hyrL-!
-]o;9[K
-"|KK7/x0-#)&;IX6SkmsQb<CX^E(Ma^0K/7oo"6ZYF8Boa8j_rKQ$6jJs3:~/Q%]-Ks#u6o@0^NnD
-Vq1va&Zx^KtE-Cc5%&+V*OgReS50z#hzDJEbiL&-b#f}&u5w.MmbvrWe.ceO)WXoQ6%NEAR`NUVXmwC!Fg>xTBYKUd>dl`N?e}d.^NWGpvS/6RNzjrDQGDu5fh="-y&mWk`($&C~WK6U8P[;1mo3KI#I]eV0Y}U(j]*dRz)KZVb0qxDbU^d>t%RuURf:YSWQ(=#@GJ3ukLd1@@xQ9v*GcWSe(55R,x8/Dut5<XI@1g#|gd:STBi3ijXD-<u91iX{/v"{Vxuhs.)-7;fB,E?GE1;d]?&b0]^":*y1/!Md^,1h3~(HnZdLev1jv/KTPkdX-yFp-H3Z2r$X;yBbes%VMJ-O%.;r?"R]->p;>Q8~)o0SQk%=m>_ft4
-FQ)Zll{4"8Rc[FYo`6k:$`?u<II$kjeM4T6Upowjv!1^lGd4<;Ndz6~A^;.&`XLFyrfHrPio@u37HqG<
-;SX8-8rh#FR>Jk)=3N?`8^:dtICNT7XNVXc@$mg0C`gH[#Zd(M`v*JX6ZyZ+
-
-]|<&^""{+rO,Nm0uCs?7fio02`5740u9Fn.($I2KX*Zl=lHftx4&ISy8(&=DEae43`Y_K!ZA"i5Kv|*_DD[FU=,C3fF*l?Cr/mXRWZ[skp*exF9v1%yoAS@(1l-V8$@JG/07@xb;yH?+H%,Der^jj04a=i?;^L/J@cVb`Z`6V1/*?lv9Js>3Hxa0mYOq-OUK1d1|)/5I#oL!p1Yk>*-PSZdn_Yhw*$24/_kQMX6^U$TgrL%ReDVf[/v$"vq}Hu
-:0/%Jt_tsmpo$"7wp[eKL!<^WOfhmYb;NllQ9T9J%vcRRBb0D$,WVQdV5J$d,-6BBbp<7%o:
->(aoK*YZ3P/RQT<|)q.wrCP$cu#Ip!uQl,fxCRYplp2Y]@F,;]*Ce5<yLhT?Kh)nJGPh-TRp)<vSZ]JJZW`1*e)r?WoQHpEHh"#xAE%pq5@@,QpXNGscE^`UQ46UJw+Ti=J=wI_QVVJ<Q|in5gP$_ySg4n7CxXKr2D5o=:(co>k]OEH2.^W6_(GBS:YtT*xo@g<MaogITytp
-i+CA>]}XZEL4]wP)?fEtVw!fDR=,(.Z=hazd;e#H+<=Q>YOX@kJs6*1*tudVO^+2a@@4!ZRq6CsqP2}GEBKQ`OSWUCLLdvyk3k.,L_uei^@7NZ*9lUa@+L4).2n(qx$QUWi6PA[X70#H&)PN~pkDbU<3JN,$nFfDqkehqX,LH1kyx*m-emgH<4,(]7!C(`wBb"`gxsWmL`8.1tBJqX`eCR<c24}7#U`%NFoZppTk1$6Of#~%m>q:@vJ%|&8>e_~$AnjlgCdW3VEa]A*wgiOv#W|+r=3`"s*XW+3?rSIPiZ=.%)LRH>iQgL2]sez.Z)((nF88!Y^AN#W#5^@lXDVhot|<6">)|*aLa`dFl*fY(ah5g+8R!^mqyF9*Hi`Z)iI9^m0HBw;y]*63?Z|%nm*>l2Nl-#3
--:x]@=@Xn-Y63EQOBn1[If
-$T)tTGsc.vHw:,>*WNMdv*4(o1UwxRaRT"w#3YB;XQF$.`LY]:G([XDFVgZzQgb37ccX8WP5yj>^vcUv<7p-mmHLaYvUvAoFM>k=c[#u]up[p(IN>0a(#(
-N:KG6keYjdaj5)4G`"p+SC[K:n&%0.5:bir"++"WW:D0uhDm~lX*Si$YsV"!%?Oe{<Ul$0L5?({_^B&^:Ru?b*oT%=Y*$%R4~@ylBiK?DRo9ZhYMeca^/M&*P(}d}6l5{/i3.nP0}<Qm870XU&Z/o8:pIm>.P^jF/C#,?jPiTu./#yQSf0niY1.`+S39H!4`R"whFE
-7z8[?%h]yOR#Rl8s*o&v<pEk8V`GC:^Om[c;Q4!gKX@~:ny7v$%^^h@;eABlu}6YwO:htBw;6jP/=hb#=}=1T0:a8B]prgso1Nd)/2?YKCR2nPV?@-#y^Tr:Mh&
-Af4D[@NQmdSjv)k=b1?Iu2JZG%?r1ILY)k4oE9v4AE[/0TeSJe#EAz/36WP$?TXYnkTx]>4&4M(t7V3jY9ikKtVYO."Pm:N.rW1sJfCn4Il(X2VMw(KiRzI._I@SC*d
-5Z4T$#B{qGHF5xOTFgoopfBhlVD^duv7hN/^UJ4;iU^gO!En,VvB`=$2cfH}9
-.)Rc@u%
-E~.|9U#Oq^e8g
-o->HMi#n;hW"IvK$.O^7=m"TdVJ0.~SVgE)B5{Z9o[?)tp(h4#!G)yWZ?_M9-[w80"R&bCwa&x)f6_@N#DRruD^lG.!Hl+3.nD84OrYQMj_GmpPu7*1BN5O(%$]GIl1($Ff6]I;&YO>v_TJ=bW#M
-DJIUN`s)f4haDO20qv~k<ZxqNX"FeGlYxW$uxUh]Thq8=PFf=bW8<2b6<Q
-.;2gWgLdut,!&#trm_f/4=FZ>l`KpK
-W1cr}y$[Q
-0o8Fq3l&<+h&hm|S6>>fKTVB>!i"}]>.C#D0K52:.nKvThYM/*MjLASiGa5PgmQ@!4#J9[>7i[G6S[7Hf_P*d8
-C.]T,,&~0/#ebPNkMg+C[&LU[R9Ru44jr;V|(&RS
-N23)sQ4_FE{x<Be<*NW[dG|exK(eO`nfXyCdFMh[:m~94"De~-;+`l5s3w.W82#pt`*A@&%]
-QSk5fcMr[A=vUqBV/3!,j[kTZG+55V*p$`ATD?BnBu8zJjEw^_k9kzeBEyAYm]`^ZHj@DL/@4r7wxT>O-H7o]/w&P94&q8lv&KNU
-wy;AK.|<+p8F8V&J4#*O%-e1{S}xFfEIEY,_aUmepFrKb/*v&_v^qi~.*=Jvt]N_612+a4uLw6[;uV.V)"E?fVKj@X(o!b)ui)ZIP1q^g]]0l6xG4T])Qm-UI^/E@9bFx"5*EG01O0c>_Ac/?T"v+G;uvd`F%?xoh4fyVK*w|yBMq`sA
-K*$N+H8`?L?=o8"E.BQ~xUGZ3O3[=Ty"N^10eE#?Fp&%P9wM_BN)N-RfhD>u82BpUrE3Re,|K=)!#qtmbU:O7W;4B9%hn_"5v^^1UR1|,UcDw]2H)Jl##L[/EG(7QF@B3%1O^!lf[|yh!/&}Etd,5QLd/0fN[m8Iu5=Ai_B9cI#nALItxOg#H<"3-Qm_uZ>@iFj<N>iWWblKq>b&FwX.#I:um!dJY`J>BM-^HNwZMgWF8e-jr,y
-K%Kt,amVj#t{OX.X=q`RCS!S]vLs6uV}`v-nX"eS-::<2R[xZ?npZ!&&9xtqSB%E^oWZb}5GZS_!LT0qL-c*e<Aosy
-&;w^-O@o]&(skw^]4]2WiXX/#[7g$!M1H$l%)*->;O"3EB..zi8p@VEWKKWD-4%/zz%#L*o5G^F7.sebw+Ert]jcW-e`Z"HNQ%@2+=W)fDMk9aXKx*]QfQI^HdDu;ntGJ_a(.`3eY`Fo]H*Ll&CxX"CFfK%1rmC#d7=<UL;8v3Lh34i#*vl!md+G`@TkI5uf}PS146y-w?;m~9Q5+T}-oe~mXGwnrQk.a]PT~3+5Z_DDYaDeF,46.&MjE?(TN/(<fRW3VPLwg,P
-_Fe&d4hTe)BI+`QRHg^t,hJ7|#,[=0w^
-d_DF:fo=n+%t!X$z%`V+IcQ~sL([
-=FF0:3R=HapXCg3bk^0#DC2Ry5u&1bz#"2gqq?hT
-e|:pV+Wt%NCPpDx^"L0Hg8Kdub5$U2&#WL.OU=lkT03i&.bWh4AH+8esD*3H:l.W3*"lPBfRj_(WU6fPJ?
-HpriMvg-/#IYa%.>w[LQ&R>JN(a-$jQLUT.+3iikoYDgVxe(z#XIt1yvnxdW>DLMHc:Y>RlPsbSV;kW*m-Ggv-KWfphqdFlEP+~9{n%z"Fz5:w&ylyo2WO4-0BX/Vt[/054!XO4`|=IhCO^-$X6<0y`Q(%Mv%R)W5O:.89a=W47-jVJKpAuL=59OfTcR&4HS>mvu#crlW9TOi;zj6A|<5j%*RAcO)ojgD_1Uj%(DpNfrc8;[oci.,1Cr)(lk"J)_Z2M$FS?b?s[b/?B,@3
-if@hL;Hw?jM$;YD
-LH;ps~Lz8;M{QyXrX{,c3(U}JrTE#1czA8ws
-,.j]zszAsF7i1z"=}!_:A,*wAw}k5+NGXV|fN7>tQZe!RmX1`C.<xy`F[:rBL!`ZQ.i_?4I4l=)IH9a_Cbx5PC{y{ePAJgq/<BOrf0@uk+<xjywQv,qI4:r.uN`0n8^gyn342;P+KB@=e$lo`4pN<4J]0z#*}2;l]8MPrq8j{:(R3a<&xWA64DH@yDl,(ar:|N=-*5T>[7r=-
-cgV<J
-
-;1=@/l>)O+qG?iK$Fh5Fqj2.@IvS$$sz$W=&&C/;;I/R;.Cxn=/n`v2#Fe.,<2!P4M-W=s)yHq?GvbX?s$jRuwh`wS
-q)?4,Gu
-WIplfqzT_.INJ+RYlV6yY/4x:X)*e2NSV7KZ|d
-exPg$Mo9$V%(gesw@u.oqhA9bBHdrN":OtmYiO(y$mwyNkc(:qfeY&]Zn.1p&k2dt/AbJ+>eNZp6^}vc`pl&`IXg-Jl.#QF!?H,uRGYE@`JH;l`^<yDvXHPRWA/,/H?-Dq*!^V.^RKH.iyYC[+9//QPQf3#4"lVd!>Xg?FBX#89C=cA;&[8PODUg5HEqIx_
-J+_~K$DKo2YnRk-YRoQi-:8UdF?5(dssLbcPkYA~$c3KHf7C-~Lk=cr*@]mA&`+{m|`IMf.Sx842"=!j;D9m@Z*yqT!>sIDo2r,{K>8XF~@?`jkm=2."L6S<9p[sUrobaw3*f?mxLDr^rRvYjbaU&G/.e,gDTl-yI7R{/I=rD=S{F`/2hW3(m!ie+I0uEX;UH,aIM<
-+o4(<Q_baVKMI^F&;[pPpI}XEZ-2THzu;h7Xl&*$E)((1p{5H0!XWaP2&MvASJy;>dd6SK}8b2,sI!Kh#@#CXLH]^VaUhE8R][uv4a!`_BiH-Ws+Bmr8w.qqYN?
-v=j4XU5PGZ}4{<_<&>cGBvQ_zg.=Xj`h7Tu9P&/&.2;hGr%(uG|W*3n+!n}q}&N)")g7jmIC:H.H!L2Q_wgj?=zQ-*-6TVZ>zQg?%s:j
-^+T~vYdVVt8-b~H<p8
-/c~L/J@_YS44w`!Ds^"&]Rrs>,mg~<^3zKe[-0x70/qVUr}!m:3#w.c-<oB>NADOkWAH#o5N*8F;>[1xJAIdf>"6Vpocg=D&l@/f1ph<JsyjFwDM"mo^:!3eW+`y2f86`$T-$8EY>*V?ebOMFdKmRL!E$xh7Nm9*M.)mi&B5f54R&?,HI3qrDL;+eL^c(T`U9
-V3L`[OSf1;s>Wr=v>[h<K<4Z=?(w:@IQ%2j`"c%o>ZP1*.J%7lBT=.&Fhx2aXFoGTZYoBx
-?S,$IOqjMN.rbWU7o8f%NJ?+3l/%YK,vd
-AE["U<TxZ!$vbSdKO:[=;$k@,9yMm.5Stko]=o7%r7nQ0MT-IxqIB7;ZVpIcmQ;w(6gE/O>%Y
-NT`
-r0kSbNe+1#yjUd3_.Q1)V76LJM,-LWqR+OO6]}:~`NLKE4QGT4TAjRctPI/.:KC[vMf,>f
-D)h_>nJI5hD0Hyurz%A5]N~o7neXggHuvcTX{^Mn8s#mP*[S_+(&4FnA^a;KDB49P].l5rDTGG1JM/"NE
-WsqttZ4>"nvqF
-><*AHp1_yD!qGM,?kke-t9)isu%v.BGPA9l4M%rFfy>[<&/2tuwkSF$WRG^)(LMd9$F^<h.bSFf_w.HPyESyJHBI[6xcJ,ZK)h1O(QS>e<!QwK6I-<e(,onn5)^XK71q!2iy"eG8
-QFFZO@(ePBrmgW/flK4%g5wXu/vLkko,*|$AXqj4rcQf@`
-P1O(
-:r:<)mxQk;6h51`^&.yoXvN~Y;xMlHO,>*4n`+uO
-vG)#Al[(3Ihj.M$aK<D6S_)/Y0e87YaD1;h&,StXMl>,bC,O%@co|MUb;A<8p&kmHCpn(c`Ulc73TfG-7<R%17obn^e(Tc9"MXbH<g>#XOYb]5MwvjtKpsEsGpIYz(B)3E5YPq.
-<`+K"aM19:K2:c<oF=+o1A]Zpo?s~+AdlCjSr]>iJo^9U+EUQW`-y]T=?8Wb=q>X:2_(il#;RHtE1$wWD7HL;*wVQ2N[c6!AYa{6F`[4]uWL`5;1_GLV^j]`(&2&7^_pg0XHP6@d@F;dT25jpIT7gchhud|1nSfw)^_92W=a,Is=CLQ)-.w/_3|e?a:5g?Qn|uyXwMLszFwt>MH`oP=[#uQf[^Z_O]YVFTZa
-umh6(co;n{9j_["wOHZ6F&d;u=eaezp})Sk9u`Dr!h.#rK(UiSy(2v_?%djqivXRE`Ezb2JQy1mUFBKx:r_$K5@NWGW5-Qd.",i@ozJk]ev|MWRdmf;gr|fshABV$pM%
-W:.cxZoY@0{u>4M6iOEIP!f7:qIj{b|,Wn3h
-kuX}O<Jbe2&AP)eXm5TwM9@gfZ/_W5P5B|NMU`;rr+_a(6[HTITbY)C"Py&+1<[OFNz!,]lkQdf%xgbl8;lC6j=YbTwP>dC1%5=B9(pyg_cx+toO#t^0*<$cG*g9p:F++](-Jng@_]m8$9uIG[HCCMV;uyyr[As%7wTNaw*`+1`kcf5n"u7q#*Sz75`3%A/xcL[H(QmcYq6KD>1D8[$flLqg;XJnw^,IL7BodFMp"ph!V^TwIvRTWa?qb8E8=[C$Hz!YQVfw(UovvA-^=Oi$U#ZH%[5M@6woD!1joZi;LOr*=aKKNjjj8g8;`UQZe,rOp.N{50_R8XZW&aBThloLl4)`lRJ.](?}$vZK,#x1SZDw2uKP3HsFVD$lw|>F#2Et*?7Rm2u<2kjQoVZFz&l%oI*SK@."AbIvA+e*KI9:irig$8>pj?[5N4y;oBCO:sx&$bE@y0PY@o=v`pa2nUvGs|*hR_Bq1Nb[>2Fk=$)9f;[~ut[a10d~pgYCc/SRI>gj[|^ikWLexzV,Knh49@uI^L;@@%*L5U-(Mh!s_/:~30cAp&+W6"qs(2yF3wgC&
-s?"|MD92XrEb<utst{q=4_7=k8JPLD_?9ND|!}sT=9B:ZP0+e$%ixO`DGmIj"+sI*hl[xVNkf*YIb[_@dtSX.L,Pm.Z:pd`bZ1"+[.Gbx"d>c]h|"Q`?iu_Jxu4t.S%Y#UK;X")F5)i
-%H<Wy~@Cnu*r[#d(1GUoZr"r%6:&#~7Q1%kG"i%l&IG[R#uNd?WhCd[6xD/#B53bHCw0"`LS]O1{=+-!$$Kv=~Mi*tPuZexEYsfh-]&gfX^-x<x|e<rDUho%y"O+9"+
-S3HiZf1~aqJbPT=XQ54|,~HN4/-;%ftu?7AwEBdecjnC:6-n7$(X*!bvgK6%z$.Rn;n_5UPaP.(~>t[5)"1sDPi"g=[@HibQVk=COQpI/j"|x
-N?C^_QD>0JX:G^!.PQY^B^A7ouO2xyA#F9=^B^>NnxgAAdu~`z(+5nKOWKz"^aZ-F&W,dR2;o|
-SsRH]bkB`0yR,fY`
-aK]p4sZA4*9[d3?UB}UAPYdo@f%*l]B{q*?snbA:kmJ>&,a^
-|q*MQn}^biSyeb.Mri36e[ix#7q=b]y7BN/U}$7E<GhH~B#8DCk?)>tW,<JvBajZLJ}9p>y50qiE
-K&IZ8X,i<?R2q/lx!v5{vBP3l0+p
-Dnb+`@#Quv5xa_qfP]*3nJ(YyJ;B5T?.<86ILB6f+f!GrcVw)I~
-`=vcQL?M]a9Sta-m:+H&}"Ru1w}#qAS!mL<ug0"Z%@<()!V<zCO^+6&WGk9f|Y>vP_~Tt=pjyJEZn%v+
-Y[(YAm:W=6fy"x7!6Q:G)&^+#tx?p>I%67
-`c"`uo)msRtZ=E-^*E5o-w#kkx($6b3%~
-(NVw{N>+>Qa0VhP6P-fH8daw.)1[t^Nkz6],~iPtN>-RnZFmaTqcH]C">Cy/jV0bR%!$q5.Rc^}OKunql#n75s0o[*z!RJ=jw<Cpv9W0
-9Y>TZxB"
-jOzFuXa<:EB.kC4K}gx9r(*bt@nPxe:]c6=j!1eS
-
-:uL`BOSihCw`@?y"Y&tvu.U,:;{xl4`g
-J[_hvutBlk+Qyc`tMks{8!2YOJv5.+_G*6[Ol[EihVPmDHaRMNSc+V`CvFWGyg#!OvX0![D4R4/!D)-/3U!XTj@R^IXB`po!MCd7=4Xnx-m<)ehGp*aWLr`96~:TMjijT@[HMgobM*havf$)CR8-mICksEF}O$<L;YpyO0[vb_bmX/kzX!#1_H$u2$;!:VEOYlDb5
-]
-_$(e!5:EEDa[00mRW:(C;pN,=cyJ(O[yoaNYV{DiUeH:3;<xm:Kh,>,~m6ZR4derhD:!xtfiikb#X?/(JcSja]$b5rYhLiI9N[a&wI4t6Rt$j_Fh6%BnNmSWx-
-Em#(=`j4Bk=8#_AB#&.K>G"V^V}3D+mXF,uGbR5sbJi4lqRl+EZlbsfL&wReY/`ceOUvp?dOTh$VJ8<,3N`0#OyK(,G=^we!QlRQ3XIljf):k@n"2<
-2Te^FEm}-/F"s|@C-G?ltx#|G6(e<820omi0dHU~vUGxYoW2hwHwG9.2f<04IQ!-.X/1"8.ANJLT9!j}!j+yWqk76hJdBS&`59#8*/%iBu%dQ3ru&FARL<J*evHEJ
-e2!2@Fxu1ecACL
-A"?"=uS.r3n_Jq6"vG?.v4/K>FmhGVD(:aW6d"XR]lFr03V1Pq!JC3N$g,A_9in8xxdJ4w)$p?)9IxwOe$%w_&)-uG|-FDC.JUoUR89J74REn!qsnPD@}qAJ8qpr[Y/%,NRocLj<VxUY9>vvp(c&D4*>nu##nUa)1[e/8i%)vY#/4gLmA"`PJ8X<|Gk9!]UNymy1Z*v>F4]fz>zI&5+D,v%>e;&v&u*-9.&/`[.=1CCXeZ.(.<dm7Ob#ZF"PsrT;GT/0<18g0b$^)mjnFBh#7IlO7d8A3.TfY%VXQT@Gwi]N>1G_it`o]4NJ:vMY5kg_Uu{jw!{2n$7BNp5.,Inson|PQR.*MYE3Km8A{
-3Uc5*RZe$fgfJf3jYsJ2OHY/~vMBjM~s%r[AaDExV<bt[
-%o"x5J;l9T
-HRU;O`ccyho)');}elseif($_GET["file"]=="jush.js"){header("Content-Type: text/javascript; charset=utf-8");echo
-decompress_string('*hc]XHAs"H%tWN|U.+XKS*L4tuu!IbbTh(Ad/X43~_(![`z(J./JRSnW/1.cRLJ<B*mAZP(Q1gkL[tG`6w;k3MBK|_>4u^RE=dAo5bgI3y9RYR&(j,Yi`T@a:f_yF,Kn:g/<@WE^Lslxs2vz#J1kdxY4bbUs.,P`QW,D4"V`mA>D
-:@K0_fPCh%ph0J%$vib?wBqUx&Uhu!+[4q8T5#&,cHvuO,`r-b/Pl4w}tWxG_(iArz)uiGngxC7,FzQRw9
-wFoVEW"FKA|u`^9K~4P1_CkDD**fm?7XSItye_Y=H+jMwi;wXthBELyw3YAe?0!-?o,Dcfsx0aFz!/Hr#
-;wd2vQ?@th.QY=P>.Ve#y<ZN{OW0.6HVGBcPV7,]ps:nOTBEIDk.!bm24&(`edecr`;#WAhq=4znFp(OW/*arf,(-v%
-1Q
-M5m`(Tp8>:7:@DT/[Z1r:9##6~ne:30}Ujtf2<!#L!QZ-jVsB]&&>f1j5>(WJK59]G[t>,[tB4Em6t3[KW3GF"=,s,r/y#^vlK#$y=JIYuNqZu6MH%n}/9Xtat+7KAKX]mM"X9yndeQGqZ;%ReFo,5w|DB+&v6:hq[e+03s
-U|6KtO/<2]I&tnLW/hZe<Q^cC%SQh6>J+YT0u0AKt0px3sQx,sa4p6]}^)MIf|IY$?7+UQJC*m!Rqa:b1|v4BR_h]
-xN4qmp)kMCJ~i=_Y>^a??q_1v[,#q|Fg!%y4WlR]R
-n1EhJRD@>LL2ge3;C;
-*.s/I.wY%YlYd5Y
-@Gi?1qmx3^OK2`SBw;F&%Em)fU!Gu.+lx<vEf<3C_)3,EQ5D7bp2R.4
-^kOW5;*LQih
-j^0pkilfeoCS3y5;9a&;GiN5bW(4+R#D{-#
-:m>uv7!Xjw~9``HkD^@rlet>eE:6IW@A*V7@:yWA3b}<ggNpF]*G!adp!28jtmk!Jygw;e*cq(}>onV[Q#V?kylVHtnZl-6x{=:G^IDslEd^@m@7p^)_Cq2K%K
-Zl0_Un=tPrP4Eyp0;3GM,6*iY9E;IV9=G7Wbn6RV"DGFK&xq=56?YMS,Ui-#q05-
-aZ?*}i5s;s-kJ2Fsl3c6A0Fsu>#RAEhL)2FN$UMsBY+&Z^6bA$,<mR+%yWfvt_>!d9f53L:
-c)`]c!_AV;R194x22]qiahkHNhgFB*9>-V?yC8CtwKgWmrab)ervmjn+L3,u_)|"nv@0FTx9<_/=-rmAV>`oIN#HD!POv.Kx[I)=VU}RSJCW]M9<Q4G#Ab3LTW8!15=F7,KaVr*FxI%+2au^&0_"tBJ.#U20VJhxs[@`sWTu%h:E{>da!Gcun].EOH.1[m2-9X(jaOC_REp>v]_qR@|Y5NL(a
-yW&`qj>c,[hu`c[e3d6n?^{%a(,!+Ba+`yDjoJ/d3
-*V~4Tm+*%[V$2.o%)pre~r^@93ZU<+C!4:FDx,a=gW"9(5J=}S&uc:zu(WH?e$Y65G!%96hk#TEL0rpOCGcsZvrgWXY7.i`>_GRi]nDO7<*F|t<=O$!-Se86l)%Ui9-Kx(Lv4ta%<aOgIt
-jrV4_K
-~Yp1/]1w9#3>q2:ASogfi##Lt<[`slbbS0}Q8C2laGGH`j.,oGVT.;-hVX)+Ryz*o;D[=)t3qw"iAhB*6L[K=0H"r:KY@:<.9HGD5"(ry?6@qlcFalN)C@68W*x"EF{,kCF?=Bdd<w
-N6e1QU[ci=qK+y]Wp5RC1MXJ1aCT[/^aq<7x=J]L3@GQ
-5[C
-
-@f=^_b58J}K6XH8iW&(8vVv)ebMZ=R#y4Rl[f}r7w1d,f07e90"sTy:z41qp>>MibIb`G;.:^Y^k<*w~T_kV.sX"0cR0U#!sZBg5sh<teH]ElmG%^Dd=(TL]IUGD8UoWSH:p_>lF"y,.m=iMQCjpZ&cJ4wS*&[U|1F[k"0i=%gjxoD0O6~;f
-NdY*t<WE!5Gp0)?,+eWuO4Gju)y:GyFye1aE^7JnjsH:4y8rg1@?XyBXJ<ymIu%W|RHVa@7C}5o!.
-G1TxD^P
-x=Rm]%~HHXRG?av>+6?Psg1dlMHjp@0!*w^<`7"W6_q7`7,U5hQw;^#4-9HmyEhp#<kbV]CX`[?f{K`d5WUh
-*lB4*_UHA)FkCBHi[Z<hy/%l-r-liaG;+N$TrzH,5b3R(l"is$dgNcHlEm2n1M"dO)9z3&A,`m7glRGYhQs5hG&1O0sjCp])
-VBq]EjQol%6-{3Wed"49g.NGbK?"3khI3<Ut]6YmC;pH-]`PNi%Twbt
-t6Ue$idUr5pR/CjFa7utI4M2FO/Gyv|0yd`v=hdFUYJj4V|hF#>g<ic9bohq*1k_z3F^mr/2Y(jW0?x]cZ-v5E`
-Rf;/1"TOl!UZ&W"/DuT+":O1TYC`kbO4Yq4vhKSyk!39J]M={NN<]m0UQvn.GW/Fw$hrRcJxquT7J/=21mJ=mf#A8,/9Up{;10/-xw6A+mgcj]X$y7kBFj`:~J]$!^%qZu}#f=#:)b<T.UP3.T8kg1z.?Ce>9k[L%pI?Y,42._EX!c8]Clg^w<Xo)TxTmpo3mo37#)RfqHvRNCXM~?`nP>ddIN8e}PzKymE<=U91i;P$N)/m[eEn7K:/j=tJB+z#CI[j
-[DR(A*QmWq-~nx4X_#VS4:uzCb`[GgadkT+9vc&U.K<{UBxiH
-)I4c8ZXKYsZ;"=84$&+JG{:?/+LPS}h@7!qECuS]+xZOd|grBUR`*q9DuslMIhD
-yPYM3WU@4[j+YUBf@I[{fWEg$8u>kY=CH,9cdTF|Fq1B1Wm+:AFHE8T~gPw(=QL17^KbRgOydy10HmwpAPulby$?3#s=/W-k+A*JWR>_G2WP(R
-f*H8-Y:Q*dRXJ
-js+[}NCFP]-*O@3Dtb<RCevrk@:RHk10J_]sq&N*dYT+X$v)dls%Y"QC]tC8$W02|s~[{1vl&/|,RbU[GS:s~.*mpZ$1Wmv194X5}oZJpY^*L3L=%jWo*kqgwCep
-E6&P&C=E=H]?5H>6:/Shpap*eWP^X@<.4ZdP4uUj!MeZ/:rzm;5[mRGM*&tq,TxuJPN/p8]HD3kgHV0epa(>J3VtT&.<X2mIr>
-9j^GFN0Tz"|8^gYXtvf
-*avD_Yg!*Y]vL#Rq9@]Lj_4Kla*D55D.~V/o7^&7$Iz-#3f,SA[f:Hl]%7e8mGe:Q(hXj*2UqLZ9=N,Pj<cB,+0#ZR-]p[&Pb,jklY00Ic>yeKR@L"n0TR7qq0;+tn6*OkZ;sle=)lKJ1a/X5Oyd?keZ8:FN7]5g~G2
-*`3Rq/o>BO&^W!|M21BLRhgnTl{%odpOd,qj13zF7MRi*t+-dL>hgv!lNNrvwNwV9a*fkI~hJ6EIqH"9%K`$$&%,dg}ln/2m&>~;I6TRF>:diSYC|?V<G9l>JkIQ8"pLEk&E981.CYSGNX^LNUIw
-2$n3Ach+24]9..Ot/|&;7ATOCqW]pl=v)sE~pFMLvtKXrM/6APEr`gXi-exobsM%va<;FHH;sn#pl*!,0DbcUhC5@k>8mgvK4FijMn:i*e,+4%sVxvuA!8@@@$8cm8A)AH9)x^JgO]A^olC4q4<v2O5Zh3sg!qE,b>SInTFqDYZBUjccstv16"m-"H@L2OZ@e&9R4jtp:&6WS]e4G7x11J[V19S"N;[y6[GE&()D&K]Db@`TM`uVCq*C<*=)F`M1hhWQFu[c0]01VTWhT:RGll26Rf`BC.c!!ag@VXg[VPc*Dm#0)"XKdWP}QWAgq3Xd7jAO`$yPz!dqGA(~y,Q?!K4*vROV?Qnoo&D[`[s!")f&[&1O)L3]2H-l11,Dtp_:ObBi(j%KQ`10U:Bd@Fjm8^C4@>n(7!o*$b3w)ymB[XtIBXJ$l%w.k.9fctN}v^
-ZB>O0fH)IDpsVPEQrb)pE03sEP44KDlH*ET)hSbD2s3-=_^M"m$Hs11eY8J/r#D,~X+X%Ru+hN.iOm*fb3Ri3o{k{"?:!>aPEWwu:Y$aI;[=uQ1G7mu3~(LZC@cC@`N6Q;~Bxuue6WDc{QC5ckM&s^p3#$jE$:k%ccm%G54wiUss+KdsfuafW+G@w=wAR7s#1]Ycr.qec1s>Hk%H5??eb_jdwJ}HGC^OG`nDU.5xkW4^]V*xW[LBhQS@]IoH_4u[jshG(_XpK;gn8M!.{ykg~NPEUvtVdIl.}x$m#j*
-Ldv9f-1r_pVO??/qEn<*U[isVV=7~/:]HG]Sjl<mWs%p!X8&[LPC{H4[9_5n,mz]>kx/bCgZLRpuS]SU9,2?.vPgG`%;Gx0TkbA]f0pZpna;tLFxzW:4*xxW$$[M%cCthuB73.gp;4db0X/t.ufDs:*
-GVQLnSX+CcF0x,==pEjn,
-s&cN]s*0{s8[8
-Q^SB2_XbAn97?[JK9ayjV@|Pq*a$a@)jN
-}(Mux8[sDw|vbuUNz!;@F4o$>sZI%W9W)aCsF:QZw
-Mkzii48log~1O,2;^y|(p@gKV(#oN2*9&m,@Z8nZKA#ec`d2QJAFm]-n/E!yLPe2E<(.K0S+8&f@l]VUZBt.opGPd2#DP2#@"La2$E=:1#t*jG^1;(VOb.u,kDrdg)?z).EZ
-eV7T<}9h@j
-]g@mRP[:C%TE$1*IBH#GkI7fY1kc[<-g6X2WKZt80]cq{GGZHqR`!SS=Pf872mo/+&2Sz4J4z<OW4`zwPxQA(>t1[emw&rE8nufBKLLp9J#pWAH[3/JR7I.AXUNbU&"*|Jo)t-3odFB?Qr`l=`ZBAAiw/?!X
-GQbDr7]N@3@AJ]U:iPjrlFG,,,32*tDK@a_qbVns*Oa4CZ.N>(V-]fogG^Ro[sf[DD,WDqndJ/5wH"E}I(#uYqFn=BJB[8kL0x@QasI)H"S{6{F@o?Qu
-@A:+@Y}3_l.,G"~5gsNyQHyuKI#w.vteNF`x*whi<_TN7%Rkq*3?|Ubc3FiA]$)@eYnV``3]WEDk72SL?a?hODp;Q`/a($1,s5gcReYiwcgI@m9FBHJkvBNh4nY7W]_53@Z.e6%GM0Xwg6ynk?d"SAv/V6vUVZn4}sbuWtIc9k-%W)~cuFh&8Ed-aN"loUhOYp~aCR`8A.fr^ou(_A#Rg
-|UN@YoN>C[]]iY)?/`L5%D3xI*{sdRAtWl1v*fTq|HFSimUJPtraHU[9tsgl0IS%KV7m#W(Y8y|d64ZG:xji9x"M:X+GTu[RI#9lTl)^#8vm=TsVzf-FGKok3+^w/)"4K,3"(Jd"0Jys>]2^V"+8/vj;MJImHz"/;C[r(Ch;A1Uea?Iu5)<N*$gU(IXi1`IB;M*DtI.kOQlVIW.9bw->buseX+GorY
-hz&DR*x4=e2xfO`9Jqs76=tbNo$JKxV@qcM5ugd?lFRWbXE>@Ts{7-Tx
-_6=,5cSPwd
-JSu#[k`kYE1$5}9"y(w6bAdm)t!!4G%.Rr26(Z"P"C#>w2#HolE4_mjxc%tRkC7t$v+23DSBa;j:D9r>yqJcfkq$[ln#7wq^x*v0]N9<.Xn0F.++Yma|>zc6xtk[Zql>JqkC9GXgG3[be5*I7nZyk4CMTq,DWfHUix)8X~.#&R?Z[s.&t]lidp`O5WH=6V[RZpIwG@YX0m#oyEr|S!p"LWO*2F:]t*w[WDe-P*0up6%zc{i"JN+LHr!@F-+rc=Agye<wn7aNxb$*2FZElkHEyo,x6EfVpz2j<mBiy8c|S(GNa">uUWjU*z?*19[F"MZ2t46+c7v;v_yq4Qm#j+*cflJqi@mN>44NM^xHw6$YcElLCaW{siMz)`tQ2itw4oyT=JH|a)Z?I$KhEWrl^?$VwK*;f/]z1NXRyJcM#>]{>V0GKy^Uj*4hPJGFsm7.]EX#A(_hrtHZL@ss0L)b;n0PR4qn!mog<HKJX7-
-oKUYe>6RH"5,nj02?@8zw5pKG$t#@pn/fVj>]HFC
-;KSrcz&VM0YfjBymJs=Y$ZEbZ:IK;u6lG=o6FVDOIw1B^3|SuoE%isSx
-L5_l2xG,JC_Iv9w;){kcvlUxAQ<=SJ2{G`
-=!XUEsi_nDu0sHz=ba~6kd/c;[q_iZa=
-$DQdB}c$^Zw/v~PS<t]dq^5|rRM8dR(,g/Iv8Ept5KIV@w_qm=&X!k$
-c]LJn~8fRSc=W)BCtvkAoFq$
-J,1T>QMFCU[$="?@uR+w=h8oloS!]WeY:QbeM+$8Ut)G;pNFWhzwK,{m}v9j&aQco+aRtOf_YnYk9r]lDVPUV&A4:3C+]W"WJx&gSH>877yONdjry0Cf)]TDp@B#wH;-mba]A**KgmPbIUoS
-=/DaZhW;D6H>>htRx5/Um;06wC2Op>.Vno+ZA3WR?/4i3!1yb+s{7!t->/)":,B`%^"Cww
-<jnU"HimwryCf34%jYX4Mj[
-,,Tdd&^h:t(I]`Kc.f}
-8kkiBG/I"/TXLI8S;t2JQ.Sgv:pk#pVEZMJqh*#^^FnSH5QT^wnB@3n$=1SU~9N0L#|J(q3N<ZW4X*m#E8f(rtJ#k@-#aYo(}Cc05itHxV/c(-L]4F4ylZJD.x"u{ZdqbueX9vwB/1girj;Ku6D"H[6LaZ7)oe30?aM1;GWfA2w`$Mc.f["hIo,;v]YU`<DNR>E%)bZxR"r[)"Ux6(rEmab*uk{v7#;ugUGHa@]UTZ%(LhS=z9O?ogD=F^0Uo[U>"DbHC2n%5XT
-D+A+2L^6ItN0N#FF
-xqroq3*o2SS`e{b3`^cP^>2"u,/Z`[;Zk[ALA(A~?w`ul{A.+BXmJ+iLlH;rg%87O%n>7>CI#FUuL@YvoIC,ii[BI)CZ`RbLIDh_l"xywG_&-s*Hm;TeY!Q+OjFT"].je
-$FhP`SHmWk#Nbgd5BIM|2W3xCE,SQ>aj<Fq]IMYX`{
-+I/Qa8d.*pvNdR`YQa%v^rMdB@NpYKeAV-OUF1,NxOw5)m06%@IS@fKf"@1K:`,N]d=lNS|LgS&IM+%JdTdXXi$@]">hI9F9~/jTcln&!8U*Hi>t/<K5/1i
+v,A?3Hi)3MFc6j6ywXs.%8QTf@8H/3@xo*b]|5zwG1+N7bXn<h++/,3@H%=%yedr{w4J+c:Ope$URGK6UJz+CA^DL/[/GQr4a(Yl;^l`c`6Z__M]e]d>Ix}YXyDm/jH^LgAH0b"<|;*P<@8mask^oIs-bh!G,AqnX*(&L^wXEPx^G2=ATA30gwZ
+AM~^5Cz)c`Q+fTVlGqV(24fdqMJkcc
+Htc/oh(x^Ho6eVS}4n7l2$Jgl^f^;(vtCzm2m^uzdK2h=$/h2fIx:.tf9Z=VeHNay!XBR=EfYV8s[$x"@?t7!mN8/27#QR^HWlA~[DGw2HCKLlixcs(H>YW;4d8L.(#L@2#W?ej",!%Y:Em6R5
+[LDp9.MRw+zi45/lEsrgr&aZ"J`_Jso-&sV>dc{Sg+)Qwm!)k:/a(^#+aNxos+>Nx5UT9Na+YC>lUl&Nndk35j
+"sF$v=4|#e:<IaPI+33.`8REe<d4rWs*%:33sR7#ry^!jzVrVoa=+>5bBND8`4+?AP$X:m/E5")Z?@#|5%V`o$^bYCRXeWj/a[x%n{
+KLVWhANf_5*_aTkgtBZL5HgL!F@XdOSn.*m#*-jM`*v"8sfTaf//F)kEF4(EWc*U*SLZfNNU2j4j`s#&0Pd)hS5#]+b(C]Jf*H9ekiPhOPS3HJYSAb9v-J*4w8YqF+.F}W0!v,XO,,O?Aal_qb3jxt3nlV{X~
+FMxK6`a!sMJFIja+FhrMGMZ
+{Yy9v"WU(?s
+T&1((n{)}/TcRnu?D6N5c]gUyXN5O9$J#Gs1mG2>Un7H1y5NxEx0
+g{JsUdtLh%t;E3<~?=RK%~jH-5vO]~;w_{[ygo.p_yb$@_x/O3Uu8FGQ:?Zs6Q5PM[TSpW&=_%L[NJC$-*y,ObV_#NJURX/}4=d{C$$7]q-$.SLFX!w*M.OcBtmF5,SFx@lQJcBrI6wPAs6iAG4;tjveo)');}elseif($_GET["file"]=="dark.css"){header("Content-Type: text/css; charset=utf-8");echo
+decompress_string('(Osc*b3V?$d0U7vYy8!&<6V+#5Y(O]{_E`f_Nnud89X^o)QQ3qBMrdN46cZSQwh=;$0.!*Zw(S_-i>;II-}+0!f6`8I9QVZ;o&E5[c=8273*kW8ozGkc^+xN7#Y.@kai=uf)pXra4.tvBDppE(0O%pyGdHQ;9&iXKL5h"f}sTF^w<u+N`QqVkc//{&C#v2fr*He5[n^S~K}LsnolvKKV$0UQ^5Q%aL,,EO.YcxHfUAFE[fz;NTDXihkd+*v)=*:H<h4m}7:MZ$(T9?)fvQe/+rs-@_!6s.%kFS8BlkTM7:.>T!T1a_Q]r,{G#1K#@DJtTWbKDhYs+d&f5$
+e2r-x}$$E]x1jKb?*hC:U6#$nP!Yl_fhiNpqSQn,rFAH^Ej0WL6iVbFm)Dly<^b#KHc5d]rDfY=:)ji_M)GclRh68dd;^5K<_T5a@_N~m<-fPk)n,Yt2%c*H]%J|-hp$0S7[OX%#$N4]]QP3#il!.zdMS9b~OTUbf28N;.2e#?[uF^Zs-}.fOTD2kINN/_9i>)k^J;)<,p0Vjb7{tkV#@~3e%r)x]^Rga3?&.ot]hsKK
+0RvY8Rcd$eg%SZw7upRx"vEUKc1n8!TO-X!gT-)*AjLt.nkxls<V_YmQicVt-sXf%[@j#pX#mg5h9(
+>WFWD=eQShDcxKsdG*FxQ|on**[[%wssZ|,@a(y#A:>EurcPU7t,+8`@x02UbWotPkWM72h9$VBmG7q6Idd1z"B(
+HVL8"i4&o!o;@W$S3NSF
+!BELq[+mkj"L<1^->lc)Q6h?EbbC(-no]nk$(P8TBDBS#qatq6(vP68>:4v,f]68(fz%qby9w!D")/mB?*V6=xmTa%JY26w{H/DA0;97<0skOU_*7{taCF#q1&FBZ[^a&(jOS}tC&kDpe1T6J@z)gFAJr|[sNFt-OPIbHH>j62GOYJM]Oh,VmV(uW*f+C^.;Jx1(Ax^ue6[u$/O^15L%NPP|#[ukll8d_fwk[a;
+fjC]c/-/7w&n');}elseif($_GET["file"]=="functions.js"){header("Content-Type: text/javascript; charset=utf-8");echo
+decompress_string('!]b]`nsZ32#tW"t=D^f-cSgTKbHU
+`OQ{E!:WmYA8@oVFA!5]8%:/.^",RA)Ub_b@nC";#1ls_vRz_}Mm@*^+?S
+d)r*3/j:]J$kH:(B;r<jgc|?(dmI@U4)R3n2kL9UT1gEMGg]/WVrMy$/EqLC4/]M~)2pzyAUwk;F*6iAe=Z6}eCL%wk`d_Z,x
+a3Dp_48d+,{nQpcZlcB>k2`oF!PH<_u`fkthnQm[G6(H+d_s37zD&)Wj&a/
+Bt0uh54EUb@Zr[o):P]Fn
+n[JJW(:>>g%@bjvV=7ZbycmJIvr)$.PLTrblmguSSx&2wrv*ScLO<`%=
+Sc^(o+VLYb[l7L7Y[d
 e
-ema^T?P[<P&WSFM)._EJjSw.q>zw~oo/=c7Aw=O[bK7JkQ]&)<gF?w;[!`a&$e%M[(o:>jDp8(c4C"hM~i+rVH5*%0(u#y`Ce&36Wr:yWdLZC6@F)f$!h#q#}9*=Si.`rUo@]x9[,=W"Zd[^+s0FQwkSVkD]6gh+RS+G8(xfBq@6fbW?d:U^95i_mywr1Ovt%LEI7&P"9P(]?DMd6!(k
-nF9iY(;d@B0uWOHmPs
-YI:h<p.8MW6Gu!E;d)NvP`SMPEA9u@61{NpI9NvLer4O<t}Y^D="<5r!iY!FD]F=ZdiTAP@3{Y[gz%JU!$kav2*>W5U*&SeI0,RF*_F6IuuAsxnMB)Nmdm1+|;D2~qPgNy13i$gKHy+4M?TAR0B6ndlNC-l>72HnI#aq89199`<(PTImUVsIUH<K}^Zoaw~F:tMp_f~c|0S^TedP(qJKeqL+J>SDDWZ?k&p/mwGMYvD3uEnu2CfSdYHg7"K&DY(DQb4DJ*|-!aaR<C%H7f0Ch)"@?o5X(&+5|PpHFP`^.O7P[=2`^*NoK;YB0e+*;B=DrdwqoV_`<mzFHsKk^7dj3&?HTk)]7j)DX272l[W$8Y7("Lk7c5I.8^</l#z:z5^?$a#*$Kp6swHymy0DrA$/CQn(2._3$:#4zoH"Aq&x[^[m@n+=*)d1`=jJO$aO;E)FhX=4kOvI-nG#$!{1DMX
-~hl&Ahr+4jA^:0W$VHny.^g6Gl
-Xx_gX1kELky5MPC`8U!6u-alX@g`v4V{<[W7sQ%{PI$R"KM7i7kkYw2<LTkc4Up:M<hwx.H]g4,d8K_|>P5tOiAp%$xgy=hMh*I=?au{+C]buX)Jn0?D:aqul9H"d8sKp7c"6T&I(E>HBbKOy)fq`:Td6=&94.Q<"1sC]ZkxlvNNw~QvG!V<`?iHSb=98+@q
-tEtHu5wPadKK<
-:1fG~^i-g:zaJ
-"j_y}3z9$L47O6lWs]XbVqOm$I1tK$I%@];8;B(Bp$W8e$FBk6p27Nq1wD~Z;)B5=#j-QH%94hH*7p0#S=|sKQ^lX`!tij7aPo!C|Ds#^hcBBPhuo6GNRcG*YIz@tLqRb`[GKCZ#y@<AH=>CmKC4;_-=M_p#!R/#vD_u^IgYX<j;92#ogOais?e!n-&d`(Rn)koyokcrVOjH"?DD)"ox(:lqSpZH_6ZF~OysrahY;<KJ4_3M+g+r9LvE4?)HVo0*2`qF1ZRTq$:RDDuNvh,,CqWi91Vd,ZNK[Mt<h/jHRIyn%r9%2=6&?,|[e!ggds8arqnemBBP42mfw>R&`dox8pOYejHjvRZB?F+O>oex2j&REE@?S2=87U08G,r_Nw:Y]
-R_p3_riqZqMI`Q]aj!p"AC"[x&/B~3*JEh2=(b-d99lYMtI[1xXb"Xy;#sS>b:s"papw>Y,vE#r"fs#1NHkrq,u%S"-l$o.r?eM[B5UkBb/wwFclg;QfSx[5ene)&7mR}DpmKh+El9yEawg`v,G!V=j;pw;l!o=sjj$<^:308HVO9*eTw(ej>_65w;0VYhvebFn<29S
-`khf/8J?NauiOUKA64HBlhgb?!55e%y.3rM1W>8rBUPK.]N7&9t;4B%2$4nx,rpFh2^7zwy;,7!-g^=(q36H|L(@:
-EF3Ty6w,1Zg
-OUP^VWM
-X6;vYc?yVvYchDpqp4[d!hj7*QiYC/EEilh%`j#7GhhJN`%,4d1g,B,1ZPXR</7w^?OMgIbCyjxAXi=p"LA;PF<9;Cixt,C(([8cbfhb}$W1HP2h0>%I~G;RRRr*6nky67oW+h2IPPR>~s"E4hV7:,^$9S
-48u&`c[b"/%Vn5s[G`)|a/$.Ty+QNk;tA)KMhZyu4])":Y)WjM$imMS!.E56HL98W2XmK^x}to]4C.:d/Jr8A
-<[-O5M=?SC)xhB
-sbwDVO79~C<0&mV=T:V&41Z8yRCq)i_
-AsFHa*+YbsRZ[h5@,uQtiZ8`u^paQ]lB0qI@EuW]$bgws`I@|
-Qf
-3L?>(2C2O;o6OV^/b!63S#AWsOcvu.N`5
-2%9KjT5tiec189Z/$Kn@]`wUGo3L
-(`+RkC!C9N8pf<%mhV$=Q;+(nrC/,1GqadNH:C[!j6RB@E;3zxXg_Gu%M-jiyw4:^ru=/dM]G_~ecf_wajRWT
--CTLRXf_Dc,0a82koy,y]cM2Zd6;T&d5-jBjpFC4NvwFgHH"!j`U1t4.#kzeE+iaNd^J*@m@XvBZGPKB!35bEZ=c(3)a:^o:V1,(KKlDmj3h_4Egue|D%,,pIxCTj9h^Ir(.-IQ;>.Z9/&MxFlp?
-JCF4U+t+$mVaTN-CLfOnY|PZQ!@Y
-@cSixdwqJ`6@0WjV,o7lm*nQ3=4H.Q<tf=tBibDsa_%^!+"D<Tmrw=yEG1]Z2h-
-;%.?]6#2wQ6!";1_jQ+S6>YNW
-Rk8/nF;0s!wH1;{B9vzv;ehFlW[QQQrADBve
-yd9t&Y2Z>kU(^Yp.^8=wtuFT==WrnOGMd7#zK>gRTSGQ<Ga"5DX_0}85?I%-ZD;gGBg+yQq45O6nDu1z)0@2L#a4M?4IO`hfG-kF=(]m-OFXdpeUG
-?Nke?v43v|]Njtbu[4:AV0ZWJIua7P#ZFjW[Fk4Jx.Q?j7WJAo-Y7.I&,fqq^vXA_@1cma)-
-^CbA}
-"@Jbb5j!W6xaMK1#jsvr:h|(mHt8^#kNFi-^3WTXx!.X%nl7xjXb&4obl;fTBY
-yob%Sz4yh[um&T>T/$A9_oa&
-`m~=D;dqB](4W--u5A2//7Es"L2o
-/D=d_b0Lq|OB=wA@Qa?
-08^JsX"GY4puW4!fZlLJ;O^j4v)l?~+c_AXrl.ev="-KG--I`!KbCla.$cjF&(4kX=_-m0j;APfV
-{?RfhfT^MMr3eS<@7`+7>Z!bh5|L]>$
-?(U`i9koD,KhBADCe@skmZJ;U^HCaJ9R`Y&JP
-S"cXc9bYmxnb<ZFP@4(E](sRblyn)i_[m_m4J+|Q78&v
-Dq:#11E;QDZQI-on75GD!4Yg1z%!
-}?u3cn`rr0~WBj>j!P>FiA]"PPp6}0oFMOd-;%s4X"|#)G7R`(qT*Zm$<TjG%Ho)Nd,2S7sLFaut"fGr+L);#Hs,&V!**Bk-pbuU=P2YfE%l%W>[Id2=8Alb.:qAhP$R72A452bra8;M/X!/[<91og]]<"wi=^u/KohVYmz&x;dqwTMI7SEeRF"XSM>R>3B6B[=p&ah8#r[`
-5qrrm!6TI:6q#E/>:&7`dUN
-E}_u3y7hK)=t?MY^G3nV.HTC5r4Fxe>Hlw</o>%8Vrd&%[S*w>.w!H$.F81rXV2R1`
-J0sV)lo#u1SLB=S
-]f9J#KVbR<ib:oY8|au^;3Opfo)C^KRCm*/$J%hs5&90X3hkC4.K?>F<SJQ"$!rsF:Ipc-*Y^8)+sRDJ^gliqmY4ubbb:4>q.V]G0!!cL$d,Wmi%X>Uu0jV4WHITuvJa<5r7jbe`Vn^dt6StRt?^/i)mJp6YWYV8ay31N@14KL7g&czil_X]=,.+e55fMTv.EGlA,-5aWjk-]mq!()8mMaWg,a;uQ2zJwy5uU
-ZrRAUuQ+-CPxW9#vJ.CpxJhP/F^!D:YK/.g:9ef`3f>D`&"[Q(D_],_"_M>E67HKF09#2"2?)+#9d;#"Q]^08fpqw7bs{,V"#py_tn,^`MuO=6,]?,_#90Y"
-*bn#xs)#wge%Ehj8.No23Osx#5*F+H!a6mh@*/"5*$ogfsc=+?f[b}fiHC+{u6OEohE,o;z%8;,L1zMyxavwn^o3%z2m,,Md3+c
-tr7
-N&$&!FDFG/W0yUR*IrcxUO@:ydmJFS
-t,:=jii&3H#m(WgFwc[vO.OI)XR%ry=n]nq:[ei92EhtP2*eB[m,A$tm(lv,gtwL]PTsVtC)VC$x&I1Xs94,zL!THncm{;D][p"e=(@n8bWj.w;_m#)wT:Pd/c`BEh}<o+i`7RLAf0EBy/!yP)B/>29bW;C*qU~NUOZ@SXN_/XfsVGlo.*Q*`a2#=&PksqE&HEB;YZ9^Ku9$M*}TK"qkm-Q_bslYHBzsD>|`A_m?N=])&7k$y:{JxmN
-MJ3dVmNdx.q[m=90v0g,Mf9A%2>>Ji;>7*E6#P^/@@o7bc|es0Rx`Ub_9
-&j07Np&Onp7E;HR`}xDndtF]3Ko
-yGba,O6L3y:$1.ga<"|wnha6AIf9;kXlG7*N
-MAtzd6+Tj
-u2z!/nLO4[i66Y"<!tvtt"t6nMm0vr+<Y}WrpIlw,A]3vO7IMmoVa}FH6RJltF1h1=t=CchJm)j.U@LaIn*El*
-b)Ls1.*i9DqM]L*M5D]wcLTZxg%%&
-lPjwV!9n2;;Oa(Wt
->DSqj}Y=JV^O-9iAH1y>KM[stUOPCXg}"XXaiNwBS*.:Q1UrUXeJa`v.0Kc4_#6@
-N*b+^k/s6(sE`=>36UV
-eG^qn^%vomaMo$bl{akR-`g9:jAtG@QfetX70<V
-_;J/JX~&
-3r&dIW=$xFU8b<*l*)CAz%d&YbFX7>xSJYk"6@yv:PiK$[>Wv}l_y~KVifx_f+8Qqbcavyy7K4xasxOFy`n`xAqpEZUwjknndZE&U%l/@M?PP`p^AE]]D[pfQ?BVVBS*Lw&Wd"LLttltI~<]m:>NQoZh,=yzQR%xgHkNjQpKR+td7no`c6u9z%bJqfSJ*^vJJOx?hk,-Od9,X$M9SLm<6[!1F5T
-!H($:bytc48?YWJA#h
-V%W
-l#mw?yej*MtyMA]3^3ZvN2[vX>LfAh`]!/DIHJ3q;/)/ZPSqCN+L(tFCe>a(!^l=brafUKZs<^>1/RQG7E#C1i6nMH=S{pY!8
-3hRyd<4*cg7Ue2vh`Z+>NCQQaC~-:w?a&c@&Mt"Kt=E?C6{a9+1%>IN^yh^Fbqnz#5>OiQo,l6OiasE"?^u_4BVb]Of]6#lU2@UE.lH4EESHQrSu%M>S%jF]Vc8]D:7uR:W/V7D,3bhfU?;hN<]2<[ZGsu9cK.;V&M6c:;JG=0:!{4PZs^L1Na0y`iebgHi0c2_6,J
-M"x^X)Er<z?j.d*P3-G]ilHQENqEC~(rH%@T1.&<9i(0&51B4@o+CI=nn-y*N.y;Lk&Vw?L[y9HT2-4R4:*jRt=z3gn1B_!!dFY>J1WG)-]wjoX[grXfHQosPzRxdc7Al(Pl=bCQ(19Co:Yq6Lt(5g!jm^ypcr#`[w>r3%aq]A`b#CY$9S_JHR3rG^e:)40C.Pw-v/ttdFi
-3Wa5vlyEr
-6Z6YbY$v_%.c+^h6gY>CU4<&=?$OUb"<;NVW.#cBp?cd)DT#/M6ba{kkcE,#4{dR@Q#xm>=|eBXSpo+uJw,bIuD8.zeGu-YjDIFGHg5/y9LnnCy9i-`KDjcnMC-E()s7a;"iY)W&WCABLHZFo3fo*y1Wc|tWgare1VTFemr)87tc"O$>XIPi`$$PmM5xEla_K%<JGEeB=]N[,_>
-Zotv/H3w[F[zW#jnfQ^,.n$Ec|C^FfX>^&=l$h<>[0lYuWF@cAl{yi/T#{XdX}O6i[XB0CbpU^S5*g$8sts03`PH$T&mWt^lxoX#PiZ5EC$8L}XzkD(AyusD)N")Z)&3:sGNcA&5+6,G+dhB,a:[Tub
-*/<)l*Y-l.X.1
-s8ODn>Kmv]sHd7=Y[Wjym(8w6bdz2_MU7Hf%Ee3"(!#!2q<@eiNYjiIwGIs$t*=Z9Z+3ddh7x(L"JTV:/(O_qRz$96XCqW#DkXcA<3c}3:"b]#sLq~c=H
-qDhcL&6j(1rBUL`asnKE*)&@S[op
-XELKu2k!6c7g,GA#!&ieYsj9~kV7DtWF"&($*8&iDhm4
-3"@{O`.PmhrpkM`*Ku4s5r(*40P{x[<lj*
-~T@]pM0B
-VGGk;;dfrPNrd=Tw#7e=*nsVu3+_pXm.1(Xp5Q4Gqbls._ejE[_vI5!2Lxf](4xsbq3A?zp(9P-hQ.%}EmI50t%Pp^T4/nDC.L@)xtlUL[p)ntZ%HUaH%^HFDIBI`##nXN*:[WWd/bHWG.4"/nF)[ay@Cltj1@E3&%ob0KnHQ7Udr[tZ8Tt5UmWP0G7a8#Tj%(Z4cadrHnHrV=N<`=IG&zm4vgPu(?35X_qpyiGi9u^>.A>>(Mjo0`_V8WR$"xTSypx#7Q!@j-i99;J:i#rST#e$NUXOX~P*,K?|vLBny!?%q-_xe0ni^^dE)p%7a~j0XyuE#o:a_)&zH4Q$Z0e/pkKn_K$W(&HaMTNs[1SC3@6
-#G=;O_IT%(t<:|`*9}=oKPsw@HZfI~*-wU=v9A(FR+L;;}8KGqeEPvK
-.[,|lU_E04KT_w31)Ug4e!hJ>hc!n[,tIbGkBT]E.)K)`E$#D~Q-?[W$W8%FLU.f,23=[I<5k9ZKVD-?O`x63QUOf]4J:nLB8cgw*,c%HIyPXpii,f8U>b>AFZ68f]dE`+%h88-cf-<47B>#fy[!fu4X_KxI>ur(99SB2^uk,[B>-Rdo,C0dBNK*_OW6
-%vgYLVJNu>9>o]~=c06P(VX-;-lQT3Z%0@p%+s}U{NzU;j>;!JdH:<Rfn(ti4+x,ov$>&d<o=9!kiRXQ^%
-Iz(-iBb3u>v2E%/Y@G)kDhHWd3He]VKWA}isFdCLodR#U+0CV&e$e{-TGQ93-2vZP!H^%h+7/dh>5IT9=*;>>TyX68#wKFDsI|#>]swm<+!DDLIcv
-^ZPPUj$|3wM-")xO-98=Y+3;NgX/k4c|nZ,*ctY92#7H6MZ^=`!an+X(<RhWh"50
-G8
->pLOaN1a)Mw^X9XnR2S^^OF+yGJ3FQr|dQ?>n0@ce5Ltq
-cA.(NN:f$pKu"F8`)tvfn)rRKZ000JkT@-AL%rQYgZ<Nvs^/(:(}/vyvsDenmKL!0dgbTWK@JWd75(ts"}pQFcjEHCJcnb/)2$z)a#%_)pXocAa&K~pkL(o68_wZlj&2?>?
-!R/}b:j!Dq]=9,L,V@?CpKTL114MeMT;^B*"5.v(oOBS![J#UsmlU)+2P(yhmxCC]3>d4@`!I?A)UW_^8]P:ps!U_;&8.Yn;rc3>S4F|cuO#ANO;C%&V
-EM1ySHI57+PyFa
-v.q]^E?fqE3RE(MK0j.nh|nD*{As1lHnT@Ql]-j$JCle?1Jni/7~Y-9~_En[a/]8hJ7/=ppxv&/G^MK17dZyh4`QLhJJV4P/nISa)umF-vcLA?w`+5NP,]yb+I?YA94H<ax=jZ9;,GNyn]m=YfBWO(Lg$MQ3tUpueLv=B)Bw5(P|ry`7oOK<SDn]Ez8e:Q]A=$rUn!@fuK[YeFb]HJgPnMFk>G+?l!AI^)Cx1[]NJ^&3pMao1cAB$Uc}xxpgM0OE4g;en@&uahpX/eZk+)#m0ZtO1w0sa?>JikY]V@U+2bp/3:^3w1)?,um]3;U_n+6+RBJ7[H
-p5!T>qt+
-9:
-|RqZMc0BSn_v`@+GJUC01:?
-qZz^$ZAhg&w
-x]POrrT*BYy5*k1Ks-6Umq}xblGd6r8]:ERLVyw0#W#1)CxFUtzDlnc][c2Q;$X/,V7+0T&*[PLO2kqJr48$|=Yq>EMU@tR<VBqa:mJtd11v`L6c#tG^q#Gvr)R2?1/SL`zVo:wu{uf_BBs-!tw,=gyVq;@Fax/n/eiaJlmPI3I[m7O8}Hdc~`"w8Ds#pC3/5DUF}A"lelMN>fVPSgSqz71SNU{0/BMqDi"Y4.KPSU?NqiKalWiX_])`3*MZ0glk+u-aEwat(Hp>yRsY+oGRv8m%5=W;u/.tFjDoB^A%fZfR(rw2*KEBGT|1rKadSu5W4=gtjGak>Yb=n0".A#IOD%!Upvf2fvN)GuF)z0g,XeWte]B-H^(%d%GFU
-8"8qwpY.)GW/atOc<PxOp#AcJ)9Xtj}].Q4")x33@g{Mg6Xv1l:P3$W;A7ign-xsI2g,g6[FU5m?)LuM}:YyYruZ$,>g2XNm6d7`0`>vS6/oqLj&mA9)=YlRQ]6`Ef1&ZAQ/}N4;
-@hMRQ
-$cP.N56Y19-N8q&33pHpM[nZ!P8}["0
-N;)s"igOj45Jfaa".cwf
-6N#x@vx>u*;tYITXmLO++DZu:"f*NU9)HD^?MH~
-.lWBYesOc!?oET`yt;sU1IRR)#p%ErfkK"@3*5r4$:b#2xFeLiO_OY;%OS_Vs9`8:j#bBm1OQb.nOBom;AL)$-liof}V|YG8rL`,T,M74-$r1mmG>n}3[N([!/Mu!nR&K:
-_6(}7@V^xop=fHHyRQbTVhL
-!jOx8$qj$Y^y&@9eNEl=4XDy!%1QLq.z>9x|8zTZ*CyG?
-v|G;Hj83]59z43"6_I_B"$vfth+D5GDG&+0%eS^6JapzQ.gXm|[|C0;cs,TaIj*
-dv0KQ&lIn9KM*|!1+A&|j$Ah?M18UOihKR2LgY]u0_r.HuS/R.%aKuGYDjDq"_Tqt[Fu((F<QI7w<Tf2(dAc&NNONDF#ZXau>aehtq7[+98F"SPcu])Y?<8)D06EG>*&=-d(=W(lQ@4qEUYM3nK^B]$+[zL&`9QJa1o*2nFT:u7k9Fq7BH?iC$Y,$
-Dx,{?y7vF/:KMT2-bp<x(qpG#SMK7$X@Jv*4"j5Z%M98dU2:/2qOq^HTcf".rR6-EUo2N1MD5"-z=QE(x}h>kATxV<=u*9PzwD7$OJqKjlMCW.2XY]e&f&dgy(LCtV:oaEMfd=#Xyk.^ms$pTlMwH:4YwADgUy234>[U/"FZuc_b8DfF_8ubw]=fyI$AEO/QOJ&23&6voV3FbPTVr[TmJj$kDaR?8wep8#kddQna_C:Fqi3*;YSUo->#E,6Xq$UwDthsRArW[b&Bk%5x>:GN!F(rf|y?>^8s#Gio73"vwMhv`,t:,SNMvhDe:f-8a}[|dowyk,@lN.eQooe#WP,H6A;+gQ#4tEkhJl/uqUmCMemdy~_9E2L_sAX`)vZ!7~3sx{t?gi"7LCEZJrXOY8.kX-ZV%aj%aAOce+O7O0aMt:$|e>x*h?te>1:iaC#@CVc=/ji?LO6cgau<0;y0P,/ZuutWDe,z5F$w;kvb:&,t=g5JQh<[q?Uc])CP$
-7SKVxu2RY$$S=TUXE.+XUu_HfR&X8~4jw7i6I/OlOT!pR-eQqM6Nb2gOdGw?b2v662$GA.HJq6^Cn`6aC6O#K.K4w:w?NUz$*"Q2^~E_8?s`Y>F/l0=(G*d%99!&lrs32`6nIKMimB8SBH046_b@,Qw0BAKzi_q66T_1,ggD.N#-TU%rN;*bUCYV`w[
-^ewJ@HdxK=R=xjL+y%Ebx`NEz#)bk#tCL[GnPf!2_Xe0Lj4vj!B4fW#>.D%ZeznatQ$$aXdnPsPcI38<xtC3Q|
-yAI.~wV`+q{qq*Iwjh:7t4_yL&MR2HE
-@r~z#E;MyJhydt,)f,16,9SOCs2yAw/dfZUL*+2)n!"xa1z
-&5DMo+o2Q1jd:]dJ)<7.3isIYLryWwQDWp[I=e|5TyeCr4WSKky7Q+J.3Z8^vmr[Df"NqxaaFtW-HXN!8Pq5H#2T*dHk+Wrt$*{2q5{%A"hJ#a7trQ~E<o2NVX$qR`N0~d%$)d%a^%p;^8O9lmgMCy]@O#vw"s=_48F6RlJ/pgpN>z)W~UaK;6lS3i-0oC]C}tY%_FmqtyhyI7<bi22&I=~-&T;x5&fp%g{F@!#"]xbf58l"8#R8lUc5ZC3&kP?PkryX}TEThy3s1^fxdRIwtYCHulx%hO,,=q&[si>=ddhdFdk,-3u*CU;&b%2IN%b2T"_b&;mt
-ks^[X{_38w.MJp]!6^`t8/GMIl0=LGd0HUWL`!Q8w7p^"exVPxe3YcVj#U)FX{fUsYEy2BuM2Ut;Z;R6rtsg%"U*o3G?u[9vkEwA52N(S<v^Wa
-}=%d<(`HG;>e$hN&VbMK}$bf<;-d}cJ*>#(lJo)!j-"KH(&%#izuNH|,"TY]}3>iE":Ro8OdXh=!_INEt$i$--t%JiVeYMvrkh<Ce2)wDxEtM(2LT$?wDCNb+NR_G"0[mm<c~-ca378U<)249C^Vnvt4?`2$v1A]u"2qsuHEZi?q7I!Sm99(/$xf0h3Nn."9q1`N])xpTpW)<e^hTRd7DU"yYdxB.4p$#gb<rjr-)-jrs!r,6Zv%o_Bb{7*7TlxRnB1.Tty>2OVHb$nmG@U;zSiL-f6uG5V7{.4_QXD4^e^k0d8;~4TjRoP6Ku#&{nb#les7?Nmnqh7XE@Lb+#DLLsTnZKCGBj_yts[<|QU#Z0
-p^JB6%t?USB[dSFI[e@jZ7wNdZ?AQBwU#z,%>Rg"3K`f/{+AX(Ao97Z|Nz#;%TiL_V,I<T`bbX1OdSb1:zs6A4o:4!rc4_nOZO*RBVB"crfH2EH>V#[AJke!eo]!bsS&I,9LN.&ZIKg)sc8tVg8@n,/Ee#iG+<,K#c6_uG)r3k(|s3^kP/ZNJ{%8.FXUG!0t)A0<oSYcDZ%G,IK^:
-fr)8YN?#&7ZMWj6X=sKfN)],Tr.K9njk;Z,rmW-`eS_e)o,&w9<B_%GB"igx[0OkjQ8("=)xH0"4phlBtF.K(^&=,i_?VN(wV>MReY]x<Kk<F.2eArL9/zg:gN_S#alql,FOz!hU23--]uKJ;u&fjT&6:1BVc2a{MRU".q7{XhwduQ_o#X#}Na9$lr.cXhI7E
-]dSTrcq39rnpBKu$P87=QjovjI:Q662rx6I]=$s3Hg>MVA4mO,cC!(Vmj/Y@[Me$tv$ZyRS;gLV3VR2@C;3[NJ9U7qU,eIvL%KH7f.3k*yAM
->_iC}>YUg[ZYqSb(8^:lcs04j$p7S^f.)Gr=C98UPqspwEgH7tfe^s.M|1,QYPr9XhKWg5*35@)<`9wDXA:lYo77C9Vd~:(Ys@dugN==M8z
-q`ynlNrt"v=Lhc0TFAqH4,y>K<h?L&/0DI%B`v_TI<CCfa|?{!z,k^/*oEUz%ux>`Fz(kZR!S]1)yGtb?<9BrZ%2u?qO:eM#nJ`k0pJCXt{7&c;_u[ZTIy=B2/:l(hz>@D2PB$fh>E?$8
-Tb~B2Mf
-g1UOr4=-BvG,BHaK*$k^9a)s(j(Zk>0>A]iQe@Bn;"/Fze$9"4(bq
-fn#?>5W_g?yy<w:"HyjDccx?K`>35OmG/2VP)*&XOs^^)OPUeRD7o(#W6DIj
-Qt]%:A2zT~czmx3|?;>C
-e"x,Ae)u;a6Ay/|)s1YvhD9#ZYEnwpb%3?5UMR/1|MTy%2`nWd4_<L{ZMI@p"KT6AbXFAaUAR_OUAXA
-,$dMrmfd~[rycAd)HbqHrSC
-*cP]d]s`{FJs7FqXdP9:9%f<a`w0l8:]`bB)&]7&R*UM@Yyj1v/u&)Bjm4/NXR2I7KwN]XjLN3_V~q}#HrH,]>,K
-"n)^pC-#2]MJ/ohUTKu5FfE!:u900U&f:wpV3v%5P%4uXX>XEN-
-w$VGS}.B5eSiZV)3j~5WpYg<VHX/i%:=/"K]3gY.)L?-/Sq^gzrTMZ`4dvY.G0S!2{#rV"U)>I+e3Yox5|28C3yBqMU-,KPoIx#nWASqy6XKPpLxP.]ge^)(09=t2a1Fv,G74yoq.p/70UU"/H7u.a[YormM,T=~O*[>(xLs#6Z4&CamZ;kIT4wVMXnl+^FvlTX.s2+e$1rP=Fm_>)=Bmff52mD/_HsySD[wa|jbZau<+A5/_*(R8"injc*`iUT#Se=Gim4X(FLpB
-fI+es%u50KBDDAe-k:
-V;H^[
-xFI
-j;0Zv:^o,Fx+hL1m)6J#Lw2:g7,
-<_?<hxN,kN95ji$BwV_Nx&2*lY5OPjN;6c[P}Xd.E_:25p[7VVW5qcZ8<Ytra:T*DQo<d
-bc&:=!(k)$e<pR,E#-Kp+(<+i:fIJ,[oY]%
-H>.Qd>`j/W1F.9jgBd4iztUy]D?Os=z%DQp%*.nNaS=jO#O10HaoiLBByfG4/A378&NGuSO^{#-<S,Q",ODTwe)eQ>Qa^/R/M"MSk?-f_[uA3WD+nic5Rv^/vX.s~aN:S.<;I]|e6<>I9=5y@)4$QDFRV"JByeu/;wvch&~rBkobPdIKcYv#)Zgi<Fr:$1vp~Pes-C;Z@^?)&d`
-2b0,}kb!Au2FyXeP.-r5mZb0?<J9]!]KoxQ.PKkNaE2dG;&)XlnJ,9h@JtsV/uyy%5!V=YaZY,e!D9f?BbdLS7)AUQt2oK0.z:7v][ZgjCY[9`p]SAkM4*NKx4C99@g.4;mJkY%;M<{R{&Ghhfn
-s)q2<h&=UTOKE2n`N?hh+1T;IL`Ax?#m5.;!pY:c@#R)}9$_vY5hU&7LBZz8O?A>bK`tS6m4EJCvI#ll+?N9ymGx2p`
-n6L*t0ZoY8?J57~$k"h5`j|jk2x5#N>G}hr*
-!(vG&<jm`mwBc)ky0(C3k$n)o*FUGAIe]DtRbJ&B*"/,ebleB6P;+TBkoD[fB%)/FS3SK}RrBIdkHK:U&j+Cr=N3r{"$uz?a3<XMP]l>e{S2e%H8Bm3Ys&@8GE1t!6o{?o:UEU=CMqZ159]%1}4#w;_Z9
-"y"lXqY?L1M5I)<+I54pnSfw[sCUj}</yrANNS+t8IxbX9cEG&y>yF)wIxx=W68Z&jXA`?4k]
-)uz#kxSnUMGys0xH%tOV>vLQGxL|;jZ#2ulwV8QRxiT^Z0$y4Z1|?]7-Qzl8&?=LN&Jet$7|gb@>ik:mQq`OGRn"9O4iaW(2bb+@$q$S%U^r&bz)uKh4G_%mw/Pt<e7b4jYH]35/L`tlN*e.C!XuN>1bMnP}d_&F=u[PA}NQ(>3.yHt+cyV^yyigSd4/"ioe#y1I=<G"enA)
-DdZRWiYyp+OC92O8sy*2p@T=t:Y*b"vL(2GMe+f]=5I*]QT,d,Bp4>3L)PEeQ:@eKp01WZ>Zu0Lf:_MDz08Em6!v41n-;IHvO")_3ndD&SO0=l#-&J1Pj=4PmQr+OGrs%G1o85IsS5w_-j)B7J#akHi=P/@3@r2B|YSG/-|S*s=T}Hwi_U"O}koBVv[OPy@*Q`}69F212DiY4at?rw9$DJegoI:+!kB^9)_x%
-sqn$#0I-Imhl.Q[59V;wLI%G^/
-_Sx9Aj5?dq$TI.4"qybadd3BpC:G!~PAR&)ugCK@$ujrx-13xgvJL/ifF>?6!UEA!5c6R9mf%jIsuzT*JS-lE{kp,bk@0`=y^6W<OkV($^fb5dAE:>(HfA=c%>:%8u.iER$P8HvL(YLvJkm7y{Wn+,-&hL:@j:_F-+jRg[R:g:gcHneFQR"UQ]ZM3J6.%55q]Ihd-LJnD_5qDAixec$YFhq4>z:*GejAu,rvnKV^XHf6EHT|F]/q@kW#BET{3#rw1u/("dZRhy%uNeBs;btZ[dw"9MVR"A"Du|t>uBit)"5E-1%#6c?bI&R8K_D<Rv!r()xVKR"-$tD^=ctLYT!q,>Al){yM+,%cmX+fOi>1IK+oEt:shQO_+Vk?UFg=2N8>HdYY??&5Q`.x0M"b,%XR4!=x<nD1WcI.>Y&~2At/gtiVw)B&c*XSdb>i3B`2e^R/2bE$Q>U.SG9*9R[bqkR"$.w,Eb]R"1V>t^(=WeS[`<fI`R
-EdkcX"?-nv
-(|&K3M/Oq3-P;U2sXc=}DEuW&>hu5Lj<(}H#_U"$0oI+NqfOlJBm8x"eS6:yn1;#8|^}`7)%E8#@j#g*v*S0"bFBd6#;XV
-kgy4Cn:x_Y<+[!i4"0K9(KI6y6x&=)KM6o*Yg^*j%u`o0c|/=$H6X>7Fesb2XPb^V6!X3p,O#iU)~m}UBI"Z1AKi)nqTxO(Uouw-~g}.0C<V_H0/r"N/YfJJ;uwg|g!(Z8<St;V&P38<V8wuT87^2(fiQos"&l#]A(m&6S4PC+sSz!F#AMVY#P~5RF#.WM$TBKQvjA&3kYC7:w+YE*mU(%;,{Rb#,5mQ>&HYaB$[N1"+Z&5j&d^L#HS)~&-?^=5X|u.+<R[19,[Ptat%AJ_:s[p=vJed8CBxXKu;^,ap^j
-fvSXRy.kn8.[odQm,=xjkIoC(i=1/MZQ.75R7
-YL^,K_e*Ky*M3F4tUbmpUC3Q4/":MY.Z*
-*;6sF:T%9^eBqn$qPHb)XQTW=
-ckkQ
-66|242<1k^0qGJFtqmMjx2-(Q(@#/h]f2?U1/Hl
-5R`Q$oz"{_1M9ZnpFq<qX?>O3;oYhy/q3qvTs&vt8tXvX.xWW%~rdEuOw^b(uLE=
-B|!w%PpOc}i{T~17J;0&tD.W/+[_7/uwj}FUE6xH/"=?_kDm
-6&r9G,[qLaHAl82;
-Xmr!DgN@9D;[g]/0>ZY:Z`M
-e8K=isEc9N[:F=&fWq1@GLh->Ar[e^QcNr(2Qx@i;[vX,`u`JM5ft>Zra2^K01OMrcr*2:FBenfz-H@h<}Gr*c(Pw|>YR&JzweQ!US9gNR!.olD|R9qwOTa]E)%6UP(g^i<>:U;;Do&>
-*==O-QQGX"HaDDB1S"R0EE68,m9:&^69WNz%h?zL5A/N4*k&
-<Re[$!8-C^c<#m<]W%I<d)<p^V9-yVT%(93$F&kFAp%5Q_
-|){UwT`()Ti+lrj]Y*:>$[3)ApsT-W}(EFzf?oy1&d-k1
-z0,N_"BnJ$Hm3Qr"HN#+goLDQ"Vj<vSVL[SQLb_#/vkX<>
-Dq<90,WD0DvW+Q7B3`wciYoFJ*:6kt]TKjaBGR[8a~(!s}38T+[d]0#7Z-pU/08Fbhvbwx,Oj{!r!"@mF-kacv#"0epqT|E"&wOo.gJ[G[3LE/)$#J5^IKTQ?
-Nc!;C!bWj|>xvT$n@xoQ-xg<6=O-%@62Zch@^kC
-2eU5]=:8jA%4+=[b)Qm+-9mfDV5h5w36pYMt4a9%&&6>HursVFK:]Adc<l!mH1c5"G_r9fig)O;a0ngl#Z8pqTQ"kdu"dtKD)2,NB!CiD+)H@d>X]OEFa938T77y[9J`pb/:RR2s)[#PwE.W
-[,A+.%-0ISFM{R49P2gw5SjwN/r(ZW3RbMOJrKz,P:MOa;@_DYNWs-T+v8/)R>k4
-x!@jW-XLVuq1h>,}R_j#_<2+-fAD&>
-Xi4NBf&fAuBQd4M8ub#dqmp"D`vX-Qv%QUP^:%sXIX"[;r"mm-L*ry]2b/Hf!,[/I..Tr${Q5V1[x2=Hkkm81sR!|8l>
-!)6nj2$9by.
-&w>&L)U|$9`6-5$1TySZECbC1qTJJ%RK5wdz=nYE.4:pGD&^fRK{pC(fWY-aj-r:93[2_j#yXTtP&V_FP%FcCo#KZd%t^aWY]|AZJ[C7.G5jwhikv8t2YJNHbEbTn]:O?E-H(7*G
-X>oP0t.ZQ(*s:#Cv0eGw}s/5TuEmEMO@uE:jOpEU.[K/o*nfR0*Po8gt{06;+RRQn`bL8Sk:k=e5o+bE*#-0XWJf?4fyNY:r
-)8(#K7m{,MtdFY+o.HdS<@*pyZ4
-G3Z42R5ACHpUx2dV5ln8`L`0STgBh,"xC)_l%b4ce(ACB{A`66KOQ[blxN6P-LBGiKJuVSrX:s6eHZ*1u,p"a!Oc?,t/XSL8iYq5e<D?!t=*iti,NWWx)B)}ai%K8snKBU%u*~k~<8VNbOXlF:?_AX,m8=]Z1a"y>^`U.Y>]39/U_j(-T8^f+z#52_[MAk1F`^YgFV(5?!<E5>eibvhrRG;;,91`Y2/4hr]fvpO~">&L(>"YVQp])NVL3!(Iw&;4;uuU#o;?1-d2R.2mm{_iGDVzVVmE#gVYb7+~8-ToUxqMf%LR3%"^9+4l7>_3F1/aRV&vxFHbdnEI=<Yq`
-Crt31MU[sL%0f0TTaqZ+h?Uzu"PMLi
-/"A+]yTN-o$F%cc32G1EUE*[(+L]0!,&cT?uU1LxJ*)T:6aj%qQK<Fh.g7}fx(VBO1pT4T5huCN;g#_,aBm$5i`-~6:Uo,hJ~JF)l7gDCd;X{kw,tH^Nz/|G*_B(-#QfY1jQjO7S<sVP9-g=5,
-bhI;ya_&qr?7XGVj1I(U7(0(_mbHHdsu<m0`).+`#9li@I8jUxGL#Mya!bU,t;@41Gue8>277B:X)S8/#*"(jZtf^o6*2st-oWGx2b$6:3SuI72=Ut>PQQI9Y`?|ur8^kK[9i63[GINYD/fp7a&R*:;]ARXEqQ9t_`&&ZlUhsIAuTM
-"jTXI#.J/w`n*#N_Et,#Dy[TD?)mAty>*gs-)ivy0-N)JF7)lhD7[eeQ3v/3J2c_S-m;iuH*
-ay<z88E~)h$pxY%Ij&Y|jD;u[=I3V^Xf5@b~0@:B.>df<4_Lv$Fy$~0H@|%B$$88?.nPABYcIP%#y6)g$%cm.~@9;/7C5IH,9zOG%ZmmW7OOo:iYY?*W9b8i+]$*9#X3&|]EdN5ASno.@i"t"PS]).ZV1Y@!s9H,x,qgcXW<r9P7/x8|
-1.WnhZifgNi1{j4[;q2;,Vp!:rfO6pGakefB4,?oo(gC|tpBw+atO%Y(x_*MZf0]Eo
-YbA.fvK2*h!@bKj(0rfN$uGrq0Ak!:Lm;HVHIGh(#._%DP/Zp}V_`~lO0/a}w!"FW{/dAl4LaK*@$x7wAk#A,<ixJk3zm4k:ngB(5&C(ap6vIJpd#M2V.0.0GQ@.mmG`sgZB>!BRF"Fz!%-;5TOns"d<_Yx[Rp-:B8/k;Omx:E0P$jg7`SgE$!Rub"1DE3GTGJAL"<o.=j6`H2N,Ka8?cwGv)NPoqQVmT,[)N@8;Vu3mt:NhRg^xck,M[PX5toUb5SABsx`s#qKKCS
-sJ_%RMInQ,@Q}krwZ*`K`D.h1n.u9/LwN1"@GX&kW/WKk4HS-$WxkAC-M]N;(La;%F<8Pr#%-kKDbh<:s$pITDA.D:qtNWiUHACD-ujsj`c*J4vU;3DYPo/5NoQ?R=j`LOs*qu]efc1S=s]
-l3f9|
-B?8j+K[K{HANp->$0yS*.$AT&bUA5XTlfS,=M<GTZ7Y`OSk+j;wKpjfhAu
-A;+DuNTs+|7<tZNv$o/
-Y`BtXN$r-+1%fu$v2AsO_72tHx$Se
-H1e]-bQ@<=vF.{2|&xWy
-h7(q[
-=wV3+N`w:5D&yfT%
--}gr,iPtZ(JZ)Uk6$-8>020/K{>tkJeFDZVK
-$u?Elvwft=jP.1fCf?53o"e_L!hU{f7Ca]$1Ao@pN+3fv-k:yA6A8`67]^#E&hrO2-C_u#jT<W@&?Z74#lF
-lt*$En}if/bIi>N3PUsmHdrm:badogU7]>`MBlnv]&}
-^V%hIET).bCAmtODX0cLs2QLEY6u^.)"h1I#klRbq99CGmEqC)%<U&hP1hfb18UYE?TW7YpAzpN0}lTD[eZ]_Z%I0_QBP79I@X1]i`T_$_%e4Ln`A?NVTIm.&+PB4_Y2-mNsquYF@4,@Kh$lY$l.X(T@Aeg[A]O3W"=!&[AAqn45#(4U~ijq0[D>d+L@6L|g7OoVMT1PuL75/BQ6xOL)Y4:2LB`^p=X3fu(Y~))9l%iJ.:2
-1fAU~<rK0.h>TC<w)m-6jJ+[!Ypf/s1M8u3J-%I)`!,5fN}P"^L9o-mT@"Gnqi}3}?DAU$[ZLX8MXvi`6l6Ji51Y2^6Dw3)3*DaFm-Sj{h0gD=}GChYe;c6ndc!dhE0-
-[)H12rFX-I*`H>",hO%q+&(9SkPp>&@kR%/{B$d>y@TB6>ED;Y3,BCDq>j*]bm.iK@J]c7vB`h4itNYMKK[(#=b)0<IEgzVEF(wlfwf$40Un@0k}
-S*kdnLS&+H&bfHAk#>>B1g,R:WSswY8M"/c"t05I"
-Jfp#_9I1W_H4n3M;r@V
-:j7C|ER4427E+]BZmT+C&;0@|#?U"oK7x8]-z]{66GKZ%dT&y!j[8u2!Gly%hwkh4%"@_XInGDxp
-1K&oUm;.AQc;t03AVr4dT$7/E!:CWaWKDW<"xqio]5)Sna<8P@b_wF#31dHlKO1RQ8O$BU3EDRM6YJIoNCacE>:{$}I#U1B/QUb;])L=oJD_hK@(tzKgK.oS0
-M99YRX3M=MoM>rxanh8SWT";SV3P_W^KC@?4JgCS9W5$owtmP<i{yc<%yQw,W=cDYrG}lz=*N@18p*X5gr3c:we.jpiho!o:L^JF/hI94bf+epOe`Msc
-+H_nP-92KHia!Uf3qAtiCi.^lm^M>%Dq&-q`r1qbAXM/3h-avEQ.7o:3StQt%_C(=C*
-oc^ae8aXw+>5HjUX%j9+W
-$FIjt=LoZyB7mKfL#76Ze0WwUvx_9S,G.`E4QtMy96"*"ma&7Yg!-m7ne0*Ws.P:53K2ed/Qv+)w2m0g>Gy?oU>1to(rW?=t4eZO#;`2h+x(Fsrh<M7(*9HN#uGLw!Npc0MT^m`1l+ppSTX?ib+Hb"F`+!`V|2pmW^Pt8Bsj=!$F<=gy)0[!S]S)wRA*F03%SPn!w@d88A7hv7_yH1F(v;3+y.Q%[vh7|ex=}R%0:;~do6Qo?j#L)U{sJVN5.!{,%D9;~%(K~"K%A`{Q-T=g$$#p:;[EbxniJM(%KTj%,Tx$EHfH@Y8B/9+B^T10$Bn=2R!%1/V79#U%D^"5pTC3{2|l<?x.
-J.%K"js$Bl!p:~wQ`4[z#!5>sTmtN):>:J85^k:1LDepyiQ?e-.qV|q#sro4CtPRA4ZKIOblX8v1T=SMwgxs-8NAhhtBV?NCVt5DTs9Qd#/?
-qa~=5NcZwLe;)5ol]N&,5wi"9^IVJKU;{Ugu=!2p~6A8IB?ccDrI+f3E*g3lbF/8jRN#Pk(gU=X=aqMrIw8Nww=lS&}/#;Z2a`x%Xfxk
-.N=D_Xj"^mDhe.#&"%g<!xZ:AApv#]Gq2(^(Kz9b$f_yi~u~et5%[mc/md99:p]$LyPruu?z^Yp]rO0+A5uGS3u{lQ1>L,xM[[m7Gf?P-y
-`b~X+"VX-Z.1E*%y%f$<gdQ9PS__X[X,Y3y_v)i<kU%&v3:fF+_obVaE7PcYB9Mjp!ld*Y~/IW-5`:CT{eqTh#WQwynML2XF*P&kL.$)1;)J<>[-4(uA"8<imnSc/4+IYX}:<*tsAsp,k<:OzVY0p>^<h(AOZ/K/vo6,ye<ICwaS~PsGlBjPXSwI)S9D7@b"PEJvMVm[Rc2:~xim(sl$LGnvRWu?VAegPW42}?]?)ILel_e
-b]s#"+%ET9IirSx%U&Q<v"h-sgb8Ho486;g1^;/b9Y@9AW&<PQ#_K;pAsVACyfW$)$U5W%{2gXG^wG&F01,`B=uWtN!8`&*C5h"KC!duZ4Y,Ipws8KF$0KQyOIp?y;dpjZqI!yaTk,,221LE#7[iBQFfMxIW3?bD|%Utfp)-EG/wcTU&`&SI$1I<vI8HbNlBPI`!?8nakS^hecS_OogJQ2^6AVT8`;j@ki:9]F9UgxmbM,V
-qxdm7YVX*(x0^8r<tOX]]yYWlJ*8nC>(}!hV"-Gml&4wjLTr,Eh1!?#5Q2iQ8bcUBsvvYi%Pl$Qv_;h1+:0ZQKFW5x~>gGu5PM8m}V~LJ!~F7G%.a";^i2HS&#n&#)i;}F[POX}v>?#"qql-Qrc99tu&orpt_l~y-Sm=)/{9jiV`%;XE6#
-k!Z3t>e]i8SO1=b90j(c3},v/Q:2!Pswa:>["R3]qQX<$@Nlt#J>uJ$vF}KoQ6f$-9MS*P#NC1bB[=nG.7%rKPrBd>4Ze<sdEN`:d6w%ZkL|s$WYmu>>60hENMNWZ%Q)ZL<K["a[Ldoa2^"sf]Q;FM(u@d3n!0eLaaH-]>D[33Pab7Wl>(qyYr_SV|"f:SJX_hdY*H_3M.^[O8*rgLUm_
-^~NLuriB0Jj!3_X=KrIeDiEF#oFb992!Y3A6jA/D+1%D!~>.e!A0hx>JH~qxuUZ>=Rj&!g2w)VKWy:oJv4%(h+&@K;@D69p9#;7.Slj1,%uONCTiP0?"@tn9Vdv7#1xJd[[b%$rU/+?.Mx9gU})74h@FPDwj!!_>ncL|2=[G1TgJmuaeZ(Jpj<.G+nrRhh5<D
-JL-TGdxI&Hh35f3b$LU_ie*4sFd;uFPgT*?`Z
-:ZZLeM#[_]H%%ht$hXw#($Zdx0d.Xu3[&&;i6sTD:Op{%y%bMiU3km)[W7"P5waM_-2G"11m22EH5d`;f`q&<:@B7K*i,.1rh}5o)!i/2.1"S0%KM@3#>;h`kN4pQ4a`&"owgaf+1^Ps.FNNHDgCczlAjTKT"UnF-|.j2E=U!ki10(nf$]rWk[J$()ceB*8BhUI1M3&18+*zi_O]M>lA5
-j4Sm2dk%(^R(K;_88#fJM5j$tY>39+M<Sts3g6<wX8V=G[k%S85cO?:;;l#}Uy(%(CqZh{mQE_z#wODrxN
-?_o,c&&@RD-[%0Jd.0Jb.t3jx>B7)CnLd5[idJ#4&"l0s&0^fWFep)1$J2!elo;TXxkT6DK-O+x"<fQsV0[wsSa14(8yPQ%tf6[Hk8pX[C}GWol"rkIOz=xI3ZYN&M9L@@("myD651IHVd.STw4BEgx5f2hG[*[`6[?;NT)$irZUb9~CWIGm!TiyZI!PX7$_*MV2|<il?oZRQ.^+Tm-*Dj+phS(Q%a$[r0Q18J{;>;_k>eGj#f=e^eM$rym[{0SsoUd1z+I;s47O,6&@PGE/rY|U&5n[T<C`xY@Zi7kIe?E3(te$qc0i(
-pfaggD(J<(RScd}FSH
-6"oc<x
-I(&/845o[QE:BPiMKal/5QGr?%emYKp7LT3(ddWe7uac8;jQch#w`eCqA)()jgd(jokM*_!C|,Zm9"px/q}u99AwRo]V(`EOL.,,neCwd3E4}u|U003^.Hs5sit;jBOr=Keg}_|@Hlx[>B]1Y8r3(Wd6r&oC}keso1q2PDF3i)
-EN+*#$:Mk9FK]cvjuAF7"`p0CGD]hte"b]B"?qb;*F,%5in"*?ONj:/9$Qav?$x=JV8I[(J[Hix8?Q(DenODE-&/j$-qZEQ*5(c}BeWV/pl{.?<lnaBUU2NJm@n)FY$svKB%iWK.yUk2s.7N[iXm):fUZQ?vS
-lw:vMsRx4bdWl5SCNu4rW"j^&`42%U%#E|05=<O.CNi;t"3*2qJ0$;EdYo4H*VqpQqMe!zZ>/5k?o7@9?OR"ICYd
-rp;Q3#]a&7
-75P*!
-b<$jXN"hm>xX!=]h;7qve7s}K>]IJzR./9AY!)]W7=1xEr?Q"xJHIb&D8:F]7R"B6$KrO~ZUp4;=]G=XM|#jb)-DYm&!
-BfyC>DGM+=yoUUmKE>=).;9!Bhf
-)Mi!Cb.7KkpIp?lfSx)(i#:(=bVI/N;N<fzxg+yyBV:bTJb.k
-RS"TXckKC+DLk(~UfWtW?N(gmwh[VbxvCSy;
-YDpk-yR90w$fZksrR_qr(x.88&k|>m@dL|[{F<8m)4E~UdV^hr5$%TF#N]KmL_R02,"Sb?d$mq]EHy3h&B6XW_!qIq(>inhh
-6%M))EY=mV]8Ag6e5L$&j&Ate/5kD(^#qmnE_]c+*D"2x(*v`7Qu#)55SMFo16/kSpU0/UL#J!
-/:S>PN:<4_bTad;,Yx<|vtwY=N
-8Kr$`7&qy6mpymzOgABN1$gQwFmQ/;;.KbyJKHal=P!m9Kg5_Ib`@)9uf@87mjrIvC7m&Nj[@[gYR4LbI5=)eegRoT3;W1+=1?EkcIwye
-u,M
-c4G>U4mmDt|>baz48svV[m
-_:uedm+a)tH$=B;J[-d,xAY7R>2Tr+S2t&>:IS&r6:S}YD-I*Ril4;MA5c,`n|DItMZzJ./y*?JPO}]gQi?T]!it%1onwXa?
-DgMT6echV-&wk#].r)C19Q*vGDs+MF2FvBFLxuB:8[k?P.KCB%NWy>^i,2-&wf3wxRW0!IK0`7h_9RHq|5o1svk;`@#DHp1yo/uoGCIO8;X:#<.]}",q+:899TE
-mRBU%?OexX]g8#d*ESc+UZ(dJh[m_)Iot^$h@Ye4y=#yKU}@{ari`hDeSX|P{#WbIn+:wy2ut8E<xXI++gleoNax+(eI3C@C*I7-;B2:~ZX`e9wa3&8QZb>i[t,t}UqKkD)X:ghCV#+%fP<2:W.Q=rg(~jsk.KtuG8T<4<ZFaO]vxkHQC-79qg{*M[WCF!l#q`rZ;O@W/2K^.UKPD=Ac`"3Pb#V0u=XU^Ul:,p1GHWjptXA1TII(5@!C+JePoQfQ30O_sV]8^xCU:
-YWRvfO7BQIssRXh-2mSBuu~bIp
-E9
-i
-Tm.E+3#w/o:a"BmUO_^?dV[`Q?PnT&M_43=:IGc/N1>s"NJRQrj"!nXOp]WF!2!H"3[Qf*xrKUzM,y!&KB/!+NMXgf<>TB@._`zHzZOvp;vPH,Tx
-j5!c1a>V;Rm3*^+ko_0eb13loxlUr$f=rn5QWfo
-V9<0kYb*L8kc
-J_n$/8Pi%]Py}T}2*E?o"^7<4oKdG`nSl8%PZFP^A=,=}CaDZj"&4Dv6Q;#cxf,so/$+oRnRp$7/*@]c/i7S&
-@_n)[A#:3v@+JA#n.J48FSjG
-"7w7s#5
-wHiq+r"+7tK=');}elseif($_GET["file"]=="worker.js"){header("Content-Type: text/javascript; charset=utf-8");echo
+9x0UtD^Q9o}w_;[0S&p]GYqp98YN*XSAJk-`m8}Ja<e91
+a]BTN[9]L:cDRf+BNloiH;si{,DA0rBj
+UNXpRyi<n?M"D};Gk_m@-nv<GCm!_qO/
+p()/cK<Y|UkyUS;4m^(LzJYmV[hMQyrSLskLVl_JupCd!34h;q4x"XaXut5ygpFSt]"+"fz^(;yyE)C5sb3BQei+:m"hjL1hq7Qu4p$u_=7/GdV12T_norT!9nVx$suQ0;G0K@tan[<mk:Yz%ooMsJ;)J%~MQe0y3Tri}/2XU4;*Uv<0,,e+Y+yEj7*)A.!pH%<M6U0Uk#:$6E57
+DS7#)]=We<7$[yhZV<kF`Cx3[nmQ%s@|X#e3:<r5VG<~%sNnDA9(vjjfcNT@LLb*>"@?hk;<VH/^`!U6VX4NnkIUN!>}#6v^Zn`i7LsCjW,8hbmT,NdO0CCB^0-R]5*Mow9-GAv!)9Uc+[RqooDSs9Gn/-<8G4]QUA2`AL%,!|!HZet<,pk$k(rQaum?K_YP0NLelj?4ZtD}t_E]u/."4MM|s5S*fY.tgvVjyYegI+IYF!m]+oGsIecU;"1M7y=2x,Q^<EBDnQQJk:p
+/T=C*G*g%i3|;:`73~dWY90x@dVS@:$S3h;$Cl,{sy^`Q7k,Nk3z:#tWUTB,q*3Z4q<7np
+UPK)?=#,`9mANW%&`cOfDxT!?x&
+*gWa892sog;MjK,gLh5#G4CSw5Q?-[r1-TmTGw4V?Ho!eXC)&ZEJ7F3RsoEm}W8uR]fLf37gRVv!]PQ0E"qN4e)V*pgu)"^z!s4uiIum:(sTX"cD-W)2/"%EVROBl-3*8ur6Yc|N=yoN79@"(svOEEQKLqpx[[!$rNPd+]4Rt:Dz"VTx8OhxcTG!hg*%;m,/5.?Z*pFN=)*b#7
+9Ju,GqE>@&Du6qx66Z<2dei2mjcpy7;9n*t~u..k."Yf6r!<n0V"iE3T;-oZjQqS3i4Dd)`S/w6F:TZoBO#)D=IzG#MiNBHw,XH}(&-ltd)Q%Gj|UGa(sGJC=1?(faK+T[Tg<Ww)1w,k^j&utOIqp-s1M*nAq]Gn2IK7TZN%3ry0`b827p-YVg5/LdQY-*W<7Rx-:n*UM*8~X$/[5hnP6+x
+U`w~aZ<yZbyC_s(a3f75"a,@EMIn6CVo8_,88?K6^exjh0/WtwKR@|1aOFfDgKPW5N*XhZHkF2$Dn%NStlp593m+`[WM&"r*ElnA6h5|kD1VIMaO>=g51`Xp.a$oLUB/2cs-&T/lq,`/Bm!|]-.SKsmE8
+8VA0AZ*^C=?UX^D3$se(nfD
+:IBR$`VYR%`lV!n{<1CZp<9Lqw:9(jIpN7A/I`$&?z@j#G3:Yr=]0h
+EUM:|WoI5p
+ZA,s)dx]#ai{x.g2@z%}(b&a-0
+3l23J:E%d("5~`E1puIJ7y-Q#8zcI[]E3LA6fbFHBjNcv"KYYN,b0Tq4/BJ)q,lc24r.N
+glI
+t$>4p[*]tM3SChr_xpe`Lr.a8hP8ar[wDi<X*"=A*h0wtGK:hIjl]C%2*%_u3xO)20r+Ia^^,_JwpCdR+H_!C4q%=jTV
+)R(dQV7@"cLg7LtufnQG6f&mcg+:gF(c"t3Cs*W<Nyws,O#Sv|VE8yG0hY]>REONb]F0BokTvuO4Z99$JdH4qmLx1OY
+yx$A@K=oP/i8ljb;GbmO^CXao/J%fc,QJtle9G01]81hP?[>y+FP`NG^N1J.lPPJxYT%D[[%eSd.=W;E)y*$?Qjp5^-Xu.t<;},kf>p!`PR3s$Z1t^PopL=[JT@A)W
+~YvT,ISw,M[j5"bJ<=eM=NxP)@4IP6}<g#@kdu_F4#CA&V|AD_~7BwY,.d?LHjB+`W0ht8&[-"b##NJ-V>>=7DTjn5?C+uq`i1+L<5
+TIX]
+m?r67.&nJ9zx`9Ne9N)s`,{VPuLpaM$%0``Z(e7xM734[X(C~T+Gktqn:fT?@Pc^eA7u;6;ez#W%O*U=5b8nr8UZEEM:ja!-
+YxO/kprD#QwCNO69pt.@FJ5G"C!jAP8T4<[<v
+o`wnrLpo3NdC`-hlt<!S;)?DJ%n~`xNV9DF66Q`rR+P|)j/Ijs@8/3rc%LVjII&".PTx9!KLX*/Zm=4L/)Y(0DThSUl_+]b_!%8}b/5/T-tEGPX&Vl24P
+2"H(xb_HFn$!OVcN/1S%KFf7:3C%UR)v[uZ#[NDFE|B{]6_dQ)PTt9dU@i4`pm2bX4LiqWY)!%lje.K=7"OM1vx_V-KdAoINfWp*ZwO).3e1=g07(APZHU&hyECZXXqGoo&oaEA0emN!r
+&^QW/<
+K>]ub3&c/lbuqvWEj;iBIY
+_pGBV:LK@"Qm"aor$MayBb4RS*F`Al;SvUsj1f[^B$%.5#=j]86*R~_nREK?=L:6JFjgT>jJ!u`Q(VU2rV%K_8".40T8kd"kxn(q*X;&"f-D5JD*g!Qzhp[Ud*<T
+P[c<xjK"0jxM/&m:TR1N$d(`;N/mArY&ZCub!t/XVG;ZL0=Vq"/Wad~m*5w=r+`[+<Pr<b4*u?z^J;]FkP&sq!@SIL82ye`TDUPhZrk-*f4Qwbk:)9*R[_#1m1_)3o/<ENlMV44c4!)f~t(8XSr#el8:p_Ksbgx@oN3<Z)k@p@uAwAJ!L"B>+=%%!w&+I@[Z3eoFK=kgaM`Pc-UG~0*^jT(.h!tr_=a_NTLk/euq8=
+iP>vx0M2*EDb=>lt:#:ad"EK@mK!&NXRQI>iDmgCLo-T</Wki%&91Ioe7
+>i9{?[.T`5I<jj7#ufNOb/!C/C5Kt/j?.RJt+8(39JEn`(,-g_SSfuN=8#X`jve3)Drt6SO_[Nb{v!uv"vJr5RFrn>Kr4|&vi1xgwU87*3_9=
+AA:b/jdjhvNUtvdP`6nLFiQL>df[v}4Vdwq{[L9Ta-NYaOrWAV!Le2`wG1rs*Tiel@$s!CkcJ)<DU}r"#QtG3`*Z
+M"W>8Qu1S#j(xP|
+PTj8~n/lfEPH,Vbxk9S%5EL!U_-J&V>,2b8V&2Z7dUH9Im1QZjMG0pGGRLLE
+SCYC(KqGW$`G)bO{GeRwqrFhP;^{/uAZGwt[D_w{Ak@0:+Q}hX"1d_A]7/
+dT/PV.-rN/QQ2Tv!6YAMiX
+VW=h=Sg*)6n*$*]-E0s`P{,-v~CrwI$Fp]=[d%)WGB,!h1AJR(-c"ERDggxxeh_pL#Zd6Sg_:?90,CFyoN$(
+xcVRp[+ALsx4lI}Ta:-5M9SSg5H/R!s7M+qyUILe_=P*J"b-P4w7R#KM]orS1
+h5>ZjTbit
+3j.UuOom3g?_X4Q-m&_<:eZUdG;C5D%8pi-2R[@6:GN`&
+81mA6I1(]#*$5Gt9p.MVT:[iY]^5sRGOPJ!VbU?!Zp>gLKrmVB0uGT02`x!,bWy.sfg<Yl>gZ*[a}l?W>p&0%?:(RSf&.;Q1{ASUGQ}u+d
+WR/6d_5]]NkzrWxtG.5
+o9;Z.[k)_)eOg^v<1{EAY%&~Ya]&h-*U%c@P7(,Zl;M~5T=,c-/*-^bfRb
+~`&j|*oRoi|
+_?v>Wu_bv8Y=``7@N=bA|M*U4.Jjzf|45RR&w1!
+!:r=tMp8OC_#v)EGM1Yw_n!ap$]A{`J+CRid(!Me5;@!9S=
+UccJg
+?Kq
+42dq%_f_.u;S}D|%DL6m`;C^yVAS@c,nmy4tYk~Av-<nB$~uG3co#vu&;pd&KQ`PEE1>0n+OI?&,M=&++m
+KN-FmZfhL+E8U2YL`VAFth^d4Mv0r
+l&f6E]$4Y@
+ue&b7?0ZbLIOEEE[BkMhkHU#c@q5aXBMb_&4LdRH3(#3?H+Xs&)xqc{0i%q3sU7<z@m%jE^S|U^-*l&EJ[G,BphbX2&$jKtF)Gy&A[4DnbZe2iUS5-)+eT2Bj-+bD:frDEDjRqD,$#AN2VBAfWxd4-M?gaf?G:l*.oZ`A.,@8t;eH%2ReQtnUWmcyIyVxl7r^2l.U@D4)pB.H21W#PmDid:>"@h-pPxva#p[{WK/_.PWS/#:c$8BDna![8e_l*Nd;[d08:Gmt1A=Q<#VHcZftj.s{$b9HN($X:K,PX2]X0).DYx81:Q@mVeuTDS9O^}Zj^|_Gg=:=3`P*FaK{+aE%J6Ea#7H.wwc_.;
+S#)QiqL$(^LnFH&@R<&)>ChD.Luiw]5E,15[fDfC"j*N|vDqMnKgVy9eV?AiNsg#%H^0U_fZLh,iKb78zdDb6;YXxQ!s[fX0ec9f{y_m.KwL<$
+-Wi!tQjfy}5Yd52tq+4.$
+LIY1])3s+v6`XY57Mx<J8F]LTD^7xOyi<hxp7r`#Hh(tV]DP_nq*+xYQs*th;bmdY[CjAqW1H`WNU.YU>AxvC!e:-Lxl@ppW$eZ}4`[m;2/?W3TTZ%QRtOu(`L4Lu8tA$LD&Fc;8[`(Fgd>1_Mr
+]gkESP8D2c.y9Seg;FS+Y]2)"Dw81:pPey_
+K-%+X5:DEgJ%g:N_o-auA<UvH.AD^e8ppd+*OfByyf
+;_4"gLicsEj/R#=h>ZTUS;%B$[!h#"y^BPa)m#jE)P~l=hboMBuBguuv;c{C2im"Y_`=ix6F&[a3k[fT+4@@sCjDOF6g5r$G+E&a|[:tC1;5VG=tx3LokL;&#W&,%d0oA)H?}xnR@M<9R11a7sD,@,^lMucPhT}kWBzC#:q7|&Q$_QVuWa{Bq%XVe_pn&B{7/5wA9+~vqmpGZNSQZ,^g(OrCJKi9
+Pycb9A!^+2e+JTbLQm,K5jI:/WlZo))M+S%57IQaVcB==|A,a4Mew|m0"WAe
+@SK!_rk@JGMUrP*i167A?)XgEw]CD[^H;gW`vN9r,,CMQ/&D#%Vws++BOL5$-ux%9Gs?/ASCa=X-Wx6hgHT8;F&F:FX($rFqDK{;3+"F5(XEPk_#t)42F]%l3LP6@KJ
+:pR%fJED-NPV,WFE=q^0|_9K;%tA00h
+~HJr7pK=`4Q4Y_5F,"<_Wk=6<:@FJ#P$DgLIp_7f(&W
+ux"ye
+_E"29*^SBb}L)^`bA
+CvEbSL/[nFkwENK,gN6cMS@c
+u{#hdr5*ZS`).+2_(?V}BoW_e):gs42ifov!r4kY/P)yN4L*,Og3Of"4pht2bB#^@>OtWn0-Df%xtTm}W$soifY]6/O_0w.9=jw6sW@V++2y+fb?O}I8`8u&7kx_TJ*Lv]j<P<?6sJNg3p:>9$xdp6#GL?u=TO^{,jmK.f";f$J%tHXpt"Nbcn#NPagM@cupRFfT<]+-*{GI&*kP4=5YN~<<Hye_d65<@a2?JG/tWK4m+]0w;f46@cgF&5P)Ao6g0{Rk;f`q.V/e@oKf
+/NDtjw;Qi2mM<CO/+Hz5+N^sa7;BSVO"RByUBR}5XOF[46K8hCQ@02`Hn"]7Vvwl2%wmW1wcSycJ6Zy@h+W@2AwR3y[h0tx]_AQGf/CXYP5Qe<&JZD&-":0N)=c%4alPl6`;mx*FN>Ptq0p;g1Y_EF!0+C,V8)g_:>!@"=)UpX3gvMWG&jPfY`n&+vP>U4aw+1t
+/S`k-8BW<h<SI`[(`Xd;jRdG;
+^?!(uqqn@<<]Ru^A:j2fb7p$ghuu94ZFp?M&TDuJOY,DU`-3<2/,z/KR%0];3Sw`%<XbgATX>,&jLFy;4H29GhZar;:3K4`W85[j^u:@b*>IM)
+9o&C7AL@oxp9S8EA"g.>>MT3Fh5|TY24(
+f5&9)A2Q4gEqTnb#Ow
+WKB3cj8ff?[h/CvL2I$Jx4+h_4RXE>q#@qbCcf-?GdCjE5;$8PB&FJ%jpUW]p-Q(@15K^<[Fzpm[#2QD>D&Qz3yA:ALG*TX0ux1b:[d]wUy2@jc#JU6%eQt[h$Iin=;RVq7nlOJa(aG5)9?63:&9*x2SO[M(G^xc,8Mwo3V)/BRd2X%R~7&9|Ctx,yNLSa~C/a#v=!2ofvn-4av;^F(FEj%Sf]#YVN:N5(@krJfKw]/!q/JDp[9;;Y
+gtui:BLAQR@G_AYy0{LbC6792~,?TyS]9*WUN:!:VxG{x*=SeiW?H
+Z&j4na?<bLe-Wj]$F}Zw-^&[0z/1b@n"]
+x(%ok_Ea]=gI<^2TYPwo9?+ft;Lc
+^gjc;cnmx9}1^_`SZ9jlTBP9hu`01-/RE`U
+)FRJ(r%hvlxR/OowL+`4}0Rnda<p#Ul>~s31[]YJvp0os$`D!OZlwy^/x@oOd*66dZaSJ//_m*_=xYwsjj:,rjdb.sNrTR-guj!(CI.^<V_+<=s`L9/x,S_5]K,*kAKp"8.RF?2[N<&l6BKkmRQDkvcV-j-J?"G&@crL6N|b4D;pv&IVtVD&fS;2~m(h+#{:|Kp5=ZwEu!^Txl~.B(.1&o5$FM[ROSvGs/ZCp%7P>3VxE
+*#$9zv/JX++(id-@&iEI39LXbR$8U
+zl`41IbIO
+b%p8Bp$NWj!_hW|OqP3ghx*Px*LGH_z=NBWn7HIa0o6F~i$Ho#6"E4Ri@&i6ziQOGi4U.^TdsAwm3Hg2:jrp4%1#YMgW0?Ev)CS"BXa
+Bi$+?L,@H)Hfy(nenu+Dz69Nq0
+M[?$$fuZCJ+>3?im9eMW_%_#yZxTM?7vD}%[0P_M$
+?V`>4s=^Zs?D^aB
+:
+aqRw%>bAvmQK7[-^.}o|;nO7WaY`Ugq2G)K`hd10qNJv_@pR[%R+55I!@k`s"_UvcBl5H{?/>^DlB*nO:XY`pC!H
+$#aj![0u1ynw)?(wLQdvmMHx4BMYwjnHa8`5%r9<&O
+)~3h4JQ}?zCQof`J)rRa^6=j2T4(&CV593F^#YsWx$Z/4Kp4^"C4&jPNkS-5*%2--w7QqqDh!Sgdu.]E5)AA_NhHd>F96TZM$_0oIHK{Jo$J^sp^yx@)k)t1Y2%_u#WpfN#H*f^;)PE;vJ@s^FY|)j")L^]`NgAiJ2a>,_afEiahb<L%[uNVrC1gW($/6$P=+4!zq8IkV;CX_=I.7e?R:!CJQ*$,/J4Xd58y_e;Ro%7!Q2)mw
+e":nc5v%Qf`Z?Xfd:Sv`G!Wp:+youu6zP-=hm.kGi%_3:a82`[t-nD-B8%4c=SKCTxmmaHBs.zSOr<Mx#rBq7}
+bN1h;TM_|k?aN)Ou2JzMsy`s?Ip)KBiJxvTL@Yi0Lh|Z[fn_0<D@3!A]*7*bmEl=jFJJD/iM=ET9,YOxR2i$F#"4G"-kgLf._e]FsL`J4I6n#p~5
+fLgRD%N}$8pHl0*!MjWBcMqe!~
+gPwTaL{C~TS%Bja3]N
+?UjI7{dn&!Y3L;k/k"*NxqZo(HR@4]EO0QYsUt(,!|XC&e0;N7;Vx|)<1.F;i%nRS{bg9/$3#~jRU}8+/9w./kRqOr>9"=7A_?p0ThPrX=!a"Q7m2$T$,6O62QAAU$WD]7kCUPUQGyM}>`f>r>d28GWe0[8tLayzVZe7!OyI+xRBp{BRCj1_I~UVL^2J0*Z`=u7r7]H(=dkR&0x6Y|B&[3
+B";<jS2!3-skW]y$AB-Ls:G)XOZU2QYJkxW;KWV
+&$?Ex)Pt#4fqZ
+2EA0s6{@8Mf8-+26nk5Jd*~jnp_Wk5+F{%NJ6SmI3e(a1BC+s_o2P<CjVU06sRH8UPShlmphPI%.[7
+1DnKG11Id[&~cwWQ:^^#xBq[uRk^%H6FL
+LfS&,;G{rxQ}XxQ6r)b/I};c(J!5l9cog}j?pOo/[.82y+Qn;Yn7HT1.hj*6ID[!n|W%hW#(6je0ab$UW+33_3f@y)L)t7V7?vgJ%x]$nDLq`;u@WCa+mHm$JTn}V3pHuaLv7e)o9$Z6"sdN3+4^4$,.YvsYZu1i7@
+R0k;g71^|6Kf@4x7tY_U9T$][dACxrO
+JPZtt^gMPLe:geKfw<5MoKjw2`LAIcb@tJu&LH7R5Ys<k%*F]x,Uw<t*Akqipi!sids/#:.+l3MK<1Qoj8/E@0qQ_lntb<;sFEf>!Y~fL=Msb*mDCn1r!G^auK6UwtI14#[RJ_npL+0d%4%>T&KD}5FoL>M?9@ti^/S1$`<s*<`h^
+BngN
+2dj8A<)D[?WI?F.>g-X&qVR%jN&yfcuhy%spuruvz!0za[H>!M7W97__
+yN8&tfg7xvB*|JNDY8/y=NvK?X8p1RvBQ&Iv6D{"#"qmDV_EjoAb>1}x{K#ceqo0L=lr<Jp^"LLFDs")rXB#1sfB5/uEE#,%jukAK],hv&=<4f&/P(^amoiFSABIMiWyi-7.d=b"HIcKU?!R3!Qt$p0S2YwbV3~Fa4vqiw(^x:}"LA>a8[+Z_,oON#v],8&_p]FJ5l#%_&NT!`%C0eAs5;CImn;HxJi4&ZQ*:O;L5n!E6LwGx(+eq(hTe:d?n$89#5@uHuy:hmKQMDA(TjO)&dJYQQfM-WV1P)^gx6r0Ve1crPEe0-pR%n/@dQ~F>Aiq6?n>)/>E!E*&NBYGhf
+o7BCCqv?:?>L9_4{$0hTD9OcT$)`U}X55QTG,$ddm$gL*zZ_9gy`iP4Ae0L`r4GMqIm*@Rstv/$}jj%?#5=HJtNF_iYS[[f;=-g-?U=(LvPSS[xWE8V~cUgpSrkJO]xU"SWAB"$sI7rUTc1"<@*6#n=iru/5u,$W/:#"wW!nd+DwY?saG+f}P_s<-dOi
+UHzlVZkEu9`QVtFd57ZkW=J*m0`D4@GD^gJHiPbLHJ;*YO^]Y.r<,VkCOGt7C>>7"k;ey+I9pEESke6$S*gPepmldJq!`<P=vCbQGf*w:lib,4i=aSy&E"VcAG.73G&]`KAr[X>&c4k,}2(QLxhM/&gl$5BeNV>nl)N&9&pAw`%qMws(U?{/vwA^zTZX`XySt.<M6g]^0&xOd=Ok6>|36dQO&ePDKYdU9;12F;!?**z?;Id^c74u;ZfqSn,7V*lm<ULY:S
+"VL0f)NH3%XMos#Fb5K*dNg{mFAI:gagdH6Pd:(7]ln`-5)B2ZV<`RU*JiiWq[4wx,>^DTl`Y5TKhQ,^Gdk8Y
+%)V0SDB1NEcb8#d%$6^b.GbZg.8tM+pS!5v+9#;Glqxvk?D>)c3o3(-OLp"
+3_(BDJ:}gs[@o1IhXhF`iF
+o>1_LK+U
+%J5m-p.BbAKj`0%23=QoFf`yD[1#VJ/y5`K$>P"E144"qY2fM#JvZXd[WsjG+mt&K$/.8KnC?d]h6HFk3o#QR[rv@)&sX^tD-MRd`~VkR[*I<Ko@,H>s_wrArH8|i2TTd;U9h#u{k=#sT0y7bURXI-/I&#Cfg+.+Bd-*W@h#h>_`t4fU[kCkeOL<l$?w^RExGW/=f~/J,r=%YE:J-HA7pqFb1_/u<$+.]%+)=(`Tf}E`:@
+qf}a^badolO`Lwh-uf0$
+5[u_/7`(K$<UYHw*g5+Mm.(F<H%o6et%sEe6J*P@)G[WCR5fr/(D[!"#
+xN/X[>ghoX8(<+M"WhQ3GwUs_]o-Gn0ZNjFvpN;*v3#&3KBI-sdP*Ls&sPKm3<~oyK9rBgu;1XFv2Q%0OmUQiG3r(^H_]dI,3+7*~!rSx,Ul?CnnDa4.U7mviQ9oj_|;cdq(l6{_bYg3g8b!Rb<-|Lor4E*1(jKUqcNQbq9KkA+key9k{fzw:S2QZqGWc?7MXsX`3$vcEPtkZ]"!R"rQmbpO$k5%GL[z$Tumfo;fA&
+Fsj1;"K-(C4C(sD#r_ud?ru5+YJ^GCQVm4rlg}!>T>?]^UDl-fY#3(<h+=TG
+~4l%kEq(@$5=@E|H^IVYK#;99Z4QEN+GH#;=Db8]^8]Yf/q<Z:@Y=>4gwAm_{5|Kpx8m%bS_Jtdlbf0u&9%9}(1Z?pm0
+Q@k}c_-NkUAK$s-zNxBD/CLkC=rj0-gm!CAyjEa
+J~d5Nz9a%f@NlwDnF*Br/O*Yt,.hc%-.;T]g0l:la-vv;ksTg7?3.]&X
+.Upr[QM4LfWmzLD;Qswvie+`sR4]AJr)tq6gq>)5[P=>j1>2|g64A(YqtVWhVGARY)K_7Zn50B77]idHYQY:RB9h;7HEdL!>~q}9j5Ad-Crih`c.F2K&h%/[U^MY.(tt=m0kgHEW|6%OaqMsU[NF~`|Mn/fB7]v[r?O?&mxg73co|jNx!@q@Uc{_EH)3&A.T!Ww3Z/rjLfqTZ;zmPm|*s^/]n[{UixmvrpX438UXg%1ZNEk`b(k[6k"QO[NgOF.<+w:&oYYcIkdF1MRk(eIWl!*)mcVC.^kW?4,qd.Pi7Ki^1#s^*K.k]vYYi<xZa@eDxrajuxI#|1*Lx#*Vs^zc,.D1>a4Oic_)TYx#:tj^jZ6HGaG3(.Ig#4(G"DzI$T:%hVs6n(8*Z$|ks)G@a
+p6SSjrL!P
+7dnKxni&`=}G(Ta.DRId&-wS
+m264u%pI7E#;6zaO=^Wf-;"7)fi9L!MHr{sK7MW_5e.(HF84apfaPc)EwptjNcK6M2S/#BKd/209?)DwG0$}R
+Ui[0jQrS=IVtVGP_F&tL^q!}CV&;QPdSG>,v:r(M^[.P:*kRv;I)?
+L!;,d[w1_m6&p}3lmzFgK(0EdG_0%S
+4EZ(ndr3HOq`i;x0O/j:dJwHW`c$K<PT!
+f6Qxs_OI(oPe3Y_L)khbx@O.0qrhhbLU63Yz#t4Uo.KT`<|Z192#"G2j7
+}Js[-@%yN6pL4;#@12DJvrx68a.nLa$$CAsS~FrvtRE.69FZ]Z{MbS/<:Rte8rqR.[N>^1RDSQ(&+2rTqyckM(`HYG2dEbqMbhcqfFjct^Mhg%ymP0-So%f&4FvA^a;K@@n9`]nlu
+JTG]3JQ/""A
+WtT^j
+z=_yx^E?5V2a2fYDXo(hfx8]X]C9i[2Y`o~r2bm&XQYFx)ekNx)l|2WeViJ>O-}MI`P>;sk#)6XaZ2Lsz
+2SMX(-XX+wN7*muu%ND+En92H,~]:R}1?2cimh-4h9w%BJXAIalxj1`q*p+XY1y;HTl&fXp"eIUVP^DfGl_:"@m*/t#fn!3Ga
+R@![/k`V}O784*3(~>nPsdwjjhY]tydoswjX%]r
+}-tO_+SntrI>3[Qk[,/R2c]m8lItMv(4,s;-ze%lEpMXe=`>0UF<<bx=J?Dx$qIK!WAGI&M01nsm939>uTmfCH)nh.keYiptR,{=d:U*W<5x.C/QOYfY,O3@V0bAZ&2cdNt)_xf5I=o=$-=Q)[w+A"T%fqO?9!CC).;#]@:e.f#={>T`^m/8*yJjN8`c$-S
+86Ok&=vpfK]U9[]2-ewMf$#bIW_3Zdiri]AR}auvYco7KaE=q==I/vnyQjA2:JonFMm0!QO_y`3Yue]Zq.B/Ox6bR>mZWR_*78>M/Wcm?:J`%L<,d"!YRs=(jB`p31MG{rwUzPvd]hA5fXc]6:[0
+(~w
+wZ1,a+<g<5F$7wq+AN?("&_bSo.NR
+9hT,QJL/9!yFIOcRJ;I~YVBihywvu&&~Fl/n_&so3p?NW>a$<.6n,qsKI([k7Ge3=Nayr[ctpMwnu"RhGXb{;&m/+#kzht+sih`w42F1XNOX/32z<kP7y
+#Qh<;c!PRCO0#T/$0%FMUg>LARsFUCNn6Y^"@;5-v$e]g)1&;0:kDaXYYErWjYJEMN[f_N0/@rSM_^`a4B7%N&"xL/)"`)GHa2sYGGoC?pA58RD+vr8gr!>02wx~FG$1<.Lz4C3Q,cXMkFt!4md<E?x
+s#FP_fMpy"_?*rDd2@.4k1#=IJUuk[?E4myz_M/wx_j+)Z(~QFD{-J:.ch)rFh<N#J`Un~7|>M)QQ_wZMu"J!lMY"/w@IJaAey>BPFe:Ff*dMY09fck
+8!;qVdecULvxlOwQ#5<>_NHt4;c@oCA2lod9nqq:]-vGE/xU7fj<
+HVd6:_GAx>!#X,l%pSz1gby;K2_cLP;#$BRjD3*HB&^:afTmqECAe#/M)
+u7<!Ixp7?r:pf<l<n6-J[@~rn,e2xr8P,5^0*84DLQ@OSWNb}-a?{hx(;Dm*uj0knEJ&axyq).?y(rM+`yI%75>!$
+j<MY[hNK.y}U$2&Sq>1Eta*pB>gwz;.?+7LkDZ<OrJ(P|Mw!W4EwCQNW*ECd+fX<@]
+YMY+Rt2RTEu<!Kx5#ry~V,UR)/f9d:*PoDX~e1V9e-+{PJOI3wXZUP6b#;t)P7%]8sig7T4Gqc:docRqa$c#uz
+Pu5Xxr|y@hqt%chw13}[m4e9V2"B)f|)V3j$MrpI>TBl-9DOg^(N[q&m
+hW--,OTuM5<Jb"dSgB2MwmAu<b9hS1SB)wvWi~8DSLtCj9`=V>%dox.4SVmbHGb
+3-$YRAQ~[&txB4(GTp,bd.b9+ju(p.lJC|
+;]6>-Gj^SP,lKWKnY9FB2hn%`#E(XSFO5/u3p5B2GI#N8At/a&bF[Y]Fh*4r3gwHBZT2x:MXKQcZ3?Y":nXX~tBqI]$B/[l55X}d,-A>NN;P|jNE{=SFa6j`B=xJr]s:SF.VK
+mJX>A$}O5N"Yekb*}a&G>iSsUyfD5XI]4lE9t<87Z
+xqd5LFFTvS|Y1J<+}k9JDh3^%
+L;)WJE@yVIoNMCVc|Xq%%<~sWVgEKJkO1O+uR7oyIMU4<cD#:Mjh:(02-uxy[CgZ}d[36%I)zgO7GMmDVl5nW5WP0$Gg<QGig2,c(ooIU<)J=Ovs4FxLd-j,i8,)nnJ)d^#U^,1=GshFvK)5h&h!3kd(X*|qEjqgh#9w#U]x5<RoXYDa7SO?E2<oA*j[EJ9QY@SP]iJ
+(V5WaakAZFijXpnVc^pn5)XOr[(H|%r8!6D@/0C@~5Bh-_Z&QYfe,TXL^MaB:([w&sfGMBuwP&swv<yo}nxmvYM3beL,Y_TGM({;%<hRG/}xz[@3rQ=:T#bPE>K$EmbvoIVpOS5v&Dn7G#<#1o1U7-d>6/WdV=#jiHr+v,Em]@9vwe2S"AxvV5rQQOwh}+nn&gJ?Giya)q%$_>A[!,E={Ri0YFbx6flya?<F{i733$BcEGDIx,OAoh:V2Fy"dJ<#mg#FskCg$EEWl@QLUag!yJw.K,!-nVAsB[@0
+Jara1wL"2w30W!r-X8
+E>/:MGJ[g-mq#o`iG)sN4Vr0pEyp"?y`s$6Qc8(h%)Nb=eYRXrKP"*>e"]LO<64]yVOb@.A4Bx<WPZ1Dgx36=pWF*ESh_woVjMbd)6%@i&EUNN/C-@mVSlA4P+0Xsp$i*r%?Tg@#MqA*|V@J=ju<Sxv:^2b9Y>TZx@leeOzFuXa<:EB.kC4K}gx9r(*bt@nPxe:]c6=j!1eS
+
+:uL`BOSihCw`@?y"YCl[D.U,:;{y/4`gh"3_hw(tAlk+QycvvMkp*<32YOJv*.[_G)gv~l[:fZm=V#EaRMI!w+V`CuwYMyg#!OvX0![D4R4/!D)-/3U!XTj@M50XB](!OEl/we,npx-m<)ehkpyaWM2vC6F?#Mj-9T@
+w%/obM*hioe%LCR8-mICksEG,Po<L;Ypy99qxb_bwc4kzX$9@3Y$u2$;!:VEOYlDb5
+]
+_$WS=7:EED^sdxkW#fPLaw9D$qt(`Odw$0wtPC(%,)wd.2mo]:vMmFM5Yr9)PP>sa3=&h|M`"p]KyAE[ED+`r2yZOG0g$+)BY".ASVtK_BpyIUX+[Z-K1("yk:Sr-<5Up/P+BC7,#Mj~"YO]b+tqX6E4P{plm)hRe+5vIj
+~0?MyV3OvAV9*V]fH#7ud:UGSESeu^_#[h4lXAaeFmj)@tLOXNr%WPxUgp9pp9{d-dN"&)z&Zi=bV^v:`W-sIO3&nsDim?NdI-:h!!7/1r^NAI+4n.C/R%Chj!g_{5G[!sD0^=%CFC_s!45i~Np6jC22h;vF-;.:&9mr#wD=6bcL.]XK}U7+No_8[5/kf1=_8)#14u.?I[e(WJif0L3"%j;cjNpdoWFA6Hi;&4##.K.)lm|71CIG"Q9.9F(c5=(qU(>"uT^jgSctt6r%<RwBz#n^D`=X-#Q1(5Td1m|sLbfRN
+rFU?1
+=;8/*fV.qqC4:&yP{P`7HfWt(7QVFRT*<hwqg[He""!Ke!N-G-|p-1VR}-EVjCN
+]N2x~0Ew`o5aRnA2Ur/pO<ltsX&7[R7y@D"_4eo"nLtdP:
+p9$.=;M*v/XlQqIII;"1L,+zq0rL,FdK[j>k:kVG?jE{L4.Y
+3Hg8|U,xX0i79yC&mk$ER=Ysi$A8lsC^jb^VbS1Gq:oObBy,`R=&iG$*dm!sa1$nn&UNK>Vd4vWnO(JK"L{stC4@sdY5|D7He@5QeKsO7l^R7+|Wni#,%x1?Xu+F_Blq+Pkoh$<US$/n=Ze245L,?Xya.y6lq:9r<$q9=Y&,`');}elseif($_GET["file"]=="jush.js"){header("Content-Type: text/javascript; charset=utf-8");echo
+decompress_string('+hk^CG>pG.%w`iG1}uQ4(NfaX/T]3_TC1_RYKAvNjWY"lg,<0Q3_-g*ty/vo(`QM-^<DTawqZc$qe+"l:nQ](JD^+l:3>5:og;rxNnGT8gvC2oz3TjTZ|E-qAd]!M;om@K|7JUTVBbHu&/|MrW9/<%rx*1$JY7T/&cdn7r04E<^]uJ,f=BvtdTE3WMVeU/-q>O!MCTvl$o!>gGm[QmZQ(y<Wv-JrEAuZfhLkL19Mb2GtqL>x%s2S!f6
+OQX,|6-)`jA=PuFiId:%@CS6i]mH(?H>l13oxfNJ]ofBMXA:pAZcyfOxg?(f,gG<U2So`v<uP(>44,xVB85-g[pa4qvz(V}f=9%;r
+SVK+qyo]Z8P)(9wtb1[R##]:)ak@t:L((H;h-]5AAd_OA6??bY`By`1g<:^yf4*BBuY=ML7Dz&7pW/E4ZD/y,4lvD(Wi?jWRJ>MiCjG#PC~7uQS[^]zoO"JFid_Q3hklDUue:$(GtgGe]<]RJ=d
+jojD}kk)e>8>5F(*,s/($
+uaVX>
+a.TqlqJy5n<2b?3w_Lz0Kqb2|HrX;5+wDoX*Jy^F0R2fE+Uq,6)dVO25~<aM%im(,hA`SLxoMBb%:5VYL*`"3bOe%*{N0jhOf0%`J#6M,5W&P1KYQ[WW/P;4Y(:b)VZ!>mkj>^Ikp5L[_%vTk4;=sG&t;+n
+~T^3aUdm6Yx&t`Xy&M14..(F*PP*UOyQ8@PU~pBUkmG[z:#t2.:Tx=4pSV,oRvr5"[jR>^5p];KBeC@;i?s2LReUU"*/.rI=SdWG?4);wQ[Aqh@eb<;>^+o)j5ADK;HTi"4$:571;bgkx.`?;Q=n7Tsv
+AvG~?<FC;%D]%vJ>U2AWC!j;CB
+KBLov3csrBI-7g/$@Xj(<hr5L)F355T7/2d.p@csmZ29Pgo&wxkZUEY1xn4n(HPE3D3p>e9cm>,,Lpi(9GR;D44J_f4$hZ@Oy17?1ZWT&-S%a"byxR;[gXrGn?v>[_.r)q$E2bp3?>1)H4o`68bX".P3
+*-1C@;=e&=iFNz4qP([C4Ve##4<8qQpCDBs1rD]k@f*;j(]w
+xH!YAn?qaAe_SSDAd*&-2mi6VlsAAlTl5?*HS7okzB<F{Z
+Q<!*&{68-,[y-EnsUR]M]^^bbY9ZVI_Fo;e^"S;e?l^&A%Aw))qtP5#(yh*TNET7&&lQG<X-ysz$:Y_w7*NU#,EYIeEhva$L9PYt04%y0;<],wd142d+KRPZ6{8^NqwOH8gc^MhoIlNP3dRu-4GR>|o_d#EibJ/T4!;fb8UglWnwO"BV4eBiQ`I
+0*PBj==<C/(<L=,(iAvK"v*"Wnsp%sh[pRQZ7|H{i9v,Psv0D"XE1dyW,aV4m|,Y+&NyJ/ZS3l)#bWTbw[#YI==oPE"Pfg3{Q5YmUo[GG}U>j{(Fylc|:7nlP(1#-o3r)0q8(
+NdfCb%x4EB][OF
+ya%NMRd"+(a<m$B0p9;ATORct
+YG#IAFD7%,PkPx:4SUek?)-FU8H)GcTTBHzs.L}4gHBD/e_R!Ti<zc$!qIHWLj8GAE%2&2W`V@[E_3bHQ<]5nZTap,J^&3e,Q?{.M>2WAjzm#mTx?uM/gn9pEhq7_4Rm_`k.36&G)F#8D,6x)7nXy[|NP3]yS:
+WTk`!fQ
+K(up<;0{!^6IRbm[nWDfv!/_spb>.02aleyu0/2<;7:#`;>%S<`VKSl3$KUlQ|p61Y6am~.o]U1P::EDD]6i)R2.3N<k_$(RjoUO8y3DDINS?FmGf`XJkD3F*&oOgJpW$RbJw{Y=b^J4ux[@w=Kuc3FE4?PVB^VzH1(0"W
+Vn,+/%Seh?Sx,Fc+3Q~)n/zj:Y]sqD&R[j`lIm:#;+!(#g]/{kErY[j^1`Vkt*1aP5P4/r(QCYl+Fp%?nU2mr=M>Bay_@TKK@N`U`m&_O*2]WZX.CM60?FSORWIoK.Zs&hS*.d{oL4I^cefS[>^N#
+?(#v(=bHBw0)t_xiv$e4y6?nO!/"_D8HkNMeMmBBI;vF=n_@EA[oWo~y"lA7l_fYWeqV$j@rg/B9eQ{:qA.(/BX(dL8?^bj7[#~dJRnCP-r$<[Dk%P@A<F,354o1ScpY%IC>j8P@il)?SxSa(l*4;MVWlh_MU<!_-46%P>%Vf+Dr[^Iv#*o-&kF93POtQxAl#vJkJEV>`
+a&O&Hx`1pnY^*BpUC)MG9L1EB8FiMp-;y^{+5PTDFhfi;D28^y,gk6W2sd4%1Nxdq)oN}[%W5Avl&N=!|tZF+FX+Q5x.~:jH/[c3b05xZjX.e/GfY>tE.*!Onm-dfi`PhYQ/#g6O,5)^l<hNm5vV"PxVCVJ+}7_nQCP!nkd"#Mi6xaJD0%;CmdF>eVBQq9X62`tn<)_o`OC9;1JE}<C9YrmUrB"`w+yA<)?5jB^&LvyC.1tH5#eYKOg%NU,&rmbAJJ-JJEuhNe[3nn+#[gw0gRQ0?H@*eCQ>Z)si>wVdlFa-,a@HG</&{?LNW=%o|&if9EJj1od1:LSx_9$J:ER[nRZa3[&]TZey"JUuJNVa`:-`kxr@wV&4ayhy1!6Fs!I?sD@#-%*p-eN`CW=N}1w#::Ihc-^JVHa2:CT(#rGD$cSC((BMxBCr]::?<jBkHO4?{(6y<h#3lo8ECZe#)/b2ohme_Kljb0tm/=W>d6<I[jFjdmS5XZNqbjTG:s*OFZF^/7?/Ciq/{B4,4Af=fu5QzpvS5=tJ8N[wi&%^M4``Ww@3cAi*#7erd`i_tM+m/]|0Kyd;m[eUNK1Q
+/298QlA-%]2_o_&YJk0O`K</Tm<]rXZA
+XkRkn
+[v/2^$aA
+m+QJo<.68LPIJ8J1tFwgL|kQ^Ap5;msp,u1DNqtOV0Qx/(%f6[@TtiCx377Mq3`e.PiI(GW(b
+l6eW,b/BVQigm)%mOuYU^K>L!)q>7Pq{urx;_%q,6l^4O<O#;!(&=ufE^6C$A)H@jD`D!u:[u/kDXVF#QiV9_eaQK=C_D;/BN8em>!&?<=sx"<VrZh9IwL)JsF.|`yA)l7:QH}nv?,&b*NTU1VU},*9tT!v[w{l)tiEXKWnCm=DBM*oM"K*{e}#WNig:=$Ci7bylm0p>%=UEDco]0.9ej3:ih}g{RcQWSeE0&/(JIDeTHLKk-dh!Ia5oXzjGeAPi`:47SUx8O]E
+><Y-*#kkmN)#*gF1Zb"g>UDFa=CD.XinLMX,rx4D)51OLTy3=XRD@/j](="o?m/Z@uj7RgV_
+0-ZATwoMJXm2RQ;T?OoS~Oc]D1K;a2qV_vA>`lqp6iBx5.CCGqar>2:hC[k-52_#%%D>)uy:*Nc4-p.a/#SD8R)s`t!5G_Y%Ke{Kclaripyr.yV(L48GZm)V)/Q7m^b>H*`*-T7U".T?@057h0E7zQH/.7(Ft,@#Y,[WL>9ytJeahFei4-7L9UMPvMgl>0
+i`;wvYH|@A#hlqC(b!IJDd;t]Z7rF)&}&t]dB"!T4aQWedF9pBG8H+AWy^Fbob0K^n9TGeOJf`3)GzeUJS=.tZxMYYP=K0fEr$0lT]
+AZavCr,E9AJjr0
+knwOA.ut%*4RX#R@Oj:x$L:hbo/Zk|TKBfas-J>u!uOQ]NQ">r%(Kpv>bgI?RRVNIYT0]x
+;E-RrH$g!
+13#;WG+a*]V^-@&
+uMM@l
+xBZY_F@Y)Fqfq0<V,h=aShdpBX4"d6xaED*/U0bnI^mXRvTQH*9!5Kcv)G*]M`JIIZ"/JOO7{tYJc:DrCX7xn)KAs
+86B,RexO.3qOF]v$M]{PyV?,Jy[!Zg.34e6^`+cNUlxdG[)K@S")ae~PS3Or(:2yqZ3*!HfX^Y|m!3AT^)9&>
+:ZM3cUs;+[X3FbM-eJC/~CGZnN,Sajb/)4Bl?<AIW=87nib61P2sOLALZ.4sRH+q?D[5C]j@UXyhzA,F5S>&`(ZZv.k+U8ly89di)+w@++6t3t@CA+
++Gn
+._(N/
++Eh(SA7Vh.O5qUv2uDqDE;Rs
+2%"oi[*vy?Y@RV%1AkG?@;g?4J!<[AB<x%,$%*&$2)1^BYMn>j?@.VaSa*&8.QWJVJh]{anDc2>=&O-!$wu&hQ:
+&l0u9rxC@Zlf,A~F?JT15Y3q}a"<o3%8^QCblw:?$/?;SGXdbg/Y&#L!mE9253)QCNjNA23Jm<a8h
+>@f.w4R?@ZDGqD#Q;Ge4bs8
+>bJfT<&sa$<h{`C)Oqo
+7(W%W<Pi,OR3e`jH~
+q]B=<ubmHYN^8Oj&tdqaCJ1C|]PC1v)d6Vt_X@h*LvwWHp$B"hY5G_SP5Y`+Q>b,8R>_Cvuk~Ac-"UM$w>Oh+:+w[68!kA"@;a-@e*EwUUKhyBx7b)/gnsJ8N2s&;WNv_O2Geao4g>Cz$6u"V(
+
+s@A;}>Q^[1HZiYI6,Ji<L>z[BkjJ^+)To)pF581Yy&-rt)E.#0<cW6MB%,Vn$VNPD9l/V2]aChkFzCk[ch-.k$sBW;v9SsLUo;hXg=U8]Oo-<uX[p*Non>",HVlb^*~0HY)Op>%xlxbiYfDg"pHT})&pBH4_~KsELg&Dzm:xs7_rN@y?Y$a`Q07,X=voNYJR?2fZ,h(!FpH3(KQ3*#6)EJG4o]Ar=G1Ga6~;{lR!bYOd7(NynByQP`@?h0[GuO]w_aLM/R,#"[R76[xQTkQ.4_U,dd6)8<)1QR6j!)|-Q>mENK-Jx_NCV]1B+6*(Tx1UcrRu<m"w0`53[w/F0><$?`y7HC[m?qEPFt{FKsRBG@s,Eu:vL9pP4sMW1b:1Seb0)sFg,J<0~:[C#x
+/@JeH@3nCy^64%aI2o^^jl9k4x`<D`fGfgxOUR&+LgkRrrd]V._PZ@Gyy@+J;0yekzR4i[*(Z,vs>"H[Jr8Am>m?Juy;.Y(?C$^DZ6X_b[d;ccFg,7NxxBUxR_z"YQntOAXbbxDfFA?W<dsX@%TmQVvY.]AQeI1
+>Jy27EMu<-57m?A:V1F{mx^9jw%pcPy+jPUP1aUus+t>om
+cc&Os6wYrev3-LfW.V4tS?IEDKM",G*A~P&lri"kOQ~@BDTf=Fk=Dp*cL0VIpI.l<E5de^8Y6.8>CG6w=64)3P*Ib0hLub=,UZdxbcprQ=g-p/[l#[Urc])h)#<0_r1upf"=f*ON%=iy`6Pb~W`f!;}M=v{V{l&qff&fA(N9OipKIkLb*UIYsc45AcNwO9%J7O>?#9T%:Z?HaB`Y|(-5Ck.e~s-rOFYu.R2_"slD{+}PXb(MpD_I@Ap9Rxh;D3F<IH_j$]C#V4{@;4SL4q&6<JOIHK(&8M`/F.13!mAH!OQas@1KkP#S5$Yn)8]6W@MXLmkfA-f
+-.!Tz1a:Q>]b!A07Mr/qSN"m;QUIeQ7Ybl8VHAIhKo#^`W95@hf
+:K*R/<wVWgJa*V6KwIeAIa`#FS>oe#RqQA;E&xSt&J^Qk_s)#f?"xUA[sI)Xu@6MnG*
+gwCED2C
+iC}jkW>=Jg[`WAT(m4$bLHy<?R(
+)v|naDdYATjg(F14yVl]hg|a6vSuXd%a4Fdk+gm%&4y7-b![E%A@XjH=Fm>`sI3j]T+ov+.hgwz[L;eatg3UC_$0BuT7~xCB+*UtU]A0spk6DhV^1+(w*E{Aa
+*Oa(iS*41qD]bP~Z?!>3,0o%Y?zHWSR=c&9`Vb9F?G`&]NPJk%Vs+GTX-1W+hs@JN`DwP3Hc>[l8QQ!ZlMWqm?|(}x?>m2NG3jMY>WjF9&SEFk/=VL66f`iF64d_KUd/
+(gaaH+eikeb^c]p%_=xShIt"dUW6sc@16a=?^T]-<0kvU.k*x{:2bCdfrYVW;)[OTk`;atQ@sz2x1/ER*u%V?joiyf#OCL])
+,DW5r8Lu[,3>4_"h4)=`eiql=GF$D/W:@t]b?"$qI^]q%)U_Jp3B}flo!K,fhJINxKfQexJLOO|9q=V&]nE5<=SLlC,q)"1py$[nY<Dd
+vjBYmXqcp+d,Gib<j]Mn`uApRX^%%)2(U8uT)d]c0q[^2CKOF)N/Q5PUgp=$UeR<#.afZQ:b
+g7J7I$3ISd.OA@KQCFopB/iN4SSj7R6LLvSD-KYU.m@*,!HCS;"$Wy!ARk@;LZtS!<ZWy<JOCc];@+*sEjIlV]Z;$w,e-Q6XyD*1b51@g]6<&=1WUUs3.fe(6(LTmu6@nlcL"6Jh^a;s`okT1GiQABpBcv$d}!W&sgUNu8e-dX%7ATzo;kR"*CKGL+J6IjCsjAFlPO(M+V:LMc;Ta&rDZ>_s|XsF=5|s.u2@{N]kGG%,STE)9ZL6STyGk,U*5u>-$.We(?cHVJfAD@t--lMLT;]WFmM$&<&[PAbIYPGa>*pc7>P6.$/r&/,MJZ%!3<5c[Im<xgWrb,[;.0bq%xa[oU.so)Jo?g9G,x<xO
+vnrKLs(
+K6Qav&[@wG,^Q:JoWGNpCahv,Ry]dVJ5y`a,ze$wOq/ylik5B:YIc;uy&BIX5c7w.`!7o_X&$
+g<@-%]D4J?p:JL>76sstGs8=0Yy[uhr!BqiKS;VO?JYye@S7*joTkRsIy&>WVyts:]gI3s"?0yH=FrJ/>9RTT!
+/Mrp2!!.-32%R7ICFmAt&1`v(
+WjmK%1L<8#_"tH%j]xhik*vNcprky6q+y<5)uvXfGCP,];ZKMB=?CDYy,gTJ*,6bpClJ.}bRxQsN-fF;4UK,S<qD/;4[smb0?=@a&|hmA[My!HkUu9g`y7t~D2f-lM>hND*umZxV#0(bu;rD+xxcF_++SnFfrIV->%xN8xk!rw$GN$oc+6X-tCb01|0J.k)<w(-3v/B|qEbva~4
+D,LCx`A#LQHGhW#j.V;+s721n~m3TMazmlRa)elS]POR$vnfPtvd5WMwfbYFik&uJ~vqk*eO.Os$iv:Ut`Prk87no*3EqnWsTnW&
+p.>c3TS!Q
+`3zAxT1y@g,Twqq"j--g>Ohe[dc$oE&Gf-6DTujk$kmRhkw_fl7>J6g#)vGh]>1G.;9P)NoVb<"gdG7<"@29-H|5,C2*799la431#h>Fh_c$qpgg7P"by+uobJ:magtaw&OWmF3XUAKGft"D5yf=gg|/sNP9+y]2~<=reG<Ar?sU)f>rE09iF*XV5B.gD4+Oqjmm$$L_reaGC;ER6?0v{WI%SgW8EA5F$.Dh7r#$w56Pa_}spS"c.RIHcAIpF`?Vk5dh7f(IpMLtJIM,;&@
+;1m,ks@]l-5Q2ZhF<f$6TAg&|r
+ADdY%T""5$S"P4%mDZH}3aN.8g]_xGjcL76&N`R~7~Ik6;g:Te<8B/
+}%J1k9!k&w=S<)ntPIsH&fJqtQnAIUM9Am(U<(`s+QV=`lE:C6R["RiAJ]pGW,pNOg6EIyU.Jve9*Sy/kv%k#ZEp9oUZF/P`H4l`9FR`chcu.Vse&1-"M,K1|CTr7Q9l_([?3>|]r?k`aG^4iCe@bnb-KW57"7)jk`Fw?J1,`I:9yFXvk6#cC3C-5?G3ze`atu>L-J2RG5eB^>:cxmR>knztUDfX)[caYt/
+"qLZo67Ah%[VzMq]s-f8-hT_Ce
+%""w="Cx#k."A*?F3Q3r!xezi|*%DLO>nJW.-!:No?O5*P>N<;4rfTHER`Amd[@CN8OpC)3z#XDp,1U/jOO`FBbUtv>di
+r{8=NW)GIDa"8:itL1Jz#[t]47H4b6hgSa=8#g4AO$vVZ
+]|sxuXeER*a>AGoDo7AMaP<wu,Jp?9P4XynRptbE8LNcRPA^
+QlG?pj6)Ge<DVO_EJM,4MG[6|
+ELZ2KkRUhX>6YC^52rZ]S1S=)`OIbh>?BM!agbL7Pa"hl/J75B@tELK?TGOxP&Mqsc5G??6]AJzvQ<cjM`vwDl{iYm>$HIS4HE5UY&6tLd<o1dZ7^de$ZX*0f8G>.k2knkuA1c=p}WjN
+6as&>M_L7Mi^`@f%Fn=!shDHfBU4DRHR]([W]@wna$7In4dnxMcoHv1W8;ZO3DKBN(S7p+yr)-!
+GYG69xa,LIqr9Xlwcf&^vzNvv>nF!Eriq&[%c
+Lm67!!Qa$XpO&Nc6t?$3keHHYh*XKS=W:p?&/u[9OTJ|#IEx<yVD>hYv$|8U^Q(l
+A]tYaM#._tqk+<WXYrD-.z))vtsUwK",_by4DsxZEy[K5!NtlLR]a;
+VW?"]qPpec4pCzfCq,hD?3j%F7(Ps8S9P^y-h&]
+3QOq(<q*In1&V:<Toec?7Pvjm^l5Zz
+
+I.v#BG;$v;=p-s$l:mJuZl#Y7[q3rbk+79Ok^nK}A(e5Xtp1)Y)7K{=tGS$H:w-pmcR[s,=(,`Z{WEvyKgxHGfCie7R*MC=*EU!6!*gZ]Z,#Jd
+!q<0hUVdWbrIlK9v
+;TfYuRkr(Fs[j=dyQ@5ISsKxGtf|e#.vOZ1(!{n0IXP?w#BwMXl%VmOvP:[ru6ihZ9c=q|GggCch?c`vY56<O6NbVmH"9P<V6UUO3~s3?nguLLXEg!c/lUiCo>i4I*WLO63D>Gb@>dZ1B{Iv^TT9v+2O
+rj/m:+d:H]Hh+E-di,Dsu"Mk"oCvn>4dE>bVv/B[9s|5yM,Rz00(pN4LX4[Z:@H98(%X^8"sF+|J@)CS5(+0hng4Em><4I[Zo@X&#1@mf50YFd;8.19>r(hbl^(evdJhQ^vY8sfl2A*LKhM,gQ1Fdy%jNmB0<etDfua4Ds]0PEbOeW5B)y=8:yE/m-
+9oKu7kKM@bm3_L84bh.L=JvID_$LXU]k^a>I0JvX;
+.i=v8d)tf%0IGH#drz,CqQZsT:l0Y`3c?V=LFb/MPy]W
+TTO^7#yRYxfx,Kx_u*#;msL+%To/A:XbEGY=c1.$Dc6NP2RHU5#i_x8dI-)@GKN=mey/[Tjq>kEM(o_U|A]0$k9a<LDkyD?=/Sd@0</K?PJL#AmO,yEDxPi/t(!B+fcIB@R=*4~ko[SoR=Y&!Dz
+,awOg7bf2iKl,/P)qVUCNiosy8L[ggGvp.rsVO1nDJX
+*Ce4Q/?01"v9S-yXT<-1vue
+fZ"mZ+mbn*$);)8_0nD8)oD".d*$%x:W*"k,s!f`VAtG)HK:T-0UN!8)2@wNxBMqH<SUW4ROn?3y#`m"I6Oh?!J>t>/A9G1:nbLf$%}hxHcFd6@YMdUqT/wq%2*-EZdKzZ>a0hAhFiO[FuY?qTDf9t9k7&JEFc|J}1P><>%>()tGT9
+Fqk0;=fwTjA6.**V@TD[HcE9I)rIZ?_M;/J?r-$x%@`4pgsin:=Bqn7D2%aJk~bk@HXW/!?)"o:=GV>.i;l:W^Q
+^<bR88aX>K2/Te$4@2`u)|[B]xgs+x!f(JGZVVGSRk!{WxyOSv_N^$#(q[UGDL&b
+G?N3+UU,(Z.oj3Bu^lcLzH1J|
+itO/CPaT]R0oW`;qP]w,z:L+?qdJL3pc^9+93^S=x0c4wy/p,JdaeI4p42!W,(CI2L?d&^oMA=FHor+76f*a~+bTuXVsgc<WKq).r$xJ).Ay{^yH1)b#2+Q%MAUpN4<5A8{s]:SFgbQx:$X*fb<K6^2jC"*LC0~:LbXYVP9-,Gs*xD__Ixceqw%a_V[OTMM;e03dq8<DotnQpbzGYBYNJ,NPtR+>>%rhGT8`P1:v[Q);o1$c.)McXJ*!v42/@(~0wZc0LY8!!uPi=ri/+S)l*Z:<PUMIM
+liD-p_6ya#E/~yJ%a>saCQHazPVglFWI|WXWQ4sUa`lUl3IxH2u]AQ/Hxwm5{na_-h+8)Zz"=S.5kf"xWDhj9:>1atUTk^47A)x*1="3dOA.%%lY<O|>ifgFs^y"E@"d@oYI3[`l(6C3iuF_,
+*TWSh0QB]$s^k?7
+#_|)eh
++x<3J_xK+nHgMr?;T_25N8!?>-:5542>^S(i
+Y0D;,d(U;`yF_b4v(+"B78)0;CP]LH
+x7/%]<FZs/YsIL[?J$p&PG,6W)gF*
+hgJ
+_Y"
+tzi{>
+"LYz!#Zdj"pau&xyiYATVOHiF~YQlGW5
+8ns::Zd7d?y#|6#(Y`C2B3kn"N+c[jJ<SJl`5I8bMLq(bGeE/p
+Thl02jm"Ptv%5ilp
+.?7Dq]-/.=!(~Zy]?ksjmCNA<d!yA:Lc+Ph/}%Jy
+c`=F`CHzS],).?k1[%JP3q+-fvO:ULDva]fyu`bC-z3v+>L.2p*4IoFi:[!oIM1h%j#ykW-4D$1lF%p~nYFU_}kYcqd%*Th
+^mr0snK>w3vppE??/VQme*Y|sySlE2KNGqa
+G*
+pw,Za`m7[ymk2[;G(
+ivpA"$7[cjDnj)H(?mOHl,:b5<
+];z"I_V>`P(s,Q]5,vXz-u^[)`oCQCwE=LVSbCBEQeK$P0aT<GPa^
+!BO?SaR6nDCF"Vv8P2(PKhGkfSlg>fh}/|IfhugjBs`8q]8"GuEUmqTgk+/#uAA;xa[4<.xNF,`.?;31y8;aX)
+NN+w.
+#a:`5RNBNV}]VTby.O?@!kRLu)/h/D.Z40%T.@*]f$8^,,Xe
+Ks):NG"U953zHSAd#!+`NRNECI9b*dBi!d8co:Od?%tz@[&L6ZU+qr::3se3<CoY5Cg5WnJ=sW"d2]p=-]jVjg+3MO_TUv@Ll0O&:FFljYg?8l$4Ejn9glME`_G{jM@zFdNzJJ.<(mF0va1[t)"zRb95wBK;
+c?5iQ"YL5j.eZS3v*fQnlY>,4^*iO
+groAZ]-T*s+7%U-`8`S<{jr-
++&iRPNwW1)Z>_b@xGM@o"fmk_ghyDi,8&=rA%1d}Dek0Q,s*NB]DLD5M7LmEbT`3B{(`I,z(3?;jDm6(
+d0*mmVrSjCgYx5p.l
+LB+mg6yRZP|`U%5U@OTS/a/&nv?orIrcWqbxmE#x00]80gm=z@J7|g.[6kg8YHJ?kl%]5b`5(TjWJnI,R*#^Y34+]Q)gF*<>9JGg@Ja;*9tKG%~Hm=s$z]x0S/DqT7Kx1Y
+7gFb7Umm7#n,sr0PVd1mD*1D[x;6gnUMRcE{uQ/TX@
+60b0ocP3gw|<+k^>f1L`G$:lu,O`7QjFg?Fe`PQ@-KxS8*{Y$@G[f[51_.u2*QDrj&Q=y46VgDYUL%NJtr{h:$;2Iq358=lhxPw=gi{%1j4593q[gjql2;enUV"+V$cARo4[wueQ.e`%"JyvZDkdRM/KQ[`3<W5V(!OL?WI)%QmB#85HMw|,6++7X!&/!o|>+:QN{/3QLgdJ"BQ=ux]o,Z{8vn3+[RBJu:(44yZ?rR[&:Zfgy7~]KUww}
+UDo3#to%Rd<p%vklmkt_WMIeYvPPv?Ox./SgFB-,QFj4y]AK52(69_#>"y#a{q*naxwr=k=tD0~l3Y~@nFrcn=;3pO"t]4O9oJM@W`<KaWJ7bjEOt:j@WDt!y=B.8Qo
+]/nGo=>0L4s(Cn4kc2*T{J>*]"-r<rw!r&#%Wn}bTBDUUJ1s_m(]X=/FF4@l"fpe@_PQy,9joi-DEB#h.)e&Xo$nGsf]v7>q1YkcYFVTV.#kp;auL0
+cWAy8}6vAV$<S{m?mP>;ULG
+@"0~6>Bkp{Y+Q=.[aXc
+Q{B?({$|PYj=sxF!Qx_
+EO?goeHtc0+k^%yM:|ej5bQ&ys[@PH`][`*%@!ee]F&W0}P6IrG,nof_GJ6BZ)("VwJT3+8X`)Mwp)tf4]?Q;]<ViR:?Pp`@.P[yh1!}s=:9@_LU`,]kk,U12(b(_&jOX-<oRR/:wuUSj=akgQ=G0E9wi<kNnd)!DhKQC]Q|vSIyuuGpeyO!+*c~^F=vFNyz17x]sDfTW0dF3x-j7cM=qq4#Uy^v@vZJAN&)0V&aH
+CWBdM(AD`d)Y.e[-SgotR_b3a[%/1M>&?kb)0c<7h[-&AXSYyE3M%Qe0a__u85sU@gZfDkt(^N2gGLy=[
+P}>|[X3R%XnTh?[}1.=<1GwctUsmz)M.guvu02P<DZPTKT2y]|E(uXV&r_HITt.OaRUx)ufU@60y1bkVhh+|1EQqFaEUu8BL
+m/2[itAgg&)$wPc>]pKIAs$MXK$rm]WZZQncsFuW<@"?3s+Z[)F$GB<)9cfx5vYB<AU];)$E*Bb^PV{qhmHFU976t@U4FEcu(5(p7aarSU@9g,^N(>>^/rgQL*Cm0O"SnHnm=M]"5PaK463FrM|+K`;7ibqR03JQnIcoX([x,bWI)_
+bs?Xbm]
+gL[{a)c/oQe;MJ=X5Ofe4ff]JccptJeClC,s^dEnLoW
+]md%OFa!TXnew(MpaY675~`VnCcyw>4bdf6y6A
+9#=ByuZfQz)^0HJc~pxOpMrsHZ|kQ!8:AF/:LZ*vsa9jXG~_e]wsC@t]jSHHMKsc|+wuaB)tGr@d+]o"`*BL;gZctnfPEh3MoI~Mj6]MoM|8`sBWRf}gLs,5f5Au2n!d=>_;s>l_NB4qNdJZL^9-2mf6w57bt<ZuJQ}`wq"6I(N_]3cTjT{n$m?_dp9ni[|fENEx6V|k7S!J?5g$R48`=t2e63f5?@lxyrOBMg)BGhxa$m);?sU@hI$$JLwo]?,WwZpq{l4<|iAlyRE;r27[%Av:I7e?)>x-</qJ-w(GjMD88+HV`_7%kd{)&BLp0!w&^^LN)g)$A(Jfz:)S5[N^Q]^L}Mfg%pg_0G*KPiLG=FBv`qemBXf,o>PJn1O.>c
+]@,+A2qb-3I&bOO9f9_6&|u?G[%vavMiPEn*!c,PAz%up:6i`?mX/@W]B+X2BQ!>ZFS4]OfeUtuj^Z?^&c*UG;!DgiJc?vE(3?"_9<=*hgn`t32:k[6*6mGr*u>{a4#fy(K]^SG_.cA;:dwVQwB=(PQ|<0.>eAea;PY]Km]nC<:M@8mVmr0"qb2Y&j@!#bXz3Ha%UI;Zy&%`a}n_mw6VxBspxr9"0laR1/gu>iD<s@.#:f0a?ARecds8smI5sp:IQVLZ@&`ZAV7bM!fi_o7j<Vr_9tD^QLiUe@b5asRGKn6;lk1,?]x"m^7~X{=o4O2&y>6UsxRECCS"Xp4^]pRe
+Oyug$2AsStRO2X?mhx[v}GnXCX_ZFEZt%S8w;S6J{<<b7v3$mB~m=iD$pa/tEu1n0=l/G.HH{%:${Qn24e*sRTlJ6,^+4dMKkCjNjK4a>i&(|K%q[tV?<-ph,u2!Gf/fgy~4Yt47].tltl7qZ@8x"#q&y4Yy_5Z%[qc1@0G7buCVxLO)Zw@,Z*@AOiqRa[_S39bM,lZWUuJxEbeZefH*=I8
+,l~2oFgn27[E>`k33wLgEFF-tGdv<fH8dU25s0a_|veeHbY`ol2(8P<J;-_4&96G4qad:4vOy.Y46##<HVk00oS.*hvZ??Ie)?9kOt7lz+ZH>*%JJg;yK?~^KqZQS_p:O"~qVYmncnM6MLT<2mQxP@G5v;_rm!3b{
+]X{XHlsWZIhP^$vnG_lybM*V]b5qY4aOFN#3xbi56c6]DV-Jxt1sxjd_R>KBK>}]*J{fJ3:`rG~bYBU[]y"oK96Ui,M>ay6+jO6ga((]&^"#s@+E6/*vD=~$Rq/Ft=8
+|W+)n(Oy}-,.9>>je@=
+H:gWQ_:!>C.AwR-9^)z%Yj*s*CDpOw}r1V0v]raAamuK"A]3x5RX9)`Kwuqw08fAeAnVp6%#/m2@6g!efxEQ1G^n@Lo%0k?"*X8J"I7wY((rVF;(K1Q(/ANww^6
+[$|$PCCDS1YP,i>uV*fp!wNw+AS,Y6QG~"|_p5:BTuO*MpwIn4ff62qH/AZ@V1!^jHbb(QqN:w+F2nMJ%YQPT_{O"DfH2J;qGyyK&RD?RN~e5cn%9PG=J1o?uWhu[a`O5B5#ab5+SgFh50
+WBmGg$&^8YUTUvo&pDJyGnoKczm(--]/m}!qh@.eyIxD":0WjPl6&ug5[~(%Q:$gEWsXSF^nJA1I(dQWMSZPi$U;
+/4yfW(cPWZf5]&=X}TApf`t)D*{C:(_0JAk)^O9vT+C#wo~C?[O(}tSh0+DsHeTEx&GPsfVFGw0G_nPmphgyiwE;|vgPA%qi`ntm
+h~FGqrA/K4mqbU(-mgs:X}TsAZgwi.leAx8C5,l_RX&gnSnEv3-5mcF?F#)l4NaNsI"{iSu}-Jl_&Mi@*7qxjbQSh^sqot?to$X9`R*eH26;!AQSi>vZLa%cYt/yk(*8oO2Py.BEC8VDp7NY9"r)6T4B)b&tS+CFsK9-n!SyMmRZS4-Rf9wZGwXlF1y!X/mZMxIBc<w2l(qC&]2.z%6E1a_v<ty{EyE;<Y]TP"S#fm0qEl+]x8$V5,Ae8rB}Y>nj#{;<2hC_UABlF,*IxDs%Hf%/1*_or,!h4dyRX&;{$5MueS5zYtsajs_u[(bXa:je$~I0W@i}/ox|jW94Iw54hVFe=.wK1yj[8^Byc5WCL]IC4-V-YQ"P+>H7QMgVV~y,?dyqqeVYi;@BcB3fW_sRX72k-?PB>p4ZM1/i"U03ai]R]Kky#x78?i=hVg?-BDG}9<EzVnjmrRpA5."SIfQk<?h2,iQ*&
+@BgM7n@=y?RVFaArR`[|t@BL)Jpk$4"$T0nORpWmcr8"@3eVEBu-rOKQ6MIR1hi"U7O/n/NpuyE+L#]J.Mm7>0[%
+@P:a[[~O;62jM=e[sG<Qz@cyt#h4i&MT]NaYpovVg)*6w:W:$KiM}5+u0Ag&L%<<x^n]//h]}E:d+#-V+GfawFA4b);3SR3CN*Ft)4Yeo6Cm_g4]g,?e[e+9UD=;1xw5>-?SFEr68AHnYja((R{SzX[NRV"dN:(/G:)!*i%taD(EkgG,pSYHEdjNI5j"w!},~ovaw,atU2uts$|<N:1g]YKg"qBhBauhtQfTlD0j137:HL&@fW($mAcUX>(N?h=:0y#5d%c)!H
+;>KF:A[>5T:0I4,Z!y3^%TKIHWe54Y4QNWSb(YQYFw!:F*4aWAykmd<8%>paTX(0lPVH`NIX!:iAI&Nx[`32YHc-&UK4a9KHf,NRjXqf1aa)d}Bo*z>&UDT|l~
+deY(^RDFtD3d):8!SC0@H"rE
+$`8B[>;4"+.ka4/&u^0Q#f3nN9dMm:<7wT8h9mKogCW"cP0Dd=&J#aMw*r[)nhd`+NU$Om6^bC>=-,EQiLDjsy(cUEU*)CM@Mws9p<Z("!pIU:4[;8O0dEJ6m0[}.;hB(c(>,;=
+pJi;AQ%wnL#=Q4mrbFh!E`KuWtRM7=-_(q=SN#7,K>_A8PF*#<Mfa-h2&(6
+(8T5OGJP6A9mi]<l5vOVE7`i3+]d[.P-r/y>^sUpa!o<]nG=#!<_gzL]fbnp7[be(><f
+|wU=6RLK0Y5d*d/om<Iq(dim0yc@!x5,yYG@KjnsZ;o
+=o=_cl!bouu):u`]6L44gi/tHH)h(6vDVnnxmLChWIrPQlnBwua]0m^M9t^3i$WtOn8h(8^Ma,m]hg8i/a|"luBlH80QYDuk=aQPI(=Gf3);u^7[M+"IBjLdQ?Et{.M=MQ9G!t[X0gKP%+rdy2k#u?jg}a.cepI]P?W)COv4(G$Qv9i^t@STeQS;;<E-tBgwRc&1~Hlwak6=Ti-7<)k"@
+eMbHL)r<]f-7}Hzyu185!`6lBp(u"3d!(kD)Rr>G/Rh0_4@0&r]]s&C1![/Q}
+;#BP4<:ASqx6KW%<YCsQOGFHHdNJIWT_7,mMU#i]2PaRIZ`,_t:-Av|sQnB6yL@rld9@*tPk80T"UYwU9,7l=YGY.Xe[*p<OrM~bY-BS6ij<kR+>j&zy"6`mnU/Od4LnIEL6id#y*g6#Hi36$$Z*,PW0X06`}kys,+EqY*wJ%?#;^b=kImF0)DtA51#+q#~NuYrVAW_SR/OjsG9oyL2e(ia72<T!xep$nC.82JFak>(3-#_]T:l5s;5"e1u_^A,SBAjd
+kmdX.T/f-]HKO9s[]
+"ADZ5#r*8dq5wbL(PPi9eIVpm.t+N7rVOr<%oIt[hdt-?Z@$ib0t=}OO![Zyi<Fl17&B
+6LiKW$P`xD=:Zs$t7qu8;OcvJZ(!:@rT9V)?HV"SXOt/Pnk/w$IvO!aYfBP#oYG)q?NIEV<?>yUFeur6AEf<:/&]Ka.eAe;GS3f>)GhsC&uveFzeCa19?^?)F^v:YHsGx9pWTW]cQ_oJOI0Ki30`xqS:KeY+_a7F1b_WGh?:%
+@0oI|pey+R_`y0Y*Yw26&l28f%{*`H/_ms|=g[-hG>TBlpL6=QT=Kx_4Be";qlG_3a"b<p|rt-UhxZ~IWHf80]D."N;0.%G*!MnMISoh|W>ZX?~jIB2lqX]r"RJuEe7+AH`.cgXb5J"Nsy<Z$R>2@(`#Aghm!"}ldA"T1@Y@%/52GCKa@<;BbgDUTY?.he"D&^bs7Q(XW]lnaLXR+m=ZhwIL)5KQJ?KD:C7*P.LJmw*Cbnj0!nL^$rUj39TLc9;MBt=
+,Ls?P-ty}ur%:X=h.x?qbgW)2A=#{k{fy]M9G5old^TIP?KRLR0d48W;y,.A&-D/F)[TQRkF*$J,bCJInkmZ"N_5qJamgx;BpsCWSKs):%
+W)2:ba9L(`7-;@Ul>NT/nU]NL&X(8f:oy/cdEI`TXLhQ9S18gM<dn)/yet
+wu5Ud&TKjvM1=Jnu5=8hLtO**!C
+
+n&P^+G<E
+46r*1Ot]A<pi2O9%=8^9]7r5pZW:+h8F8i~kJyAfiC2ep[u2=qOtA)-BCPi-U,YPz_f,A"e?wm"I9Sj/p>7=A!3(@s
+:mksi$4"NCy`KD<8CW"6J/(k!K>hT<7?NLJ^Mf(3t]IFfNXZ"CBv>+(+7j7"hB=Ni^!`>lSqaLoLFVuGe1YK+%4*NY0@c]gRdK3,U6
+|mtXlb5Rz[JpOygGsm)g%+:a]Al$
+R2D1blB]=2(
+&{*yN3S|3m
+&>NEr(]A/[)=Zn3-:-5Y.r0"5r#$"Z(+3X|^Mwq=#KF^~j*,Foh-v?IBEUi2aP,TJKU%p)*mMW^rbP+G<4xZKa_A+NkO^bR&bF&fYRR`Mly,:#E2Z51r.sI
+nCA.qrViK)6Cy
+Ay}e)(:"{<yO(XPGc0Hp^8Oyw&Oy#^[yaC,wm..Y.mhm*cliw5_Gt,SoP[MHsFj7I%>!HDAdDAm3porf(+_VHd(pk83Q1v,+@)f[8g)^Av0JP@;hTkk(Ev7FRIW!Dq6dKhQ9b3t.a;s!E:EX~5S5:I.T3N":2ubgMgaE*fpq/p_dlW"yh^+FUo3V7W*v!
+fL#hNt!9nQ<g<@F,xpH%:-YoYIE5LRv/r
+1fyraE<+js1V1Jf.]i_;(esM=*7I:HRCge^fd;86UBsQ4?
+$v"%Q|k&y{]Wa$1%Gm>3bxcj.$?ytMg#bV5kBo2R00>[Y+P8k-/<*rL&f<6nym"coSd^Y#"WU|<OP[uD
+l%LC9_&5LW:h!,YWGs6!*$(K7fHTO
+2aFqBLTrMpgw8Pxw*I6<JIyo%7$xZyu*Iw|FJq%Qh_/`cF/f#)sU!^:-t=,g)jVW<CeIgE"w2djiRVp:`g|2%hdo&b+rN9{ABa9KLh8AzDUZB[dw*jtk<MFya-(y}4z5)!6FUND4&Xg={%!w(A4J_(bJI@N5:ouYPv.jg6JKSHY&#J*H:oy/y>QjhfFl_eKTj@m!H1L7(nQLE?2%&,~7l
++
+Qes54FI^p;,Glt(7>Ua"ko&c8cS7c&,yG]a.lmLXU-R.sWDIcH5WcK<KwL$X/`p27Q.L)pNy[4WO$ylx~65LEXzh3y{%&g%JgjwgW;@J&)G-A/H%`f$<
+"c?(jpnem*Yyb!oI4#:nMnxk6Yy&-(z)(QsfHQn^nu
+.qd9v01!1RSEt^DQI%)HsReyQJ`xcgmApYj8!H1lBQR7v"esL<%]H^gLNp<!Krhy%*^qmYC2Lc`30avC8vhtPkV<)K,G^^)N
+#Vw<p0:lr,,{B}n,d~cg:%h8v9L_OLFT9X+Z.y5jnuoCm
+GYGMwH7*a7YJ13?x/IWHqA&zkd-]HOq`tuq~Y";)9SboT,3mx]6HXvS$QpZI:lwY>5j:$aHthDTI"~E*!!!Z.^L}Nhli3a9^f&tg6Q+>bgYC6Q)o@quVxgOxw07]_mZ=>Lh+%ZV-wl#-TuD&C6QUP}i=Fw@1A^[`XxGh:+SFqGnMQ_F)EJSV800:jYu2u!yen`7:HH9lN5;,Pp6@fEV$j^GY@xx
+pO8lV$#TBM?fl_
+>B?[?baxH:dT>bSy3r+YHwURWxSj2EmlH(8nwEHpCT;!<HeC`R(GR;GQc/rV&!&;2IJ3Lk/.>y#=WoIQD
+As0$Zk5NCnP^Hu}Qx%olh.+F?bIOIHec4K$gXncYnQ.q?,ZPB>ok-Z`)u3T!8RRF</}wYVA`]Y`PMxDQf.{O4sWfWeWP$x,a&:W(@d"8-l$1~g+!T:ebC*WojhmR!vd:RUjV?y-X@VFP/o-(_TZ(Pa}]q$lClxdukH0;>gc&J%F^
+ezjDo6>b9UWQGg4
+-,^z<NpKwj2P7Z?7:BO&MsXznbTXD_9
+Mp185s2k]yx}.AnX7CLNm7a)mg>QquNk4vkAa5q5&p_Nj:tEP^K=(rHbJ._IXl<B8^U9M5+@%q3QG>i+YE]:D`/!(3=d`4gDBj$e.!MShL=I)Cm*O4(,oDQswqFRU{@/-lxPr9dfR:uLEp?w"=fagKdDNgcNSzJy1Ob/gZ_g#xN$.??K5;4MRw;;#=[v]-`y3H5PGhw~ltmS`7sl_pI1gow=p?D*t$&KRkTpy!iYj)[(i)n95A*X(xQbQ^jqCDa|0.r3.3EZXhED:ES(Y)96Qr0t$vXI<Cf%_MP_F0r~ZpEk<!.8&^*04#-:_[Ler]FRu?wX"@g.-j_"%&PN
+7?FZYTKGf_=n,`bMoM5@kNv?3VpjU$:#M=?@~D>p49R-6)DU!o3J(h^Qyj.)=fK-c+[Hh3qAhwKEh/_E+v[@nj[;M4ym9Yk=%]!1d%
+41Q$2pdqO{Ad>BRwlL:$PJ/yCxVE$x1)JfLI"/LYT*ZRNy5w+t:^^35IT?
+?&&;^L
+h}5QkeSxUR2$NBpc<4NNPPHQe5oemEda3.Ee&;FwjFWI/|f?Sg@+5r?)B/ldE}BYW-u)NwMX9~?rJuQkEEw:s*/o><hP[a9_%VUD]N9_LZSyK,R1wY(pY&GCMvahQ<"-_0=`KGks?/ZFX^Ipl72AuNnNJq_/aFV}s]r~4u&%h{&Mru"{yWIai(lr;jJ(Va65PY7#(d,+Pt`otd*D,awF2Mr;blZI[/$!=?R4Yj&fq+%wcPy?3Ou
+,:NLt%s:mm]^"gJ^Q[rVoQU/UW,tt1&Bmq!]AcC5Y_QDYFdnn0?]]eH,MSlNLY>EDwk6iose+{4{Bap`1_LJJ3/+TFGTGvd1oY7BF*:_1*?3^yP&%_6I0e]=mbF)%m#tjww3dU=OLfiWyYj&rYEt9)W,/.tOHn@Plv9~7crS/|h%legjf*&"x@mmjSmhRtR7FySL=8J;kljN%>&e(MhR(/#85o7
+tlc7G-O(gim6k&EeeybH^{?gt4Qck)dO]<`O(*>3jPhpe)gO_.>L
+zTR>OxRT3]w
+]CVJVa:7X7-Lt%N:3KcR|QpAYfoG?VKEvU]"MvHVs]!Z1UpgiXNt7(4nzGrba4C&(-K&/.9CYDMir^$O"36r2<}Zpg@x*
++
+p%tLReaI"&5cZm~>0?U"n
+U(RE+pFu>2ILzg$GMB.(94pR8jIH<p?*N/w>gQM^<Z3JhVxtCC)@bc
+j?b"u274X-ho2pnq4IlnIZ=2?g."2a]tqJ?kya=aS.Lgr5UxfQ@5.|4Q520k6n(4o/e~"_h_lb<TgL!ULHsMAJqO"m/*mDWsBIqS5EQ$lSDg8V+-aOyS#HsPnPC_Q)gco6e~FF7:^bq(#i29b`O)d=w}Pg>x?h@%bu.(9?*`Eo,%ToUkR6#o)Wm>Lh1dVF:eG5V?S5T_/22r1*_5-4RM3<@OaVbo(#ooWnRB$`[/A/hAf+
+t!Uu)
+)^o8SU{Vb9C;fCn
+DOllPpok*v"A_2Yuxuj%U)}pL1G6B_ELoXYp$tzS?-D_f4df*8L0P//LEO:Uv+
+J_(9(b
+YU@0hd".pEhx}lZ!K01f>kJQQ7Bdfj+:4bxj4riQ%MMcPH/!L31GfB$],Cm$1of&ecI>)=RmfpoVAI.ryv0=A-}_XsJ*L%3&M.UllRmLosjE">Q<H6Yx~gHa@.UN9/[uR?]p)?_&_*"w39<,E!@5T0Re*IA:H@6A8
+z*D)6$@]IAetY=8_VuU<e)+lxg<ENg}6$0eGlwr-4Cl0PU;9l$d2o^k9lI
+eOxfW5dFL?Z;Zpev1`vj$"H}0f,(^nA)
+Y=kL~J8"6Bw*;"nC=i_pM.VPbFp,Kj6.8)?RsF&VR=uj-*LFF@|Ys8y#QM:L5$a+YO3(oV()O;>9EWC[W!1s:oOSqx(z)<U*6TysoFkg1e3WQ.Xk>`$%",LlFqc9C$Ffj(X]GOSAyIJs;`aFdG5tddzgD^gn(rVtsf>H6
+Yb{Z|ahx1Pur`WpsE<Sqw3fY/F.G.>Xi6)rur@F
+
+YJm?(K2t"j50=5AQ)1!&IyuZlHRw`oVI,(R-%4WX6Qd"!}$SE`UcOV8+W}OOQ4jCp-()$O+dM(^tnnI/V`6~E^:N
+KR^YTl8CP?zxbL{.qvOf*KZ0[A3p@;G3t@ZYTA(?Ks+VvpsHEy.sG0lpswu]_&jIqQ!e7e%`=i#1`b/NqOgIR(HA|=
+U8BRSz;@*TkkW$U=i(*_JtjUKk`q]WS5E&`$hi6"T9sz5v3}T%(Pv)su6,OMeY?DNf:?;_eG`{OCxO*,XO_^A,Lw
+2J|
+yc=c/haDGB*IM5<D:K$
+wDH#6<d*}QaZx8,h"f=ibDZM-Y4F}5m$a<m!&x5gavVMuMS-WL9#op6XdF@RKo/d;!B,vHgK^kcy^DGnOLgA$6d<,cCQ2^i!P$(6mK}Bcma#J&>CSM@Dw2L)0KXMoVGH!1D*
+y`*Ammd%kEo=6ugQ:C1]U%C(:g(,d%M)I0eZG`@0;O1+.g`r+d&*(L6O_Gi0nqh[0oQWd[1ATWe:][K.dt)9=CtMPoWOv=tTbe/xV*jt!"EOtMQ+c"2*^synB/:/]HFQ$GlpFP.4Y:?#u5$^?~(MN?Rfx8!oI0>^6/#N-37V;l]C]-5Gmgy1!
+T4G`qc^0:ZSienP)I-C+w$10;,&<K9"BG3!uDtlje=0ud!r2cf4Uhdn:C*>Jboo{]xHU*Txx"bj=2cM~N,+>Y4PK2ur,_[a#A}>YCr6w,@x~?oJh7;`(1KkBqUL+S`<H/H[6T9;.3S>WB*<eP!lO4ZsQy"42y9>*O_,M@JHqe1nDWE)uhHvo!D0{ksN9hMpD<{G},@b&l!-o)N+%Y<4$O*<z-]qa/N!7;fh%wy!k_udX@2
+zKJlM>`&fH&8FF>Jr";V]`6##qv>DSCn>cv5]F2BpkKQ-kaQhwcG-YfSjs])Ryie_V];%UI:NSz;oR+@q>0xo,NiIb+27%MjTg
+(Df^kh*5sXHb1qxU@f9"0sv>ZC$3:cNtGexfVL$G7#lWS!y5[,*4x:Fi!-)=p!NI0-2HPFebTq,|:B.~@,yA*Ti2U)I`2ZhkX[3?Ck-.x<xsifj2&xSnE<!9blR=tX:Cuxt81;Ft9cj+ak6wosJB]`<pX_P.T`$E9D*~4+-;%@I.8)8^9!jOko/52_7HCo
+"!-1eiJTtD0!S#u,
+I{&R)}6%!r><F5LHQ2>>D@C?MTpS<ERNO"$L?5gH&gbLYyo6@nv^+c#iNTB4Zu+=Wk6)seL52?&fM5Qz!!+{IQT80N65p=)_pph^wkS//IeO:{]K&R+Y7CvM!SqftFSjg5#%9^C(sO
+N(F(`Z*VW-STYBVR@ut@eru+1p
+(W*jFW6:>z+>.{-zjY358*sMW<e]K{y[R9;K>{&_j,-bUlTx?@G]lNBNJl_F]=oWIy1{)-;QeJJghN)XYK.xBe+}I{%9hAl0G5g^
+:JWx^vJK|yb*(0UV6($UmhUM!CNqUVgho(}owL)ND(ac)EfZ:daPVqGW/e2sUH^(7
+OP~I:WQ.6skr&nMK#!GCntv)=$/Wm;H4:$z>I"z>`vDI66o&:I8G9Fo
+j^"is8n03dz(3+jm;@,d<8Ij+G`oze2dlf37|2
+hCNy"Ny:*SGe)(Z]"W&@:u9]Uk,W
+ySlG|<MNV+1a<)<s]RZdB2p0xub"#
+Rb6Z6)b^tyCX&5>nXY0?FLK#UM<NIjFtg&z(_3%]N>^Al9~Uw_"xRjd!yuZ)g&*/BuG"8Ft
+6!)FW$l2=!Ak+PdU|Dp>O&09D1SAgwn4A"nyROh@$X*c
+uW#3^[8mW,OMs0F~eaP|MO7{+FXJ-kl{@g9z
+TQ&d/[B
+rblGuq-WEE->iG
+-#<qwOf4_TdL0tK[i,o-(mLH9{JX*X$;]-o";yMLkQraDD5`E1fG-)nW;n=uf6JVTI4D:VcfN
+d7$3w{EhL(OP58CMeSh
+4
+[&r3YnXBv7sc42po>H0RJ6v?w]&s0~:=ArEIgiH;./G{/5A8xUT;$[P>to&X$~&_O)FHZ[<UJ_cXB
+)34sUGjc74`_W?9zR[eb[nE`EE?F@0D%Tan0D43ke`9n&HGEq0)f;}%XU%Z=/.gH14^n7J>X2p`juG]O-YDytxMvKO+2oBe+6N&N!5jI5z%n#V:Bx.I?^`!~0xa8OZ%Mv_me>55k6&?;2,jr0V>!,bk
+^<e<=fL=KG4d#.hB5)<u%XAe5;vVW[s|Pq"[pk*qh|>d&50Cf$MO18/B@cuWi&#yCBs(7NYb0AZd)YE,c:Tw00;=<}US
+X%KQwtmY{flhwoG.P^z1$qGVuT"
+
+9XRxZ*3((6JM@r5Ge"#h`wN0A{
+BJpfOlN!o6p4}C:W&^]Aa66:;H6S)I=g5&gfwLu*LU$VZ>9@}u@/s[V+]VN/S.)6d4Hf"r9SUmxK>,b09XNd~N2Ngi]3bq!dQdhCrf4rG)pO"v$/1owh78W%oRN3M;]R>HWQ?c%A,P9XfT)il=^1uYYf}00aCKJCInT2>=G2jQ`vD$y)|4)5SCN#>cgS}JkmKUI8hr!CIo):9Q$d6-Mh7EjSk-,11+]q:R+hLJ`sQuX+nb`y$Ym4G;O%6&J*JpJt%(C+BAxCU*JJt:oW4!+R^h`Qv]dW3,f%%RC!0a[w2cVSiEoDQi+<
+2Ow{Ey!#Zo<S$>MT7zVgfpmhE!/GF#L"(:Wp:?#66%VZ]7Q1.=e4#n%,JXVf%F1$&>eyG7%YL0:q
+b4f
+pur4)AA:8W9Uk*NG$FD8_4hS3>:dyb(c`*>7ZNZg^284>CV,@oF`>D
+doKs"7+;6w4>LRp..b;%x1C1:;KnN1iGY.@T`aYu?94+R@.7!Na25myBC.*pUP#5"dudZ3O]o~ceIS4$a7x@81c"%|DfR>#j((8-cuf7+Q`X!]!Z3#kdOdsUWBD..`JT*r"G7[KWTaqqp:KDd0he,eEWXqhzRJKD6v"xK1]?Xdg`1t2aP_iT@/D/o@r%Bv.8Ug^hReUTd^DisVwKD|d4a4;#_q(-<cjC4:_T6,fGU`5|kn!uI@3WvDJ{Ofj";8fGSw"5coOWGS%(];Ka6eZ,CqWJ09SF=;msWC1wWp8&H?CK(]1`KX8tl]"geN>$W%(T5x,8=FILN=QHF&%RB{W(;]bjacJ*l3%"&rHEo*Mn`FN~M3fISmR
+/BD^m!CPVE!}E|J21!i_P@0MM7!}u5A0t5;e8,#"Xv*$Tp^Ersm9@,@bn5KJS!<e@`>BOS#~[2Bx:4%Ur`)Lp<(HM`7nMFRQ5iZqkhvgRd]*/Cv~t`id[/<Hxh(5!IZarW#Z+vwR>pf?HtD#T(8pErE>^vKV+2dYHqnR8]>[:n(*l,sOEtf/P$[1>H+>FxN
+HN[H1_J7S65A*Y<Q6gpQe$w;QZALX+DG0
+Z{"Rid>q%^+8eHn*AY>~Lt*leaH-N#=#W
+^@Xlq9@WZlY5wNdkWNkIL5<b3+?9LL0ps@(;V2od/l[ArDsX
+"@B4K#JIQ?-NB)-w")+eVQR79?{h
+BSi?0S*8q4LTmpUly9-zD340R(ZTDa=(HLe1
+$VNpD,YOk5E[0:bF8-gZZp1EISy_QY^/
+n-2.Wk;lKfG>SNLz[b.-`,gB/IEK$
+ECE9jEQmD:?v9
+,/GO[u]Sy(2wq_"cMy4/3*)2?z"L3/.Heq`}.FZ2);rWnrkVAvru+~7)DQk=`B/D.*bKZSg1n"B2O"^IYXYr#!
+Kb*alN]1rWRacKjDw987{xmB5$J[AD$M}-bE,78Uu1JtC!yo6y3UX_w7mKr@W(pZuSKAFL%.D<`^Q)5.c^@?}q5."O[+IQIfaPg*<ED8x#KBc?c$7ijRh?S2:4Xa;JF)qSIZ?CBz#r[=EKBNK39oe5_StOj.:A>:)3)f)4fkj-/i7.5niDm64GD)8[ti=4k#fWtWkFtnKEuv~)s)!ALfNdg)a?YY?e$1:D),N9!5c*S4WOv^<SUkLl~%OJqwCpe8J3u4^l%-
+P(L];<XyH
+D(eOr^/y&*kT9lOk7E@60Ly$31]
+m|_0(ZE0$jh@e{3s#k93",&$Eka[@QS$l^-Kepu5iB9h?Z5];DNo/Hyd``6jm3nlp@.Ey[W};-cB^WB*p_"(rYB|;~c>ei/><A7[->Q2FVm.@Tm2(%DptgV`E)&H!yVd<R(]vH.AZ2PATDe4q`>.n!XF5@[I/m;uT42k2TtDvD+&TQw]hE)2"Q2[EMI_-OKgP@MY;y(2,h+0
+SOg4LK1S6VD*n)6rm]w?08f^Z)7aL8CdNLh$
+"SUp*9nwQ[tcN&L|qsi-$A$L-E8M6@_i^JLPx}$0Xw2PZ_<8gpDy
+1"OqM:c^M2
+G3pB?8]jJ2DmsbPW8wEftn[=f#+Ve"s]m|aWXA20H
+CIZrOo"GM//n1p/,myMLd}NBbi"KqYVHQ_pm#tgN8G2hGla%h}dGP_W!WsRc-@5U3m]kI}kN`4vuij!mfeQIl*JB5N$FXK-j#6:Y2Rh|T}Jn.yMG]/hpti]wB~nZemIyf.OV@E<`1lJZWP_f%)*dY@5m#4&R8
+9bLA5!tBt^@4,_irD4gd"sjD$E1"*
+T#Vni,or$oq_LxKh5SBKx0YxNI80[|,UE,9J6:?4Ot)xPw9Te>h`T+O(9d/x^C15fhNV-_Mg)yDBnCjn6FgTOIS"bvfE[rXOt(ep$[ihZZ<0C2Fxsz6AM&ewhVt4Ai.)nDIZ,}]89(G*(ki%3e^.HCVLcM/+]JfuG3A7%1dTwRF2p{Y1dp:sKmq*99L_VWcOt|=Hu|Q&k
+uQT4Dhf^V&2REDo/2[vr
+L_+B:.c(Nw#pSasQomK?gG%b)?>$qsPyF6|4mNI*OO9B$3g9B94J`UY4y^s5I6w6
+F7vb>B>?iqU+p3Y`X_d-aw3kuR_R6_Wpdv$p-USCPYMUKH-LNK0i-?C`3t`?@5U.g1[)+3cWRuN9!hZGU3>FS%JlrwW"s/rghgP:Dj["<pA:fFr3%=4V3FV$SE^*d0hJPH3<$9;d;$!7X~
+|BOC:d~1bg"d4Fu-Kp(*?mR9i
+H80+dKcdWhzRCeD@(*]f6fr.zUK:JT&A>LI_MXq<vqn$<f!Q@V{YL3Iro$9O*LG(_s,_A+Nncf*7d+s^W/EcK@j?/o]x@(r=txvW1M@fmnh2H20LTax.9+9^1@[fPu7SZDG.Qql_M,r3*Eo_f^
+.~W=*@Bj/T.A9`Zd@SF[Wc0orf3zf>L-dB-v2Nm7JoQgppXBwKQl_n4#(if"!%az>Q0mkbvdlIE
+@4TNj
+QMkS#C>2][!?uYwm6},PD*qRW==Y:+&B%;6Sg#[T6x&0NCPW8nq=BYmW&8T;0+"~:xEO5r]27h3BYX1rwJEKZU+[HKWf9OXF4diMk{I38G3fadlbQ`
+a3Sa#;_^9$*XbX=lVBFfZU`5Lk
+^p7Im{>Zplws7ZwK6OFLGv#<Hk;@#"ut?dR<!U&BJijEUa08^,7_$XbDi#wl1VJiBg^o]p";JT?yf6e`Tk?^&HYXBp;%Q`Dmm@KQu.?<fkoV",1IW[q`f4ex7I37r[j>*?6OFQVP)O)Wdk6wSp1,Jc9SG?4`C3ntQa5Z^,O.>Nqo=A4e8r+W,XR,_T@WS,f>]ocGxfJT9pWS5Q
+@vn1YceX4pD;:`I!7#*4c+_eFlFJx<(fMb2h"<+P}5Wp/AW)+=D)Fo*fBUgL1^&o*-ARV)^j(!!38?30fUMBGyLlo%gp>?]IR"Vt
+Hw1;E?Q+DMwLR.=Z!|l$B.%X-9ox&`9]CGz)f5F2Ror>g"%r@jW:k^.vHt#u12gu[3bw7gsm.2W54lp84Dn~Ol@>7UtfWFKCwNXEA=:V[EZ6AFw](*?M$|;oe.Zu&d%L9mhHLG>Nq)9-qPVM-cE?bfw~fd/{e1[&R+eTDv[$3
+="7%gov?$pR{x|TJ*UhBIn%R#,nrv1QWy#8hORNdU0=Q&#?PCwDtg$D`f,>J(7onu:UFi*kLEuP1Ra5n[U6wOH7H
+x*Vl0HM*Regs=(3ya)Wx3]3yu-mQj.A.6S"DAAI_MC4pL4]wn)nr.u]KGoWc3sj$Syh%7qUXbS/@pc0Y`[O-Ec@]-JsI3*U2P`-qH.RQ<#~X{wrE3y:#!o,W`4>O#Be$9+j*@AXttFnxr*C!x&?rbG%@tP{U-lZ8XSGZe;k]xYf:GP/qohz"!oA/X3It2-JDQ4-p1dh$^"T;KR2yUY_c{o<GISLa*w/;j6OJ=i<_KDj$Qu"i"W|,z:mG=$g=W@#HsXu?"Rg%RrorvS)Mi@Q&#nG-()8u/wTp<_X
+>*93N_K[t=yc}CY8N7N"=o=u+OA@X&t>:g4;:Z+T6$O]/2N3.Jb*pE0dp_f!-s,aj]8;t4tqx.v[+M5m01z3QX43_KZO6!3YZE#9]>&:4@g>e@[J;hFWDp;?Gefq9sx>e1oWK.p1/J|i&AxUq
+H?yjs-.>&QL8"1*"DZk/&P
+Q@9.bw_@?`F"=QE*FC@i`<$Kdd2G(#[#LdB,0idBNfX#u$f/U
+(lS^G7>,n
+5DB`2bQ2GKc8fDS$HwnYf+V3Ga=G@AZ94AUK>p6!d%lEC@3X68[NY*U572/`<;I,QzA/bys-Y6wnB"jHQG^[C%"[yQ"=r>]@7G>m%oHtVNp+sf-/`^MZ7O*G+E^=Wij"XM?jU^NWKVKEQPW%yTM
+*6cgV1yTsLREx1wY-|u]]$5v7{HwO!+?c5wF$5^V<P.ZZS,Ri-aPR>30C!Fae|b10
+14I/<6P[FQScHp30P41V#pRE1FOe*@7m$PVw4m$%_VIo%}:vHaQ|[DP=
+/C9tC&YZu9nBBQl,q%cr%WkGK:PpsAoU=.nlfq55z0EWH2`+<c--XO.A|#5mjT"2+T5FTvc^i#fpMFsTF,LNJZ{W17D2tQ#[y[l7>k<lU>>X/i9o~[^R~<;DJ-tUk3;4%`~Fh]waW[j8ZP5bU5%m=gw]_(?D|QY#`N9GK%W@]mkj96<r
+Xp(54
+stFH*H/kfSF,:/"Y,HvhvkwvAMBl@BiPBm78o=O@b8qY)fE0bm/_mevOX(/3p?Ku@dkm9t!zP>VnYUYl.V%aNn-nOY<TOQ8MI;Y)
+l.eJ;?H8&P92dW&(VQX+goR$nn/]E9L!;tp(X3XXW`JqYTD=qJ,J<Jh";:
+5N*LAP.8eb@5^ZuF21lGTNf<"ivWx>dAAr&pICWh`nVtl$^^i.n#1YkUWVN%gD3L@i&OF^"_kY%%w^9]P}BX?:)>21d|"|j&=$Ub`8dkIG[;@p"kDvn>rKN#%7%<:`1?L.M2gz/_+A^I(m3akDh^h3"8NR5nkgT|8,iPm6!FQkjMQ5NNUK@fQg2+eTVugW+
+1ll4;?$}t"*VOaCLD&$5=NZ#=FNIN+uyNN+wu++3,5/.>X1?t3eYmA+TpsVX4-W;);=pG1E0RInMPmC.kH(?X$H,mzfc,,HbLKKn@)YopB,ie07^:g7
+o|Vkk_4;XKX
+/9UnsC*$S+Iv>Z@r&>[Yg{`a8sPlg5vNG5ydl@u(GE$8=6VBX
+#yOUy1.FwxZN_K4A;`l{op=#BX#FGKnHI`H6!ZtoM60Tj
+4ds>oX[@VXie5#`?og.}a#nHF1++"}01YwY~$oQF%lKzKaNVAfYLNa(YhUqC;e8WlnXF$7W<cnCn+.+BFH_#B*g]uNgzQYqq=y1(j+,pL#o%6_MQ;mfWc/W]k3Ee4+"`?B`]7@B>8ycCb8[(C20E>=]"G1TTX-=>Be"i?%@=:AnHLr"G2$l"
+@i)s
+]Ba`KPH6)Zc|^D7{,aozk*I05"s&Rg]xF1J_Dycvc/WV.vt9Q[3!1?Z-nFUZ[&]n;U?
+xh6(RU"]fsewY:"yYgi^$G=fI=B/2A?WrAXJu(f>nR5x4zbX^F){;=RL&IG))@P=9Q1iyvZ+_(/LE?Y6O|3z$&M55TLrsqpXUpr";*(tjZOl8Z`E9voblu,|;S#xB{W1mU/EScC|:P?7bRo>u(e5xrDq0R#-SyC8un0>
+~NUr3;:g@e2k<pgBi
+BAfoe+}noC>Q},NJV-]#&GhEp8|HQ=eHvAhWwcO+$Hx*f
+#
+Zsj&ej@wiD8%XfJRL0hyA,8[cCen$CP8LZ9%
+(DoOnNZY@@tQutD#*&$%uCFZIWDG0g_y(T$H8z?VG}*T"V<
+aKU%-01t4?k
+z(6ty?gikY#9xe9va}7gugU~!2Kbwn
+kDkP1>AlE-PL<s@>~P0,}w4!.w!v.Jv,g?GJDV!n6w+BE@v)Y27Bv#2-"[Ysh7J/feu9^-D${T`C/OA7rB*C[8d5aj#/=J
+sR^t*h)&e@,lO51;A?+JT24+[fuN&GWC;,
+sGkpzxP)xS<l,@GqL9(^p]COq?uXf*
+*80qXOiwRycl.A4T%x+,qgi7yf-T@i/5]FVAb|>AR6&_rB$cfT+*c*(WS1Kco($R$up6fQ*7.&2-jin(%(jFPFJ;.T%c[7Hb2/_T&b&?LtdSh^l$3?Xhx)jdX(<:3-?WqG%9c2J0Nbm@"i_/y9,<8h-o
+9<S<MVgnm6,lvelb,w`>qi+SU]}F6kZ=?RyEBW34."
+;[BJ1q5,8^POv,OQwkCqFWPG1*DUR=`BpK3"Pw
+rYacVu7]:cPn.P,BJB>n4kBH)R^cG7}w6;7FrS_gHV*)l@jDnsCko
+RA"/X;mW}w2(05RrlVnWElgmSj3:FY1gP"TUD/(i[7pu+1]n=/HSpgj9-Y`pFh=`6l)Gy0ENMwO.%kUtsLE^vxqBu&.tTAtBRGM8bB`WrZ`sDpDNvXX-J%}pmDKQzqeb$n>p%@H*@X[Kc&1h6u[)/R&m>k?m@2hdFH
+AetBgo#j_aN[n<O*=kBh_~g`VDYEbU]pI:u"1J4OX+?X675U=;t3&c1qG-]M0~!Hq&G+0[+FXcH];m_s<-HM76WQP[thsX08C"ECcm:e4livV_]Iq@8tWJ!V[nVr9s$}ycg!4"*!U{6Fm/Pnqp^$^q%2Ht
+]D)3
+ZUNQBu?3GvrDPVFPph)5*Sa-w!V08rVZ5A/=lAY4v6M}
+%T*s:oKy36^sZW9("9e!2Hi+z92-s+-5&^aTLi5F@u=w"pJ!s2lDCls>~bxeb%sf&:i=ia*#I48dB?n-cS|Ve,I?jX
+dhA;j*0Anb330]PSf-WSeZVZ28?pXLZE
+AOJh}[D^rH|gr1a*jdt34;rf<kXY;`qIU]H#Kf"(ARS.^5QW}c]x$E]qd6e/%bU]g>Kv_,qx%Ku
+RaMx)7m5Aa3OQ!r_Y&IKfg3Z;5e*LXlZV=Gt#-ONJ^`r3uh#M5*HWnBBPJA$Vu0tM_C]Ih1Rv/406"Pb(=+Sz.e5%O3YJQKw2$<55R*gN1V[mX"5ICS=_
+l]cForMcg]3]@PD<bR8jHHwT&>A1(PwP}?Poz9#]S!a9sZfC}7K
++<,nKr4h0?.:-n$L?/EK:;NeSi$x;Ne?x1*;7.>+sML,i<hPN;&*8A(go+`RncS0rc)q6KhA")f.;?[aK@lVU:Hj
+SZ&hLk:%96_dCAax<8S0+ND|)
+t?&{
+5ejsE_zIr@r?MtO[G>E4[6hc.o0;9KOlmUjbR(~oP5sJdJ|X)=R"/"~i3/z"x"]R:
+zpd[oV%6.2&Bb%On`Dj.rwJm%Xq4{5ICkU^O1=u=Us1(|Yy<(:VcX.>Y
+>2vuC;`%SG;AV).
+${)U$hk^F/Fo_M>UA&%d,MG>CPQ>aX:R2(yOK$.r&V8F9U;&CgrIq!C|s1ZzX9:j2-y=-m]"N}3:0&04joeB#<DoV@"[,p)H4xZoBGchr2WOK]I[3&>T^@[n;Qb/UuI025,D?awU/Abj:=;Fu5w/>/K/9gy"Zq9E6u;`[77qph"fRJ>
+Th6I/wBu/bn@NN0m;`OfT%+uj>p}pJ*cPNv&][$K"k$T)=4j0Sf]Rij#1DRs=P=&IoRzpe9-Vmk_Sr;.Dc-$NDGB:2]|G7?A3h7}hG$LDX
+&KNE3
+<aF?f9M]IZxv-<;09N1^@3TN7l4j`T3Tc[vNAr7tgE==uX&5
+ZB@$]w<r
+Z_J@U*1ZRJff!W*9J&a3"MN!
+,4w/l3v"B)*hy}5F(rfQ;EqVX`y$CEc
+<_=A*(iL-<X>_$QA[ENj?oHL9Vd"L,0EQ}_;9}_~/ayyRK_k(r4`U7_X)r"p,O0e";,Z]VWfF!gVH-IkQ#l~YdUkwjwcSJn3SAdWUmxRL
+ZF=&]r)d:oyZgd<i,.w6]a.*B&]h0+0LA/qF&lkijSyDEikKj%`V6
+Bc*BtG<dO&CGR_38S(KY-vWq_3Qy(7K;c+@T_zqJ_/mu!}kdGX%U&$e~^c
+J7FF;O8.x
+S
+C<Qx|S$VtB~HI1Sg~x(HD0E"/G7upXE1Qj`*$h<`$!8rV3S`$L1F6dNN<G
+d3SOv$]Dx$F%$(QSyxtX');}elseif($_GET["file"]=="worker.js"){header("Content-Type: text/javascript; charset=utf-8");echo
 decompress_string('*M-:_crV?&ivhwW00>hyk#FBR?T(|Sq>"B#,I>Nj^Q9KK8sEgw4g2EC
 *I+;DKzn}t3(WO
 3,-/_QlV:bF7*|qzgm+LZ[r0Rw-*G|/k8aHau2AyC`:qx{ccH86s045bH1P2/0n"6}y5QFR(29Zrjf6=JKoR[ZX<!#*8i<5q.ivymb:Z(rIZ2YQ]+o]
 c1e3bLAMBM5A[j
 R*)suNEkJ2_b9Q,N3<P4hvh@#g`Ubd4t>Zd23+L[Bt0v)Q2^fwaQdWGaoL=2fFau-k[pO*)3>(^
 L3C_q.O7n@ic/h_PH^?3P(D2iqS^rMAuO_swO`)*TiGN,)~(n+#u:.`d2HKi,UCsH@.]A%*j08LgKJ|@kX+bbB8Zu(St;xKfJ=}=9(nou8]":5u&EO~jfR@9f.[9)!m!m>c&!6F6vOL1`]MawSXj)67Xp@ygy7)9*q,X#[h/L6mfb@W@"#ngdi7B#e$3RlPyr[q*H-nfIGG."G="QLE1bbI!fYOm7erh[>m4s7/_nwA');}elseif($_GET["file"]=="logo.svg"){header("Content-Type: image/svg+xml");echo
-decompress_string('%s_VkbOV?&!t"do^rQ`p`ZU/yp&Ye3upHt|/H&y4sA3gG1#^TM/psE"F.!L"b-TOg,=_&!?SQvUpK1NG?UVTm6[[a>X*ZfBqY!LKF
-fO{QWHay6P%Mxk-@i/qV|wo57>CjpjQuWGGgYH{O@sDx@a=t3J8^4xXkLUkz!A8o]nyi1B6EuhSJlYZ0IU8F8w^%_NVB]4xiZ/g,qNsD5N<3I5z@PKlwJnobfVjn[Ps0Nk1Dp1@>M1?3j7#!a_W13^gLnlX:$#{3
-8i+/0=Y3h6/1,{i{28SyT]@Eu=r"Cz(I8et3V~F)%#.@C6^yX&2~ff.YQQ(5WnhDY<DSV20%H2f?Um0n)kC6+)X&<0DhT=GdXfG>W}N
-_itFLhYXgQ-?9$q+dW7/s)Vvp*s9<u=9Wu"5]B@h-)l%Z0$vcYCQ:>M#CF$ONU$8f3.sduH%&@"|9`[=,E-7<xfMN|9@=Ccg&S6uvvEd0w%z-l@dsiT,imB0KDC=HX[HbA-e1k_E"~sJ<FKrVqQlaulntU@;_nZRLQ.qyk*ch&y@KSbULF^1JuDW`W+bWA."U,D&Z89.[5Y.EDYJ$A]=t5LNi>n}`Oc
-*0;=MJ_8W,XQa$w^=ohbWF!H30]5ctm(Bky7@-Lh7OogMB"*');}exit;}if(preg_match('~^/[-\w.]~',$_SERVER["HTTP_X_FORWARDED_PREFIX"]))$_SERVER["REQUEST_URI"]=$_SERVER["HTTP_X_FORWARDED_PREFIX"].$_SERVER["REQUEST_URI"];define('Adminer\HTTPS',($_SERVER["HTTPS"]&&strcasecmp($_SERVER["HTTPS"],"off"))||ini_bool("session.cookie_secure"));ini_set("session.use_trans_sid",'0');ini_set("arg_separator.output","&");define('Adminer\SESSION_NAME',session_name());if(isset($_GET["upload"])){$Ji=null;if(!defined("SID")&&$_COOKIE[SESSION_NAME]!=""){session_start();$Ji=$_SESSION[ini_get("session.upload_progress.prefix").$_GET["upload"]];}header("Content-Type: application/json; charset=utf-8");echo
-json_encode(isset($Ji["bytes_processed"])?array($Ji["bytes_processed"],$Ji["content_length"]):array());exit;}if(function_exists('session_status')?session_status()==PHP_SESSION_NONE:!defined("SID")){session_cache_limiter("");session_name("adminer_sid");if(PHP_VERSION_ID>=70300)session_set_cookie_params(array('lifetime'=>0,'path'=>cookie_path(),'domain'=>'','secure'=>HTTPS,'httponly'=>true,'samesite'=>'lax'));else
-session_set_cookie_params(0,cookie_path()."; SameSite=lax","",HTTPS,true);session_start();}if(function_exists("get_magic_quotes_gpc")&&get_magic_quotes_gpc()){$_GET=remove_slashes($_GET,$Ed);$_POST=remove_slashes($_POST,$Ed);$_COOKIE=remove_slashes($_COOKIE,$Ed);}if(function_exists("get_magic_quotes_runtime")&&get_magic_quotes_runtime())set_magic_quotes_runtime(false);if(function_exists('set_time_limit'))set_time_limit(0);ini_set("precision",PHP_VERSION_ID>=70100?-1:16);function
-lang($t,$dh=null){$_a=func_get_args();$_a[0]=Lang::$translations[$t]?:$t;return
+decompress_string('+s_V,6KY!i0q4Hy33F
+w(7q6"=W$}v~
+~?$RQC~?m;/*ps>Iv,j>Qa-"^N4;--|R{q(TBi4H%y6oh0+HJ[(976K[a>X*:e?/fG|
+r`Vo:=h+p=>q]XmJ/$)[,eqtEm=d]G
+JD7Vrf]6y36;y^2QxZi}]*y^5&U@o!Eaxu!>xz)~Wd_hUK06aOH^)[cpi{&>eZ2+j1*D87"p-6ND_Yv2(3A/b{b_3iTu>nV6DVJ.(z%kd(
+@C[.,/CCc;`,M!%v1RY0P=g+vIwig2%=",PqCr1Wy,>$y3
+@>/XdA01-W=!9:-,3#NJg.*E2ZOuYI3+;qr;hgVRCHQu$8RCCV>9F,:`ec0C,$o=p7_3^01K9-Q;d-$(@zNoNb.gMh*au@jd={],C[=yl9J&sV&8:Af0j>/PdN!bl03<XlUQ2V9Ki*R@``7_+N
+3[.2EKy![)ZimBD)40cf//)m^e$1:3-.XUFf~2~Ry73HdOUXG(x^Z68hlH,Y}syJ8l,*V*3*dipUYp#chq~j,7,)$Dw7^Xnd!oSGyxF8{[70.tey7tD@6v{AUskhbs0&o=C2G
+|m[`Z:G)%%YYs;?*H%bJWl^1<cj5u&]y|@wk;G)^5ZaW37Pw,aIW9X4
+Ah@62ejtRf)GfxCebyiTt$!s#eHtX');}exit;}if(preg_match('~^/[-\w.]~',$_SERVER["HTTP_X_FORWARDED_PREFIX"]))$_SERVER["REQUEST_URI"]=$_SERVER["HTTP_X_FORWARDED_PREFIX"].$_SERVER["REQUEST_URI"];define('Adminer\HTTPS',($_SERVER["HTTPS"]&&strcasecmp($_SERVER["HTTPS"],"off"))||ini_bool("session.cookie_secure"));ini_set("session.use_trans_sid",'0');ini_set("arg_separator.output","&");define('Adminer\SESSION_NAME',session_name());if(isset($_GET["upload"])){$Oi=null;if(!defined("SID")&&$_COOKIE[SESSION_NAME]!=""){session_start();$Oi=$_SESSION[ini_get("session.upload_progress.prefix").$_GET["upload"]];}header("Content-Type: application/json; charset=utf-8");echo
+json_encode(isset($Oi["bytes_processed"])?array($Oi["bytes_processed"],$Oi["content_length"]):array());exit;}if(function_exists('session_status')?session_status()==PHP_SESSION_NONE:!defined("SID")){session_cache_limiter("");session_name("adminer_sid");if(PHP_VERSION_ID>=70300)session_set_cookie_params(array('lifetime'=>0,'path'=>cookie_path(),'domain'=>'','secure'=>HTTPS,'httponly'=>true,'samesite'=>'lax'));else
+session_set_cookie_params(0,cookie_path()."; SameSite=lax","",HTTPS,true);session_start();}if(function_exists("get_magic_quotes_gpc")&&get_magic_quotes_gpc()){$_GET=remove_slashes($_GET,$Hd);$_POST=remove_slashes($_POST,$Hd);$_COOKIE=remove_slashes($_COOKIE,$Hd);}if(function_exists("get_magic_quotes_runtime")&&get_magic_quotes_runtime())set_magic_quotes_runtime(false);if(function_exists('set_time_limit'))set_time_limit(0);ini_set("precision",PHP_VERSION_ID>=70100?-1:16);function
+lang($t,$gh=null){$_a=func_get_args();$_a[0]=Lang::$translations[$t]?:$t;return
 call_user_func_array('Adminer\lang_format',$_a);}function
-lang_format($ol,$dh=null){if(is_array($ol)){$G=($dh==1?0:(LANG=='cs'||LANG=='sk'?($dh&&$dh<5?1:2):(LANG=='fr'?(!$dh?0:1):(LANG=='pl'?($dh%10>1&&$dh%10<5&&$dh/10%10!=1?1:2):(LANG=='sl'?($dh%100==1?0:($dh%100==2?1:($dh%100==3||$dh%100==4?2:3))):(LANG=='lt'?($dh%10==1&&$dh%100!=11?0:($dh%10>1&&$dh/10%10!=1?1:2)):(LANG=='lv'?($dh%10==1&&$dh%100!=11?0:($dh?1:2)):(LANG=='ro'?(!$dh||($dh%100>0&&$dh%100<20)?1:2):(in_array(LANG,array('bs','hr','ru','sr','uk'))?($dh%10==1&&$dh%100!=11?0:($dh%10>1&&$dh%10<5&&$dh/10%10!=1?1:2)):1)))))))));$ol=$ol[$G];}$ol=str_replace("'",'’',$ol);$_a=func_get_args();array_shift($_a);$Od=str_replace("%d","%s",$ol);if($Od!=$ol)$_a[0]=format_number($dh);return
-vsprintf($Od,$_a);}function
+lang_format($xl,$gh=null){if(is_array($xl)){$G=($gh==1?0:(LANG=='cs'||LANG=='sk'?($gh&&$gh<5?1:2):(LANG=='fr'?(!$gh?0:1):(LANG=='pl'?($gh%10>1&&$gh%10<5&&$gh/10%10!=1?1:2):(LANG=='sl'?($gh%100==1?0:($gh%100==2?1:($gh%100==3||$gh%100==4?2:3))):(LANG=='lt'?($gh%10==1&&$gh%100!=11?0:($gh%10>1&&$gh/10%10!=1?1:2)):(LANG=='lv'?($gh%10==1&&$gh%100!=11?0:($gh?1:2)):(LANG=='ro'?(!$gh||($gh%100>0&&$gh%100<20)?1:2):(in_array(LANG,array('bs','hr','ru','sr','uk'))?($gh%10==1&&$gh%100!=11?0:($gh%10>1&&$gh%10<5&&$gh/10%10!=1?1:2)):1)))))))));$xl=$xl[$G];}$xl=str_replace("'",'’',$xl);$_a=func_get_args();array_shift($_a);$Rd=str_replace("%d","%s",$xl);if($Rd!=$xl)$_a[0]=format_number($gh);return
+vsprintf($Rd,$_a);}function
 langs(){return
 array('en'=>'English','id'=>'Bahasa Indonesia','ms'=>'Bahasa Melayu','bs'=>'Bosanski','ca'=>'Català','cs'=>'Čeština','da'=>'Dansk','de'=>'Deutsch','et'=>'Eesti','es'=>'Español','fr'=>'Français','gl'=>'Galego','hr'=>'Hrvatski','it'=>'Italiano','lv'=>'Latviešu','lt'=>'Lietuvių','ro'=>'Limba Română','hu'=>'Magyar','nl'=>'Nederlands','no'=>'Norsk','uz'=>'Oʻzbekcha','pl'=>'Polski','pt'=>'Português','pt-br'=>'Português (Brazil)','sk'=>'Slovenčina','sl'=>'Slovenski','fi'=>'Suomi','sv'=>'Svenska','vi'=>'Tiếng Việt','tr'=>'Türkçe','bg'=>'Български','el'=>'Ελληνικά','ru'=>'Русский','sr'=>'Српски','uk'=>'Українська','he'=>'עברית','ar'=>'العربية','fa'=>'فارسی','hi'=>'हिन्दी','bn'=>'বাংলা','ta'=>'த‌மிழ்','th'=>'ภาษาไทย','ka'=>'ქართული','ja'=>'日本語','zh'=>'简体中文','zh-tw'=>'繁體中文','ko'=>'한국어',);}function
-switch_lang(){echo"<form action='' method='post'>\n<div id='lang'>","<label>".lang(24).": ".html_select("lang",langs(),LANG,on('change','formSubmit'))."</label>"," <input type='submit' value='".lang(25)."' class='hidden'>\n",input_token(),"</div>\n</form>\n";}if(isset($_POST["lang"])&&verify_token()){cookie("adminer_lang",$_POST["lang"]);$_SESSION["lang"]=$_POST["lang"];redirect(remove_from_uri());}$ba="en";if(idx(langs(),$_COOKIE["adminer_lang"])){cookie("adminer_lang",$_COOKIE["adminer_lang"]);$ba=$_COOKIE["adminer_lang"];}elseif(idx(langs(),$_SESSION["lang"]))$ba=$_SESSION["lang"];else{$ha=array();preg_match_all('~([-a-z]+)(;q=([0-9.]+))?~',str_replace("_","-",strtolower($_SERVER["HTTP_ACCEPT_LANGUAGE"])),$Zf,PREG_SET_ORDER);foreach($Zf
+switch_lang(){echo"<form action='' method='post'>\n<div id='lang'>","<label>".lang(24).": ".html_select("lang",langs(),LANG,on('change','formSubmit'))."</label>"," <input type='submit' value='".lang(25)."' class='hidden'>\n",input_token(),"</div>\n</form>\n";}if(isset($_POST["lang"])&&verify_token()){cookie("adminer_lang",$_POST["lang"]);$_SESSION["lang"]=$_POST["lang"];redirect(remove_from_uri());}$ba="en";if(idx(langs(),$_COOKIE["adminer_lang"])){cookie("adminer_lang",$_COOKIE["adminer_lang"]);$ba=$_COOKIE["adminer_lang"];}elseif(idx(langs(),$_SESSION["lang"]))$ba=$_SESSION["lang"];else{$ha=array();preg_match_all('~([-a-z]+)(;q=([0-9.]+))?~',str_replace("_","-",strtolower($_SERVER["HTTP_ACCEPT_LANGUAGE"])),$bg,PREG_SET_ORDER);foreach($bg
 as$A)$ha[$A[1]]=(isset($A[3])?$A[3]:1);arsort($ha);foreach($ha
-as$w=>$Ki){if(idx(langs(),$w)){$ba=$w;break;}$w=preg_replace('~-.*~','',$w);if(!isset($ha[$w])&&idx(langs(),$w)){$ba=$w;break;}}}define('Adminer\LANG',$ba);class
+as$w=>$Pi){if(idx(langs(),$w)){$ba=$w;break;}$w=preg_replace('~-.*~','',$w);if(!isset($ha[$w])&&idx(langs(),$w)){$ba=$w;break;}}}define('Adminer\LANG',$ba);class
 Lang{static$translations;}function
-get_compressed($Bf){switch($Bf){case"en":return'#X/+JaQAP*4c$NSPw"C4"jH+^J)_$/w]xbX#x/6E}qs8!kAVqn91ig7lc>*M|A>TYws>f
-i78ZV/G#S##&Y1Aew<%5Jx(.*bSjm.GwiEbB9HHc<F1/D[w
-c5Qb)gyRfEyjATW*n>&a2]y#qDtGn7h,(U!9jpI=c5,C?]@Rd6)204AsW[EnY&7>U
-h[89FP7=U).P+![qEP;#r&%)K66Pvttct7M@8JIL^z(ZIx`>iw@q4hBmgF)?%O0BK(+^Hu~ny]r$Jk_W;Bi$=)
-7l80n+%!2Dvu?_Wp+AZQ.xyq668)H
-`1ZAFwX|4m)V?adK6Aql#W
->D+&+3JemOqD/)G_ZOYyy5f
-|X%`r`bx-"Z`uJPTkC_92XHFC&)=Jz$`s//39.?h*mks1Z&w.<W!ro8w/gH4rBecC8533
-Dm;;*=3hAiJUmXV%7W:Yy;vnlD,*8<Al|2hoQ@EE$[wZ"W;D,CV%K"E<0e(fmI/0g5PQrD@RG%e)BC#ML<[xti0L/O.;eXM:3pUfAYLO@BshR.{O<KSK5WidDk;,e4sm!@#*N9BopA3Zw/rDHwt:+i5_m]^YaO?@kpSW+sGq`8}U[cWe!OjANC7+qn7Ow5m5R<e&as#g"X2dkc7f/A+-8NK4$Lsu
-?PU_7kx*.IPO]D*}vHh[C$S{$kJf+8Aeubpq^&(,jHBH<VUZh#8>Tbx>^~rWPgq%!qi&868Mh<I%h
-MT3?O`EJDM5X?PQEUf/gIT5p;uN*1zUmaB@!gi)OEY!
-87;yE=V-b/jAI0TAfG*QI)?5^xk>^#3@8=;m[}y6T/#|%]e)aW0lApkzG_!1L#@_0f/"gVe3PF3VJVcHM0*h(,N7v^&;y|:>A(R+9fHmecuV${*#yyXY[.pEu&ihjrj,&dLq7K^sOwx_#CZO^OiFJoof>3oT#N0X6"bjRcY.*N(4:vHVQ.Hai?ThZ!(8
-9B.K<em030*kwY)1en*UtA?BrYaVlFkHf)a!wY)QF+:4AO99o.,2Y5R-clFjb+V.J$nahUf,VJ!Fv%{9>d<K9:YROI,!xsn3WHf_yZ/##b=DWYsu|Q5*l`g.KZN
-(n_>)wKrBJklmsFc&[dBk=yvCZ+@T<]>;Y~afXq!u2LF!;ky.w0NNg`k}e(VmT%bY]+34;.pagyi`0](r"<xF,a<cq0]dn@;?yTE`drESBb]D,F@oxq#hSja`b@Z0ETV+O4&j%OoO&Fe6%:1RVqu]dcqPfaVGL3
-I(:;:Z;4$>ddx9yV%^cMn2&NnqY&XIp
-|Wx5,@6x:3#mfjl_DkY1yh!W_KIM5-^g}&qh121[@1yF)6b
-1n}S1d[B9RU8eXv>d);h7kK^8#}x5KvLYXZ=>pL<Xq_eQ4aScC6DvWuo%kRIGPDJbF}Cr+_#52L0*<%U;1+e}=dtYDP2m`T];_L>7KSO!tFAnPU"[
-4%5W=rf
-pw#1.,iaZ"K,ZA*T8%P0J5PdOg<ZH,.a]60=(<mB_&At=(n<p0AJ%S0??<,F**bJ?b?>$1)W/h%B?0P[*@I*2LniS)^kue&g<,x.Lu`@!lHAGto<?fCB;#h>b1p@i10)YxbixZ;hKEG:nU2!L[epGK$Ici4;JSwj.%KLybhw)cN^heV#hV_L!`URu1{O;_qD,;IWi(W@fA^lTp_xE<~x7]oW8toKO+iyYNo_/RyZ6H[#J(SA6/3E{ZwIb>ma%yPPcI%iSTGh)I&2P.ukG&?VOS<uK?7BFpGncY8YscThuY^LZFXMHs,CNEeC*&=P$X~L&YEm
-l._K2[YS!KCBruR.qR]GQ!)+=5TvE;g7tclTwi(&2sPvFJC{UIy}g~E>Hd![Ck0]Oigy.gR/qx)"[CrBiH@BMGYn8%hO/I$qO@0NQ)(Ekcq3"0Ru%=aNJJV`fEC:gI5.QNh:?=-):L*~Su&o:}GOI@y.rLR~v]nXC%LhFW`k&6eQh_QmVl8x*^Z
-3W!P@.T;<39%ETf8jy(DGeY-n/85vv9dcf/}`O^{H3Hw1XmN895Y_S0|8jJ;)Kbt/.QB#K`,Y|8|2M1.(I*#Ptxi(zb4=*[DZ^Vx%=;<QB;[Y[ECCAI[M$K[()x,M?!`^"H-?5ajrC&ji-_,fWJ1WDO?-Rk0`@"W7mrFJyLoE&:bfgd"o;/Ed3Obf</h3JP!2%=RMnqboWA,pd*[orvD+NR+?*.t
-{0VXIEIIXpgh!L*kxxv!sb3k
-52;yA"5V<c8AeKrh/*FJy(0[2H,h^Z:ec!Zi1u(9vrr`S+/ZtbAG2;QGuq$5GF<P[^n]RZCt2Ng@5IwZq2%E"3Z!E!t_]yx[r?NOvNDOU0*HO/3ZWw=@0xb945-><
-(;Sho^QvQuR
-_fPC#Ih{nx#pd*ED
-#E+p(R=DxEei)u-yfy[a_H-JD$9s%jPQxs
-/}_BySOfW!Xm&;Mo+qkiT
-hwN7#?A%
-QrA+R(De`0s+eFbeHgA4Z2u.*(oY6Z^p_+u#FNZZlGQ;&0D]nr]*!V>i~%",GfVZ{JyVERsSe=A/4QD7QKz#M<(I+]g_T#Ao`K,=$:aL/SOVq#*vZk|E+ktclf@BaU=iEYp!:Y.o`9FJ#*I&wHR1s]W^v%4uD2#Y]NgxBEE!4PqpbRyUr4m]YZ:kP[MXg;^LC]Ms%XojT:YuX;e+d1hcD]c+TpjT/D}cM=Yk4G51TM
->mXU2.nX]%A~(c35VuF]Rrn;6%sXrdYG(?/XQll2!Dc4-+P>Z7/44$mUqD?16O674XM2DN!QMEheZ+w|/|BFvp)*5T;N?#,|rhxb"}<$t>i=#*$C$uyTmqn,f7>*Gdg#Vek,SVINoFmg&eTUED8T2%6?=[x2$Dwz`8$0fb]Fg$e:wF2gd$W(7W5KWE"@v"?Q&zBQU(CE*;GQLr<j35p;CtKS;i="@u=v/8B"w{H+k=C;xY4*x2fK(s./U]0<=]8CTv>E"i8je0H#E=G=b@Zjuk-4@L<<NX>402BAH!2$lf
-#Y$X/+6a~Tjq
-?*_X4a3Wpg5OM1jcwwC`k[/dVXn,LT6_E5.ie1@[j9dV';case"id":return'*Zu;BcrZ+&)qDdk9C068+`th.0i$.X8X<T3_kAqT2lm9I%sbhxaMrLFJb
-5i_S]Lmg<c@_
-nMjaqd2/`Cqe!bl52-?.+SgvkSvi!PFHbeT@N!T#5Oq.-83:-OC#$=i-Y|a$"v*
-36ygJOG1xap,A7egFX3V7M"?E@sY/Ju5t,EZCRhQ*El!%C_6LK@8D*R]YS]0uVX5AKvbslhzd2cdo?$fmm/wDW:=E5f2L7l.-Q?^i2G}eKt%:Y(OFXc^lhfmPIp]D0j~q;[VJF*!nyX%pD"&jz/
-CXmS$s;L>7?I/8/=4~6cOX;ulU9FH]fc0*7j`eC
-_Kpq_t:4oh=H.wMq60anI7cB4.hq"
-A3.Q[B`Ze4JTX?e_1&w^E&lgUUm[k%T3t"0Y5qgj[__pC?t8FnW!)b;dTfuV,1r
-YBhhZtHX%kKn=-s<]5k2F-4-:7h
-`Z.6R;F"5zT}&7&*`^>,<a.Z*8m[NdQR3pw)WCNn@4-2FF@W,!t8^
-#&JA?^oBEvxG::S3L[EK#"&&2fc}_e:x2A_{GX"=aS;s$k&SVeA~t[tX-[(uu;1e*@)g"coI>`rJj:,{]neC7ho/Rb#u8o9R<:f1Ar%{1vK#,Jy>f{O]bSL~Zgfl"H8X]p_0KT,8/a1>iWgwXW^n23DL.%$StM
-q+^pH$?QlC3y|/*s_
-N+w%.O*1_&/dVl@Nmn3^C8Gu++E$bO<*K&Q+H7Vd)V-U#hiY"uLkB4x
-e1u@JS@m*mo15vZ<wZ+pzw^yWi@oE)f7G(VQJ+]"y*o0gx:s}LtM[iWK/qF#2W<[zC`-U1.b9at2Um|T/yAhCQLVvF*:RD1DX
-`1]3W2CPuY+tX&GLe$.nbKF_7qAS}I(Wb>{$O8FP"0J=3,^w![>Mm5V:o[~[NagW=Zh0p.BHn-Cu~^X=lp/8*;aIWu;_;91]yM-aTyAHt)04KPLSC;r[4$"!
-GiEBmWScS[j2yFGHCB[3w;#JH5*R$^Nc6"!KX?
-/D7sk(NnJ>YBl?0"#/l
-kfn
-y5}3>77TsL..cvJMrou>"=!po%!rTlN[2HoXKI4Gy$fI/);#4,]XeZ:Fvn!;+:7E6(@DN`dvBqg8FeB(06K<Nc^i^#5+iCW`,9bhBRrMVBiy294X-cxpO2c(IP*tN&GrGZaK`IY&cNph&*"hmIR"fk=TR!BHq>a4%A*pnD)sTd>M55kDM4Ixg0#Xg5s-HTQ1%e{<mPhY,am78ExjyZ|gOaU@?t7+`_VR4prx&t_[6J*5&)REDKJWf>Ts<8HPgM./Sx{:T7T;h_{;!x+R79oMELT7nm_CNL9gG=wqAdT-$,RwEV=pvS~IcQ<ia*]A&":7g,nC!<+i5d3xt4P)@u-6&r]mRFxA`y98EAeXIR05Qt[.WL1eg9&,(uK5uIeooV;#cI/IoUg^4[Yb~"C:lZP3*[M*X1Tl/d|u%!RuauG6l,<->1!Y(!AQeCwD].V3<(jfr.9D5W{w$@UZs+iq~$yNLuoI1<<_H%#.I4-U~1`x`QL./XQBSUIeBRbR}=OOE%
-%b,@p~74fxR:g0#QRu;O;p.)*Pi0h[e^!F*z>I^pZJqObUP-2S=S;zTfxum
-!]$.9U-?udp{gUP_4~We37`?`!d=GRoS"ehcX&SZu=4f(9vF:h.fW0NIkHb`OX6+=-4:[zc2#v3%Cg0bZH*ZOEv^aF&7<h/)2#Ly:`]p
-V/5@p(j)AQWE{qH!JN`x~>t$(i>#)gu^!IX-kl_8$g385lqnX5DO8:^MgqFr4gK!I+SlhrJDudEMrbg^vP9?)O-:][ZW0AV9zZ=!mR~?z);bOm8dT93.r-1xPpZCXYfP.h0Q+3:D4Y:!u[09|qr7h8LQ8GR;%XF$vYyb#1vh0Y@ab)vRHED,d;E
-&76ScpH[:SsEIjdbrR3.N*=;E^dx1sh/RY|`f[j2i)GgZan@*ZcpkmVBe2-K]&exn38cN&(f`<>,&<d#l74;x/h&V*9V.X{IRvOrsP3:v<$f,cqYnZ!
-{6/A.6L8FmIY2WCsi>h4e42o,,)As@c[tKWOGWVKi!n#s5<8}wT+[1z`,bp`GH"pM?x2,X*:/uf]dO+3W3}yQ7^kn&7N6JbL_HJe6cg;fZDFl
-JNBM|*wQ./bK:NK4S8f>Er?T()El>+1ej=r@z.tv;I)ayJO1xT=k,w87F5m>=UdYwOy)IIS`jVn2]+D[j(([UhIHdvp=]Ct-Lh5^po|b,GX)+(9YX[K)EeA$Z_UtZpEE$h~FsLma*2Q3ckH4g5vtBY3gaepfC`#V37C*awR+Y[!
-!1(>:;P(_gi07@6R#30
-&hJw+/dDKYt3B_?BJSuI@rXahT%-)U>R5VOLwgoe)tKX>Z[M#k<pAU)D!vQueVd7?h^:?.XiP@g`"h)fa,2fjrWq,yA`MBhH|w2=3GXLqE_g]DTV}NYpx.pflX4HX5hX&*"KAOw8ZB;3m2;I)Ha<.g01E;lA
-mETn6foQD0y-^B?-&NP}=Dan>j^_VEGVED>=Bc@Z</n`Bo-aw4fO;=rp[;Tq+P]q%gWx%n!IPcCd*k%vi=yo_88kn>V+<`W<P?S$6X-}[tcI2D/MJuaOD,k:fmk.U9]"`#T2ea9{>d?QL<@A-(-Mb*bvD(MGoT,
-yR&F=YOe"QT^sAaL`<FT%L`{bp%1oXj>sIDa8jkgaa
-]3s$8#?D69k&0K](Wx.wA';case"ms":return'$Zu;C7nWB&)krx(PH4XmLR9Uv.aZ##}llrhPc<x_&5dFoQR)xyf@4m|gSX6T
-y!P3/>6cdD!Gw~s`bMh!=_3br=t2.9l-uA9oDg#6f:v))xrXtWVvMMIsdo[S@Bk*dN7O%
-x5_DdY_[Yc`
-MLRg+5xN=P!<
-fhVr/Kho!6e=
-@WObh0/?^$6OC1`voax
-insQvs7eQ]t+Ld1R7qbfudU1).:Gum6{?Fi/KbVXAYt;@N4W]~QJJxOpNZhqb".&:0gR`C4iY3y07g=a0N($qEG@2=:bVe=a"ZbetOae).bkdeNwF@Pj
-}1@>Y[I2D/Fh"2a[-$p7ET
-?qQ}b3-N*?(39<N-3:@fUw7IJtcCu],w%pZ/+@p4:`rADDQ(K0etII.:6?ftZ@K"O6&*vTBJ$[@M2]qWM$DqYi6~$uWS/J((XSWaJ/(C>ZJ&[Nd@83HG<,976pec[{4$gKx`E
-(/ZJqbl
-GiRM6Da~o6r^KB(;IicYXWwM<<KI$AK1,;^Sj4Wgub`W+~%q7Kj,0@i^x477nF;(^MG8a<wQK{L3!?;Q`R`
-uRt5+XOxolYDo%`Onp/s#{6r)905tx#Tn.!OZw)1G@R
-BUsFfo?tuJiaF4Z;X9;`myoY)[T^UZKNdknpriX-"qcV]-bO)+tuIff~-MX
-c
-aIX~[X)AG*"2ya)&N@Pld_nSCaCR68x@.>vKiZTZ7u),TskY,|4
-v;:`
-7#o
-"16XRH/KVR"1fZ`I,R1C#1qs/BZOSF"(>MW$U0#w*LG,[^iDkk(u"wdPCs.]dk!%;S(&g>LIb6kon]#Ool?6|/W:ShgRZpdLzfo[d9U33g+%>b*:Lu,({UJ4wHQfJHiMUR~Ti0qEZm>VTXcXp*^eH/b^.F80@%C9v(mr&S"q2$GOZfGPWawnm16>G*T-
-aG]pf<a6;"[=l{yX1`1~//gE4Zxvs&%?Iwho=Y,@lr-?#OI;L(L;*$H%13o|&&
-DJF1:N*<@/6;F
-DYj[#xmS5tj:9XK*81IgiHP!mBZtF3y<]XRVLL^Ywc]ew_B
-0Ye(K$g-WTY1RL2Sjl@G1&i
-J1/KpR*,9oRs(`kz%%UuO=P[JoyS;B?KF2#AO+RE7&Iq
-Dcv9+
-Q#E6B@Kz?QEqcU.Rvv3BRR2Xe,(O5`.[G~
-zWT%^o*>-Clnk+<8ZjXu>GyFw`nv9yT0Vf4_esoYrg1p#poZp:=i]t:_6pSe1Tt=eMKZ0=^:,ftgr4
-yn@eF`9PPbk^#hU~ZYn(P12c6W0*&/Np9j=;/k,*Rm61)whaGEIak;:aS:VAs=)Z4b%+-_oD:~*c%[vG)fFF3a$?Fs3})VC4>c=e*Sr6t~2y8;mpr,+d122B>=)+o89]198+uA^qH{skR:%<pAZwE`/+:=A$1`14@**VUT)JMPKlq:Cs5r-&3V&1Y&R"I(//3j]4-;6;Z/T.h13)p|m@2o?WH;yoaq4Z%^Ek2C+]kw5}W3C]jCjjfQe]djpZ-ICE$AdIIZ5M4^:f6mQe1/TP:{"!ca,h6o2F#n-EW
-fX-48FtnDs4Ev:mUVm5cKr,}H<tB1Eur=P.o(=d
-yHs5noeMR2hH:31y^.e~669{3`YO9%q|Hsu*_X
-@s2&bi1._n{ATc|/e<-s,RuwvS^I9S3^eqNFC]OXEK$U{r+0{jq6^MW8Oe9IDIn+-[*Kt[13s>&d2f!_x4_NT(^x7FEVt!*)(.BvEhMu/yO%%%@XKssUmxU88[M#cA$Y{mjBK):-#]=,L@=b473D.T_.Dj;#bo]R@M+:/$hX~d;M?
-8vK%@I)9LZ{,|XP^{a7DLrJaArT_T-?&d6|@=v>qR;lH/aojxE&S?.lUy_O0%()Hl7v0NUnV:_n"|MO
-.[q+Cr9-Y@X
-<OjAL@w0@#,@RKR?@g^df1+;QUUM?(QjhAXEL,L2{H*^<k,[<2/3tbvSlNI&1A!3kske<kZ",?yjeV,"3:0l!*G#(2Vi/+"uMGn5~K99V,(WPE#DHnXQM5whPXnxI#
--ZZ-Nh2:fJd*9v4591CG2T.{UZaEHx2)2Q
-W-Tb~O.^TFJ0dpQW58m-S1DI6]t>,c90/pV1Ak<C=J_QMf5?fwpg&6;Bb"?h-=@:dsWEB0?Tg8-5rHdRWC*7:9j@;`|Y+1(<*G[i1sP=saTI1r]vV
-(ShU,o[:9JrR)6t>?W$QrKnQxhpPsFOCwRV;wuY-WC+"#CLKA,9JmX;3Qvd,brs(h+r/~2&xjU5uu7K<#V}[Q?l4jklB.:A,Wuah:*6DqCbsOX_F+/4x"Z[i<Tij-@MS
-JjuqEm+CCYq&hxn`H+5)YVK|,gB.sCUz?
-Az4-$Rpr9M[_R2jP=O_V%{l$uQe8UTI]CQqi>J^A
-oVU>A,aQKTeW8b"S3mVk|sW(iM5yn>PE"e{tJI
-vN&!*NdwT)+<Vm@?-~2=1#S.72/5<]`,T|)W$`4
-N4e%2,FXO/827R:78vKJ*^7NB,:jDqLHj#O~N}0<kRjChjCO4ObOorJoH2/6C9(-lW>x:l#,$(b}%s$3#p-lla:|_Iw+lUAvJieLSWCeqt@/Vz_m5`Tv,$Q&,5L.Cuj74jF3z)7W!veZ[W=|fA0?+RNkTT.y]Y@2+WUd,VTO>-gk7%6sXJHYy
-We%<wBw"+J
-WdJ6ilX"3,2%j()!Df{l}"WpO3+BP[}`-5)"2/@O=&S4!6z;DgrpTr/[bFMO%';case"bs":return'%Zu@qbP+^.B`ofy#,N1ZM=3K$!m)z*YD!Jf9U5yh5`vjHprZl-)^-8)uD<7KmMU1+_Tscx;el;`,,u>CSt%n~@h
-ew;]0$F/.
-FrPM0:!wH4cMDcmo!C1*T)^6K/8E0JQq*c!Fg5gc^JCbYG8IO##hIc|FHLE,uJ97TAyo=_>w0<Ki{Mq@@Gh`RYY.9
-78B;?RkQ4]tFk>0g=H><#W,9vG<s[%+vv*vOgfKj"y}/Kc<1HJW<]cqyi+?gb6tkp1BibIS/BQ>LLP)stb-,]6Kf?a1+2W,w0*/8l*@t{)P@GfqeLT@T6l@pMdAy4szmd#R]#flE%VXEcw>F6grJ4or;XgPM1:9[X*4=^J`D?4N/%!$[Xh_4|X7f[RYZRZ(1"Y>HUm+<)vnK|fUI=xSVAE(LWi(UzpvBoQy/6:KMG+8x/;vx:!Jy;.$-VfF;2n,Ri`/([!svGC,dX7)ZOwygUV3M-O0hj(
-E6-8Xrh4<xsQGS)@hPG{[|ug3_W<c;wHB1U<)Nib`N9ZUR>@ZHa:HUU.+hIg5i3R@aRgd/KM]X>,LqUqW)X]
-N7u><K&r"u$[vS$M#g:m=*s+E`ziQf3wL_GJn6wa>A{s`WCt;p>%h#!lnH_0SNyh
-puk#P=UcU9C8q?YSCfTBj`8:inA5%W`SQ$56o=s:$nO!i{)C8]VbRgd>O1782zHH&/,4GBp#4IwWMD[^%se)a!!fgC6:3AU[S?;0y7te-LE5BsRGYTu4A9#G8Aew[Sv|AE6"@hfLQLtt:PH2)%9.sz/AsB*cJ~#z+$>i!rc=ut[eqQdF&tq6SG8NF~mkBiOa?h0DN$Z6^.iX5Ok_,,p-+uPBFs_^=XK{@dh^+`$Mp1b]5zW`o__j;`U,J__I)kH2HQ[v_W5Bbi$X2M4Oo,nin
-iuB9=tZ)XFPKG8PS:>C|KIuTop5R&$gVM<`<#mRx76sRd>L73e4IAt0/Dm6ClN
-M`P1bx)y&$p7%W.=dNnwq5$&Q9VUYp#gg2
-%|3Gg{Yin+vwDeU7O<8Kd/C4d,)[&JHka
-1+XaH9w<lWr/W@O/"[`+$J*~2tv.hWTSPco@V]lKowL2OowXUm`|^<3mEjN8W3.P$M.XenhuS2ggOFdKNgv[n_!|sBPZw=s1gocpH!"Vd-XlP@B}h"x1K~KrA;yFOB]T<jc=:8>n;gjRC$:GBkBl-xpOTK$ntxj(^wB[j@"TfsZYN+1o+-$ASYsct[Ez<D"amS7heFq?fTPV@0)&@}.JDa8QnT?6z)ospL?MWO(OW["?-%6*r*Qn$@36[.*$:?L_1Ij6+%R[*a=RX|tYHrrqupgs"OZ]`$3~"sa:_-$~-VaW-|710kxbDd1s96y-q_(&Oy3/pav!!z&_.$DQ1~<@$"O@Nh:0klqIFoS="AUi#6p;X937X)")0^Sm[(i;.N=c%exRBj$v[Ma&Dh4J+Y7>#L6Z/j?{/X[fQpta?_<7>=(s&2t"Nn(t8*D"GN2dK]]Cs9ua=X1&)u:h9^Dcvp][L;dl3,<9xj@%mD`r9"8AMdtqX&?7G?<<wEC0fm#`c@U6lt:3!thep$0-otm<hrd|E}KUU_u
-W+3(];-!$,"xxyJ*Cf6Cg%FlqTOa+4Z=#set_]-f<:_[$Jt_szb_E!-0$M#52Ug!mb,d<4"gBI,<*+:)?FbIdestb97d)b,
-e8[vi}S
-`<b/I=vT,<<zXT2Q!k"BCm1.[#tcgXqztD$sn$W=Qq-,Ei?4j=fviY!xG`_%%%h(
-wk96<O@P*3*weKm9T!fQ:I"5l,x8AH?<AwG8.o&Em&.u"_8D:uU(9aml9i+=n&RB{AL<pvN6__]mtPe7ec]Mj^Lhd5@:(?%SAo<firDEy]zSc.j$r]IaZ/BocB;]%F;uR,ND6hBpOYK@Zj{.P&^`~3Z31g3?C^|qy2^.&wb+5FAo-`+NOdy9O&LnS-B_;R%;3iuU8L~Vw#YD{n8+u]IW2%?p:0wmI`AgCWf/E@+%hU&L=Nck~R+L9@X/dtTyl%^3oH[?;o<,1C5+Z.;Uu:@9D,0N_v,X$Z&k=^U%SPJ$8Kga-CZv^N;YA$w.VyLDtVI>]<h3&=q>>2q1YF(HqJ`KL/fdywjKP=G%%Y2m/Y)0kHKl{F#Jhv6He7z4oWkj2;,15=UI-`O;efR_#J</B%i*"?bA:r(Hz_VazxU9,Vw]"4BqU(pp(#S1)[H
-j(fPP!Ux+xvrp@1_TwRp|N*WnKL-H,Wu`LAQ^>^QE[;^{e*sm-)y2hxco$b+r()n+bYB)*ZlkRB=@oOoNIx[J&w.,Q|ru<k4R_vOy"nMH.nORIYSy(f>YNGWmwEU}G>3Gd~8>hQ-G<qr+buLo+o.d@Y_=FWnR?Ud`Lc,PL!%CQ#0U;Y<MTFw."stk98*-/E#ji|<hX=$-8X%hyuI^2|aD.;+5tZZ
-DH_]fg-o8^O/&O
-d-%]4DAB^m{&p#MaSnRgGiVfwSL@WfI9?-9*1L/)u@J^B0aunT6xr#JlG[5Oc29+eBe`yn%y*pUKun*fyWdd#(JUZij5svGgUKRA]>q-R].+]U_Nt/:we"SryUE&v/AF>CX*{M-O3WD(>0FNm^#/k]Ye/eXYc^0Y[:~t/F<%m+HDA]rM!rTf?>d;O%_/x-`nY>2`Wg^
-=V4%%`"QJ+C7d`{a%c;:El"b/E@EvkzDUU|h$1:%vf15P=wwvUU4nK}hN<16"J[-($Yu2g(S;l?FWS-JDf*29VcX]wP:G5{@-jL0;vZ#(RYW^e8iVZ]^J:/H_;eu)(FTn*1eq30^5A]CL?!<L:C=f=zJ_bN5*M4GZTfkIM>bvM#6e+co[EtOM"(OijPE^=xEAOy)I4{T-ksgqMhhQ<7qjdiurd>HSY*eFcb?QauFB08pil8u1!Z=vkC57]<$oU@W%*{,fOOkitEo-`lh:E]JYw:QAj08|9I?o;o"{X<Jbi`!"M>r9agk=c.`TDm!K:<M<hNV.h|@hbZGF%kc$ppG,M
-!4ptsCix.S9xTWl?Rq$JbX&yEtrrvG`4T`/
-LOe[bW^3CBT4$hL@UJx1P>oxpp2{DI;>bpk_C7LHQIGF!3[rUW2E"9"[fvQ{v%0XvFb$8e^}BPn=2}xwSILX[?Oa;RK>7J55*Lb@O9cY;8"hWt,DJ1l|IGE.@0iu$CfNm3g5c4&JXXE=&ZcH%MOvtwN>';case"ca":return'#]^@j5I.W?SK,g"1u
-i
-A/A35,U>PD@aLR8T/)2,#7;63UN053KGXo,yq*)2s<^TpNVRK*9&<M;vfhI)A&/Vq+T9oQ$S4E^mQnEAktY!N=Mh;Vz$UrmKs&/_Zq}6db=jZ`[Z@SOwph}t/4efkI2UT3Bq)Ur.Z;O3^4-iKn7WH%2H3XW(5IGJ}`I_t_k>N^4P}YB(]s1hqeZ_467ZD*@W:o(4-d"l^uN6QEHo+H+D>V06vF{9qMN]*56nL(cU`Ane<M_rzKpy70ookf.e$,gs?gcAPut0/QGy(fE210EX6ASp1mu=;t&3<8(d,9"f!ix:=71Q%JM%Kn-7I9x5P[>D5yIUWOHFsx?+Tt{9dIJ$/_p0P_%V#$Q-UHNOaKO,=6JCxw8WVb^yuPOa4OC$
-cxw1I-bk^^=#_Hr>&6=6jpS
-/eafU$r}UBvH+):B>BtPD"Q!*^5Z=Dsu=5y*BafS.6`JkLZzv{(VN/[|4=Or[vrg][_GcYoL=5Xibbg^`m7Q+7XDyWqmqd.x+>m)%Q0CXX[7!RRgeG?%C6@a]wT?X:.TRHSp0+UaZFie^Mwbmu!I*WX"/qgcbB[Wp6.<<G<7v.B7)kDqjp[oF~xu"A=F29`ZK|12gr!;Rs7u"2u+n*DNFEJ8%LxU;BF>Fq])C@wDQ/[_C0=
-h)[[5{lQe/E|I>9Qj}6jj
-90u@DxF-Dc&$TxNLABL!@NMqBiH:F>.?7`!bWoDbKHCL^|K!
-HK1LS/E+R<IAap9AQQMX{8NBr_T6er]b@tDnk#<MYDIr95m^XesXOPA;%m@TfdG
-U2VT|_X%H^`8wF^%,RMIR:~%TW{NM_}4IuaWXpH]bxRP^].xw6a`qH%JCI61lnMu$A
-u-afZF8zz(?A]VPz#97:15=.&n5WPA0&ScLwV]K$;HR[K,*Wwrsxf|v-[yT7`ZA
-2>40XF;sZbxlnt:1ZfQ~NPKE_!+Dq?K)Kxyksyb$,&>cZ~8lSACU@gP0S1K)P]rCVmnNq#M|v>e%M7m2<Ab/CL&|<iLxSCHw!Sy|3DU|o<T?t=,wQy3"><I)O-8y"%eM@y9!l5QX>-r%qa(U2A."<kw12X5i**$w4tGs4?Q_U
-7x`a=JOMG2&WjqJ#OxZUiOh0Uyk1qnxj=gTGpk4y:G8B(4%0U;9Y$eYbN[>BT8*3`;%s,_"|lZjvgXpPSmRW%h.*8)y<2@tqP2jswvi-z(2QI8:-p99dQ-wG($`(gJeA6fRMwW-"r),|@ID=AeSAa82|L4FTC6;!&=pA@On-A8L6g#Fg(YSJ,N*.Moc
-Ri>Wn"8E<scQVPW<
-pqtw&//:&3$p
-a9$}PIlkiUf=Zh.g2VZ@$4Muxa%,E/e4yf/e3v0nPz^s7_e2yDXSWCEZ@q`|.=(HuZjK".h|DlOrGoHV6:-?
-4tYZ:J^hY%U_*$)I#E&3N7N0"i@Mgqt,FNEvnvf?(`^S*%@L"_F*:HEOFV&!{IpWe
-Di?Zzx+s-Wbh,/y2-
-wb5K=WTJ7LE=<#2#9`U
-NC}.fDDK*"eYk&DAB4)gXRI]TB3S7vyMn@VH5j7L8L9!=S|=[+~KE8>,c$tpjTJo2tVx"uu;6i"Z&M#EFS
-1:@1r.BK57Opk~6-)yl
-pJCeTBp!fc
-|
-#_1r8SFF*`4_~Tx^7.|3y[_X;99Vo_q$@f<1C&#<xi[5!Hr-:g!b%WY
-9N`3xBy
-wR=.L"6Vjd.PtThL`-%!vnVs7/PFd2#&onXZ:^mD`JA<@R=w*,
-YG
-~!D)&OUq}7<M|
-iEln;9#SG@er;SlOIU5YL6#huI{U,.2=tg;Lj9XZfD+?]wF0F0C=`LDORUOgIOwldanX?`9jWSSM[_?y>JSIbU;(w_~0)o.8h%H&.Z4qN!fv[lBmO^g*`^(6#Cd3u+hH
-f{>R+qYO;_?VsE[j]?me->AIN4Iq]b!yLve5wbKlT~>mBbJs$`C{^6gh+77ES<@:$>eRW1qi.r]:ASAqHofVUMiaTcazOZ`.t]B#8fuYDz4>0Btpm1Okr/sYKiNB1n1C-)_e2zNJtzEHoE[cS>MJw/j(/)C>!HsVEA`Aai3kB&`*o,>_7*vF$YHA3d7l>A0T/}DN/~i0Ejp%!"*56[R,P+]uyq:s+r(C.:[mu#=$A[c^BZkH9Q1RG(Qj%xLEstDgLk,>50h2ic:^LU$8?Gl`$hx?ux`t=ma09wbk1EFeAL5PFKYOUZgm0Ivb*T13*uQyx8]9aqsICzz!RmQn?W?=b$>R9x$##tOr,4)CwHIw*[_#9%fuEz1*p(m7MEm5"/6?TBFxR[(aYO.5jC)OXfK89&-5SQD_r%Yu&<sH%G02i7W3PB;z$`Nd`2992;Kin&t4i8L(iH#^p~7uR+4P<{]?k6xC4NROe|H?TmrzRWAN0x@Tk!3P;)H&3AAY"{73`4u[RfT
-HQ.B:1Z~L3+VemT"Nu8v0unPm
-a(=*W5L2pd1{iIhd%
-PjlCM|>a"cFen*2Qy&?k#>uuEmt
-`JKdjpKh[3U5[_)4cFnx?OBm$mqD7kr
-HUUc#:3=^ik@29lz:ixqLB:nDQ^A*==I*q^v6uTA!,-CXxodGA/GH(Q3Jh8lPvA(i8%4Pj0-qe8h6QdLS<or%sm/@eYMN?c|vVL.S2@Ta$boD/:D<m0=%"rVL1#hY|5RJ?Y5dwo1GZm-2*Vpq!u#EAWf/Kdw[3aR:p#:Y.V9sAn%Zg2L;)mF3H[.C+ELe3_%yU^:h#2
-eD$o+1
-q0AH|/7X=
-#]cud[uD_JYJ&er_wCvM1+ggB!Zu)!)j|9]=qUwj6VSd:04G}U3-LplSXAU_QUWj2]-A1B:iFXk1AgT`2`yQ:F</*Txk.qej=Na6K%Q3zC-IQ35Cx;`Ac(neebj>CM.;D`V?I>oI(oYwj
-5U5*
-0"Y{n=QG:D_O+,v:M8DfxpDEZ+<zvu,r5|42CPAuUL+e7y:(l7<0;Wm~G%GVh(
-5mE){oR%^&{093-Y^E=2h3TO+!yGZn|[3d?D&@ooureaLca]V3Xs*/(tG@{Ax&h(:z!v{p>l&sCcvf=%8[;p
-PbiD&:XQA7Fr22L<9qh&<
-T8P2SaIqR](/Yf-uQt2KU}dBrMtX';case"cs":return',]^@)bTDI@W!(ie"]Vx!QJ7*QE8#v98C.Uoo6UmT`kj/`JE8b&4BJ,VKf=}s-/i*{dTdU-!hgyKB~<}c/@V_IjSd+HyJ|
-v6[XSJTwGE`VD0nRIKLv9EFrz%z*!Hfy#rPnP<XTFy>mFjAwVF|Y7FEyI(hgU)L>%wqR!uhmO<dOjs8x@P87Jvzr:o^kJYI.KpcbQdgo|vOcjD!nq2G7%!K:
-n-;l]/;^^Rvpcv+[Sn+[c5B)w1nuqexE5:Hc>$iO"lB/S3
-4vIv!n+!7snWuM*ntG?e/KUa.">L"hj,cZ,I()x
-Kv-PLL5DSbrcDdTR9R+YK5N0kV[hw"}qT79@d_3*g`ttFan5n5U3Fpx;X3`T-V4@kD!j=fYMWu5m
-a07nN"^qq-A?USl:U0&=D9gVt>$FSq#*;Wl-Fc$PSSK2`{xEf>`(M-G/GTLO"0Rs")F2FQ-zUsnK(qs9xN@6b$BJ<}H2r7DmuM.Q*obxp&K{6ch2-ZDrqI3O7wwbj"8Q/,=TLk4MFpXYAWS9W?
-)rgt)PCr"Uk`wd-/%_L1}7UgBP|xbN<-,4NJi+@hl(+6[8v@OsM!<y+M3.[`UW(<
-+lK;-lt,<MyPfzjqU-$>S#Ljv_qsaI<rUIR!P3bbJtPdtkWpc*S(H-G],=P4*%1t"7omqp+:UtBMTchb[@t}dIW}
-6Yab
-WUEz;LX$U$-6$(W#)?As9Xti5-9qAF
-vbi6H?P`iy4xW#=RGoVJQrB;^s/1J5D!?6S3Yx;SRF$66J`Bz9=8^vu#X>/g
-,>)}D<6Wh,G5Q6
-9!UPy4y<V"vP:-/m^K6vGyyPPN6OlGif
-xWVGBeNgXQI;ANFf9s1~Kj?$J,[FuR>#[b*_t}:*C:R"_)^IfO
-j6$<?Ar5:K^&@U!S"=3-s<iM]H0u`@pH5/oQ&wL"!=9Tfh+cv%Z2%Pa$.Q(%NeS=r+ZWdaCSOV>y~rnp^dv]^FRWeGu]<y2oP&5U)1FQ~^)7{[v%~gy@{HDsS?_6?^-hR!OpUfQe=G{l*4o0dui>(_g$;ezMPt+,88F<0Ux<Iq3I+yh1?`
-!G-_Ln`1>4,OEya2aaY(m^Gz:XyuJl`%V0*vk`NePr*[O}Tj!U*y.E1d.rJX;BZy=)y/I;58bmn(V%R/L+OV/`fd@wR8Pu;ZPGr&j2sOlnnqlwL]TFxKJP&z9swf-ctT%yXH6y5DMLmkY{ch7YY7i~&8?!OGxAv/3mz"yD0O(lX}N3^uW!1A?]dLxxib^K;=sZPyiB3HK9bH_7B2E-(QY>lhtY:|^x:0J9z#wW3og-g@0%;mF&&4*twohjyEM3+
-yWH:i5&xf+6k;0+n9"f}S{AlOVP4kf5=Lh27`qNh2@)2Mxho=O9j4p8X$VBnu6qReN?4[ikZISV2Q0:RIK[sG]uq!];XS)*KdX)[hE$xnS,Atd!/;YMS6Cc"H%`7&:Im"mJV?n.T!Z"=u[+$x6>IwI#jYeVut`qz7EGWCLSM[FmsFTO`mw/a"PU3SVT3]7l?&CI5C|#gI[9*lhH<1SSq6+(JliVL]|td=D#RDYFG$$,/EJFzA,`bfOUKU)1VNW]!/06ny.Vq4Uoc&Bxk/To[4>IBXl`6Zke5h?B3G*8f!l^0X0.mYGZM[31Fg8<a/LDau?<V6P4m;xQo?*m_+Rdz%Pjl"ErSrZ^t1k@
-;yC1#_$h
-7hRNF6Re[]ql@0AX$9-3;$&$Q=ZwVc:bC7?J<D:Lg^B3G.FY+Al_<M
-3^AXC.eaLr=q)["GIf/zyQkYkoU*ik`pf>x(n[g/#ry{d9?y)wx4={OQf4ogCJy_TC0LRp9U(G+<4fVtIeo;8H,]Ctsr3n"[&>"E+*H_3F"SV#S{=MRzG|!/)|8dl>#c0872f~F_noQ}jR/K)WQ!3{I#K>lF+DM*sMgak{:ln^!no.sEQ`5<NDp@R?L+)Gmh<,es%Mwp#1eMp6F:h!IW2r=H5M6=KS2k]jpN$pp0+3"oc@d70o7qN!MOGo/[]C9RIDBo#Q%2HGY?3|Hx"^tJfkSgSb<~u"eTMqoBx:d^dSu[D$Z;h-)&^nn)Ft8n.|%%Nb(Q?0G%iwyUo5kNl][[RRF7&"Pel_Q*Z6@{T0-
-,^G6]t(^Q7i[^bbr969?exe;U6sMeH$ogkkXvB>:M/+U;oG4VAZg/!Ehqi."mmTe2lljV9;0
-@6%ZN&/
-gA>$>%Vd|+5"aT[0&"caHBwHJBd>d:YmoA^r5&7p4W}v^)N)4qCl=KPJ&mGim:zjf@"O<]n<cYg6jDp3N_JX>OgKd=8d!bXst+^)1HCvI,!jr-Y[MgiTR)%FB27l[=}>cG.F};#yLSPZycQK-,cM#PuC~Izmlt+vA+.OEO-p;]!7)fq,5Er3Jxmo<RuJ0;Fb"TS4&%k1WbwQ/wfB++_6F+bF("mV!B%]pYXUutv/DR?:U:z4~c:09)<1&Ty?RZeR78vN9$QhQex<AHp:#D(EuEF!p3if37GrA&:t~<+12b`A^vHk,K^7]JE>(l_=WSdjUt,,/){8TNIE-C5LK?sXOi>Bm$!4b1
-Pz*sDP<oUDK:OQRA0>u;Lig6]L/*>)>z+^Q_jBO$Gn<C-<.[=A@])/g4Nu#J+yRDv*PV>^37YJkJ":oleyd>`%X<G$luP[g{X{c;sdMA`wGt9
-w^fwL~?=A[_OZrU^5ak&7&@To=I8,EPnf7%tQc5sVt,G/rhPuaHkwRtz)]_vU+r6n*y`(%hjE_
-@L(R=j84lnHtP;E>mE7@0p1b3sSMaW8#-i(NX
-Z;fT^)4Pp#%37Qod6E!:8EQHls/u,:dJA"vEUI{PI+*vTtHV%<6t(53-&3]i:u0
-=W7%rQL>9<:k]%DG3odao^IvJub3C1u#)1v`C<q`QM.Nt*5$pyI=Iw-bu/K3nG_F
-[]CoKdBIL0>iBO$BI2O2%!&ia@:+Qp(.y[al8fiKK8D:6*EIq=P_J>Uoh,Qi&T=r6&NI/=5|8a;u"fg{
-lS8`T1:Rz=)iN)XTKA(yLiu5"81VW2AONKt;Gx(<mQ6hhd/B]KRqn.t-ulzD.EO9
-prOhBr)xOB+.NTVQdFn*px7aynx%4DB!Ua[/4<n|
-/f3>.jo0~Uf4m<f2Ba}[Ue"sY;<o9p
-3WxD6JGr7=L}"@K)IlSTd!_"W3Y8G*Faq}!F5?fd&~7a]Xe~ETCS8&ZMsxJ|>B[Om}dyBuD|owIl-H*}/W.]l*JJd^d07q;rUl]Fa$Wjcfkm-6_DxSSkqOW*LvXg!B6m./(u2d9<ppU)P?q$b[q}Wf7r7#[1Ca^s[Rpj5Fk_RzRKSbha543_aXv|4,fp(dBd;1Vw]B(i)r-yygo)';case"da":return'-Z}5pbPDI@G^OU3P4hMf#O"#p-6R^*bm}5K,7f=$=F}=k]KGcW1!,DZ5-/DE`E^Lr/b/PnuM)+KF]q;0m_""}^Ir}XRyFA0oJvm1(,<1RuMc&ZIMnXAKL9-?gt)HcITYwHQAtZQO|tAb)^`_Is(L."UXBx+PH<QN}azHTo_sW&H[C/_4iv?"^n95{lw$Ikg?l0`JH^K/hz%i6qe,WH:+*<Nw],bnY)GpgdeFnt0mQln!Bxy8Ml^^DSWGBf|q<DZq$,,Y)GJ)oxgn)uT*u:g:d:cJa_}3:d>>D:`SUqY[GQ>S=@j"
-2"7W/bKgjqo@nto
-5[c_2-uNcN)4
-nVmkuMM-_l_BBRYYIL0w>=n#Iu+J5^kw&K!EUUk`oI5rsJ)xcL[J%(Mu(j_6:@=q+8Za(u}m9Aeg7m5721q.|,qA!6A>dgM"b-9@?M6H+aEkPU|1`]k*BIX*/q
-Td=RQurPCFeYRD8gRk<g<n/]V@a|W[06KjkG7p7*&Iy/OgjV6-!SvR_iIoJP"YL|];S,vTXv=YM-n=KlM8XH+aF;7w[[_WJ]T1P(`cL5^Mfq>:Abj^e8Menh8iS`v4r!*5HunOfz3y^"h[B_Dtl2,kXpw}He<!&hB;=z_,XV&[E-j`sAsLfd,1imTEl}4JIz:bs*oK&,:b.,[$3r8ASEh"!u%(lYS2O66a3~K$GXi[J]n:7)IV-_Zef%6.
-DTg&hx/Zv?pvSJJC7w!W=V^b5qc^;7}%e&,i+PnB`<h,~Z>QE3d6xNA*-n?p1&KW!C@ynRx=CK3kD^3c2Bp"oFG/Jp<]{WWjHspZ5k{:!:ZXz)Y^:o"e=FUc3<-JMv&MF`"cRu{>OYt(&Nh&s&::]dSw|R"+Ml/(|Kot//=e{r^rMX@mfg?f
-Lg(f^W
-K><qzBK8Ga4a&ixZSdN4z.&X:/J,5UZKVyNDB/9(5fb<?j~ulHcTl:{1OIvYzMlt6GD_r6"G9=3u=?ChRqF?&%
-9OkVw;_(z!Fb!*9^mo:ixobuOp!oXpMb<esbG}p>`p$Yyy$gmOm`1VVtQS.BL>v)&9muF=*!x?XagCN>uN`GSPesqR5JLDy&-(SjQ=FwB9uPw?vgu%j|Y4YQv^?DID-*Yy=L,;z)_W1oeN:&Qx_~[cI3C-p6d=q{qisj+{B+BtXA.c`|JhtI6UjxZgy[jKN@Vn`cL7qd_[0s(USjxk^dP5-:]@02us_hM!5$b%S0GR%rUCtVttUGq"yGV+ygb"b/=Z/)6fv%QS`HNo
-Kv^Q]^`,ZjdOFWtc[Q[N4Jcu8N#y/T}m
-30Bne+VDc]3LQ]W<
-wq`b{5ePL^5hE6dbWOx2I!hqdY|
-nM@[Lj/>Q"^?gCURY]e$@
-1F5DO,XI[eC)u@(,dC8Z9DbM!oK!@OQ6l1^n.,=&r5*uv*?$,p5OTAqXQuh9O7L"iRRX{k!vYJ)rb7]bET)4|yC7:+kNI@v!409mEoLSEqhZqFE@d!"@?;*_^D<SWScd<NYxn(*M?BMu!iyEg:P0Em-ArkJ]GZvuc&}q><07RcVpBd.u`qBxu$;s+wcugN1):(g3S
-_Una;i{LkOin_&eUUcfx;k+S?kY8#<o$d-+djl$q5dA?_FN$Ag:+hA=7-G}TqV(*-p2GSKrlX]H%DM.q2Md(WBV815l
-,wg^NGMe;MGM81*OKbR6wIA%.y62DEz!x5,*V!<DnCSZ9@b;E9tDOA^%Qfcs9O<hn<&DuJ8..)2M8T4vLlnB41%ops?0GnAGh$`%OI?/WhgF)9Oc@xagGI0e;Awt;W:yQ7,LsI.[*[+R{[AH#;7rxy5^<D%g"2QOo_.!^6Tps5h7wG/==t}IHHp%nSh_M3ZADk4;Rx1F_WXyCt>`k%j>FZBW{PpxDXQ[^&?-K2M_JRqyqX.r!%@*gJNLEk"@T"CM~NXyNBs)Gw>&XD1wX!x)W4Zv?KD,N0:Bwk-k.k#EYhM;@]3/ab|!zM?vM7frD*g3v7.IqOBYHF`sV)/A0wPWDGED!(%f?gP?w!%4mbN`*bY]Q5^e/:b
--5^VKei)I7QE6pUp2V3yH.9Kz1R2P+.os
-V1SO6&nYoyc)%yM0Ne7MoF`bq7y%9!sUYtkgh?(&*8{yP4+g:i"gQ1WbiJp^RjQD"_i+B^a3JQ>-s/53i7g16l*/O</b@spbt
-)hpUSv]r,Hq.9N.i<GXb4KB@q*4P1)O)vfE;`/ojaEMXz_/0F+(vcAC;F4hddsVNt55:qRL
-t]o
-:><`p^ov6e(`KPnUGo
-m}F[adZ^W?JoDi:#
-]PH2>l*qiXrsQbXLgMfGkFWuQOXpsyIU+ggBq%
-:1O|%lM^EV>o3QQWnKWL<(:%KQN?0!J3E>P77A7&#GeE@{sJJ(8cc/w}BqXXvRf7UP
-qT]rz_7EDAVSd*>4"1tcOF=
-+mA9C%v8^nGr_[IXj.%,sVNu3:G(7ZhI>1r^@=MEn/UDB1*J*(cVK$%:i15N_6hu5>Da>_:$(Qno7b6!j=ySPr$k%,VK1$&!>H=Vk@--YENZx8taZwXAx[?/}`iJp-j*y;#!DJTcW^J;~9*_z9*ylsHyg>49xMb5Mt`pT0@OR`+_G>95"5qZ=bM+
-M}xb,qJ1f}7Fn$?knE.GPgroMCdSUk!2srD!"3rgnzbG:c30po@a1(Jai)s>S>Ra@u=Gw7;IMX^AunP8Bi)C5,NB]C(Wc7YS77o;TL?*t4e1CDLHn^KzX:wR^vvYvmd(';case"de":return')]^@iaTp=)Rd&Cu;m#+eK00;rT@8(JdJ>xU(KY(G]lPW=S;*`2spsPQ9~eW"=xUvYb
-<kwS2K/P?WR
-,K>&)Hjft54Rb9B/@&k(Z.tR(q6;WJ]C]6cMQATp%^W~MXM`(5
-j-t&rk7>p0zgD6+y8]Zo,wJa^Xm*ruq5OhR`vt}yIo_a.eDPP0I_8bYRbF`0WHR$|DNM,uLbHl-
-G,Dkh*WfAeG
-tm1nvuz3C>n95y2,@yPB#Os8NAVz)KRuZ.=Gl-tGvE6WI.%a6g8;awMTTgY
-f_"g#.z`FApSXj6iF7@^M_}&eSS$=dO9rbqRVN
-<en0sAiJ*|sw2.g?xlWURi%o9}.y
-zV]WZ"]p(9/Z|G3uy+;?(aBF_QGTY6RI>.|yLL
-d;_ro
-$$2kS(x#HLr>-?U+9Wf3u@CVInDwC6B!`:SjAR1g28_ub"vdiNF~7q/jZ?CP2ySQV[8H8QaZXW?yWBG
-b?/Rmv)q)tODcML/0mH[Ei8^7.bLyT7Wfd]JO~O$qn#ScTsZCkDq@w"j67)fCRq<Ld,|d&,6kGEfV54Up7l_`z3Kr_pWb$o
-k]E(M}u:8"OL9"%y$ebO`76q)opj4=)jCUpKPC_k)@X;&@f|ko+6SG[oVVe$.9@$7t$?8G@41R"VAm:b?
-9KDyt*i(Iwqehmes@MdsA[&A2Wn7^}e/]];&yg-kFb[=@Ix/yE3:&tJ"R1e^2pH4FL9%
-po^cg<[x_.II9FQlXT^,NYMqkozvymQ7Nm&bZYL7_EgESL*AVAc?!7"wsJPbn.y%6YdZmyGYB8
-g;>`gzp>hp4#_6Lw
-*HEXWmeRJAKnb#H3v_<_2aLJ+l-P$XsoPoFAE7h&c_/+N4|uoycFy^6-DH~F;iDK`]fL|x`B22qokT7M.k|Bu"?_(pUoM!6_;"t#S;>y&<oy!DgFeV@FPq.p>]X;2loi7Pc6k!/*z%H&*^I^rUXOw>Gj4%ZyF
-7^m
-/sLM~u;r`<JkZfztU*
--V6.8&ZEh^iy&+ox1qbb1n"$Y<a.<n6)C=
-#&,kb5Q/OdpI$loJcl!&]C3oe*&naQj%xphFg-{#D?[S[fh,H5P*cc}->]i=/&O]c-9^Zm)dRj"2V3^^B!D6)IPrUX]c=,cc<VEWI4`>*0J$ke@`&#A0TqXBdM,W~s5a98S-9dJ-N&V,?i=y}UAK3DoK/Dw/:?MS[yz4#t6uxQ:^rcDy[@)"6@[,*sZ@=rcGbpNV$e;vvM<+b9(#6XlZ1^}-m!9DsKac$!p&k,H=_E/O+$XoM@Y1WO7h*FfZ:;WD$4%FVl[z$cbO"mCEB;138EWZ#Xg0sK(ez6s5Rf%06"A$MxX:2cx:%a6SqdngBC5o"2y:8R>*.W)V4Qr@OJlyG]kO$C*>vA#z#?mrg=;Re@~r#sH,XWw4pR)TJ<aeo&[D]DA#An+eA7cmdAev],!]u7;!SDiF3]]xy^!%Q(u`H7wPr[aXI3"UFH~-xBfg*[#T>Jzx(d
-HrE-V>k54@$hhJljEo6c/a*d@gC"3!L*"&[~@L#oT._7g1;<*-Rx1%i6).evH$`ba0F4l>KO%}xq2qgBo>G/nI9>Oi;b3TnFg"DNwLRw,%vl]:GHre!p*TDC>BP~4coZNY%npfZLA>hcGYg+0;KDSNXi9C5`mH2OOf#06Pd7:IT#jrqp;gkMJt?"Euqed+N`gr>@h3GW:#B?gq43:*:[RynDC.d5`,y[uzMlA0I*Jep&F*ON]9)DbM!M;LE)X8RAX0
-T9Xt8MXkFeJ/2ywj/+F@gSC>jlt+$("x>%^HH0)5hYH.m5dRe%}YaR;1
-T^mq,==/kIEUU~1YxbhYI07ELjQdxp>s+FUM_2iewO
-4[D=l4ct.Q[/e7BmeZcMjcW/3aO_KINxk9.]jJN;q/i2ha5$Pj@Pi7*p_NW/-8H:}WrZ~H]c(R_t46SZKe0k
-irHh__q8dEvRy&qC51N1W:r..y;JT}*dB2<GcF@G[@jbJ53@wUCI08u6A[GmSC4<3~G*yZn#)gUzZkZC.Ll=ZnleR[q9uto%5/SLi(S{lgaGqj7a6li2l+9SK<85(9N^tQ)A<4CunCC{Ap=ehdB/51ga3a3W)fOUOF/Lb
-H/7Kq$PzQ/fUhgs]2mx)B&pLU+B!h:kx^fLRld:4AMST)#@fdt>!CkB):~jFAt;&c1K~SC].,</cp%ceP6VqHRAhMRWcG9w,GG!LsKy{aJ`gNQ!2e#Jt/S52w2Cl/;v15nXmGA-q&x9a13gU"MpiD{27lrjBGlB?A?PnUhw]9V({QR31]WR&T&xZ="]xmqikMz?1Y}*;
-an!RnJR.>M]>-pHrL0"RV?-Cv0t>B"8O6E`2h.+;b[GJ[F
-QZ;$"G:h3_P=aRH`qYKs+
-_yA$KUHmTb@uUR#yLf;RFP;W=e;eKMg6F6RV@Dx+[s^S*FE78H$-%.S_jps64&1T*@BgF|6JF6kQ31[m1=w6p1?rQu8K3
-A25ze*q,V"FGk;QRIZ5NCWlNVpJ{I+#swS
-~vQ;H7O4@wXpNc|pI.D-KGsE*qbO@YS`#NBFIklw7;}SNmJ*M.84_z!0!5w)@[9T$%~.mNoJ^#mYlvWU+7}FlOz6%671xQVvja^h)veKPmv8B-d%u3`Bmp$/WH"W*_<:>DO9-k.dY,JK{Wpa/GUEL^U.SO=W_;i.F.sni7L%%o)ms6zqHa!D|_>!&J2+(DK%F!e_w3xE}?#_9cJrz-;Vy:vl$N*E6C?!8L<%Su=L|(lMR:LFrWfNb<$Izmf7Y5>0Hf&M!,0]Vof@>yJt=B:<;)CXgqIGU/Ra=.i[J]p^&WO*+,o1.eUF~"+Ao@]>UXug/3}w.#NZE2&R^)UjVd:?XDC.Vlx@Z;b
-c)q_V@z]EJ#b#0>[A!xXW9Q;2mh4C#TyaveSKkiAAdpFPhO#I$:o7TbOk90Qp1!H%jo#}@KE7]R.Lx
-XwW$Lr]evKwx5sl[W*CK:`Y??jla^*TF7gJ}fGu@vlr$oD0Y4GLxM:
-uA}Dj)x8B<5_Zs`Y/xBCJb|xyJs4wBou;LLm0cIghM7FVt&2F2VXSi#)lK);sj,[l#%!zvnX(W4["++jAThX(&zZLD1liG{Tzy-RG";Q{W:GQl3N:WPGCp}ErecUEI~ws)Fu$x~NvT}hHqaX6dqX|+]';case"et":return'&s`@ibOZ+:%!(id"*-#1vwQP!?4g:(+Dprt/K9j>:9J5oH%yX8"*2^MnT5zr$n
-J7$Q2h;ZW(i_=k2v_1buV$c>w!,M?5?LGEGTxS,RU/$AV/WE]]iY(/`Zm3!W&Gi65(.58XYC(j&7*ngB>t?}$Yw7y.bzt)Ozbw8mPPqac5H1^e^YO.gctf,>I7mLgyYHF$`5.sa;Amh+cdyVGMN7c|Wy2<#>d[60[0[274y9,3>Y#cL1j++K^g"3D[!fs
-cs`U8p/z"8]bX?i[ZY3EN+M=YlE`G$@$sm^Tftyh[d`pU+qL_V<WMday9Ie<Bqbvt?5cJrP&Grm;$bhPfO=Fu:Ux(k].`a?~jK&fJG
-5BQg
-vd$#OIjlby?Qr+j"&t>r,W^
-7KA27i&u&ROhm=*28z5C@#e.[d^MPGpp*EgzTWw[VJy)-8X}Df2=m
-W(f=3[0Ay}W*0RFoZ*v(peLEXtmONTTZUF`bh/pU1QT=CU.PDm*21:K)2|kuowv
-:W;Y`3UkE?v?e9w
-D,Y4y(1,U>A+IU_.
-,_C"tdTvCI.wvb(+wS-X)p5^OnXO]W
-X:<`.5j4/
+get_compressed($Df){switch($Df){case"en":return'+X/+JaQAP*4c$NSR="D:{ZfaQr/C;=pAjK)0r;!j/i_Nm
+Q3
+b6Gkg7lc>*M|A>TYws>f
+i78ZV/G#S##&Y1Aew<%5Ix+p0bSjm.GwiEbB9HHc<En/D
+Z
+c5Qb)g}RfEyjATW*n>&a2`b#qDtGn7h+s%Q.rwpDj!-A]b"C1i5h+R<;u]i5/e.?Pgg.y=ro]iW$%oVeoV{
+B8OC~ex!!-dcLH?iIU:7.neN%^rz)J6yFwRIXa`W/e&(HWX1uv$BUMA):v<m;>]:g-%b=YDfsR&.9vS?s
+Xs)sA4(xxB_:O""^!/@_gRk58$"jSoB*^EXM"Y58;=O2wZTakC<&ZYi&z_k7{;q`A_o4rvfe3Y~JpY~>t9J<}IkQ6.EKww@)sv:e3e^7-mT.sUFBWT.o0xqpJ`I]iWYtGY+;
 
-sLpnPxMnuUWSV29C+&y,%:mFp[];&=xA>)"cRn4pIsIREL0v9JMw+kc&!8WN&aSbvwdL4"LO/jb]tvkH/F-I
-;lUdGW2?nAX3??v6GKfGwHnj_lRcolV9;4tO]dM3*u3<P=n=HQt.:`k";84"*.0,Uo:YR}e"MK0.6Vkq;YYTmSq}CL6SwB8#m#:H#|XhPz7n43y<vCx1>Au"AS^F&=s54X%oFMpqY54,k!R]a-M#TuihJR,""O+eWC&.yWVa5feaoT"ItC![M1r;5MBm1AM%Q8.uU;*siI"r.G;CQ9^Bp!<^?_kpjZ.M>r?BBLH2,R>Hc
-P</$D?cSZ!M&`7x=2:+k`$k@q}lCsO5K:HT1@(7q^OJO>bl>;s]d-FlAD=H`W}[q_b0/;/rz04%vOx-^["BgyfBHTe:gFZ:Yq~+~w}gWLb;
-Re&HA,wc#!<_Of;j,E38g_W(iDdV:mR(Oiz$5ANO9vg/hO.(#y:T>fXBd~P|;oorHF_qoNF;/F!:NtM=H;Q7m96Dp]$E"i3OPe2T
-r/rBqE*.#o=@~uG;C$r5JT4!f%0xR0Rx`tYNSoN5
-!rp$(Me}Xs1lXHa}<mb}Ylk,CYNHty.RKaEn&j4?88m;m9G,F&#y=q5Os[Dq:kr-=BT7"CF-#V.Mg-fgmAUXX;SR7H2AyD9@ySnOq+]/Jp4^Q>/(^cJ8cMw;y9,o.*r86rNShQcre?lQ-_(:+=6s6.,O#)6SeJj.#<@19fCrdWQ./0.F
-J&tXEY>M*ij1uTH<E^(?]5s^D<gC/vfc15rvBpz0K
-"kg?/33mv;UFlKSPdWpxAIzt)vTNDxw%,hEd^cYHi]#60a.d?;g!v90JnGUG/2$cc5"^.Ss&W@pWCIC"@[/mjA52)Gv^8
--$6Qq<"]MVYk:D>?W=<`j=rcAr<qNX&fbLysQn5L+1?$mxlYOFZHrY%06t5jQm5/KL]%{PwO?CSDL7F0C>ug0d"*kw]T,cB%o0F`+GD5bcW0B,2n%?@XmtkwY:Em*wmtkufW}xTm@i^liz!3.LYEv2!QNVrX(UiIP3fS66J2h+{.?4$v`NWn0VxNa,%T^hDEo6;)aDP^thO!wbJoSm`ey3z#0,Q1Y.
-VPg+*
-UyQD2bAi7DMzOr24/1cnk__rG)w!?Y`2jB5tXQx0pO^Q8d:ZDAl_KxlloW6Yrs[#1(qOOcgJ_CTi3T"?nv8cp=:6]vHW]/<n;h(=H?_at?RFl!js=cd[(gp9+P=e*Vr*=RQY*IU7Y8p?qZb1bFS/l}Fer?n/i!^==[>=b?5zAjgK
-?Zcp=q-Ct(]w<m*;)+vi3duh.*SA$F_?NR)xqiyT()cX)Ui){Eze+f0KaumC6rx$1,nDN.|IrF5Avp"bzSU[Uyxxz
-@`%z)q6`>f`k{^2JD9sxRm#sTN"j62Ff,MKi61UM!>{gAJZy`?1q~3*xKEUKM@ccjKO.I[>+}HM.BZ6Orv*/D]b)Hl;nbre9ikgZ-1L"17-?xSlI
-2IX^tB`Aqp,+&/_2&B&I1QDIae`=.!:$+XSd9pNhq`l771XuKt
-2DS25QtEg2l6j,al
-,WVQkfgr*ls/H8?jc!KOLA;9on.uBKx`&!Zt0~!~cf:wNfK]SHvl%TFcMQ"]pK!3o
-KO6gjsc;HpG!2?r_Cc$AxZwf.Vo>fSD:2hmGQmHqR,[-DAA_4N#TfG=UD}l:O9';case"es":return'#`G@r5IAP(q@#lT"z5!3,TD:%)L+$8,m,lI$Sp/J4FvF,[AWGiBB0<_SUxFRy8J,P<Ro8Zepe7rw+YzEa]CDZ5ysSjG_x%Y`k@!wx1g9GXud;:,({[MM)C42`tid/8/%klT1>xDcK<4:eVsuv*8daMS`xyf3Wg%(V"vV
-D8fIbdcNf<&8llm~-E
-:#zFj4*JpZB*C4Z2D;LGNy#MTUl1"+:LzmDausZY4>*C!>j$gy|y(k:4370CB#?qhxPj`b_$0;$+eBhb}>m<$)wnlS=JnK?gKqQxL9CXomvBi@fx;q)J.p4C]>dE&>g1/v"$/_*:6!1.Pl^NyywOW8b=dQ1oxk.Q?`0<<@oV<_uezHx9;X_z#RdXh+]y5&-D%2$+MaHQ0dIP^[!^wQilvitKChBo0U~o#JU!a7nKO>*WbeT=Z*JAJc/D@G8T+IrqFhbUco)XRPSrEAfd4"IXh3t,(=6(lCt[1(E=>mh>"EtYosMb:dt<7<gX+-YU`Hl0/brsYPWGE_OnKUFxcXo).UUGwBVomMjY"^#p&O
-2+_uWJ
->3_XL-KPz?JDC&se@na""N
-3<EhuQUYF>Ho0Mk!>T]DAou"P]M{sk`7KUQAl_-0<61qZ2*,tpkBYi9fyR?"
-euI
-5C[y"++KMWSQI?=ZaIe=}H4^*1.>S)LS6lb9T`U3$Sm3,<0Smnbd$bgJ;W]-
-3x"!0iEz%~Rjen&x(IjPNDQ3tI,;8C]"lTGtgb/?DFYnYN3XV!^o+v&hq_L}[im}*i;Rac@aT_#+[YKZDoyllI$U,WsKRIZ)n/&k,J%$<w]M$)-|+Sp7OvHMbRAWkh?ejwdrbE?8nPmMz)K(sf@SL*JHWAp^Y~?v,IW/%,3!Mqj^baFOV8*#s3j<V]$v1bikFWM"p=+eQ~/cM>K8wBG!xqV{Xa1*2F%ID}o"SxT1gUEjU0F&N"=5GS>ALovKhDh"c/,y8T@aegj9t"f*kU[fEd_x6-LYaDy|sk^e6;:_$(lD"s&{cKM+L}3riVxT@FJ75vqvn!^:BoL~@;Ot5`]Xbu-{,r[IY+Dbz$Dg:5(oR+:}QuOf/J"=[m!s4RWh[5x</>NkmT+!Bs&(pG2aMw=u_,8:*K59J54CR*5Cx#Z*DritD?k$plMS6om|2}+}UKJK(9$</[@:lQ&I,=d
-AqoOXS,d#/pFe<F9$l-N$p(I&iDv0:N#w{tI7T2Igm..a7syDzSdvyZyxx3Qq1$b=QQl[!e`/G3q5EgLr-wxct#"jP"q>X]Gx=(Ve3CjE^pKmB/J++/imDZI)L;O:tmd4;]X8k_N@D_5C8,YaHPU^Ttm?>!=2to{o&Z:Q/FY2]m[N#8nU79N2hoOQ&(ML3p(gSHz%2MCo_V]*=y;3WTMeP.Rk5m*3wWYUeg9CaDcc;Z(OdONExu8vx7P#;I-!B/BVHNsd<wiY/IWA:b}y(%Bq{Ih&pv
-0cT-e.g{.9PV?Xdi&)a_+y8hV0*M+@I6!2JM4`8]efSuV7SJD?-c<>6`Y[D;,5;j8-NWj<E4.j
-;fVY/l`X0@)+}%>4LUpq-x3irWS9@b"G$#IEEIz#+?__5u6O=d9f&&1Ei
-$j_QV%%_[C}H>0Xo_u}Q(J-,<-Y=f0W4L@iy<KnL2kvewEZAWlIT@S5byR6Aw%N>F98Lj
-Sp!TMjmH,,JG>9h0t(zs%+^Uq52btNm`V?Ps7Va!tR3K~F0fw2G!<`Hp*HMf!L?X/qjw>MK[L,gl:t9r=6Qc(@5`Cak]Xp<HfI!M[^VNncOiXTBW![(9#QRl)_jgL"xPM6x?r"DLW&vhXpk--8<mB)7tx[B8V$z9A,RF(PuA6[}C(8jK#K:7D5,Fi2Bidn;/7BTu#H]oyQsL|Tc!jACp{.j/oyc_$-IAL;jj~-N3:%Pkmt)+I
-O]:-l[Q"Y%;)3.-9
-X/k?CF*!b-?fBk).dq_ho79.s-Q%Cv/AvAy5>)4<=[Dygh%]0A;7CFVd5Ih?PwHKUBPjQp84
-i]{FC7LYUa8EM<4$(U/.srg9Mlo
-L]%_(@qMoM:9sVP?e5m6~uVK^2O[jpdSg#t6WW7/5rAo!=YZe;[>D>;x<Cl]ANhuVIXA#l&H"$#V`(Ea_Xn^*>Wf.x9h^^r*2EmP2mpowcnn*VT*MU`Ozc2]IFC=at{wYaFD-tqQ2rg<xAaqChx7R>Gc#X?Q!grQ2bM]t&?Ab3
-@]rNX4hNx}byu[v67+GE>63Sw{D
-L4z#FWqV4.YQskGhMKw0/ra5g*/~7K*Q@E3=c_<y7gEi5{Edl]ksaXcve5kwYE])Q.OV`2ImLkV/1L0yH?<$nk52VF.^0g:^o}1x!MlK;.WZ4w!yIuA2_EgG`0S(Vz^*%F];5l?7
-@$Q5!ZAXy?}7n.i6Fu]i1e3!{."W/MO.~PWbiD+<y0[<cW[t?^D;3@w_M""7;Nx_!aalvrCx,6Q#Ci9gerlh"TCAu=6F}oa"j5?Nwd*tEC$]z7$y^707{B3(V`!-G<rqTBUa(K;(ndnlH7B$^R.>*M!:O/($Qx{HEl#?"Qf4F1+W?>PuNSHoQu|,UD-PGn9&,7K]*GuqdL)<,LT.Osoi&Z%9
-@NO_go;u99j(skT<jdLKp2IRG+?eW],}E`]v[CO!XEqA,sDk#XyJ-DK)f!6
-BbiW$]@~C;
-rresbR!fmasIl7n`B(UcZiuTA
-N&/SE#b<tW`B7IaKk1
-m`OEB+5wc!I^
-O?F=NUpM"s&jx$Irob]
-$$`FmmX=ziD^;W,5tY~]OT8c6!"7n"f8*&;;tSs;5w+d}fp>
-`sZJZ>W0Lumcusc0n=Oj)U-n(;;Mmv+v04shb4#cT.?Os19D/FMyUpfe>z6(x,E7"q1Vt@<mW0uoKa6:LYsdUa`G%>1#]sC7_2kF5@,@nhBC2xwlpV)(.$3:Bo$"d3i;.XD^mbvr=30GvC9jo5b<9l
-ujf.j/0dhw](LYZUmMh,QWOOCV[gs[:I.=kxN6eA!CZGFhM6}FuhoT?
-6noA-NJ.UD<A7?(1bvEei_#>
-jI1V.^`bcWeRn8TBh[+m;hZJ!1Khh1x:+9I0KsVMRO(x)aY*%}?=N;eS"P<q01"]oJN0vo!O$CGU[|J=e%*=v>G4t^';case"fr":return'.Zu@BaLYxE&fYm#.W8E>PC7hi(5"j!:-gdtLU[8yX
-{a(_T1@a+:Yh>lwf;O$*p,:ysV8(-w+m8M:AP5<)a3o^+?S`ybPcCp?W>6"Bz/s$BVC!&#Bd>LT]6J&O6BD=9B_"`"=b<w-uTP*c"?QJJ0Ep{gW+T/+_fUsp`
-RBk7~GHikV*%j+?Rjl%gB_B%/RQ9r;^lQ
-A7xgK[Ec^34/b^+s7K@x6=2bixCyNKJeFP_^d;BN%nnxhv;v>BR?B$Vb[,wI55z)`mqPb_v(^p.1GaXcfi:n]i+o$`"yVdr
-xIf_97#;K9Iw=oby+7~,Be)+A;IJSF$i|bo(n@2C8t[,lJ?dH)}@fyh5Jo(({yPXFiNXxi2Kz`dJmO*y^OuV`U?X>1.Rt#^l*aP!uV9]6;@"XwwHO4c3x(kDQ[Tb2[FnKw=>)t}]!*}^c+SmyV8V__mP|1eTZGAXm*>*-tfGH3?ZHy$`bn
-6eEsM=lFN;LJ19nz//F;LvOmZ%C~vv.^Wi,tnNb|Lb#hfg@VFXaCb=%+kn
-]y`R&x)f
-_(6ql2/OwRN^(bjS<sF&fpjY[hbL#<qz/$0av?s03ED"yB/"q"__*f@.1}^Ri,fxAWxovM
-2Ss)}h(cP!uknFqe!;&d9:>_Edwl>CJJX^[%MjT:(CV`2h13*?R4NTiw:5c0IyiQ@&WTgoe1srq:9tX&EVFdpp61[ei!k%7ofYd7Cz$9&!Grz9d#T">g+:R1K:`Zq4Ng4jayXxy+zeg/m"$AZWc;v$)y#SMPiVB"mw0Wwr#yLYE=IyDwQ-WCZ8Nn.yEE?>L
-V!AjV&%][<tTY;(Y#2K*p`(bW,F,fg<B
-xs8~`ON*$V)K3_xBFCc4
+e4n(;(l7d3avRZ>"u/=Fb_WK5*s)RT
+Ji#L5Ek_>%G#aS/?lA!]8t""k~_4C_mq;[kcDAVX/M8z`Hk
+Xv+Fy+Iu?+obF*;qZ.uAoSSogL^Nf=)adabm@x&rC3F]!G
+}Gc0}R|-`wc]]IMSY_9L{Z*qV>0@1ip:%]Jok274YLXY3rrAHCS8t^MtY$2HLoz*S+x`vOb`SDQi.CFm<D8]Y![d:T?7Jwu
+kgs!FM&(=e;m+RSy
+E>^Sg$9MbI&;RyM6u=fX%W47WB(mUJts!g`5c[]=!"oWr;OQj]d/S_Ie+O_c^J:|ofgGla1~CRD%O}hsA.4e;!8)!DDL]ykW3K&Z5VOOj~je0B[(
+[D[md#WI-fCs=UB]3c/E~&@k$>^6$5f.Sj!d
+tk[3Qw/KIn+@Tr,PkaghPr8uJ4CKRKAnHLp6:eOK.J79+?M@3&)ipHCHlFu14.dlf$N#/.;?L~cgpQJX%q<g&x58>OKYo`I>jF@;c/uimFvSdh^vW3i-0dSpWa"C9m#Ef]/yw5g)%2QRk=QacDNu+o)g)sHAU<H^6Q%s&IWBW08mCYNx)#
+IRjS;$r,0kEd4y1[/e
+[-hU(Sf)!ku1YgR{<48Y0XpDvqp]B"B$7="Hcg6ZEVh
+Ne]|aVNmY1>G2=]d9G/8@TXEW,E%:INpsBsJ+pO}@C%!?x;(iqLEvKTg>U^jR6kr0f0#!`Jk(6y-RF^EjyK5)x$(H`7Z
+I*nK}beXxSs;i^c#m
+#yg&]^wvrmaC?l]n*Vl[Cx<.rI|qyk)YasTp40(N^:xPa+PI;_f+5EO1B#]rs&F/)^dEJxq"Qmz&}D-
+R[R;F4NPp@5:b*<GMa{ou67HxuBA/FanKADpecSc
+?JR&oEXirq^7IMA{BeZ7t.=)?QHscnK:`1IJI0dMKK]oa%&HGRr0(PO^$I>H8]@,txAn
+!Wxb{s-v
+8(U)lMZ-Da$N$~@%g^yTA5RBt&lL,,<[PlIlm7,IvP[4M[c!(_"1:p+SaDVT=};7,SB_h|7qrB7v/z-NA{?NC?q4
+swv*ZF9jD<"C*8I)n)O/b1*4yl+S8
+4rfkrx4k;uLc)#wVA:8Gf>Z
+VU
+U">A^+)yc.[WaTnXYqBWP=LffjswDAr,AX!8xd+kJDrM:uCDV7Sej%5nI_G6dK1TNHuZL:Y[C`TdWj!DU|f~NBxSE8Lx/j74.@(u9V*aUir)gG+5QOO>p{fT
+C.+hLL6KA9
+6q5MS>1:9r.cTC8[=2jo]FV/AL(:md9gV*G4Q{nz&w"fc;BM9}8FP![V4KbU1lst7(R#Mll?5R=Uco<~?egXSN925B%`F]qK=%2ctE$8qlls1n[Rn8[`Vt+c)ijB9e")J:`JxY,$Wo!^aEb}VXfTx_:="C3z/pepLysE<m@2"a>_#U:MU]F(^;AvkJo"$(.J(|X.]SN0lO:<WK+")pRcDzD2&UR;!)(f41t^3U2$Zo4<D5OcPsiI#dCu;E5.QNh8w%,*:F*~SwRr:}GMYNc`y$:XL;r{^V5A2vWFfmI:Dqev<O.&*^Z
+6@"a@.Q&<3>TETf8jy(DGeY-n/85vv9^cd/}`S_Jn$NjnY%QT"I4D|BbOUgS1lKa<9!w:v^wOs9}Bx>D.p1BKVo306OiQ>hs;63)(`TV!W`;p4<Pj4pW6(w}-nk1z"-2<Jnx
+AHsZnK84r:N+~jX^$!*P+(:lQxNH-jbRpw`gGSJR%MxdN<iN<
+BRnDbCPR(<VY%yfi=eG`7hd38e
+q{K(*,[o>S>G?,h>iSpOgGl&WvY^wu3:J=])EZV6TzJPWGT1Pmpp3xjsm%0*B~2#CmSLI;;KLl-.snk:,l!2qzAG2;QGn<#:GF<R[[n]RZCn^Rg@5IwZp/$l"29$E!t^1uLWr?-LkMDJ),*HO/3ZWw=@0xb945-><
+(;Sho_QvPRR
+_efDeOh{BtDr8%qH
+#E+o-R=DxLzgcu-yfy[a_H-JD$9s%jPQxsX/}_BySOfW!Xm&;Mo+qki(pPidpde1R?9v5QI%CCm74Rv7,CCejH4VOUm#RSLjDI_R~$(8-_J4h.JU8@9kBR(<@EPOTS8pA>nbQfq:JlH.}(YhOXl&MP.UW1i?s*_NeI2bY[UZEc,fk&?NYxb;x_Ys0nwp5HCgaEbHxO=ijoDYcx0R9PPa:)yf0:|#T5_V!ipoIwp3b$[f0_D=5g
+bLkp=ux?j*!B][c6vgJR;rwp.=aeZv!4`xne?q,;uJ${b=nJ$oFY`n)gcqrEi@U
+=<0E21QFWA&Ic,f.H2X!v_pu>&$eWXeYs.CbQbwB%_g(;@a"$@xO
 
-[6"%Dd%K5#rnPG,K&-_r7h/36$"U`a@Cy.*^,~Bvz$P2_x*%*lk&th(8@4cIORuyFV^fk^0]CG-KkopfRWVHI@aHr
-%94@D}NBFo1X%CI!d5dMv>NnL0="MXk|;@7
-ZJ5d
-FOhekJdYo=~:rr3Y>ZuI2kg:WLtQ?VW^!8Q-0AWq/mzJeyMr|3bd]4y8]s:M}ujxBK}R9&Pt^]kEz4+!uFONmR&"^"3>jYZhe@I@H>0B:,)<(Vi
-X1>X9K*w1*MpYf*Kh@h,[3xUaU?3^9;:aw!&HOMjgFBDA%jnge]-fiNr"YLKxuyTep"1Z`W^KMg)5VC"q2WrTJI)rP@gqb{WP(;nX7oD/ojq([Uq6
-,iB!Bw{DSrkpE_xw#jw,{3G,O!aKRM2w|dub=2,>-JMO@qQ4/YvYt7$JZlhs2NlK,e3a)
-s>8)ddHBCv^JXZMyY;x*}fj
-{9bi}L`XKf#5?p,ZX?5xE#sh!ZWo[mMj
-Y#?K/xRo$)$xg@)bb]"QQ%qCTSZ_pf`XshL8tXtJckcBpzR02iI)U<nf:/dyApHX<Qw{$-/fjNFDUTB~oN8/4/[HMz?hq!5~u,-!_DDhEs8-^Nhv+/6*i%Dl
-Q#OPfvny}Gf^m=]4v9>KSXjr&^B1SIG0?k%B>4>,p41d//HQsM[U<)7#An*9wGsg*M+O^#{:zGq,FeD`;uoP),maJ&]YC5dkS3&aIQ.QQc7<%0H`SHd>0GGbx&jL
-*=h.xCU$TtWN9nEOgV4m(1PK0d(eJ=[=R$wg$CXdmlrUw)j[O-qaox3^[N=~uG0!(cO<^>x=*I
-ZH+HHa
-Ym:,`DHK(
-:Ms]+,=kE~vy&>O,?Bk02<"#&I>0#~[x-g-nk^dkX.&,;J5,0P9HZN]w%~kdmftqNGN02T-fW/*uZTd6Rb,d(iD@]K*},8;W=zhw44.a[?^Qvciq9<0r3%Y3.Q7J(]hf:vC5yQaWs&OqaM-v(Y2pF9@meS5r[_5QWmI]_&">o9q1kH]}<`sG4a_6jdGO4;b@QPu@N|YM7p&cBy-bBYW#`}_Fx9X4m8c`opO&?UScOSS^RCEFex]5`Y(Ch5rj:x,&0+E
-X]`ajPv`w~p>Wj7
-q0+Tx42u<y@tTV`+)m_"jODRVu:3v_)hYgK=P/wC*o4<X!^u[M:.oARc!fidf7:JOpFGXhS$Z2!I*nOR$:J-opOj0&&ZUeo,Z.%[(94F[VNg5F&4P%AVAwF>],UOv}9
-$XWy]vT)4Z]]A)DI.&`1%5$xH8d&*LO`p6,SwI[cu+(wFA`@[:5pR:=|h7
-`8,sM9J26)+`*Y-kX7}^u,~)E@f=dNuJ#3c#zToH70oZhviP//ppF+;%uKX%ni*FB>+8l/qjL9_B)Tl,`p%D)".e/6:Z)mhLfg2c{hpF5?Q/xz$&0-ni(gKKJlm;qUBz$O|bcnz[50:
-0;[[>s38h`S;vK:1_vy?O6UI~`.OqX~UDT;y3ui>UR?(9?WqrKxy`fc;frU$2&X1kS(GQ#zeHB^),%%r^Y3y?
-8ewGD,Z<<F&g1t%`H@q4[/W.l]eV#?by;;1.JF?
-rVFs##A*Bq)q>uN9#,88{bsf.2u#4tKZ#57(`,L*aPPH|D11{?G
-SfR9@W>R1M.s{:bt2AMG3@oXbui
-aCel(rH*RBh!bTDw8],qP$-4W4pmT=jjUvBd:."?q5,:8kNb=TX=00:%43rRh4ZFmCQt/+e8(BHp
-OFUH)?w[A$_eMeg-v@2->N,fSqWCLv9!]wD`CX;Wo
-W>Z.EYbH8+`U-zf0C7)};Bl^:ON4/;qes2Fh@a)Se</8mRA2EF>.>_.|:08s.h:KULOE8"%Z<VjDG(Os5fpKGdsXbU:^xWCNLNihpNJl-Ch4lvZ+m<Q145)Xp
-:
-Cod`Id[thuT^IsJsX;;p$xYRBs>#S|MO^zqhU=1}X#.,)ss{1:WQ,`IyVuBM]WmRA
-I6]oH9/aLCE]DK/vZ^Lc`cFv,T%uF>(0Qa2]p2Q4<M1)Q9;tR>.85]?/>;dPC:f;N3an##f]4D$Hh8Gyn1^W8vR"m-
-#OK`(,s$Eg4)fkRA%ipYj%T_id)q;n/DkSgCbE^/|8wW:skHFQnn/-ey:*AUP
-)
-}OtdvVf"dB1tu5wR
-Y]:S+]iAfo/Wyh:.7!PIPBL>-WRF9rrTJ[J8C#@"Su5d;j=*C;*c"mX#+t6>CwJ6:]=h
-VU4%=vK]O0uDQP*[_1>Zx[tEg%ZNcGc3&[09o?o]7_
--w(72%K/P8Up9sVfRgU-j84*U{*4FjkFJ.OlU-qnFI>;MdIBta4xxTj/AJxdN&';case"gl":return'.ZuKjbPD)/$4oi`"+!QKU(Xwgo.TT:^"5*kdtD4x=%4]##(m#!#^[B~dG^x`:Pt.LK8nO7z(GW0?WS_=auV%ki=_
-y[uu`CeP7qNmp<F=L]Qxiud-8;YMdEN2&/A>D&U@t4yfsl82^#4|w97=NWUjXaka5]L
-<B>YZcg>nLc~kE$*kMmhCla>#L>0J5>ZG~%1Oz)fp
-`fY=Soxc4OR#bmS3%hJlJsH5Muuflij,"cRZS4yna:W?b|=1NaP`DOawm{3~?XdZb7FF]%<Vc}wl]2aeRJkLYP5:hWG$_<N9TT*}MmHN(fWNvy#YQ_p$<I&r[1qmMrKC&!Pd:RRx(ZR?fgqT$|>%*7-m/ne[B*hKx|j0`!0WxN(DPNsDosk]u#MV4j:]];n%u{f&Urthqikl.&+3KnN3,Ojss.IV#g9XtZ=2^w7LH+KPjEHnXddm^PyR5"pG5Z5uF)*BQf2XIE*XFOI
-E}Fc2@(8ZpkmUPoD3dG2Hx.)M5%A(61t.fLPV%jr1,^,dP8_S"dx4&:$vyJv-op|kdY[h8fZ,`-eKQt;,9,V<Kwd?js+h&5I878rlLt~!&#Zg#%.e$7Ob$4Xbc6,B(6*:B@B@5iA)T69vhNz<fTou"E@^FrVpUZ7=8;_+E
-pnrTDysd}E}R%mp!XkcT$!mZTtUA08V+9Y];S[q6*%^sFF<o}&0??<]u`,1,Z!_`5RrB3x$RbX"o7A+F@$,YNUJ9>m#B!n_56%+k
-/<Q7%^#6A]ad?$Yd[PDL6i[:ro2G0LSxMm<O[U$h"eX+)P+H-gbPY2I:#M`_V2,SjelgxN:Na-a`AT[RTBU}uJ)t$pZ/4gnyn)M7F-WkiMEeRr-`[ZW"e2h.t)``7IlZM(6Y-@LOqVY$1[c&(*UTsg++)iv~(2s@#^5zdccd0:n~D[QISJKqrVAdsF%tGzxQ16OlHWM$19&aSMnC!caHF5rgmEjXof)Da|op!D:timCO#:)C)+oWIo<6t)aU,6BG>"yvX%gdm,5]$&$Y3kTp_8gY5"syKMx"HBoe5m=UZg_1SLa?Ks_,(~=3;iu)a]lv(@udf"4a4!WAw=fN_,WhQ^T&7LjAuJ7`u]e]*X,q>/"0EuK4wF*cl59EG9Ky1zMjx`";e#5--o"N
-;
-<A~X_ZL"KH}#
-2!7?G_Zp<wHemT"iyFN$EeE!_Z<Sv89^x3V=+IHSkN?}[]#>@Wn7+x&H@ak^`Um{"!eLCE6RM>>-QnQG4b<M0v=#M=JU#WvZ8/-K4k$Fp4H(Q;6#<Q6VR~uD2"j&D4sx8Oh56r)_Wr(D,>4?8Fy|2IO+ESQXbi!imuCt7BJ~MS3zuG:
-_|<Upg$93[a/i0/
-VXG%.E)+&]bnPh5K]3SV&{&>z"*CGEn,[qfTlX-fVjYf/h:0%[BjT/[pa8%_b39eUWD:(w.ir7H$%>1Ww(VYt@ZpSCMnkpe9H*n2p_?rmdy,A$4DDtkdRf0gaYwsp[lemuV_o-@}wM;%bpx-l`1&s7]Sn6qBgdMk-BHKCuKI-#8pd2B3)=+~w_>MKHA^s8T{8x[TTzuB]<86Deul"u&qp/d^)x)~ng*h*4m5izfCcmBf/W`1``G#w~#nW1!)ZLtjhHjwiiK}*YdZAbUwhjrb-IkuVV(cHf=jPC(v(`=Wv
-v#J+YI!}xN0^[8#CGG[K*i/n4dik4"jgG<PfbG(2L_WkX]jwz$q,^=u/`BAr/ep+7OG[WMG8^[miL&Lg,mLJqhhx@Hj`8D-{Jo?
-0m17E;2guYYZ)#ld`lqu7MSGwMPpdp$3Y6Hf^kb$Z|Mq@m:znx
-.-4Q#G3>F`_l3xH&V?mNb%c*uS,u>G[jrRMNvx]Zb12A/0.O}9X*3L_A<$&!]$2S?Q
-;2@W+*f_BM"@(`sght`>bjjp-GIK0(DXhJ^%uS^M[~C.nqV[
-ew.P=-t@:M~tCwoHr3ZI
-_0J*#/2x*
+&fX0mK4n_</i7Lq7dXydj{^8L)0YVJ.fb)w2KhMB",q)K0E^($NSeQw(s|=*EO[w/DpU<KopfnVlScH&$Ah"_Zr*)`TH[qM:#4M^+#%oD"JgpUo`s6r
+o!<RXO6f;?NEK}0(:X/PgW^j&.`
+5T.c*a*q^]blI%/P]O[~c,[>L}*%rb^qM=VG7!bPQNT(i8(|/p-rgP.=N)NMCGa&_d42,!A/KU2_0C?1FQg5ghnDD|mWhIIVjwFx`couB_rd4bqHE6xwE]^KlMcseOKtpgLCm!tFNVv78{KH0ow|KbtX';case"id":return'*Zu@AbSWB&)kge.Z=0BdCF?V2B(@BQ5t5J-^)7+>Q?lUGVB=[jOyDsNY
 
-(M|"c4l:cH$hJJ)!kdbj`*pZMbtaHRD$+24bC+H`*nP`0%sA(w^s>UQ>W/o+4T:S}oVycQ|;9iIAg2
-Bv@$N
-]]66T`*V(229`30cbg^G3~PyS7@NEQ152glXRrh7jJW#SS[5`fc@v4EGGH7QtSo8oVm(QtS:i8Q2=UE!vBs0Y>pD;Wi~8vb6.FqQBCURK{##i@"{ds#OoP%Qu2?-]p`-"7@*GOYYh%!#fxF8fPG$BSW3#Brxa,m53YXhD64M$s+4Awuf?SB<,wGgJ/)x
-O=-kE&HnL*b^L&b=(m:*6=Jsa@ochFo$6n7nCF%O=@>m3[WBr<egwmKZ8tq*7<6woPXccu7S)gm/swgRJD%?)*c?N5!e-6h8e/cN?;D%#BjBUPf*{t%6Ao:w~P[oz&u?7%xJBxqT*^.9EXr4B>/;Z+N"XK{eZ=)_4)1[S!,Lw:
-GNg3jDbJw6vnR6B$R~
-V6hw(wn;z,UN:rq?M]5F2,}SV5?b#gi^EK0od3"n2s{!svs
-Nhq<>xDv&#O1t0H<:jPO(.)bhU+qT[^!
-^~;A3T,m3EYI<|2[[Aw.l%O7(xcV;*XMZ0_NOq^LOj&!*uA3NkQh*{sKhFoZSMy9yQ8U"h@,Jdea;0g2>[F/bAo&={mps0T^,bgQrs1*IRcIiW/oW,n1jnU~"Y2r1M<L%|%vFcGH
-&wp!!iI=ZlahSR|I6F^V7KonR$}k>qOOIXK^
-@Dgnt;+bh$th:YM@FHg@G|?3IUFz:
-;?lDw:],W[P5R8(Zaq_M=Hcb/Jbk#30ZS
-$$Rzqwc))_Um:w,jd:LRo$Io7}:c@AyO)8="2)ZKv6P(m#Bh7c@n+a_N]=Uq;BJc2Wyr!.]<ErxmhW<a9xZp8##oCblX%qIed)wqXE^1s"
-r<T1)S6]8Hr9F(]X<Q2`V9J;&-
-2OLx5?I]D-UQ#Y:FVkXDvv.DROTe`7C"u5L4^eW)aCr
-dh9P[9*,1&brfoZ;vYh=iIxXx_$gv6S=o$X_-Ar{eT1aY)d:Zt-`hrV"T`
-Z=wIH&FP?sXkJFR2+*6XL9qG:W)!95,Yo>_2mCOR[/B$p.rxbZ2g"kut{Y125_h"s%uhPXn62tTMC$T5HM)4pxdN&';case"hr":return'+]^@r6PA@(q,gSg">-#664*D9d,u*=Z"nJnveR~d^y`1;TR;:4
-QS$b"EtKCHs6M5[`7`h/
-i(9
-
-x=eY29D};_DW^IkGrgrXAbSDtT0Bcgw^]K2Q$G^ErT%|
-<Imv*uGl;MKe!>`hlDvs*<+xX/
-RusN?wb;jrIFIvcgRfj^jLvmkbq[:=la42
-=I3$0.a7lVD^uJ@sVR[B=Wb$CWWU=[GnUk)&q#UOE!jU9fKtxx[V:Rhq/h@F|&QyX4J5_X.mq<FS=1p@OnWgS90wG)~J~-"xf4}S@4xGrPsB9:J+[!I16U/L6Ei&_F4K=*qK#?LBMe}W|[FSGd)"8uv^.O/]o#@pdDG;NG`&wGR.ww?3{ISSyqcwk:K)>$joI:)9<nka[$GMV.QG$&{Ns1ve-mKBRtPd.LOq|1;7"Mb?,,ZI.TxP#U7ZgN%8TiKRSsIF*U>8D)oS<oV4F.?M}12T_z(NJZUQVWp++V)
-@%|,7ESO+)1,^?Jr^PQ3`1+3}5P8Fy.%r9u8R`~UBWE[Be`8#pniY.Z^7aOH3TSZS&&/&3FeDLn^qDXm7eEGM3.5diP3fsd<dP[9ktDRo]eloV+HCw
-bz+KKy4pd?5i&$^#R)SFhh&<.z^aKs7~U>0NT:(y_?o#%MK5
-EU".HH=JeJ5!,dwkP>
-]k9u,WEf9zL|o-e[X^`Vut&!dJ#fT_HtwQ&ULl?+3|n1tnxwMo&ed-yzDV$x<O-P*iTz?SV=,pY[B|!%P9lf+]p4)(e60q@sf_O$M!E|jx>8y[jrH
-ApesA4Zz2*fUFu)bjPmjV@cUFW[zyxn>E!,It~h?w5mmPg^?ZXdtpvl0,u4wn*(~aE>m&T+#QY/^[wOf=*/IFt*BhXs2I8VL.7eED{g@*4RY$.X!,$CgKTMo8u!DRAE94![]7l78C/z"GLf"[^L+l$N5%z&fdUJ3kPmc<!Z@g6BABRQ[9"<]MjHYYthP&j@+9`_LNaJ]raD6]*X}ND/d[,Cx<R!"QF4C^J`<2N:jEKYB*%t#2uwq?n#OlAp<$xieHOWZ(n"F2r^9SPr[Orees#-f`P-t7*bbbsuV$mooaK8cDL`G"gyjZ#.>1?i?ZqcRVxsF&N7AG}1FQqVHNYbb[j:{7D>xC(=dCu%;"xv,v"8_/HB[_38r4Nw>t5BaE?Mnjg#
-"<>Y+,By]^u8wHB79.w3)R$~GvIW6.ZdG=*u&9,<L:!e"-bTmmZYv((]
-"tP@ZGw[{.ngcfZKMK>[;(I`4h5/0@#FUy$d!J)
-vWON](}EtT<&l!fh9z$urs;8"#O`"EmG@Lb
-T$dea*A?K&n%>-j<eQ&McN)<=+uxYc9(D!jlvTT"cS`m*Z7EVfs?>=?9ltz<<ke^5%(Xw(<`u_xvH]{""o$[B1xa!Q{ROT!xCwQoN2Oe2oI<^O7:ek&@H%+=7mXnI(,9
-3vJ[=AQGb[Y1o;-DjyZ/u}K!r5Z[s+2
-2YHepV!6<w,8-[!_(vbn8BUjfrvhn`D)*l(<i!NLIJW_,~br!KE6!Z;a<>9P%*GUTNQI<7]JcQ&9e_I34s2B1VoZ@STqlc2b38Dno_*Y$.HuW;hT5)E
-kJJx8>ml681`Nt,+$)eB[A@aAhc}9s;xCe(n>61"t|sa$&e$OIc)y;3TG{A]:ntBg$ih)0u
-q4G|P#if2[x%UOXo:CM5(5i>qJjb5;R1^f#"er[,/<(z1:/5y_Q.+G8sqRBtmsq^4$(<@&?Zh0)7-3@<5ipC&[,QMD6G/e@kynk1K}qWGv(Cc%H"F3?H[@P
-kflWNw&B$l;^!x#1DqjeTRBHqQ]{[v4f4c@>9@5f
-^"{A$&By4l4;g._PIeO4q(%P]DE&=5-8;Z<0W>I:%)WYUP-?`;}M~R>#Gn,9u0PV|fG^wCL1VAM1!M?${n>y7.Fb%%)N$:]pWE[fOJ?%It9Wr/SZ,5{abkAyNaGHg5~KqG?%K7I`:tC,_Z$)>9Jqls(+6BKE=5{Uf_?;M1ORZ[KA1,totmhEG437uOtk:=&N=B}UmmD691jyrFoX-dE.u)-QBZM[?#l*{Fv3;C4fu2{cM9ot/nVz$mhQkX^acjDlM%WOQ.2pv[@gM*-Tue&ggI!#x9b
-*HgIM5X2rO5#Uj2xDR_$&q;tzg_LUTg%;?V>+vXTb]O2}92ZzV<@I6Bx7DJ
-}oPkI)T<9a;)TGy]Gbn.|&;x^ncn0x{<M92]<Koc1oY/HM;NDwlRHi@Za*@1[ZxLryc>vatZfpk5..u6e!WS<_ExZh
-`MIMcjs)=n]pO_
-R0OVjMmIsar6X%cF#"g#eZEi$sv&@<tS;g@d.<8%Xi$FfZ`",bUNH8I3MH95TC=(=P.QX!WdaV{#O6O7
-h.%YsIBqLV*CVh2,h&xReu4zY_<ektg:cFciPk3%f3AQ4HYaWIq0;!P;Jh3{Y0c]MPv}9c/~Oe!1dd#|1X".%>_rh=-lDl@|cwBHg+CgbgEmHw@GsXg?%KuX;IA?IHiJiw]J[_M&Ki+64ec7CV<).cn4AV6rAMwU[JM{Bgy8r8J5F0IFnbBUtx?V2U$&wjfpMV1@d1s(5U!e8FTB)-&?rKAr7%oKw>jWJCqki|jpNdPSe!KH^<GaN8BMt~uA*"joxzs?97.-YcYe4OgxL~RZZPUs0|$=T,;%eV$#H+D0x,flL$+2g[*&x5c
-N]Y1NgS(*><EN~r.HX(zJf3Ub~V~/d0)+-Ks,+vRwFTck;YP`+;
-NdR*X(?6)!NvKxN6j<ZayzgL+dKulxai+JKU;h
-]o;=;l~1}CHWX"_)^+W^r#LJ]u]6Q@6:1l1v`nX$IQWW+iw?!j!#w"zbJ!zI))x#T<?@K*^Z5]}GMkx2BKZKw#`wKlf:Z!ik,>JQ;gnEw2&ouVI(/Z"pl8bjSf;QW[VVy0}c.Y{I*g^+Q`MKZ2l<V`Hld
-[.#u@?Q38_UZZo0f{GQg7&XGv6@$nk5#>`GVi^"hRi
-Z1@Xrn,sFV1JUPvL^Vh%OKI]5Fnaj#)|%9+bP1J|Mp9
-a?<4A7Co=9jfpvujIH4fTDr4?WX1),0KVWNp3kA"8YB9OC21WB?N^?3o6r#7tL^&WzDu^Tu/%#7nq
-nf="d6nEYcU}c3@itAc,y,]DAA3~!q^4jc;5[4,.Gb1T:BmPX0Qwpt+
-^`xH;/*wED;,J!.l8u=L8fmhQCwWHT';case"it":return'%]f@ibP.!#P^<],"2+X.&&@D~d,O-":+c/"!ln
-hODp"TFEhLf-QDm[V4;c7stB^SozTHCH+FGc;3yt:1]mMP.I87iG9V<A##G,IsOu[sgSny*&N}b*0OipBmY-tIE9NE@5,h0)!)yKRZ4iN?jrE4*fjcm{"xxFPMJ.m&.m
-+5(An7hZa(1S4?~ci/Z!.MhYd$#&acs4R^Eb.Y]wxV$esJCXUS/V2G^ZL(88uuqT3ytAKX,ikBHHt`(L.C+w]6&t>tt#e0IR:#..PG>OS:/7eNVviT8`(t.er.@<h7hMil8P"
-:!#V1;$!5R@ha@SJ*c3A
-SPcIA;>xSyW?,!Wj1HgrEkK&CA*042JV4h"}+:tzo<sl8r
-Ff*<`L.H:X{pm7a5lXl7!-DyVb{(dCpf3%0CF&gH~Qdvr;$8RxkI*0zKfvrO1I"N"Q+4U&)]uEfxTBcHf2(,M6(5+Mx
-w9$4W+3t-Z<]+LXw7cJ`NJ{.[F=$S"qZWe&DEJjmet4N
-WPx&_xUh13q+FO))x7K>r52I<aR6%V%1pR925.CF-A=`e2t
-KB;h,+u>N-,c,&;g8m"Bv*NOG<NfUDUgDL1<9V$]]vE>T(i%yP1:PgjLZIOKHo!:C^_gGi[laE#IC
->uF52^y,Mr,RHce747a9p.N`Fr4
-ZsoZ"D8deY4^dgfH=P.+qs5gAqA$g+N$`6?n(wFFqR1<RuuoUT9^"[26yu^4jM#ML;rf!LELv@>z+bf.]r1tr_gLYKUz6|T@Nbv6aRa}PxU3qQ%1qe!:*$u3e/a.V?M
-b(q"@8>>+
-?$CP$8=d]7HL9)__RCpnW](@=A,dS@t>oD2DwT17]qq_vOOM5cJ4$).uMp!h$Ap-%,uY<
-+@h5vk$7Nekd*0cQeCS/5KnLXTU(Qx`(3k7P91*=vzC$
-uI{AHmLD_z$rj
-fN%am]7w*sgE/O;/
-e/;>E,0
-Rk:.u+J#
-"$
-szC3dr%iQC3;a/2wNl,8YV`6TQF|hQkyM@t3O?/*[_+uIPR[8H4)]rs.:iCe3,WW;Wi.0NtE!UKo(WF"tE`4g|I&0:ofQeo<.FB6gmohhop$lwW.a~N3$?F$9Rj7ODE)hqN^Sy[_V~4l3jh
-mI0@2ck:hEdRSBy.52o8>[Md68rK4@GHW%v^2W6iR-*a3]r7]?$=5h,!"yDH9blQ8lm+]a9=k=g*fBqm=7oIWf8%W>[K(Kn>#LT.Mo0>MWRJ(6]O5BVUx&=$_:.8vpPq>~0&;ApUVb!sLxS]$cw0B0!frAlb6%V=!Y8_![Dg.+w**gm"`e-tj"(C6BvE)=i;t|:Rwjv@L&u#MW]YF+V1nxtRr(hvUH"5rZ#h<m&ZIeBl*bPG,f0
-fl(h1kM5).J6bP>c&:Kh
-4s9,{p">R$*q[:?!fe@%hsQ!hfBrEl6vOQFn#@Y>B1R/YN5Cl9v8u;}yMfSRp==b
-3]1d,KgJd|J|!u4}2cr;j`wStFK~xevu%90La3C+Jn4khs..l#.]:~Zg"j
-8K7K>rd%"tLb3Uat}0|<jAj4SP)BmUkc)
-GTM/d2`k4s})KHAIOTOc>w
-.Qa"QnhVUWbTgB]]w2xp
-kS7x*wZ7Tv},o85CzmRmzU6%%/@jZ(o?o?t`d,B14x+r`^&^:Wbyy0^YBp,vA*ftO0Q@v8JgB
-s)^]zeLm86ybT2?.XS^!<_yB|Yq.*eQlU])t^#[@ec4gsQ.W6g5TYuhlIn%_],3o`]O.u9e_oduIc
-@x!pwuBRzuC5f6Xd=8j34ZTP*/Qs!tb<gGvw<RF]Dil=bVv-O"Nuh[{#vr`Rrj>r)v`ufVTnQp@8J#vku-P<-of&+Hkc66e.=gw-wo}vUdMNM0rk2em#P24cxtWj$f!O7R!$94BnM_($e]tj;:x2D?4*.t7w%sXkJh^2a,liPG(_!y>12$%I{r?o/^(_9
-9b,)H&b@xK>PC<KwWxA8%&
-k3)}@S4In4qe+^/L3_;u]zJ.8QWGN<%?b,2IFX>q?os[J#_(fU3fnE%qHrbD:_<8+~pEpZ[q>n_%7Y.i0^uH$9^@FM:5DkU
-E61mGXuP/qB3*XIcmF
-_E;&pvS*X/k$xjnf2+yPF0NH
--,wJE<qZqLSee!^po@!xWXL)/>imFiw*_#G?afN0ZE??x?s_m]G+vEWqR6;.^b4VOK9v
-l%Jk#GsgD)!f%6iYGkg8y
-u6F)c@9aI:x&%R
-DCu7-@!3(uB^:|@EArO7E58em,BYB6MXT"<92%V@UEDu[(?"]W#w&1
-"czF[@)mm`Va+CrFFyTeEW#&;gO7|a|R_XRAYV2`<2[W6<A-gp@3Q@MdC
-0jmH)^lG8(4umuJUBea_#vPTf]Dd1<#kOD~4-vZm=hHiUA^JGv@[dUV@ur7#d/5QA#(R?.94@s{Ur@{CoB-fpw03v6#
-+r10#P/u+J}@Hu>hbk3j?oHkKPKBr:*tFo6TJ)7s5k?O=
-7.YY%sYntp0.-a2obh)4m.UQ[]x$s>CEn1k:UXR^lv}q_A3(M*ao@5UCOeB_v;h%z_Qb4[Hr7*[qKY}U-vI<FhX0IxqYBbM,P!{:QG8/w9Q-vx^X&H^5DYCVgj&-UgT7p]*BypkE[=Oh1]C^mXp$cm8%rjg)cR*RR3;d|l|^2eZ/?2]@7<vAR*LCbich#QMu4jxY%pRNIurT_j[J~_JPz<zMda^JD4"g|tTDij?nov#eH#Fu}c4vJaZe&pUEk8s;9*_`v4WN.';case"lv":return'(s`@*6KZ+;hWLfnN*2(A7y]%!#uw<:,u^x^3>@_>::mP@Hb>`u;IcM;06Z[3fT9^P(#r96:x"#VK4^Z;`#N)n<"_|PS7zqdmzb2dvq]
-0(=Kqm>azErWBZ$J`Fik^>wC_=!FkbMU>-.U(]dZWjQR)JUx#^6SBsVAbhw!3ol;()eWztU@1@V
-~m|xh,Vs:@.UY9*sV1LO);UYAv^g/cnT4]nsncj[kqg,=RX]C9|)Z/pK$9ux`L?xSXpJpb-V+sjDU1uspBsaBLQe&R362w81#HsG9jx5NF
-6t@&r,o`LRa>
-RPaO<a"LT`4DQExFy;<63CF[&?GFSc!=/3"a+>0cG>K;+B3MZQb>f!0!@p4>Fm@[mSep8x.N1wQggs~Ky7PeQZ*[WuRCo.SAMc,[]8Y_Oe<+__>=M<goZ2
-Fl[^*cgs7/M]?.RqH7CPv@p?xzZ:p$I&o13uDfh5Mr.nky:VYFk/r]Q?+hCV7H`K2rKdPNY8C?x?-(v)4mWXW.h]LG.+JTkn.GLqQ+vHl80Q(oR,#;:<mkaqW_fOH8>u^,D?f%,Vn<mhTBb,s!$gBswI%fo_,>a*)t;e"j=m][Gp[LbqCx6hZ^$p3}YAD/tVd|3xpI14*BeqGTt`447cTJ1Z8NWKE
-Y{E?8%D37JT(q`0SHbgF]9PZV*;p`tLN7kr/+p`9smj(+PQ]i2X;o{bgTf^^/[_%s$1<tO"*6Nb^89KW6=vO%mKh7mx((h/IO}e)
-3_E"7x;*1gka,Lwc[>|h_J)AAE5#?mRj_Abkd>J-?q"2W1YQp??#h6Hy)79W+v)g@rX:
-/2AZQ^X
-=6m3dMk}!~VE=A@*`kk{M=`yY*DwLyK1X_+Y$]#|AIh(iExXto5Uxyvke6q6Ux:ObKGuah%Re#JWjiDN({!rW<V/^mvZ2Mf(MHjEmYstFGZnL_M^+iTy1SFU*<TBrjwrI>:0QR<YJB<-R2Y*ngi]0|P7($0%L9KzULuo`}L
-"*K[qsfM`
-XvyuN|m$Cdh^L_[i1+1i2RopCGmF?fl?9!#qOaUp_*^&FS$,-08--8D%kN`&K=9Iu(vFX)b"Q(NhVrK$HL>S2Vtr>%p/jq$ksJ:c5fJ;uFY
-gQ38+#4C;%a1r<L(yZRjArOMw9u_`.k>]PZ)[|q@&gm!V/7?OR"3W$,lw1Hn1AUwng8vPCll;>O*YV%5`mUpeuYRa%H_9wj^44)&?/IMwBRSR&Mn1z%*[`Hd/uHGr+1j4H6!*p][=Xe;j2&FY8VADLR<%^oHQ2X9)5RxjH%4TTVB+;/z#e&v7o.]v:!VePZyRE+O]oQr#Oj^42PU$SNtCjnr/3Pq8$Gm3ChX>Qx;I[y5+dd+LUt]u*b2Fd3,qPIOt}"}!+UrSi>2t$)^IY4@Cs
-Y;J
-]IT@b^9Q2rcb+#o5J,AtDoa&dmc2;:}$>0U`cf$0^GcmVZ^LYipqI;^aQ/(:=[_v~x:s9b>DvuCh[5V@KVce(Jx^d-,Nhwa]$BJ/@!,`MeBy8YV<Kb+WkC9NZ8%.W:NRR_1><.`Z+NhP|N-L=CWGxgiVC(Cq(qa5wHr4/rLo300VK2_QirSIYuXnG=1R`r.>~O~8(15GPHt`})B%GSI=O^V9lLbbpFqSe`W%kNe@]eMnTvU3EqueVD+tFe]uR`?P[(6Io/^ON&sayw{8xvpmrSV&uC2tryj0RFkTk:g-"N*CYu
-C
-NmY[1M:{ZC9nbn3/2#T`ZrY0>3ntl0q634schjR;:v?a#^[~<-OhX1Lb(xqOBZg]k]
-f6dWJ"!5v_Tq2Z0)]w->HlEWN3Zec">8A-eA/h&.Pv/jB^u15#lC0e7j,<_3L,z^dk;p^6xS4
-]3*G8(yHL(-$q*AY
-$x4G>Gxp+eXIN3)<
-I1X^WKLC~1]pgU.uRG~<y=yP"<H:,;gbGRd)u4dx1aRh3sLr[uRf0vH8GjVF$lK146+:Mv6YPc?i%)<TEq`>1jWSe+l7aRhmp7^PN&lYI]X`S.^%!#%Z<AC#=9&0Gr8L6W02v)9n%jXC=L?_-qu<YYm6
-(W$_=wRTgm>a:/4=<@30Mbgc1=m*#q23Iy(&#H
-}2{-+g7ID[N+Am3/W"+qzoLW.HQ!?e+(Q-g%/2}3_4a8CnOx7F,Ku3MV"%g3|UReK$6smM<*y=F`kMZHvCpg7,Ix"%-LuMA6WCG5-?TB4P([[SEQ`L9JCphNJ1F6YcSZ3
-4VeT_j@<,u5g@QByjtg#`!_1Vj8^l1fg_&A/dS;;hAnvaJX
-=OIpM7-.Q@js:T@=#,j*g
-?j>ptpGS[aOL7m.$KTGQZ*+1TDimXdjuR-(ov0,
-nKF+Zn?;]s:Q6y.q|K3#
-KPyGw4Q6^KlEjFV-W"4fK.J7N"jO]7V"%d("x`QUV^2T1]cO*25I/MZQFxS>_?/2Jbr@<`_!n?;6v9!?kwGd@8l@&Z5<fi2QkzSn_hjH-lTMEK=B>$/y"mYJk%qH%n%UTK.iN%.Of*oRDxDjX#i
-*|GChP$.p2[RQz$M4L$pUX=
-q|uZ@SRRtAJR$LS`nJ)jgv;Ju"^t8rH!8af;Jk,D9Om5Ym&.4j8fTlWziH<>0r<B=<P-%,[mffqX2
-.wVB*N
-S/a8Yv=/K`Yq00UgV!8YlrUv.iP3CNq`F-7/k*2Y+ufD4<)D.xtdAFopG&2S#s};"n`U2<*pCXbKzS^nnr8D9<zeQ7qr7"%en6>tZ)9Y_<y(Nx-8yp#0UfJ2f8~1k$s?I:!D;0j6U0J!h;YqH8L.6]?J1Bg.&6Nwr"<VE94RxRju%Y"daF<G$prLZvWr.!u_
-e^c:IDjx"b';case"lt":return'%s`@qbOZ+#A`oid"*iW?PLpY?_=rj$,<KxY?+**
-5[oU]ZLM@pg)fNScUoI6:cA<,S|g7ySya?]?hjblDqs-;kKK)x}ls&lwEwD;FT-7L
-
-uIxJ4SS3"=<AviBImPYE6~qEUm(Fd4Y}?Ji1Ufu(]9t71DHod|?61xYn!iDxZRj$q@c]qjn3Uo[0B
-o^@X-LUkHo.6Wl.[)sUi2zL~hPg{9kd^[P++57m=X=l;qdxck#rOQ>;ci{3;4DlD66Kx$9D.%n<o]B.kIcpB8xl
-Jo]=+4gD3X3JF`0{618Yc2D#YgM]4_WP,^FR>qrQ,-?8^_X*f^8f&q&fb114k=m=!&oa+9"}!Sj(^tm!LdK/P(=<mf!+vmAxFjdS-v*9X32:^R;ZYnY$56&.31wE%>f?[{`;*W]ys6ByV>&FH)kW+kgK*gQ*^xpEEQnHFHPw/,MPW8oZ>i#-lVuU<8@WuD__QZS4SJQxF*X&(v=*ptWju5mi)mPKK/B"Pm1}aC=:sz6cY~o|52d>Y_&!PJ+zO:6p+4hI?(326eRX>tcD>#_Z74X%n$kZ]Sji4WLZ*pHPrO/2WoCJ&5M4
-=<Z1f=hQiaXC[5h0mi7>`)r5f0Qm9:Ac6s4cgWnrgbLP1Q]
-[@.;Wa$?;Xji%E7t-eMwrocXgs/n<xKcYkZU"x{>g:&9H4$C,KN[l&{ol<4;*.go_LrJux8k^&Hr*pkC~1,c4Vo^TOSP3yj>?@M%A4)=#e
-=:l0;$oq#_
-eqX*0GJwshs]w-5.aiS.aM~VS2QU/iNHQ^5y@vgxsFMRGuB<NM+KxZ`;a6l(|,;_8oLfULJp~8|/+lS4Xf3H{"Nyio@Y!2U8:$p)12KwN<vS`.rwJGfp/AlZuWR`P:ndoie7hqKC;=)&_Q"T6/fAi*Ko3A77.g=*bhjJkH1T"9T
-O6-aJis.Jsz0J[P9D,Zi/av*di`R=XTg/-6ddkQD1^{-^?o$=OH:{Ve1ei_"M!&cyskcG!xHkX[Mb$7n6;F:9,dF!O_77dK`e^=rd7C_DKEfw8m"I(n-bt)HFQ7X+7cHd2`#ms%O9QyhY(]RHh!%
-hz/<_5C4"3.<3=<v%6DI<-SVj/C^@f*w^9u6UBjP_6w$K
-uWGk>l!2qEO_CCiG5OH<RfKe,
-M5E^A_9+cz?|2R49*Ch54~p^.N6@fmt%q_Q?U{(mU-B,Fa:_#o8PbjLp0y-2NCICsPE:Ao<a"eY4nz4liX8P[N*Sk)MRArAWw+$TROxx>^&4GL7Tn`#09qIRPtSJJ`o#[:/N-r>|_XgCU?EpiI7A6,h)o.F,FPyIlT8."x!GRBfBgC&3ya3g%,4f"oZp?6RfG_+;hSrU<wY"i!31ET,PO_lO386e9#O[*?<zC+f}=BQqgeNxV:^Xs,+jeqHds>8{$9?3c-[o"~u_h!RChs[wMF]s!pQ(2V$jtIG`M?q6:EmSlTL-5Et`.>,d[mv,0c9k<VEMD=Tq3+2iaSMgH(g]3DEPxv#X)gm6[AhZDWoY8yh{V;T6T
-/O.E,E7P(k5Ts%TBZ%d}Eq.(*7jl7YQ5Ejiq>@wDOQLbIJ6he:B-IAxEfp;^j1%EVBace)kTp^P(1hQ_C#4l9d*55]yt3@CIXLA./b[D>/%^7FmWt86idbX*m)0P#}pmCc5F<eX7p8*v^Oi5$
-y-oP@pH5.3TA6<pLPrfix/n>(QDRHKtvsC;7
-M#SO,w;%Wb}qebs@)rEAI&[e#]8pg5Jt2<I-Lx
-n"0HX{R4V.Az%D68r@4K5zCbtLG_vWl/T(!j-Ye)Rvf9aW(m48!z3UT"_Z$9m2OG+vuj33lzghxFesQM`^G(2NdFES$Dm}$jN~f$<#h@,jq)kI(pVP?Z%[.Pbhm#`z+A`GYX/3u}tm.XTzZ<V.UIVEXhR7nF=%RK0_Q-4|,<n"7`*/Yr*C.7!Ug.
-CqXi3<*Q2HTu_cW>gP}[/(:/:h+5Ggz1GK,_=XqbOE?M~*Ie,s:,25jslx8wr,&gbk0:3
--DqA7Hr-n!4WVc{r7+N[K/Ieq0&B(Hf^L=BR-[Ad|ZuQ=%T:y`|ICXJ+sx`0R%>YoW%yAq:>bUc6#>(Q[WD;exj3@/-]S0ikANZSoK~&0[hrZD,
-(Z-a*`D4`pY7==AI79jiy8Ys_$fF`)G.@0WqbsegGD=b~->=s.-[@c]U35
-)attP7)]e|)<E<-Yh,-;x{>>u_^ug?CXS6Sl=0eE(O+Za9^,5<lI*2?bln+VcW4FiLw]wo"81*[aeUV%^0(o"@&oiG]yoR"~V|8b(Be,BKf<9[oqQdAX2N`e,AkD/;p=&3b-svgnN;d-5vj^-=J4(p9T]u$Hl1u.X#/2/-)Jmgb@,"Q7^2d*
-v+w[s]jwx0]B;EGtO2B>wLUA^fF';case"ro":return'$]^;BbtAP(nk|S}+^NFWD>}wMB"h4tt$?BJ%6b0%nBE9pt6S2)*V%]*@mK3!i$`H8!P)r:kKx7ebwDVGOF2^q`eZ,:x7r@R]^w=efj2OI"2t@91/JN*r^"x3FYpqkc&Oi.aTEo
-Iu59`D5B$aX*,YJ!mJ9@!I##bElgR+@st#`xoZeH%/`St~@)]/%>>-h>AlQ<MNFqx]N@V;("hF+K])AD_8=xEJ9$c0Zom/OsRe=aKL?|K;J)05h7j5W?:
-T7I^D^c
-XWeFw:D&C=G5`4w`c;Y^R*jUa;OcdiU|(RL$3&II5pw2UHB.6%0m(QJcD6uEi52BMe3"od6eZj`sSPxFO5fWJ_3Svhv@XdEcPs$FP-b)Uf7q(]q*<yUqycs!cj<r`^Go6]xr:[7%d3lW)2xJnRiAm"B}yG,Nb$DPw%",&
-@~d4MIcf_p"]te
-|4XAR:{[$$.X.H00
-:>Yh0!/OPTv4!Mk5;nQ;7"EJYrxu`HQ}d=:gTQCZ1To-W%fR<scT3Fu6-7y*lhuWhYPXuwrmN(>$u.Fm)%tzF[#>xW`XEOgt8.<:`tb,Acd{PzoqVR4{X[Et@*x%W_,?6xxgp{<wO`7IZHNhC;xX)BkDd]oQn$51^F>PXb*%KB8p/>SCt6_2H69z`E_Wu-a?`Y%2)tFL"TI,wI">&sbYZ^aja/_><*a~Db."o4WTVI-P2M.g!"F>B}"%x},NFMopc@V"Bq-])Z-n;a-kpZ2E8"OTK[[Zaw6grJV<8c0*VFTo+nwHf}KmDc1#7;.ii8omtKUSg"<@a&Y&TFwc=o#[vRuYs2,"HWj!5z,:WM."mhjR_OfVrA@^goGg8&+%b?+r0@yxWAXCRB0Ugm*zibYjuY=Go]uH5}h.L,yxfSAGFc$7Jsj4byQi6
-y&6IAcI3Hsy?h0(ONqj%[m]=#e$kb,>-^AjfTHGcKGE)+EC-#(%Z-$wIY{M.eLP(/[-$7k(84WV,k)t8GM@(NObOa`rrb@Ie+-f36yoC"O7b@)T^o*xteBUv+nqVPHEgj7;trn((k^4.m-1Sbeh-w?!agFsI&fGIO^8b(v/
-x?G6#aU1!d&cO{(k)Lqf6U;n.b/j.VutDl[M-^wF$Io6co@qP?=jHx;Q[l"7ABinh=8&;5QBYoz%Ok"&/alB!MDY;3U}uw>,H8yy)<OfhdeufbZ6b-;sOQnwS`KZm{.w
-+v&tC5!ob?*(a&3<
-d/bp+%:1bB6;^?o|c?h"w<=)idIk<?@N>VhlL|Ttk>bTr
-HePU[zmptpV{yjU][oFD8@nM,{G&fH2MBznlSW_7Mh:k&|)4&XY3>1,q>,17><6]dItH(m[lB9k,3(+R,mNzvW4-Prn_HN%/h}rcK;87#7e8q"lK)k9"XX%uCIwHNU;6QP%;]
-I$.(Drj4v#j@pB2IspU-O;_q=^`SHB5`JTZCgTT5$};}uPSG/uDG$q!c[XsNIWj[.@0Uw)UPE3ZDt?a;
-4F]FbttoZFGbn:j;+a]an9H#c@w_WBeIgw9-(epiAtzqkNmUD<?h&#z:&9CM.8S9Xd5$`V7vnFm`dV!;EW#.17J>g7/HpwIbw#T/E9-#zg^oEWc#C@j(8;F3;jz5|!
-YFU6+Ut12Y9X#M50uoS3F[(VK
-/@/Fc7Y-."mZ)dZ%T*`7ciF-n-J|HX*RY};|4$UpRglubkM"CH7W^q%?f5jN$FelpTdEDW+uWSE%S/oVb3[`>"Cu`M;7.PxM-*e<$~SEUcoNnLQlH)rA
-sdxn3-L!@>K&49)YXbA6S_X)0xmyH<7<N_do%=Ji-A;"z7u
->Lg"Qf5N?obm9`an>j{Fv9*R.$7gx.vtpX;W#H{)G*>V?Dik!8$jz
-?YpwMFS.8JBhcd`@f!_TSP_CDk#Z[w?T_YAcGG~`o`<tVA(2ZJ(E},0IKB*v]nrL(9NqO&HcGw^QCfkkt=dr0at`HZB%VGvZAuQuegTHjM)`J$K;UTiJV+H@k<K//B&pA-+4eW0?YdvTP]k&#5|;17Uxo)<$,Sh?TRJ#hS.vL=1lTS[23h>"HDRU***v0iiMd,nmdE6P=)YsaE7&w+/hD2y$=Alw^#`KhA!]Yt*Ek4;pB9q7TF_1"%cqXPr$pB?-p*6b<@y0+/BKW[qA>(t),Meg3*6C-iH
-s8.FN)XA:T1*c5DSkqz1WsXwSo[%:*jq6c!9@Z8r~J`$-r>?.0vVw7=`m?4.a`6v3IYx/Oz>C3WUP5~Z40}l8q(ZW_($4:DO|2Y%4<THGtyI+.zc2LwxxZoE6o-67p[oegA[8S`f@0
-%[Q!_28<`}##W.#EpE!#d<sG4+e6=%J8cMG?V4A+kj$Wu]U4s1R!JaVQ4crW,1QM!(MbVAr&Q"Rz_g<*Zg$tC/;{&nM=8!3(>5sPi1F=&-mdSoChNWIPMnrv"+9Js`&xyg@mrU7LY|
-@l6"q1fUUwtV$6d-7)vYy7@Sc,(+Eo?^]b^mF+G&+."%,q:+63Yiv;npNp:1f030b.sho)WH7?H0$ae
-Tk9D[g9dU6?4m1tQs>/kZPB1Vq*#EjhHa((Eb@h,|6x].gte#s>Kx3I`(AUJ9I0@NA~c3cHW*d!cph2w<m8Ngb><tDv@j!L%lRpZMCrb]r,"s=yPnNqWE0EZ//hvkQjSxY?c=aJd-aqbIR7S~NZ,wkfVWTZ(Ut:HU
->/%xb%LAjX>0~xQ?Dd_JV<F-G>`ef(Hq]?r]trc*D0ayb5E@Ep|[IhPIi,@gkom077"j!J.x,=r$F7fJIR
-<49/>).5bZuy+h"zU>>`*[F|/kj+bZ&H<eH()fLA+cK8_E6yJMBnsAE$<A(~4@Oj*H^SN|hrZYS&3okl;jsDk2y9fa7=p^A1o2o]pAU#,~mIC<ZORe9"5wB`x{^b[fe(K2)DJSl-lbE"M*LN>U%kZa+qde9DQ~oqr?d7(L_,ZSHIwx6*ypcC^<"w<a/0>aonv!-VD4DoPONuy{uPow[WM(<:[i<3qoi%*ijRSw<]7Q-}?h9%QYF8GPOm8wjND(WbW_j&?@n9b<Yx::V:lpTu7:KPA_^l@O.}#"j{LKQFq.9yxc,LyCp(E*Sij?CHHe6i4^=2KoKQkyeFHW::(twja]u7C,tue3Yk$ryxF_KRR?.ny=^"MVK}y^>pi<e:7>E0"|Li]<t_:O]yHdBF/Q
-f??_iGSU{?j94jbCwk=f[uh[^+&WHRN_Odm6H
-z_ATVF2EJg^y~Sno~L])];ZvgmQ@rTJw;d2mT`
-L.?u?HEkW{V$?m8TXgK
-o=';case"hu":return'"Zu@ibPDIB=q9f.-$E+%oMs/;&dAU0*d6Cq7
-?J?5>RGK<UAh4"u`UfH@dmS~[!i_O9-#_{K-^K.%(BJS?A
-kk1-;e$l{R"a*Hwy%Kzl<qY$Lf0mZF)SJJG6]I);Ke-i=C"CY*ojcs|[RnyZQ&SKg4uQl3EMq-]%BiiR,?VFRGh2.e3n5vi^kYd0cd)fZ2*>RqZ:I@Zo/c:3zAJb:53X=inROf.)o&f:30sjRe}&w^zvtiEa%`;,vz)LL`>W_h2:Gx.1nyg3"$8K3XRnp7co#N[No^5Rms~>eo6d
-A,h,vlq
-j;pLrCAh[c=Wo?J(>{a7NCN[jb!*C?RAlIB%x^-}c}Byc>&geQ5U^0@$sICHqi>t=&Jns~wO3/ma[>Ox=0C9#a0i(K/xIrc5Ntq
-RUk1mE^U+Dg@iJJe,zs+hW
-p9z?t.Ym?1+=Sy2bf1^J7#Cm)UoSMG/1&hekvPn`%&PXCquPRfQ#A
-Bw#XanEGqjuLY0!&*i<ljOsc5RL$JQ23kp@.-bMJe].mH+)PXw7YnQqqFGwmJ!=?[=q4o=%,Xw&u+*v?^0jstb[.9^>P11YTc4"k0vLWh`G@z?S[7F%7~";gm/^K0R)=EVLQpa8Pil]h9M%sPR
-<N5]@WBw/UW.F}rLDyEWDCm;!lXQt]s&j!Fn@gIUAlg+Gc_U:WV}>ts8>LIQ-q=.<QckjcR}RhFeN;G$K4(w$mr&
-Cg,q1ceZ:Sm(8A?N5Sc!I$lRbc=?_MtGv&=w3c"@>slV!1deHj9]A2soU($V&-S6]H*]dTJN6qX_qlQu1;>[%u"n`LAC"g+/2uBL++JJq)Yow:-H)E3"VbenZMOO}$CQ|9PHl?hK2a%
-~nVV(uMNL*Q^n_t1W+A$f]l[*DK"i&E=(t;j+:`rKLer>+E+e>O*qBT[/8c)tuxwOhCdQ23-*:(B(J<KJlJ!5_A<By|#lUzJ+_HUhOt2<ouY"X9*XX8ET`VPIR*U@m&hlk+AV`qHBmW$G.;C%Xk+#mt3h&8#kQ46cO(j;#Y4HKgh2t;i,*CT)XD^j=>`5Be;&//Ftqrf$-;-RC(3;.k?tAC^mx)[uR8fHf2vo_kJj#_F2PTVF9s8_(j`8a@_K++n#Jf
-m"N:plxP9NXy>4VntVE.59h+(!:&Ha)(nJhjE<X<;"_eUP,m4>X3q@#@I@/Gm(QNM,@8r?%CX>)R;np6Mk}/UC|#S2=v+h@ky:
-)ac5ZV$o;9[{e$Nd-#k>a))FQeWcgzhTfMPZ":UbbQ+NX=X_A@P
-Jx!T5
-1od|$"bS@eAG(u2Ms>:diI^G`hap2K1ESq8XDDOc#rbMu$VBJobl;0s=
-vw
-$)!sxeFO({COYR>?Ec$!U8>Nut(L
-6J,)tia@Ih:UL,}s8HYf
-D35`U"bf_D$.0t*?E-^)hp9B]PS-<.GwHz"RxF
-Yo)1d
-E>bkbCzEa(=6SAp)VIVM^38&3ytP]*X"(=:MVL]s6]j6Ka
-u.IRtgfOQS.SpE3C]#Q6:p+!jd_++(S6,F,^Owu:mTQ|1X.W8c.c8X`Oas"x:33rDDo6fn$~ct#Pq|,w,Z(%.3`?DG^2"OfHD[eYh:lTT:pzP$bml2mJy2O{:m:^"J!At5,4PoKWs"41%o6vi,C
-$
-B?q]SDTuPmG85?T4Uk88U.D2qzyV%Z<>ej0Lol5wrC8)@<ZkR>&Cw,6RKY`wWhIg/_]N[bY^%$8IcOxj9C0<<M.Pjuhw*^%ag:B]lEK7Cf^]#^Y&9LoLII9btP%5D5=1,"X/<iZ6%Jp(a
-1T$$@S$6,[x>BR,i=}o++Vux68^VRv#V(!WEiWY;p]>K]?=tMPo2#aU14X_ob#QLdj>[1G&wSW[+_q;|vu7Bi
-L[;kP|$1IsWq!qH,nVj1Uvo)+"huA#x]nmV=w:#jF#G9vKKJLFq/*z&roq4BIB`Sc..9!JP=XFj61-T#qkV&,r""[(k-6(U,2a(6;n#B6wn-iI%Y9$)a:"`{ncGAU
-uyveX%&VC8!=)K0UBPjIwM#yoU=ZRA9)q(Df44hQw$4R8-$hQY`hTi.)*h5^YLEN+z-{rVE{T{p2
--hU!ne;kp:1RM(7EZOckHJ%E^!`A.jm6_)(E~8E4=eN8K:s4));
-D3pW{RuL4-a-VC5`
-W4nvhUjV!kN(B6.Fl}jtz"1l5t-ZF.Y9+t&pOrCq.|k"IS%pC@QP1JSgb~3lnS`xud`X"1WoiQ>"oB,P13r:PzXCf`EwZo8J+,avB#Nxa>T7CM>y;hDo!S@k)x7*hr/CL*66Vnfx8e9t,L/UKVex[xR+IEWOI##1wYS
-TVa9k:brpO@pM>L)f$==D<"j"Ch.QV_AI]373
-q]IK+6tO:W*f5A4T_5&1-.u=o+YEt(++J%7u]`)g#!1!]7c]5`?G)GLoGo7
-KomdO/"<9_1?=<tH0=PjwQgRly]lfLQ
-S*CEs(?E8Ajup1&o.,M!@;;flZ>e"b?0C3#K!Zo1]bL(Oj!jP]8kIhIC^w%|/k+3tGdB&"BFQO-fY>`HlHf;.$#{2u?g38`F,a`0&nf3QN2b;1Io[*SE:MjZWv4!XTk0)n+Z8Z+}_typn(PH#BJY?~msV!%u6KX$TEV8/:Np!$@-jl.s^WP42A^y=|eC$rBnivJpc=?6NK`$.%]S&>,L$*Wd+}7QRhDn!Sa54dqt*&MEj.4C5Li4p!0*;HLD8m</U4"u/cfI_/wj_?Brl>F(JZqv;IlM)fdAg"<MOp--%2oFdUO,x(wJOV&%Q12:B
-YMi
-d]FcKkTz(7>8dZg1x:G1/+8uKK[,`A7/$/O{qhpG9O<9ecA@Q4dm&3Z1f|O!OhWN9(15,(f7E).JID@{
-0,Jk&7Sx*TYb,PBIKB~uBQmQ^R}IpY_r=8GeB8ZpH$;p?v0S_+=i
-1u4.m
-=<BA
-Qg;X}%J<x?&7WSE<*2uD>(NX7u6xxdxBV3Li7ZD/yfEgC_-Ye5]LVgzg/p*yE(}tHA,WrUP%s:OJLSXBF
-]RCK8S;^XZf5_K]XLVkTHyk+Ia~gWj/`-JB?4#k/yP<c."A%[MD,XrZ*UOrd5l!h6rxh+Cu/;:bl?Py&pD;"i1]6)1m08S5gr?@_q?L[Q3m6lG!a^]2$7Zt002q[}xBC-Lc-
-#ogR_|"eIl%t0Vb2#tE`?r4~G/fd)"<S%2Z)v/%{l)lV0kNN(0A7J]ILR<,ZAkIiem/N@.4i4<EChh1cFjgV
-d?;!.TNNmRQQ1Lg<XI~ud_p5Z<y32.F(=hVw<_zT:*{QUb#D6e?Bcsyjr(ew55lA}ZXU/y_3g]=gd8sm>M,X_2p#XyoRacj$0]6-%X9qcVMtF8=dz(J_S
-P:s#PIElN=AXjkPk<(^-|@
-M2r-';case"nl":return'"ZuALbOZ+$c,/Y9"upd[48CIaA?YwdvUa:!?z#4k$"kA1.N(=@q,xZ.-VxhMxW|51:E0F&0#KfUT_HBGO5iDah`x+`K$;C6G|jPc@x=x-@uj0;8q&GI**H&4EN("==?toa9?UtJC>V*x[ATmx4%g`S.^k=;,%(2i{CVuq_m)=ZgMIkPt/R^L*g(cdy3#7?Vd`]^BePj*M?Ph/2J.%t)E@wP"zcygv_wPGT^gK+~v{mT.~KUjcJ<Jo`d_
-Dvt"P((ol6B_$%!V$w(L63GntS^nc$^W+]q>v9HMH{a(?Cd6#opQ1M(ApWf0)IiUc@YO%Zq5B.]L!/_#({Tu)EbB=VgCI77}_p$A:`prCu(fvpW`5Z5!a`@0N4.~2H#EjR"t$(r#_.6N
-"f)%mo3XD>/?t1;U;PcL$X0L<8/b/a(=qYmfC_BWVWq`I(m=A7|^U[yRMno=:+s)R2vx9f`rVH{z"T*Y+3+Hsb3%8wimXcpV4%1s$f{U7e:
-e(G<hc-h$nd=$o~hKFa)6uU(zpA6Z>9+aDU_UOdZyv0,8(SXI+t$u8w:UsnE:_msp_qK_m_Khlmwra/i>/A=Nan#ukvv`S,3-^ILmQK!VWBdit>@;nlJccb<MUbc<aF7:tt1,GkpNn,O(:RC(==t;ayue29PBkH#4oIPrc.[z+lmSeHCDMA6->K")!9nKIJcp$C>V)TgJ6UPQ:q2F!}1#4Fb%"YbO?7LTdPs+y.^{XL
-~b4k=?RyA?X9`(_,i#kcgp-*7SM+7KgF=Bv<YycBfa:3cwOFgh-g_>ko=]tSX
-m"G85by&E7dgXBTXqM04./~
-O_ElEobbSUxi|tjBZg,C?A$,.O_`gL8Q.I`q=AO:+&^H[YCKtg9&+8H3J+wyaOf!aRKOfjwNS-W;ZDxtu30*q"9>cU7jWKno_roQ@B>uqb_48<n6T!C0Sb`_7_TlC<#"}:Npel|E"xE8jovV{-h%o;9n;rflC]O#>#o#?DCvqOf,hx&]u#2XLK|7Tpsg0Mr>/#4P3,?IkKdAyysbjuG-XU@/!/W+bQ&)28@n6Br^l5{fp%3e3FJ$-^t.=&p2.&:u
-]!Ltc|k!p/-`
-BLvK<``YRf@s:?Q),8UL~yVvOu+`^c]
-mS*oi_>--ix&{.tPGu-pvsRCl#Lnisb&z`9hwjNDr]AD;"aK>W_Trf#mA,Ai^L`6V-#,QepyVQV-]6U%VmrS1Lvliy0p+TUcmMw6~0"BwMd#1J|cniiZ<?I$-2s.0dq
-<:2$(OU-Cs"&B"6:
-$LU:7-o30i96jdLi#a9h)SJHt2q#]7>`+&Y!5AqG=k-tqtNx1UhM1<PSrrNJ+BNYS}u.LjZ)Sa#,ZP,)u*-?b=3
-wPKMSd`1^_BBua4K]A3F[/ZNRu1o:T%`<F#kfQVBECe*N<Ge6JjdXN9C[apJ1PESTI(7$3g`Hyl`)7:z%8j|KV+:PB7E>N0;Cz-*]Eu8;@
-3<tqfb,CjGvKpY68bIkUsrhRRNXiJ86:W[C3M-d2&
-xGv##.<hl`>X;kCx82
-",P>)`C<rL<hBr<;NfRiSR.s@YYc#SE~JiA58&#xx
-%~p^Tn3%MujF%PEP9?j@0Wqc8g@u7f#46sbLo|YxKTNMjCYAwi$;?+tX?HXE%Q%8!.c)#o+1]8h
-a}6GS7g1=[VzPvQCSRU$86U>z#Lc[6"K0/?xR{?i(3@/[yc{KVj&V}hY98u*Cp9~PO4hVH%PV9#.14iE<zasuT:[AI>#
-OOJX)lF]MnOyCtQD
-WuUE&Z<F*A4z<j_`KH&N84lWmLU%&s8O:dVV_b:w^;#ud)W??qWN@"1ww`
-v?|41yC?se1EvHdCg*o(%QhUzUT%.3
-Ybj;e5FSLOTAyeY^Jg<7rKrC;&tdS`]=sRVD#vH&(vq[P,@LyhT6xkRjyRLUo1b,g..zX$84c+Lk(<-[dR^vJk-|Cssb-n1BKV`WF{5n#`F$^.WeDiWc8uX;>DL
-.m;wCI@;_0jbI3T}/<P~:sS79zF0Szs)%fA_h._~)WpyI9ena[M=<ft1FU[xi/s]=^(=Nt_0;&?{[&UMJ?
-qh58iGIxd<qW@!hZX/6hy`Z?:?--p;ePu!toF!a.cbtGLuQa{GgQ3UjeZX$fUZ*n54kiNZ_fMBob#+DUTXT%MD+8ZDFh,`b@~j]O
-:)@,0v9EioqbG5N~A)I`dRUI3$eM)9e%VfwEY}w+H-*?kI(KyE!CeQQY;:xNK?7S4ahKZr;B%[)iFs$"DIFE<fKucRCb1:>ui=Z[yxgrd^*z0ne>(H3Sg;Fgu-L;c-]`5Dfju8VkH:$36mDUHVx>rvH(NgoBb[f3-5W]PxVaMRYu7_cSD"9!%6#X9},C:dnXe$:ru&PB/+Uqo)u3`/wWfr7KI)/mgDC/+/AE"{
-SU+E61XpUGRMWW(H#[,]gIE)&r7?V#*#^MHO19w=[%9AP_Grrhi`jMC`vs|t~cs]?[o>Y^]^B`MopLZ#.!siD82ZLvJAbj[`A%cxtPmn/U_M"u08g2`8DNKt,W]vSdfGFB(EdWke"!^q}_.Te1(C%J_]VTDn!CQbx7]@T]"c%KOOm<~g">J&CQy/P>xH(cp`N-3+d>g8MN)8ZlIIWesuCAdk5%9;?xQ-h/FSlK-7SF8&2Q6m.#P=:.V`][P`3RHv89O(xH{,&
-n=<=c[fXKDy-5(PP*J%,qfuy-09!))z%]$V*He{J}A,?k*}+HZu8Yohdv;D/$36ex;m"qN2,:vTjt@Ol!5#1{xnS<qv';case"no":return'-Zu@ibOZ+:%!(id$11u@~b!5#YXB&iY:te`7]i{F+9gPD<pU;B)v*yw"Gl+l/Mx.%jHM=J&PN>,W%:n:7-J5xt?X#M$2-Vx$]fxoF4MZ5@k9?mpev[KvyF?lU<i&GE<KTSpvyc2"o^9ZC1&]%EK.PJ:b~]z9TG>13ar$SlNm6Hw;Gj5x`J/n*9W:Cbzk_$Qq;Cx<8E9^!<ox`yeyV*u*7N|n=1x$ca~*2P]6Vj}IidH[UEdeCE6w@,&Wzte>o@~vsX)+|+Fq:<r#&f~#<^DnWq
-=>C=6n5C;ZOk_5_VC)gl3y3-6BB;c&`x!K*)
-6Pi=i$m8"B#q%M~SuLd)jN
-K*R~"D
-kZ+n<7ma?6isfD`R<Q<x[e+%Nh?f;]L4<]6BAq&vx)&1Y#Lt*v*w%;
-Q|_Z_0.E:7B0xwDcYr"hh5(r0`p/?@MMp7qOT-PmjSJ_RxC$HkGFs~trj=SE#[B}k;1hV1iJ6X3BK06QGfJZW44Q9uY^?NC!3&]>d#IEno"5PKc`YGlvA%o&ujNh?Ul[E[SS]TqiuRSuPW&$3uy=2ztx?cnltJ^.b"`w:^WC#NZwZ$(5M]`<YF!"P$_02ET[^Tb9Ik22pFMW0RXA?-p8?c%FI-o/_
-JB#0FlbEA-`8hDFlnvd+#]@+]hB?U<er.3I.r1ec4fr4y^chI3P/[E-QY/=U^6F;tx)>_Mg~H:!RRExyoZyo[?v)Z4b-8r!DCRo
->|ad[B%T1wth[Bq$xP`eT}ovP<&+,ohW,|_sDb9/N-O~&pj9)>*URndyc"xE[Yt2Z_6~kcu3c>XfW^ok%J52_L<.b>^N0Yn
-/#2A6
-f@z))2n!xQ^at6QWKjA!B$>)@YoD*Yp9`;y$k5gK7.=(1lCmFIcbh_!"4rFC6OrBraj()?*KdvqCw99!"p<>,rpBUuH|l|.7c>:>k:p3d=t{8S=*%K3>GNAg%xXwD48bFL_y87`,)2bBM{5_kGe/D)FkK-+;-;6~jBIFbXB0B4CqnjtwCSBq]{Bd)m2]tVoecV-0m7B@xCebYc:
-;$Sm4O"5x{UH2fXV)+k$tGV)XTocfVQpwu]7=k%%8]_>qY%&ts,TLpqbtQ%jOe&my-^Eqati3`HYK#?T
-X?tGLPdb059x!y$";U&%-$v7TN,s*IM9?
-s&<TCq(49mdF77hInh}l)(Sd!B(5::QZKL,i!lcpJn&ZJ8oYhv_M:*R#@-B4BO!eRTC)_R-sG[0r
-CQm"(xBYUn]#]KT:K^_sqV^x=co+#8,a<R+b;:3qT2(:W&2M!wg<ZL,ZonX]2?J|3x3Pu7/Q1B]WPXf(#=.KYJ@X5We=VgE(MOQrP!)J_mN*c
-9Whebk
-`!,qL/EHJOv4?auVCk`PEgdn@!
-p)mK/?6~HnuooHAj+"W0Z4/XM!6Vs<M-F1Y$Rg"_w1A+S.!y!sm3_2[LM5QE_kp>jg.cC^0Z<f6Abj?H
-Ag1JZYLGW#KGwPmG}7Rk6A]GOANlzY,F#^hCx=WcH:oZ*hRHa+:5k1Mc>$ja};8QS?e&af~A$!8iU,a8TU0Q;@TOCV@Htt0N-)YDOgXKo"5t",1vfN*(b&KV3Cb0smV4`[aBHr5TiB.kl)ao6:iS;ar009"v^E6oo0`khT};ENG`?
-<o#u?7+9BcN7{tuw_M2O0w|4dYmS<hI5,)(e~^P0HC+FlaLfL
-,jJtH.GRv6fpVh1R;]e]Hs-PWJ,-mYc,2=Cf^S54fs+6lZrs0w~I=Dz[X!3SL?Sb*?%r#W%^dXIget*$+re`pi,J,8g)3?MSHj
-FN)9)y5R894#9ZIH6
-ttaG]zP:&p]Kx/Z!<p>,4XC|(bw>.ZrxM(HU%kaF-%@-G,fOSTP"gTII+FhrP(_l=8)-&F3Gs8A3)p)Kv;Vi]2?m[,BXWDvW.k!pk&5"Zl:z<e[A?37`7HhxXs6nwzNzQ`Q4;q)/%zbiVLtf"fLHNop6fT,5E]ORgkX+7S;~ePP_K"5Q5N$1*f_X-rXCosocpu7|qt2aSHJ=n!SiW/7:k]Q+5Evd#nP#YrPghXH>S^rgEw^:9@3$qLcO/<qA4e4-3[8V5rOGtfE5%;pQr`^-TP<^4/pGx3TJy>oe_:,[DbL%+,RQ0C<XPIBD1]2yK+AD.>Ea;*HCEt?xDfbR=CW<s%J)aH5P:#5"Uvur_[l#p^s@/Ny],*"t6_pa-Lw?k$
-6ar]:$Nt+a+G#KZ<,nEN@H^HUdE/pL}(.1]mmqt^^CR@>=@>p??^v6rT"wqpM/Imu&"68SoXc!n+>,y4Rom?,LlOQVs:3)=ov4Z-3@I$(du?5A#gn1UGL2bn"t4VFMyJ7CRJmfCUIv;h^lcmgp!t>qd[v?)=vdz,,[.NkbtjWO)@46hAl9sFGB<[c`kO$Id=J/MI@8k<A_$EaFON=1{:]:HXX=>@xWYD-A-t
-]p3u;@Kzr`$7D=u,dB&6A`CV>mmcs0&@rwM4>ubBw2JsJ3@TT`cm3mD+&(R/l+(y6a3=ulGaB/#XgdLV/y9@%^,&x`>-KA3c;7;T;|
-.)Zvi%==J_DE}#plx
-)ui"4
-v9#)7hqaD;G8m6PB!G*rrG?"Bk-:KHj%]y%b3`u:C
-m@_J$^GmaO@^5OoVa(v:LorTB`#@k(6Ucm2-5_495aRj3=Ln(X[X=WIe>2>qIJjUqc-GblPG*16Wo.iC[;[t-DQpEbZaQ%).98@agoYT%];@NtWEW!927M^Up
-ivSR=W!]@-q6Cs[kbtjEA^*;|8y!ty$5XZv/FXR$a%,YAQt;2L~<!v5d(';case"uz":return',s`09f{WR$"vqR<
-iHXM/6/!%LDlJGD-z_yP@=VhTucMHYdB^/wwj/bB#ao"r(IQbBNeXff4w=As2daWG
-ZXZdfpS=hf?F#$i7Ojp%FvuAR##s+ZRWd$5Z}`EltB7glfG7[J9Zlea40tH`it$`P<q;ryq&:.~w[NFs^FkVf
-y#-<#!~5f#gYRcBCl^7ueJ/`<<kuRF-$<Qc?z9nRId!yz^(c4C0NDMm#J:a
-L1Xv91Sp#ECI[IN:ZkbOC0:mrTbY~/,rf+#jDKYhhDKP_?ovn@o#(qDwo$t8T2=-^ZSw;/79{*{utKV!XNCB^vG3xuiP8+Jgh&1sdu[#?-hlFPXRZ1aAmqeaE%}+AZ>t,FcOmHqXypw;?:&i#`CoU<[Yb9mxX[i.H_K6zDpk==Wf
-tjQWBE_X*Q?Nr0hKW>Lb>4kD;.b`*e1e#"!eouc"vX3$v9o&7/cJ8=`XQ38L%X%D9^9MQx;j
-fX0m*Ouv~kug*3t&xk03rY2No)E&tbjZ"&=fK8J?7RfhjAO[CT2?cMf<^Ab1LciGTamescz
-Rf25x^&
-{%aGQN!cCCmyAUw4eD?eMI]$7S&Ewf;r9)@W:;>/#p:<qp_/xa-4=J`yXcz7"^Qa;NSS:[6f)iYc2Wb]lyr(&_8=exkjTE}6),]q%d79(YSLji."oFkcWD6I{ijSZ&CHHQ!YWJQY|-8eSl~8vRqDIAQLh]Ym-5M4__<n3;D6%2a]WJ|"#b868B="g4NC:FbUHPb#9mh<qXT,1i2ASPLI!q)n>6"HbdomRP)%&?jix9iRKS0iMsw1`+AeVU|IrghY>bC_!SLas3MG/aaB{:"z#(,tN<GQ9C.@Ro}rObK#!.lQ6az+=NdU.P"B/JULQv=#DKeg-TT>4GPB{k|3$]st@uHdHU~xf^we
-AY1]/Xi}UNX3
-Z3Je{%xo/Kt)L
-lAc1Q&NA`SC)4La(tyQ2h^N%E/ke[x21DyRIWrNkb=d;N4&mmynLRn<%+4HO7O!7p!u?=Y=`2A
-6/"YO`EU(YVK%[*q64K?&zF)/zj9^Ql?BwB`L~i96BN<E?Chv[6Q=UEk5j(pDA^V-:Q/uFf{
-d5Vav-jR1:VkfFz#
-(5ljgRcf(H>l-6LM-2U.J3"J-gLM",gJ;CY/ozOA:tIPqU%~Q/m)LIx6ZTpN(?X+ZMiGI7^bN:yv&f$V$}[7O_l43wX&wQQ&_-$*aPu?:iP*"eX$r;JuZqgw$0%jrZ*-0BT.=,+]:S/l6!L}PrKf-Z!w/=@DS-8*9bo0X<7a!cG:Z]];vj+bX
-1>!1R+r^.(xje##KRXtc4
-)&N0EBO4:q<F>aM2$=>xh3yQ:X()W9U[kJ7iGFdR6T)uENN2%*:v2^v%+8_qY1^-Cf$%g_#)!zc"gMO:i%y&rzlT7xh8t|&W,Xt!M#M</E,piM5}ccOj*$@Z"D[_fu:_kuka/g2I->aJY)oNa|8~C@8@O0^}%.(L"#@1!,;)9uQg/NmQY@>+9pvEDT%}Gue(,{czm[Ohv:B9[i!I7HK:pEKQW]3"(UN3m44Muy_J&jSn=NJ?^_f0m3hIZzf.6E]<LtFmSchR@/A@]wN9.*rsxr-*VNkW5_[d7m;+Yk[g_;T0ew.P*<Q92uX!bL;^PN#2Q7*ft.`rkaLqgOd;(tgU+jgHITi!#a1^jl8lIHg#-HBXCm"F3>3|r&7rr[_ef:Y1dI$Cq5et4c$jEY8@CY@3WEAQ2#I0!!y8)&9z
-ZoVx1[S@h6{u-bwVoS-p_=3&}x]0pN9&WPWDT2@
-fI+qac_+Cda"}PZT@^,7v.lt8j~j)K:hz(Xp383"B"P=q3)Qdcx&K0(oM`>%G#jG@_D4Q_Ha{O^d+WQVsvee,1GHONdR*eF$SQSP>Rj3KE5Hv*=p6tOghZnVDlXl~4Gm$n=XS1l;x1?v<N
-uZap34Mxe>3i;p27vjB>U2Oc=kV(:,oMc]mBdmv5M.?TL=HD^FP8hvk1Sa`tL6,rEhd=I?,1C_wk/%@TOU5w[XY!M@97<xB
->Oi<3Of=37N[x2
-VH@RM_Y^aF[j0uXCh8[EyC2uq*{IWLr#ttjvTmK?2v;:76GW~=9NtlC06U@OZ?lFe^siIV:H#p^uppe=&%|!w;QekL2:e<n&4d9I_`.w-ch
-2ezxRZ8l`j0B[-l:^mqXGw4Q=PN?bWG#^i?+>w:
-6M~2J($d>Ml7gI`oe
-O#)Hn3J2|vx5;QSD&g!e{3-Tz&R$V6fHxWYIKw&3v?1HijAbg[a1_C_jdP2H0`j9y+-Y&VJELgu`sB2gR)hdhdP;u3$Mu/5iv6/SABFNrW7MPO>W":"f?tFWE.Ug[d/HH`b#8K*Oz@"Bsb"OQ]5&lP7UVx4`9G9Sq+uVk<oE<5Lx<f>U{<O:qPR%9lReF(YB]"_=~iOoSHEN4Qwh$#EogRR^t,,"7xx,o8[0RixN7$F)U.ydTa[Ngqfe.<n<FirKovQB@KT1i2gY>G;!jt`kS`bW0>41U+-Mh:N__`o(9
-bRO=Xu0T&!zM~+nL4db3,adj7n1xQ1BTiAzW&("4gMj,}oBv-484j^We$Ko1op8*A>/YY>U>Jb6#(#U.8!/
-LC
-QMa3u]Id"b3fv0_YLYA;;X5_NfkY6cjKd7T"CHRFP=KIdNC`=|_3mj[eA,e.:QV,tviDm55#e`GUVgnhL+ws.pMbb[,;+ua(h%iafhA-Qf[yWY+)5jl&<vK?
-O0PQ;11m][OuQ="_R2<enBW#|7Uhxm4WX_Vo?)5mPI9vMrDv?o)';case"pl":return'&]^@j6LB#)Q`sfw"YbJ-2._9w;m=#*:7d;Ie34~:LjLf@Q|S&T<%M^8@C+[eC.D:,
-tW[qiT7Vc5Og22H_y<,sa[E`z1Yjns_+4%)HOFDM9
-iW$[2W{Fo>^C"(
-.a1d_Ox`nV$?h,mZ[En]f`FEr9bec
-
-i`(IimR,t+iFJ@IJD,}iDrE0Ch`hrtF_|q$nwh9tnA@B5M*SJT;q.E.ud]}1FqS./]+>r;vd!,]N%no]5GAd5@0C{Wa(83}LmwLR{lX<|Stpr2EoCjlFQJZj#eHoKkhp#RO0q
-zTTr/@4m{ZEqeGhA*eQa#
->pG+--A*NG>xade+_g"B)vk"
-7MG[n0ilZuKBbk7@?9AVvv4GX.k6[cFEL+57yYocITdBt2H2Xg-
-RvBR3PfAw;BqS_m4>Dv<,Xr~UHX96ip?+PYX4aPy`XA6.vb>"!kd0}O"(m^ZO9x!E(Ke(7O4mJ)-%h:1C&%08ajSF#we-tab-Ah?YDm:fP066oqXmgo#/)Do@Z@WC$Ty*TO+&3PQ2k9Zp$;=BAtFg1?W
-42V;@/bx:ZH#2P`nMPqQe6L4<F-X.dG*c"D*xQ3q;s[K0*nGv(C`X0Uot6CToxzbW%Aw!rPP/(BXy=}[e+Os}Zh-22|ZsAu8DddVLKC-h8%au!Wy`okSpF&UQ[WL)WWTw]HMc1ab@BtBcE%#FAGL%kX2WB<`o-(7Nnh<WPe7/m$jNrQp1(DV"
-mTsqNWPh5`lV89@))Lwo?Y:^?&$Aq.A4[I^9*vOtr8iQ5*SDuh
-ssdr>B&|<RXk?Cd0wS57q-t0l>%C,^;TRV76PT;wAx8KGHOkO}D6L}BL?.bR@&RiBk`%`(`D2g]-YF
-Kbo.fg_>lNxNlevwSR9A@6qcDL,LirBf,M;:?)/=E-m@55XI(]lk4:;2xh?yB2hu*k.6|434Nj/"j0GiA5|ZS7yS&+gb6#,Ozww`lrUU/sxYcDf,n]-o%1
-dnEewhb~KILK"b+Ran,3i7H{!Lq94(Y;xtl}7H/p^SB~dm)V&/7j"Zw":(=T
-_V{0n[#m<]?N&9Qte0ggB*%l-=!6ElWn00m$d31P]>9,28m1l)S!PnOZ-6@nA0
-f^LSjTrr7&uNgKXpk*]{S$S+O#_Wb;V3pdUTI~U0nY#kN,CoNRBoQQ"U%ggpea"v<3pHTnA^F!-7PRKb`fnu<O-#eB<<[U`y.k`oO.->%HS
-J>p]c|]kK{w;c6yxr&m?*JejXRAseboqG73YeE7S%%)_)O(8[$qXC$rUxOB]tE44FjyoMT*idLIW&lgP4`>1TI,&Ep2(pw?6Zzti;]0-hc1a,1"0*9q:?/r&gM2<xG<
-sS
-<k4sb,7hEc_uFV"n-/[P[v,Yb8>6,Pb:|".[CV,?-DV/.Xq#&OA2<]wyK7~K{3v<jJA7d8E-qfu5te"lmFUEgxK#Uly2SQjpdBR7V!bC[hOXr_LhaCPn+9-a@$k$=Qz;)R;sGp.bfC-,8"{di;4Vr0#v;lbY!Z4!Y6lL1QJm7"1A~Ze&!6&8R-s97_Qez2o*3Ep^y"X!ZL>:RTwP=j4AH?F^jq4G}j)f0)SFFgO[+?:"$-k$]hDB^LWJ>=a;*Vzp4%8-j.Muz<;>zxD[(x.:lYCu0$ru6MI[H6`n>)|h"@%D<miJOt}Kp/237I#CwS8o.?zQl6wr0`.vZBZDJ6][NO>F12sp}FCqzlF0l[mT[/fZ%wPJ<#t;1Pl/0%/7}*CtviYHF=u-7&A,dLtKg^)AS;G<`]DUpTw^7[YFIm2-diPNCW>Ti*>LG$BNb4xBc5[xgEKm?`i4=Jz[wRK1nN#0R-dR{JHZ}#LgqBB*
-$M
-6u4^$[05Cl
-R4cSD?E->82K:Kuyl7KGD<Y<o.%)FSWW.?#C6CEswu&wdQEg1v<_bN;r*pX)+=s<)gDQL=wO]t<{^gxL/Z*uc|i`=Jp"U]BEk(MPZwAeoF
-4d[tzXPD7GL!@<uQ?DF+tSh0DFrS#>u6n#<bTy+AoW,-.q:+%GV_O;Vjo;=Xe6>9~Hs)l?d:rbsk<7Q?k$Ut2r!nWv.]9Z<WUf*[@Y,?BIxM$Toy7@iG~(YK|jH4{lNpr%/"vK7cxptTf^:=M]_9@PkUvY}9#dDG64&2D/2%.-1AHyn7u!DjU(<Bd^EL|9qgUcY%lETH4LW*HIjsa"Us:],opP%<rozm9O^P-s9-.orY:E,)})0lo8vv@T;p
-K/^A0[f),?fAIh@fC=6qw.bF=+`"G+.-_/q_Y{fh:M&!oCTT4sA4@@[=421D`S*++Ye[6F*>>~vi`%&.L^WprfGs0bKSn9g!2OZrd2[6L`D)!W%D!9#{R^R`MV=&Hz]p+B#PcBuP&seqa8q6M
+}0dP%s).86ge/<GT_qf2/`Cq#*Bs/l%
+[RM9yrmL](qlN^6o;B"jkVHuzN.Swb`2Q"l:VkFA]NB&G@
+w26:``MAHt2:2Y/;R:=N"%<%LA"[M1m`(/l{>]:,4Ie71~c_k
+*BO1XOriLtq;vq5nb/e@TztGqtQ.`K9hGbo,H-KOV(K`k"i0KgC}Fv^,f{adnc1KMAN4x1cZ+#-C?_g`)RJntGL~&p8dFvu*w<#yOYDIge*%(>xIdlfeSfDTNYU"w+U)czm_W=kfLFs[.+5Bv
+pR59e}4YrZV/O4H/SWB68lx-BmWgV!].s68Yc}s*n?6kALpF-;t![q`:5`>1gjn&<%N[TU$qt<cN]+GWf_F^tNhDX<!f#dxKF@+2R1e~LzGT([Z$lafDZr=oxn1#9GuB%7@b^H=^wnR:v#&Gi6Yt%
+-To97%oQ4o=LdP$<5i/S:"Bo%b953fnmF|oi+OwN
+?dPk/mnf[f$h4G}=wVB$nTTX0M{!BdIX,BF##C5HTN(S>"u@%fBI5b=bcPjyGCc"xPmH%j
+>bl69#AZoa$ZV,w$Z31s^)ebEJ8(i[[$hzp.pC)5!4vF6&[A&L,ziwO
+oFM)]b8t+lOdxk5F[i;EF,^E:TT@fN4Z(6-BAa<0&ty9i_t8,Q"?ohPu$YT__^>1ag%_KuhQ@xy
++}?GQlB;i8i|BjK>yCn]Q1pZ5Pyz^OV
++l!)/Mg
+k$#0SkpyGOy[bD7b*lu{<nb7Y;p"xW:rhk;
+JpsBBcq<j5yaE-9PhP5I1#3%_aJ:)m*[/c9KZ>v~*naA&3dRl0+av?KnhC87:UF{kC5m9QK5u#2^PF4hYvy_.D;*y)g%d.:m5>k"mx)dA`.+NG>83kfwopR?#^49e]gsw+-KI*psf]^)XfA"6NF)KAVC4[1w"~G4M.F`da8FOma<b?N|V]mK!hbhYC7}#3(@tl<HXr@4k^l.tzb
+e]`$$hYD;<aLg9mD_zonY"jme:G,uw(Vs$Hz=kJ}TNgr5pPHu6^AIiiHRrGi(ktI3/6e3bo9fr]/<j#K].Ex?7Lh,(X$PMlj$eyUN-*Yf4SpD=W:)wx=Epx[n{uLfIxBHz,$u_8Qo0B!4MUaO!:0H4F6j`@OaE`gQiCK^X_:MHP+I$Q>ZW`#34(OvN[FVskdd0qMsAtQ%&]=ZrBfWaO38_w,jp:W*5BsXhT:Hrc|hN1sodihdWTqpq9IR_-IhfoDKG[)i^;2UvM25%LwH>61%^T{u5x$R4Cq0l7yMuo7lj@PI:.KKqD^"2TvM-B=v3<Dd79}VK"29*^~,+T!2p<+S38/x|4P)Ptz5euFmJD3OIgJ->H,S5:IAnJ{.WL5egsD,(u)Ikomp"b[$!u#LXUc^=[]&<.X_jZP3*[MA12"riNnO.gIoYKS"m(RNSf*:*$X<X_F>:Nn2%
+)E-(!Y^hALU[w>u1tI>:Bg*Ka5[0R>)rx&R1R<N6
+!>>_ZWX}kGe"hAb0I3Iv!xjJ?/fR1~SqYwYG3TVbK^.O4PTI1:@)E.uFpAA18wM8/khuJq!SC7YkV)/Ft{`~-VVPC^TL"iUZg#BP,ZC5iA
+mb2!(j!?C.A]>_W@Z8z
+Qde;+v#DA*,0F%V?oSL,?Pq3bTrY!ww5!RL(<nVCulZLrr9i+Kgi/Z:I[R2@jZS[3[sDXx
+7,g6d!Y/_)0N_Dqv^l.2!2!I>Z;*@XVAZb%Wx;uG1-i{?:y(a
+!XH&c0SJRhtlCrF&-dJTV#SGbv^|1"S5[7LpYz
+i1y`g.BUl=;Hcd`%?WH95i`^Pp$vhY8"QCiFTh&t
+LnU2)!P~oY4l2sC!ueb}RjN/4G+LKMy85
+$N_WK15YfG&E1l<
+f7Kg?Z"&bi(a.dgLLZ;X:D7JY3:u
+J-}t5>)gP4~cya$ZRcauMqqwfS0&{6V4-2$)pxj>=7i0VcA7=jx201FJ!bL#(@b2B9rR06PZ6rW@tX=O|Da,<[xLBWaj
+EB2khJQR
+z_p:qy|[AV&*$:{*F4rRSymw1:]t9A0I`15m/bQ2^REqFA"E/CY/zskMj]U)h""GExbC")ixhPuZDIU
+II/yi6Y(r<z^SNJ`S"d;
+pyI!)8l>W*rPNd.44FhQI1ae?Ca%g3rax^XJW}0/
+sdP:B;^am:1;i&3]fh2Q!(h/4b*AL26^m=ek]!^H}n;1^!e(9c:Yf)EO@fS/"XIRWv=2zGVu-n2z&k(
+fG8K4cJ8/U;>9OtEz2<MwDwiAG#V9_Vs:%(:v1]%o[Z,O]=R/[!*`m{ch(;Z[sPDUbs/*DK4!J-/C8q0S5B3!w0UNqjMQ<Y;OxI]r:e5M:)WHo}3CLYXxQ9@cX73TC3V(H:7fROk(juxaFqcqe$sW<pGxM$E_g}DT*yT+q;.pfm,2HX5h]T"V7+8vY^!*,<V"
+-5}[(?(Ts./^44hc"Ru@>@W7V
+j(Ye+J$f&mx_4@@]:S!.Bap^J]A]nt=!EU:LIql;>Fm[7>m+P]r%g+t%n!OSCNdIa(hi92H@[oLt5;[qM;:9<f3Xw!~WcnX*4(fbOeU3e0Z0KKqDo
++]dh@bG_F*T[+7T!Z:}=T]]<Q+nXTaKf%7seA)8dV2ih!K#A`m#.h$HbQf4O<I*okvp-1YJLM+-??V}f>#>D6Ok<2J;u^b,wA';case"ms":return',Zu;C7nWB&)krx(P)GRUn+l1]e7Qsl+D(k*2@VOp&-uj=?!/+yE^KcH;ORdT
+y!Ox<Z@KP$,mpEgyLSh!=o-dr;t"3<k`uA9oDg#6f:`&fOrpvxdDcj@zCHc@.UFTqR%FOqr=mGESdYSsLE6>:4Ra^;/_S@Txi,GG6sy|+`qzw6e7kW(?>Y1i_?+BKZG=]&o2fX!G:QJ|b$!bc]BDKq6!0WpoEwSL9m4O)hJ_UWW&@}&MxVGt4_fNtfuzH$Lh(!_IGh90v?7tCQ%LkE:0Lf74=P*Q"F0uhRvwnNl!d*f+3<I)#k?8T@g*l.#>eIo^mHpW%O,R8X8PJGg;3jTzN
+=hKKq7WA?TO2)r).yS</o5Wn=l*drOW%h7WwV-6vV#8oKW&v4;_012Evqd_S8+W9Q?Bi9D%Y&Qj7"*GLT#$yZhM/"V[~gd.:Ct&ndhK
+4oeR&&18Q_p4<9V9p0:|n*$OUtJPCmpiW-o%,z@B(;SIez^=EIgB,nVG
+orY>YwtZ}M^C{+H^wEB::G;FB!K[d4OVN_Dt72?A]-B
+&qBhGQ|)<Ro1hV`w$,`WL@W)5ayEp39_4(~]x/wH`8_r3t,
+rL-O;0i[OD!_5T4)58l9>MSZy)GE0$lvBK{.>P"?3xG>vnUT{a-A4*vakSO0T>}NR[3v]ptvf-Ax$C4OP,@`Z%;G@Q_IP0rRknJ5M1jS.-Fx%;f7>t8ng^}T"71!*d}Lq(-w!o`RQ5Wm]=B+5d%nhp{M,R<9mQP.loiJlSTI~Z=t0QE?uK|0;*V47BOLn-k<4FFG|UM+6tG!^B>0BMlWs5.b01KFU/,pB816x(ebU0u-1oMWRS}^2
+IgS3W,^&m""MvJ)JS[KDv>Og%K"rHhlVcMbj-1LF-sYg:te^cKB6g==:C!Cb)cn2B3cat0+j_/?Ht$xye-^PW5),,A390`S[Xvi]{Tkg$USDc"h]O"EFd&uN
+J%aM+mOhSuU`kzYz>/ZlT3H=@y/I%^-(Nwue@k-v;=/)#~$s!-,kymMTp+?%y%5i@_1|(~Irx;#nXp9
+n>Ag:!o?7HK^cU%@DETi=#5&"oRRF$OmfEoY[Mc{<K2QU`s&CJvqw:<vEyvR=.Yn2Xr+fy4P:LMyG>MwKm0ZKqy"sIA69:u>NE4"/Q!v8XUc?araP|^C`%BrP$RwLN)T?Bo"+R&e-|qFf)WO-VGX!efK0Ec/,BLZFlK&Ao4l<cnrL+,wYpI/>2-tyO0.
+t23PGjaPZZc0;0NA:3yU+=%5!P??59dp`KE"0FHZk-W;$[gDeB7OsS1_p?~>U`*1g,h9}Vd8/"DDhkeZ#EzPaftFv"-Y5eh)1YX6Nc!cP@h$L*2VFc%B0K2C1Ju6#C:>;3MW2]V+m&ByCRnXzgX.JP]i)`Ok8QKha.Vd^ekHcIi.PjyQHBd
+ru$
+0,s:v)3xoO:R83(Q9%l[ZIGl(vEv6(>n=4p)(y^,mX,;8:o@r#=#S$S)Q)5U|BT=%me>$=6QQ$|X4"%FoPf<H8k:Qo[KG5w)!d0fn7?q.8`loY@8H%OLjYMQP+P4}A$N$IdrV`ij(F=Kr]JxEguw[u~/J(O1>"2>+%."5FdU&?Dat)tCWhL1o_#K1haV<Mu7JXqF%J
+k"tWO$q.U*sNlQwY1!X|5_3iQ27uMsL;x_(ZNs!Aj4^jH
+)f8+aU@,mg(R^R)ZV!pbj3duo#B&Ts#^S{(K^BF!BE:gN7d;?FM~wgFD?7"q"KP!X]<X8
+S}Chez>4GE%};[j*WjmloTOK*3n+*TYK(gkdHQS&`G9,EtTl>>W<%Ig,g{>d$CXURb
+|2xSvNti*gq5,w]qZ#C4?m2g,7_NtF3W
+)8.,]f,~ZNA}IV)u^_<YvLi(-5BT>qKfdxg;4Vb;*SS:,X>^by73&}uf.0+4k:C+s_qe)]*ve-U6Flp-pel9YNxWdyH[6w/%T_sr4!Rn[eIA#xh7[mm>CVSaIxV[#N^a&iQ}`kO]wl#`F%e0fDS^tqvjZYa0-*a`Wh>x(3/-o,jUCYgyP>4x")sPw#ob98f,
+=yyCHNEQj&]y+SX$M]Mdt:zNkG|u3
+ffbadaP9zls]:%c^Ynng)ylwdPWR."%*i/N
+/B6<Kpr>?qp/Jsu((]>/`0@Fiv:)G#t0;<m@wB5FR(V^0B1y50R.Jp`Hu%>n4-ti<U-Cuoox|f#q=9f^v%]c#;7TN6m80"$8pH
+;}qVbW(oe{x++yWAkR7./~0@bxm|g+B~<{*aS7^xGf`8bZsc3#qKHpAP)LV5_c6JET3TSI1EKiRovT$q(kEzAEQ/_;6,A[q<y+fyK!,wBSlvr)D?55^lrkOq630>-X4,C+UMMhqWAeafUQ*f]~VnQrXm;_c3]1Fc8ILfV09UkZi{K3H#?wfVH)viIDAHU7kh_AhKv^26Cx*x8h1-E!CA?zL9B&Jcv)3aG`ZJ]sjz7"S[#:UlJm>J*l#6ud3_&ae3g2uag#@?0Wm)P81[)N9M]aTFGcre^R4^@"r(t8E|x%KVQddLNF3%-.1`RR
 p
-:S:FsEdg$J*3s
-Owj_<r%Uf*xE@_k!r+3l`:UsA/ib9]s@6VTTxUQ_aIYNwv!}"i1,IdP:nIJ|C=]U"=%.u/T<ioeb"St@K@EWc[@5:g;6+*I8q;<
-5xVZr.2!<ICAAc%:EB$2H!n`3z-)gtnt/Hi9$N43#L_vx&_l(Q?c^41c]aXcx<hY<$4j7HGa]-Isp9$r<nTk(yFr!pNwoMk0<iA,omyjc6-*qnkv/i%O%{2jiP=3,[Nnk4Kg<fvGw+`e56o01HfEs8;$0v^A:+rAaY-XQ5Cf
-AawM7bPpeWj]Hkk.|m&wxmh+=LYDD*"cLy)p[x+.eG!hV:7x~T!gF9rc13zl/=]:RX!aqN8)pH~vjec.O^?.D)zb@=$@X5ELG!PY{8XEodmt[%A3-si#<t*o5]k`/&nt-*DjkWeF^drBV%P4wWtI"IDWYqPKu"fruI4KKJ<[TH?N{y`,5A
-s1=hAkbIQDEKNOdkS$5wV)_@)m[
-G(AcP33FS~IqHKE;C7sa&SN&n2N_u{a`SxKmg;k~?=7ER2Oxo-A?09lPpuYJQ3UyS0:weyvcrV0yXGo|:1#fu"+K$^&V;)ET/
-ObUNcDGBT2wZKs1x?n+!FX^-DTR_REX5_8-w!6c1)0YtXZZO+2c;uf!/m^]:BhRo8w,u@e2>_`R(=M6KqQPiH8KUwHtRC@8:T5F3S!s&Y2AJXcS-.{689"7UjE0tK_W5=+w@ehH=,rr@VeVBFyT)6I#WQ1)Nlq%yS~G)P~n>Xtax2?!rf*j-X&O*W@$4(zDniKa{Wy6?0x%fhFa}`l0*e15q<A!Mup&VJd[xs"oN?Lbt$<B^a}tl=vUXl&._1=m/5aq*T$J<."#O@$iuba&q[4<jVG]sFdIhke<xu*7(DF*+h;.d7AyFx6L^%tEBL[F9Iq%E[xcV,|L[:@GRD45n:>3M%!Y,HaAL/%_q6@cEbrbK1"fOV>Xjd>OK53J/g6Cx;P$<!Nf6X6lw0Xe_i3XEk9&ct-+bZTN%U$?+jh(wE.-(krgUeGWAEk`CVjg,k>I0xKv?R8iGt4`es21bUgU_ba"R';case"pt":return'(]^;Bbp+N.AJyj"+x+_ht!cDCi`DPg1$zh"&GvqjdU=Bk[EXzhITy=R-*qxe[l@+#&vf(x_,|TWTVkK1>UqR^D,p*ol_T1AeGv[>KA]V"ht!6yueBKXBg`PHo"cGI.>RF%VmPnVCCj[c
-cA,CC%TeO
-dZ5l+L(.spp.MLS7E_a.Q>jlTzP"Xy_8%h^Hrtv[7zso1nP=.LE/Uc9PBnD<$}$Fl(/cD5*)=7bFi(H5pMTB,0.5w2fWw@K!n3T^Hh0
-]kSBL=Sp+[sLha)kr|Exo#?b^n7Sq<3].E7X@w?v6]XQNboWL//f>Av+*~fVoP3p(Pu~Gyl3Eaf;/[_hXo<YsaR!`E,FCOC!&>M*>et*M"]seloxHSkatLI^fWJ0]JX3c?Nhmc<Qa|[JF/yFAK%|p4fZ
-KOC2Hy/&*z%oxp]ZLAN*pKHKui9FTeCY.ql5VssU1=9/M"yLDF:OUmtKcA}j2bJcMm~2k<YH@KT7%nw^lS$t0tUJ(*Q.7^zRZE-XU0)`}Kc7]*4YXGZ7b=avFc$">y6AuD;])GuM[u9wbMTR?e.xUs<X0=$1[OpimbJ+`Thsq7="[Ia0J+WO@dQ:Hr=;>OzqWBm)j<;<?Rus|YM!h<8fD]BGXQMYI#+y-[jqeJQ;i-y&k-uv7*_A_WKsiB1YesWL9q_N1,607NOhv[b6OXj@C!pm%y=ER)sK@udtL<Z-/[FJztQ`zeR/2MANxN~v5K.WeX$$V8AD~[`G4$8]Ux.tf6ML,RJ^MqQF]xd[_8Zft!lLxu6=Aw)7(r#Dg_>>tf?I/mXhpc.?UI}7[r!I+T)/4OoaNbcdy=`6Z+3k"r3UjjE]]hd_K1jtMG*Y$y~llx;w,P@5"G#B!y&5qpC=+Xv91MPpVl>j}M[d{yz?+<v);b"EP>tR6vaU
-.]1p!F7ldSj!pstl#
-]~<BFG%5cvw*1[x<u):bp(+wZauVBNlC-|Bz0UV<-]c#B$MLp.s40]9?Ma"%CkcO"a#,Nk2KBS4;cgFcK{EB:crAC.tp^!lS#9#IR]sho2RhK/cw>3S7oXeN5*!|W{"3>W>%IM]z/W"2ccO!MgZ;
-$94^=,Hf4>L^8quRE8c>d@K/:o(y#]4oJrNom>/T}qhC/#XtSwEYAIQJ(`GMX,L"]CCqZLE#uqu/kN|u8=#/in*0ian@-6->*lX&nsdp/%+dIIDcm3;<06A:xw%"0y$LoL2<rxFTG5TwHnO;jA^oAw<g?ympe4d_v?c]s6=9k;&Nvw)fZ3.PMRcYES2;1$lZq%bgb2KSJOZJwR]eh`9e0.nYB]:BcdHnm0YHTk@o)tHQ!>$Q[!AscT/eG.~=^QOLqBYx^!hup"&K^uQmvEl47r[XBt2c=*vVOS*a+tB3P87JzyK7o:>:!V+q=e{PM/eY10runM2LXRH$i+UMyed".HA(<@!%E9(mVI*l@.eEAwQ<5BsJY_AYO3#;G7T;$:.*zA]/KY@$s*%Bd3>k^a,D|ni[0a*#Y!P#E?8<y,8f|P>@IKL5R
-Q%lY;L:_rU@&
-/J^dPvf&qv^JQe&.C~rQ7cM[_SV)S4_p&,Inr<xClgbQ3P3O(BVH!$ZQ7u+QO*Jdi9oaUzugPDg.!)g&jF[nfbq_wkSR8yQ(@zpou9;mTAVgCbqowR?EcT%7>)]oxQV!FMu>.YkB<BFN3**A,n+b$|]r5E&[,KGNl&2KV6d*9(Bi-i;oU*S8LqkC&@Cj!f/U?>5O+TQtg9**;~:WvV.0VffD0#]e<DorwpBcTG@Quxb)mlu,(GWsaDKW?Z9"#x6WkYX;*MbPtdC}`&8;#&#z%uII4`7NU`^<WX-N6l
-|l>U]gKV0i2wo.wMd^H!LbBl;B7.CAesV>t?HW3`b6p/l)c+Jr,Mn$[RRqn%0qNi=!oyciihavUZX&<Y6pL%,7"gb+.ul$C>]Y5b,l2.TbDee5g61aSHI7](#byT#Zf?<q
-)/dVY|a)=1-mgh+tbgHMda]qezktlHQGtZ;u
-jY+,T4R
-u(I"ERIXHul/xrT
-zgU`?/55HPqS!K?ig_B8C(aTEj.aFkqYeUWP`]z>69K=ay_nT<;yH5;(~/q0NS&-8aPyU@bVdNr!$vI#a^+d!yNkPFV-v71[`Ge%dL%>)+%xQJ6Ju38_dP*c=6
-RgG|8
-H_>0iXesbqs/G7g*Q3hN)xTDxT[b-#?&mByo0;?L?ou_c+I?"xt2=++*Dtq9h
--FE}1E>ph3P$groC[Y]Ofx&U^A"
-?)TQh}<`H9bLTov[P;H<XTO:g|#YA]>$UOS,cx3a4,T{NO4dVm7l
-6v7>78iUkT]oLcr_3VbrG_P-L__cDA0X1ld9UTbP,?@F!"f_,=DN:Q[]oZ$JEpnfSAsXS=7.!I)a5l^f~y8+=LT.bDyGfUK/u&^J?z%O$VLnCM"Innq6(Ifm3qq/U/ydr(*mv6`_1ldW]d
-&pZl7Ze[faA%/e(7e;6AxnB9VD
-E*R.e`:%PwIa4DZb-jz=|aV1AFg8toD?#swiCYD`0[7F)T>.w"f;7(FqNJWDmcRA7ToeB]~`49ek,H:]7&l$1-[:Aq,iar?m;:B:]
-*cd+KQ`1
-W&x#Uvb7`qX(gSX#h&2v&"q1cY<<TwN7P)Q"OOQ-X;,]&h!Ob<m"j}u.M!ZRv(i5]L<Y`uRZsTx]h$LD*"Je_Tta%)aT?NX[GZ6Gm"GVK?+^xN75F/mi&A$+@^R+0%&<bVUA>Mn+)9pjbR9=WqPtj-TWr(6Z5_:GK-j=%UWh5P$vrZIv<A+%sxgK@Q+n3%A.b(HEs^@OOst
-PU/Ba8)l)yVB0$O/R9L`3#[}A8QQu#5^y3Eq3GLsBdPqo}n^3:sIv/
-|]1HC`kMR^a
-I9(pVm=mXsWDc;z:D?j>ILzMC`bY*q8&ca)]|?(m(!2:AbR@%bmc?O+W%ipy[_P)/0dZ:x95_Y=ij!sld:vBHVO-">~8QrE;pl?]z
-0Ib40PS%g)y$7MI
-<]u^?Dz+LjF;H>`-swJkLH0WU%!xqLq;*rPnE"feeMeBX^lw^tR(4';case"pt-br":return'-]^@qaMAp(pw(
+t<["Q)-!_p!)Bp/Bn85"I-YO&J2i<RSg?XwZ].EUprK%J@,mTpcw=x
+9^(2J90^UA3_>a#P)QI^f7B
+G[@flm/%Z5Tlx(D"L,o4u)aC$7oPAkLQ>4$yp*f.#NGAV6s`]I952$:^,4RCB,d]/6mk6Z2Rq`HuD~NKXM$]DDg6&_v*yg8$';case"bs":return'%Zu@qbP+^.B`ofy#,N1ZM=3K$!m)z*XEiDLqJQ{9Bn)1
+So;:%U;Y,^Y+p?VDrtyK/hK4m`kAQ2k+-AEQp)ec[B12v
+x9M#njf#4u7P][cD$Ng{8[r-yS&9+#fUGUiCeya;bYYt@c1Fln
+GK*PZ@<B[URw$6-DkvLXkjeW=4.:(tAW_.Tt#)$AU`p39Il/Q,I3F[_=N"lb8K/*MmvXQ1Z`R2PPlO9C.bev$S.C#2iM8_fWFm1Gp[d<KXNrK^mVY2!AQ"Pmkw|.UTdc?K
+s0nK*#Z/r8s#_xAdP<S#&Z)WJ0+"&k9Stp/M"bhg,n1]Oc/=f1a}t$F1eJvRD=UT@M:W/NyEVe7TGLu$1j*oiq@niZ=&tV_q-vyXtqt8U.p5HfgA79%sYz$XgMyR,=+ZMW&`v[cp<:M}u(_~V]1OP[H]FK7.PkBiPVe]KMS<Frl+>7F;J
+hyP1L3#5N1BmRP8QV$ErLKdZR>tq,xk0
+u"Y#9Iv%==7Z%vL#D@o?Fl64s7.0"aoc:QVXKW3?{J1xV&"*J>iO5
+*n^GnZK,B"xVfl^?glL-rE@w`Sv#l/MIuY;/H/%O-[
+DUp9UtM"?oc}B4(jssh>X.K3t%TmRcr?K=Qka{(~S=E]=dFGP<j0g#XP(qik6j8V;g)^fH*$k`<Fa8)=x`)6Oj$9B].HG9+P/:`D)gqvb)!WJZijm)g/D:K|QrpfwA`J1ZIx#mh5gSh^vh.1ZiP9gEeX_&x1Dk(bR<UK/|$V+B78w+h&iy
+b6J=2PN745+ZkRaa[RU3aDpn6@4HV<n4&v@i5[MX_.B#^A-G~"K]~CEKNj_@{Z{syQE6>iYo|a[CXWu>b)/GEdwEUTdv/ewHb%VZ}Bsw@*$5h,uL,PvteZL`Ow,K)81V;hqo1-hM
+1i"1yf+<:b5.AbQmlT#BmXs{QxA-sRbU9W+IV3mntjx+o|W=m`h/O=c(ElgcT&>lb>EF_VAQF{b@o,Z%kb[>Vn@<v,^_<}?S.Q*QIGC1**lo]+#-#g.]YU&X)*k<]AFH;C5u9K#QN""3#ZK};$n#G%o6M8#@l+E,jml<"Y!1n/^X*)C2_2]WY&%lA`#Ahb%e+;4rp"(;RtVJr"0=>ZGmjZ)cTp4NNgJqL0#Df,5Flv6R<g`ryDn7G@@7yaoy+7#"<HGbz&a.[CCN?pi&nv/;jNN9qs#*L`q
+sZw8GfbSum148i0|OAVV)RHg_3q/S2!E)o#p8!Plo
+$%=+#4SL>x7@2YtPLSo
+5}a*r`8a#U"VXE^$Fecd7^cMP!&"r6t_aE9G8|f@QDt[fS_1"|eg):rl_,_.g,K_GOyfw%,@K!k*`g9`J>X0"Y:m,!n=YoHuX|P15&(KLe`kh]-fEh56YHT485PR
+|Q!:yF0i;=txPPUiZWs;QH*@Vnpf=C%wW2eP|M@rD)m/y0PV.:7nR.DD#fxnQ>Tf64?&b5@CbSot5t_!.^j9qQ#T+q4G)9rVf#&(U"h5"0ZY)"JVprHLX;9O/9=TcQ9)nWdK`)9X2G,;bYfM$!ikD/g*iZ7$E*]k}4OPrEYQ9UQ#k1k)G2=u=GOk&4v>)3}R`Per&Rs*0_pM3[t.gQ4NbT^i#HO!Y$iZJ_(0v-/O&h!/zc@gr&Ta!gsb{[F!n,)0):uP$-z)uu/Hej}Uid8!6AVl[2,Y1%i6l^YhWxjUxY$w?Mq^%f1UdaomI(o<T!KdVW=RoG8GDZqY2yK3w8<S_+FW=*,SK*5KA;sL-I
+`l-ZKwK&+A0t"GX2X
+a3Fsd}l*2oK~^9*T>{=aNHZR?]]K]}efoIS|c,9J*kuivSft#=XPyHh-*C+ZJQ[7_JaL5S"}-q*/NB]iZ)hKlxYf9>70a9ob-hI[J%Dhnel(T`G_3Fyl#A?E4Hi~4yuYQdQIA[^+WymN,y$P;#72"o(wCBeWlLKs9Z?;<iO
+=y,+$mJ22LKAZHg-dM&G8>Itx^ka"w>E4pFo_?;U2$RJc4GKv5/3HhmSqC!0/{vE97/,*,vT`T8KiVyQ)ECYtFQTeqbDgQ3o$S1dR
+Pj6?#(r13v0`gqYV%WPJ$8H~L72l(Td2k#y*r*41@W/0_Q;s#QI~hR"|gw
+VWen-WhTwCEv3bk[h".o>hH>_)%K7sRk!bIx05CY#mPf3F0-vT;[~58A4ZxD3lU+2%w#rAS0mG^v)hg5in#M;YtVw]"4CXp/Zdy#W1%[H
+j,s%<2Dv-wFyC](IRg"p|N:X1KL-R+yI
+MdP;@$QM[<^|O8`x2UMXlbC"#@&xQ*t2kC^)
+dF#5S/CtcHfaGjh:J?Leqy8[Jb79%dl-I7c(88jNW;G%C/wC5m)9I?*4YliC`-@:,SgV^v,EoaVguQ^[0GBPFMQ0fSq-DS=6^8@DQ]W[S?gg7MYYSml;5M<T&8vU-Vz=/PN-/)Cy>KsH~aD-(+5PnYyDH_]h--o8`O-<Pge"a`
+`i^DGy"gNz6hK#.a@;9iIv3{_/dD%pq,4*CpxHkFuT;4J]Pbs>j^8Q!J8h!Jf
+WPi/nq,a!94_/Mz&9|4;v#gG,)K.BJe!UywDr1:TX6)*.f?cy#+0tS"t(*@hlHgbm=O%ZbeeW+-TLCBD0uTU4{/p0}sbj:s)`SJM#{5o`sx+mYX
+@Z6+/y0;NGe~_qq~fDZ^fXd~`@Zy/2AZGoLM:d:YiOb.ET19jgKl@<kUJF%^gku+^?=X8#DtRoXT7WR2H%($;0CcKZ38s/v=P>G0XBT!&(/BK3M6u6=$UG?7QZ7h+xp5R(q~qM3>3oZ-[sDtK
+%3;(#rtq<O@v*i[tJb.sqwaP]UMq+SxEn=ZG.W^qB}yPmsBJ:,YCV~CF"CYO50b:nO@a
+;xZP`K#bLe/#BKHT+p+wU-qLR]fu<bA@4
+GK3g5Z_e$^t1}gSvB6Zi4(u!uw%39WO.b2^i0WnbbWglphS:aXZ^xm9[o/9=5e49riM#{5$D4>WL9oA3]H>GS*m#;VsY%D)[)_sUc15+@;f]zlo+{,f9`x.0yCFU!heTWl?O($Jb`&qqxxDvg_uT`/`LOe[a4^1CAVz$hL@V-vkO[p+p02WD/;=Amk_DZKUQIGN!2[q)S2E"9"[fvmO`#1{y/`^8-^}BPn=2}xwSJLX[?Oa;Ra@7J4^*LbPO9cY;8"hWt,dJ1kY?iE.@0^t)r>6]SCw>-[7<j3*)OB#Oj:`v]d@';case"ca":return'(]^@j5I.W?SK,g"1u
+i
+A/A35,U>PD@aLR8T/)2,#7;63UN053KGXo,yq*)2s<^TpNVRK*9&<M;vfhI)A&/Vq+T9oQ$S4E^mQnEAktY!N=Mh;Vw$TrmKs&/[nq}6db=jZ`[Z@SOwph}t/4efkI2UT3Bq)Ur.ZFP#.4-iKn7WH%2H3XW!fIGJ}`I_t_l>M20P}YB(]s1hqeZ_467ZD*@W:o(4-d"l^uN6QEHo+H+D>V06vFw9lMN]*56nL(cU`Ane<M_rzKpy70ookf.e$({s?gcAPut0/QGy(fE210EX6ASp1mu=;t&3<8(d,8!f!ix:=71Q%JM%Kn-7I9x6CZ{D5yIUWOHFsx?+Tt{9dIJ$/_p0P_%V#$Q-UHNOaKO,=6JCxw8WVb^yuPOa4OC$
+cxw1I-bk^^=#_Hr>`$25jpS
+/eafU$TcF5vH+):B>BtPD"Qw*>5Z=Dsu=5y*BafS.6`H)FZzv{(VN/[|4=Or[vTM][_GcYoL=5Xibbg^`m7Q+7XDyWqmqd.x+>m)%Q0CXb[3!RRgeG>|o:@aNjT?X:.TRHSp0*q5ZFie^Mwbk/#}*WX"/qgcbB[Wp6.<<G<7v.B7)kDqjp[oF~xu"A=F29`ZK|12gr!;Rs7u"2u+n*DNFEJ8%LxU:oF.Fq])C@wDQ/[_C0=
+h)[[5{lQe/E|I>9Qj}6jj
+90u@DxF-Dc&$TxNIAAL!@NMqBiH:F>.?7`!bWoDbKHCL^|K!
+HK1LS/E+R<IAap9AQQMX{8NBr_T6er]b@tDnk#<MYDIr95m^XesVYPA;%m@TfdG
+U2VT|_X%H^`dz
+`%,RMIR:~%TW{NM_}4IuaWXpH]bxRP^].xw6a`qH%JCI61lnMu$A
+u-afZF8zz(?A]VPn#57:15=.&n5WPA0&ScLwV]K$;HR[K,*Wwrsxf|v-[yT7`ZjoYj)K-xfTPy![H5OXW7e,d[6tF
+^U$qk,]>imh8]d%Qu3L]57g#O/BS8A-i>,@i9^2n#x:0a-0D94<Oh}!EM!ca;uMq6`-n]{x~]GP3JvZbPe:jP`.!8BUltubdH1z&O3u):0,Bm)?MNEZLw]9+x`%c_6rhi=x3DeeRn=Mq/+da##*]J4&f9&Ho>RDFJra~u+n63)Cst)At4iK{+LuPjNc4tJhv)0vOr.F&ZN9/NF^oPwND`%^X]{V63N2jof+VpwLCH"@e+qU~(0YQsAqpuq/&nM3MA&7fb
+n}gPt07)Lm/|^x,A4f+-VWaKf_j5EMeJn4tV%Lbo71j!Xc/.H>Q8<b*[@-LfbCKqkL2=@nB9-7I-_}dF^OSbt~m1c8fz32JTjh>jJ!GUhP.^inOnx~,.8PYDcjKlg,w4ZZ7AV,io0JB{
+81LV?3pq.`n-#(-ht[HwMx[_rw/>S])b^$`NhXOLZ5<Y`&2N<2)]w<$#Y?9dha}$AVu"GMJ-?&sRI[@2PZLat>sX4Ttj}7C,{&?c]E&-)tD?".f)g3$jK$-uJ.6V8*qU2E3n5,qaN#i0GJNtAGq?/D%^Ra|.XY-qD4_s<$}&MS.Y/_yQTfz:H7)Hvl63+_m:EHQF}<l6US>&[ofNm5|.@Z*QCZBCFWdjDBC:]mJo(K^5t`GSJ&i(4seFl]VSNE7N>x@$QqLL#]@gYuL?"L^v?c(`sB"jx]VP<BRuS0H.dfHSs(gEz=y?h#`VGq""P
+15~R?S4d*KOmOK,)D:n;}G+y4SfLvfp(YSUj[+#$YOy9/aYXT:0s?P"0J6(9U9h4aS@J3%#bP(1m%@RoH5d-+t(pG5*W8U{,G?"g0.xf@-tKE3^
+R?]Ak*.;@(?ek+oqe[)]nVBd[$96&PykHM[11.k21Yrf3/4/gy,JQp?Ri^we.mRX6i&#Y&cBFK^F_&$"l0)c<9M*fw1s./.;&R#RcVYh%P)enB1DFr&#NRbT9lkA5bjl6?
+
+l[)_DVwhaO:pO;=@SZ3>nFM-fWLr%>V%x8MrP_^h_csQ/H7=}rz0U2>yI9a<(&]P-<%I*06P~ffZ707R&@:Wu_9=cy]ij%d_qYgUs$c@,Jm+,cA+xxP`/8D3|n<f)><V:g*kG(]h&!0.Yw<YBeuaW6}c01D-78L+.l#F@yXI~9RsJyNrTc`!O
+44$?"xud~"zNU9_uZJEDrs_2fRgkbDL`Ya5xVy=1>w|k~xLt{T5j=NXALO-#6DAw<H~GL#om?.
+@m@h`XJLuK`Vi<Ika2+jBH",rW[J>M+7<*@Lk
+q5szyAr;Tu;8e!$ma@HXO^
+#D`b^#_R;-cx,L88QnhDVcd(nd3pERTD2>CMVDj8W2&=!9n6Qm%wiWm@PysU~3)=<XMNG7N$Bo+^`q~s5=g3LUG;VEJ&][L+V8S;%j^T7`#f#9-1XD<SOwx5!cFR`X/^@9tFaDsD0qI@nV~mLU-dmh6;ZkSe=OfZ[.UF=yKG6_mU6=86n>85=RZ<~E<h+<&]L[g@(j&p[f7NqR9ku,_%Z@>%ui4/XcIx;U~i:mM)W$!JRcPZDBH4,eqTLy9&Mjw_SBJpnZfk7DD%
+"UQ?9vcZ("cnotu7s0%ZYj]b;&WPN?SF"VZa=A@]*V.WxPQv_?Wn.
+3C<8=m&y$o<Wr:q6(R4P+^J#4;gL=,C><Y/i=2X{fh`*gjf%&bENaeorr{Q/a(/c:w!o1!mZ/aa)=3:W&|;<:3l#e;O!]O1vUaCI53gW381/4,nrqKs
+s4T<rm*TZp%kji$(e|EaM2qBCV?|%#5T/T@aYX"PGMh|c:TihLD,asbNMI6q_oY#I#/,Q`!2:xfBjRYwvdUnsM2"S}8r.RhVh9.b!a4Bv4o:[(m<(AkhK
+wu[:+1?Ov(ly-O#YfbPN_+x}d`FxCU/?O3gG"dA-TU.)P.j6W39AB+c.ksNib]Q/$aJI0@2c*e11Up`%O?xT_3BbtV[qa;H7]>6*>"l_UVQSe2A;4ESo"aCjx8W=Cm=pA:WN19E$4q(+EN9Q)m=|Gb.kbF(Tj0v`>!D(;,`V4Xb4TUXg/cRoG/#z,1Xor>`Jb[rmiDSW6
+@RyvWwJvE(RxwZ9lJNeX^dr.GJGKiB4E",oxAi_VAp#K?)E]?&KNmC5mbn0[G8*|hMY#%K';case"cs":return'!]^@)bTDI@W!(ie"]Vx!QJ7*QE8#v98C.Uct^g:;AFuTsW2YF$+7e&YL|
+$J63y&NC;C;T:E<yj2P/Km8]@?Akvd+HyJ|
+v6[XSJTwG*/VD0nRIMzv9EFrz%z)dHgy$FLmm1WTFy<mFmjw]F|Y7H+yM(hgVrG(#wyQ|udmO<DOjsXrnP87JqKr:o`kJYI.Ko@mRdGo|vScjD!iDSO!(*5-
+2-]bk;/1jxxM=MSI:vP*BZ=&z"tOut6VGpj7kXcA"t*-JO
+YM%wcJc>qamq
+,hJ5WL^nXZ&geRXL_hP@r"Wn:"H"yhCNt/@^tD.5H_([q)iY&9V-R@t;N3umX`]7:1!!rzHbAvb{VKVvo}.klug,h/&E_(a`jocotlsqm[cwb`l]x~2B;iDD;wP/_1p~w4#4$n%>ZoG#`F#9@;/cjay?ptL"7V`K2%K,"PRs")F2FQ-zUunK(qs5xN@6avBJ<|H2rWDmuM.Q*obxosK{6c]-.}DrqI3O7wa`j"8Q/6=TKh4-FpXYAWS9rp
+irgt)PCr"Uk`wd-/%_L1},TgBuKs3N<-,3+Ji+@f&(+6[<B@OsM!<y+M3Z[`UW(<
++lK;-,t,<MyPicjqU-$>S#Lrv_qsaIRtUIR!P3bbJtPdtjAnbgS(H-<
+,5P:qZ&s5Pomqp+:U4BMTShZ[@t}dIW}
+6Yab
+WU/xgOn&(}-6$(W#)?As9Xti5-9vAD
+vbi6H@s`iy4xW#=QdoVI.rEQ`s/1J4u!?6S6Bx2d$u*u{sCc5$TO>sC02Z=T~6
+1{PTMZ1Ptv.d.Z=g-WAdLx%]*rNYG~t=jayZsF#!?"ABW|t&Dmxj%DgF^;FJ0}4Lb_.k@jjDbMe!eq^,C|O^*<O?1yx$7`+]
+xqx5zICc~qt_S8T6SDHK}4=bOcx<UJmbf-53To5C:2lho!/xhrNYv,t@V.+/x"C9+28F$o{BdDKMRbUU&9AYV]%2cbt2ykJP>tn8__W&ha,yrSy1>]lCahDyeP;P^uO38<f`ioU4xBmt+_U?p=|aifj>MUMto,ERp2@
+-p-?a#kr~njF/qn"XP&"3^zD0Im
+a^tLIJI+~!z!.h$;SK<M9)+x{RKq5+`yO49#
+Z}aO1(KPwn
+u.+x,]<x2z!p>-YsqA4F%6is/BFG(]xedmo6g;[<6nq/:l.kV4oB[b]sKK86SY6NkEd0/#4dWJx-/gL<-i/<X.e*xdHPAaMW55Vz$t-%2eJ:gwl*Np
+!QIGjXki(
+4]/%[E>4]<],/quj;=]jq*72uTZ-!dsUc^:Z%SUL(:3ez)iO_,kepuM<g|#0".KFfiJga<uxNAz$P[vkYA]>V>mv3N>{^fwq?Umk*>X:T)/ePTA,:n.$YPd%B]p_fa_VOJ82DlnIOGLxkV6My@j#FM=d,VfO8tqYi:CDeOa]<A6e"N<9VQ(p((,ceHOZ*6N|G0jW+ZY?f>".coehIC#%@=ac$@B{26d8Y5@?EvK?T0Tx:JE=;JSBn/)nEt,-="-&*cRR0qZ)<_SjBeEDJ"0r9e1_OGm}8E9+u"G$*jub+}Zi*Ckf)gTDSx%:vt[%ltse%8I?CiK@+LCmL^JdKt5&BMaW<H3CcH(rEScCQp`u,&hD`W(KZLFob!_6"lb,$03a8}Lr4+%RA(l(8>p##D?/aU)I+tY^@@Y[H?-ed|!!QpO(hg#^$+o2#E+OM
+fp&H<I0wrB8yN`$PO,G;"0plLQ+W<!(ofZ1x[G
+nfSp`"g:"WEA#T^`QT8vXqa@w8hVE1<UC7;W`Yq>gA)UsD"BdTs5dika]a]2R"RSA./=|-=AFHtbZTqFF+]$qx.N1E8nm3BLh;u9*U*y>//_~^XKCF6W;sE>BOJ<?*h3c?KR_nD=d5>Q6Pww)C^W)$gH/J$4RNF(J9h,33FJ*$QuxLV3A/_ZZu;$NlQH4/US!Eo5@_
+?+D@+Rl//r#-Y|fzWqZk<UUY7E14Q!fV:u=QnjJ7]_Yw5X:A"5<rs:h|KG5~Wd%yOFrv5_m&@/;P::q5H;X6=r_Y36],6bN62Obm6H@rlAL,RMOL6-9,v`$|D6h=ZPYci^8gZ!G_
+T+VWzW56Ak:kRR7"N)6LCoID]ryuAOP.?hk`L4gi[W%T8)g5Hq~VC@J(gB=+w_:jRcsxu+r+(/G"}m#8pr($~
+LL^qu_[/DAaaIpjjIr^&woJH4+:myYDU1Hhf/bXpdx&P|pn=KA<a+Sp%Fw(,^L8xEHN:M.vO6On5o`CDObEUp.M(H41q`EKIbkIeW+?*pGAC5EaQ"WfDAN%GnxOfOeiR.xNE`w^%hgA-z.TOkVKFwCl?sk.>UAJrUb3ZHs`sXMA#:,X*vAuB%Fou/hbi,-B%&6y0M+x_7PS@=R_MeMg8<nl("7Y&2&AW=%#!:E3bk"z;n=,)y@B--hn?1g~G>prR8!?p3B:>:B;YT&)GZ;*.nB)rhe0As-!j2H[T!=8BI"B>OmENVe2gZ5nhu
+_fQLiZ#gihwXcyavCke;|&
+jf?lkU[0ZZy{fYq,!]-#YX+A,PjqE=jxkw-blqQJ>CR@@V%wosy>F1N)
+
+aPUm8p;S08:skn$LC94""4mrjFh/g&9;Wi9e%Wq2,~B&,Tsb/c>x)*
+8)7mh(tfqbgG3K)+ykfM<tbw<pyb]w.])xXmILW-kBh9cWOU=F
+R^3WG[T2)PQ?:N31@H1988W69:8V=OILWz=IJ{M4,j-+FUlm%K<j=RSx+pE:;`/YQ!c(Id<l2)O
+9N4dezS+AT,Y[irGHz]L*}[aZaVd-DlQ8J#%0"R2q8eWq5H5S,[NP3pA5=Yn>r.Lr,HIa.O`6*5)N52r*m:9,q]
+GL2]xerd+)?nN/0ww"n?YNiQ_bRL5R*CSk,zc,$B?G]v5f]?1-$om``z<3Q!qIy&)?oaa[;`P_@FI"n&mrL(CJ+~+D&Y85>"47>})F9@k!ugI^xjl]SEp:[/U$2cA0vh)>%+.(jAc--MFN?4D],1e?bg;zk(k6PNh&>qFFdb7Ct@`?Kbs&OX*$0kpUc6[6`:%uWH7>weS->Q6J/-s}j~MZVi!SrDK~5W,hF:(^iuPKyT2q^t@5"s;wp/jOyrvJBK)$m-]^9jm9e+x7[NMoQuyG(N;%;N^u^]`#dg`
+;=c~Ja_Qz"vy)(9tRV<Da~ecTKPyA;d.w+dz?MYM!3&u"
+gBILP:D5<Wg#D?7;)wbd"uaoJd
+lI]l`.5NIVH[GFhT6JsOtd@H&0I7}K.#2JB9ViFv.5Le}50:k$LQYL+:bl|:B7OV-e]VQj"p"MV)qHr2=Ql-!pT=<`tOZJuE6Q-=:;VNGPqu_jKvQQ1v@oP@;""';case"da":return'%Z}5pbPDI@G^OU3P4hMf"NRO&S]fd1?G~5K,7f=$=F}=k]KGcW1!,DZ5-/DE`E^Lr/b/PnuM)+KFtEg0m_""}^Ir}XRyFA0oJvm1(,<1RuMc&XSMnXAKL9-)eUlE:A<W1HQAtZQtKnob)^`_Is(L."UXBx+PH<QN}azHTo_sW&H[C/_4iv?"^n95{lw$IkfyZ0`JH^K/hz%i6qe,WH:+*<Nw],cnY)GpgdeFne#ieln!BqD8Ml^^DSWGBf|qP84;BA!p3"u/5`cCcw`Uci)5$7#,?a{;>YS"|jl.cNM6/7Vgm@|hdR{G2vo>]i-,?)Oy~<9i^w24wSrI_a.@0R0`
+u,28eFHx;L${k4a(P$CTOK/fOvc0x!1D_>v9O@@w_xo$,C_Rl/;{Vf@.ta1QhqYuY=UMskftp_s>d)#wy1ilm}+#=3(u?SYBtS7|Q|@U=ilZApOP3F6<Js4
+o%_gXj!o9oQ3-[n:xTmEL9S~Wzc/UAUxJAw4?)hske=@1q[^"MA*aV6c@
+AVf9esh3AHKr#,kJW`V5m<dmf4UnxLJE2AC]+uBQEb
+Zs1N[-pde3a)nu(Hx-~$g;{Q_M:2ooE$;>@pXjoqF?fKbu4v}Rw$|x
+kAmx(s*srBfBD53[i&gmA@l]%t4wWt*a8YM1W?!qcyLb2|AR4m!IwI_Z(4S4S-^.7Sd[9^K3>s"iCbW,mi2$7K<lARaGVGK5n4[!?ZHSm::p%zI`[6T#QMMMu>su^6ykq`NKt<lAyq6&VaK0h]&_Kvn$35n_Z0&ex]p0lCMp>pybk2`|/@X6=q5EpUbQ/WX>7=H8BVKFLQH~uHxx5aZEv~c
+@{9NpG%"feEr]gU?_$L"4D_#
+(=D53P2.?oJ,Xp|hlFu]U6Oa2U"C]4FJ6="GtpcZIGsQ65;@Z
+4I|[qoZgLn)g&%/o,%_V.RvTiSPri_6&59A8t*;i-="UWv>I&Tj$yp|K,YzMdqNGD_r=wGY:,v`D*eiqf?"L1jBknw;u"L^4B*
+Y621&,x)ZWdz!PMyMb<Uy6G=O;m8%
+hj&-mOh11VlrQXOEL:viRmf~GX@9uUXagGbzuN]^V9ptqRI&L@w`Y0"6;{r{?Puhl>x-u5eKjGlby`?D8q16-e=N!Lc|jX1opS8`QxY.])3)Esp6d<sBEUsl+sB3>YXD.k3UJhyz5reIZfy_>KpfKmkdKT[b_[3<(USnx}2^ORGP]?qv(l_hy+5<abiIGS%R`HtVvjOwq"cITEtYJKH^Yc<25Lq~v!m<(G>ms6)4CE76[Bfi!xOvU4CAsHpFz%x54ca1jpc^P-2_M3Dw)04S?hirKoIL&{AzVhL%K(%iB`-bd+:U?Ux_<oZ4[&OA]Oe,-RAC&_>8jHf|71q8Pc1k^.7IdO:HgEx-dl4w$xl
+A>b25u,NH3qk2
+&ofA$~ad@WqIQ7Lv#T+V7p
+%s+r*`=VwJa-=H-x
+LR5X#{_Y,J>Q`b3<.giJ<6jh_I,"^
+TAE<fW-D-@NO+DwU.2x4c$p1Ykj*S"joJ.i~
+k@E<)q?+|hD@>M&B%q
+N3x,,&K_%2mPwFpe"h0`/PE(@[1YtQYoy~%MX6>e1$MFvM
+-,U]+N$W`SM8QOM]}hONYR>jz&a^($>akLPn"/
+^029f:n*uf_*@e(gL7h;*|/Gc-NCu^>6uHBrlUPTxlxN@3$mJzKop`(kxBBfjNoLx=6!b!Fr69wI4_^B.IXQjE_^G%t{88mNL:MN94kz^fbPAmdAVYX:mUy7QO.HvnhiQsk4gNMwvI!}wfeSu4mjvAk4ww*tyu;xDB+/`Pk;T]khuY,
+RdXXBm+&EE^`ujQIL6Mow-TOC?#eob%J07Cf[KQ[
+nZar+V9BputMtJ7$v4I<Xb/@&Y^2epj6nY>S&<wMbW/]gk(&:`vT-WLU6i[P+2"m_,/pRAZI}ap[)+uR;.A<"Nc+{/y_(U}AH9Q@yuaDli+"5ooKH[+Tnc$*.wO^pO_[(rS[ERf;c[{B/:N1~SK3,aFfa?}dSaRg)?vuU4uBhKWS6T3uOU7Gq3Xw[g*8Pt:/[VIa:$yhPv4S,wVBs/~4BT8`#3F-b2
+0Q+RFo_72WL>5ZnBaGQyWY=8B<14w"VE1J<3q^/J"XZ$,;m:r|BS0ahA)_6y>z+v5M2ktkVUXoQ$X)K"LWtV;eFtuUjry;FFH!h4.1UQXa@Z!}U-5|n0d+MfB7GE*cX/TFlxwYq{^A.uTZeN9*t^P-2hr67EFcjHuQ
+Y+4>OE59.v7ca(<_)iEFCa+
+"=`Kh<cP.fC7CtoZ5^IF]bWItlz*yRhwx/"W;2BY&;[9,@K]8:MXVeOOl1f][E$I:/XUhZooK]gBCpP<jD{=&1K"`u}#%F:y{@6wqqK]/j)cTjtp3-m?vXNU0Z&vQDut$6*!c/H)6FF`ptU;2vc1Oug#zJyJh*;Lki#eCr5J#H&I/,!2%
+7r6+o_*r!sodaRz4Z`Oxt+=ee2Kr;+:yd9b"_Lp6;?"pTQT_mh./v@Wt^wG4?:94C#UlrSGwj:fG]<^Cxg-;g0!KR*FM7@Ah.riA6i{.kQi#zSNT.iVQ:wCQFJ7h,#;.Z>87Y6w@dhO,<x7gn1Lv[s2wPhonZ&K*(w|;zy9:-p@JY.,[x"AR&u,Ac=G?pr6g"uGM|:@FXuX!4`W!tjeAEIjgJsGw`
+{kYqXVTi<KFp,aj-!exDp@KGi.j]HY"
+Bi/7Wj12p+@GoZF8aJWX|';case"de":return')]^@iaTp=)Rd&Cu;m#+eK00;rT@8(JdJ>xU&E]4G]lPW=S;*`2spsO^9~eW"=xUvYb
+<kwS2K/P?WR`,H>&)Hjft54Rb9B/@&k(Z.tR(q6;WJ]C]6cMQBTnQbW~MX7^(5
+j-t&rk7>p0zgD5
+y8]Zo,wJa^X}*Zuq5OhR$Bt}u=n<a.eDPP0I_8bYRbG#0!HR$|DN.ouLbHl-
+G,Dkh*WfAeG
+tm1nvuz4f>n95y2,@yPB#Np8.AVz!Gdv
+9um]<MmmhG3Ef-HCSckFtq._`1>#CxNL;v0haa-JZCXbL_=BFVAF*7&YNtQfwP%V#1WL_Nlycg2WmwB;TUaX7i++4dQ{;t:?3t5-#;ec[B;q@Aw=4T
+!H[j}(i-eK5pX;:xnz#N-EbfT%sCX,!uqnwjrC^0,%,WjpVe-tFgodJb-F;-M`BAWBNEdI|sB,~k}Mc!
+==d~Bu+V_3NpNA347!^7)Yn]FX=&aeGe/#$_Ltv<?ko5hpeGIQK2x~M0!N@i%v:)fl%HAznPeWm3_/9_JL]Q"}g+KU7zN"6KY|iN!?HOf5_8HPDmm~g(Ixer
+@m[y<pJN#%;Zx(PSPEFG!Kc1_gMF
+1U98l=&]EO0^6L5`Sr]W4I,e=`5kO[EQ
+`y}<
+N,tP><#-VZSE]IVFg4X1X&r3i@WTQO^yPBw1!xCPWDE:$1A3TkcE<@k&:^^qI~xbE5+ao:*9
+6CanFjvPi)Xg{MGb5uqg!pPk$_*/56{8mh-e~y<`8L{biJkCsKy=KnXv2a%^_
+LA"w%F{KU;s(S9A;Txe9}#&TN[BUvfRW9F%Eewp>*ni70^Z*j`yc=$~ElDOD;KWqrS4!B7Pd7dbvbJi+H934zt1qXy?UrBB9)dxkxXNuBAEwzz#b"8cePZHri^Tym"
+D!r%dp,KDL#i$|T[w_bax$g?kL39k"h2:Nm1TC3DXG!?5U,=48(n(mByG:/d%dpoY{47xcjICR>5lfy~puv6Vh
+{SonNybx+[Uh6RYORE_!GPBR!Xg$,^dZJKM-[,.6ih-io$0LuA5o2wqaU>PBoR%x!i/&+xYQ?bDoglx7A-i`]7FX.N74Obj
+^e>r[q2+zc!E~Ex&:5p3!kQ&t&;T[lED6Jr_tP40yJaq2j_audEW6
+R%L(P;n,1x9!t3L:9LC68oVo>n^&f9VU.&6Mustwhhq]FA~/"7D](/q1kq
+w:ZILR,l6-Xk]Jn&`$0Rl;Fe%HNuOD9LM7x"2Y38!,p4m#?Qyk@EUVSeA>0$QUcxQhS)m%oLk}$(Lw5fdPh$2DlcUn-#VI,jYQ3sv}xIa5"/W4<l;~j%3
+Ugg.@5L.1-tADR)O=)fl09X.8f/dt=awP-C]=^m1huRm(dFtb^ok[c+7Zi_0HuJZ(O"X_|kthvJHLPGKlW#Tm{xhE|`bB~U-DVl`@+07,X!5s#B3tnoSj-eCrOHgt(NA.P<}Fepyv68TYt
+qvR8Y,$vwR.^_QP?[u":
+RbUYaFi|!6$[2fgwQ(^,8*D|:~"Kr:7ArdgkMlU,ms8M9WeK%[RgSL$j;Ey#J{AaKA[+0gDN&#xg8[cxmwC<H-V:<?9j@3u5,8/kkFP~uA9JN]9$2zsd3ZI1/(k-SNfA,ZT
+9N.%&z<A"A/T-9l>32`?..[*oG7gMp&4psGE,[0F"xK2NBRq-uE]iyUP^6Ge
+#N{SBPr"w`bZ_V,m/R/b`XDF$]3QrWp]/e)dCDh(]/gx64Jp2sLO}j>%6@D2-vd,z_wh13^*Y66=]Q2hty2^YPk<Cng[W`n_N,
+[N_b4Hp%u/
+viA>p3H96;[>I+C*+9B+/+./:a[6WX?0Lni15ITw>W+pBKEyL$)x<[g5n14=*Zg=`No<^ocGGmp6&<(xg[t;_y~J?CzHyCIxcwOP;AEp4dp=SCRH@!"[:?CJLgX.)fwN~NM6A%so;L!69lxK8@=P7]*
+GoRE8hG&9r}wlhlEX"O)Jj2h*P=/sIQbEVMAa^m<W[?rH.]u#dp>Sqea!m^,
+)YMVn#)gUzZkZC.Ll=Zn*_<Yq9uto%5/SFi%T4GLnJteXvs|ELp<Z.mbY/%-isJVQd1r2z=-_$1waHD`DFW[&V)q*k%rdYNd>tn@5(XiIQOOv0D;[>x9(Ay)
+bI7<z/{`g>blFy@Gc-X76:)g_1-C)g,4:MVVFC[1aZWnYB"X{?VXb(qHxnv8iGJ_x^*cjh5FzIk`o/]Jdyoxkle
+%MtoU+F*/WLs-_
+jcI?I0tH_ACKw&-0!cGRX~g8BnQpE7a16Hnu;U-eYZcd%,#Fp$hC.o.#/4cbWTr#5&bfY$eo/~:*L7K%D+)EQM2HUhwX3BQTZ3);*NFj!^8A;!@y4aOb>kF@X4+0_JI<k*:)&X_/Eo^i3-XqqBplV/Gu,CZ
+S$[ZCR)wT9A3SgU/TN,Bj;A*8|vd5LFg_u9J*u+e"#Cqq1v#
+p<s
+}<pUtL<%eW+.s&=;Y!4boF)@2YpS_`Uvzf=twr3DAW?J@Ywxxdml
+`aYslH<="MnR
+jcAuGh!h^1txDyzgOT72b4y_HpGdcij>9dV)4t?LK4SP(GlPDSn6Ex^U-X"%GjT:z#^TOdL6@"x>Xx8gY,|kL8|X!X2Uge^ubAnf,xG6gs~Y6!yRg*?S6v4To/P<TV_Z538N]GyC-S<6}<wjs4j3ijy(Jd`=R.l(5(JtMWFOVHTGy,FKRm7(O@]PV
+
+&S_BOeQ9@{*{410;@
+,bvR!}GOpQG#=S3Z^c!Cc3#eK^7O*v7(Z;4J=5oC-]5|yHX0+^U:D$7S!)knoG]47bw4^R$)S+i8uh4*>rjx(euijX@4B7%CSTY&nK)S"&1tGBxSSMp[+AAUP0j7V&:@;dCTCN%j_6_A1K1~.pn.Q|Kg
+/kf.ZnfU,>`${i@[2.XxxVSdwysL#fiH:1PCK49.;QR#.;`<e10-Wf^UO7irLZ([s_o?hT;M?=Lh5TA?rx:sPX`G6i<]F#@=_gyZ
+h^;<,s6Oe7wXxKDQHakKTOcQ7`j,^%3H]#-!Gtlpkni[yF2dnSMEbOWPSGy!77M)nhDkc`4<J%(n*@BcqU;obXJ-;*@;"B*Pwi=-9ojtRYGT;EBT$b(%3*siV%suMV:4N2UQ5h^f<)eUh[
+YGI_|ovrfx!x}QVwWyT8Ndiq9>o-|YKN"3u';case"et":return'+s`;;6KZ+$#5$fnN>SU(3cu9%1_4&dFL8@rwCmM!s=gexvSgUGw,n_,+PcA:suFn[,r:4U?S#KS""jRZekXb7@6^9l5AeV|
+Vl~kbvL<P18GL3W`E%KbiD70}c%b~1b,^7UA9"]l~mn3aH~//t99870nEoUWHDV%XZx)0_Dwdivn<!G#5E$>T&RXs!T`8U)!g&)Aq?4<rtOhYfix"/U&=v:f/J*,N1Hkr^c-N]R]Gpg*R/NjHh<eFOY%)=$yeW~xW]}+}1w9|DD4oKR/B%G(,t-H{L7atJ(lJC#8[xQ76^{Zq5(UprMtehfC++hG.erKvT;]QBho>]3M/i$`0x"MusWK2LVeuq)?zHqLJ;d,bV=Rr5"%sg/7+s*E3N++sKD^B1^U+Yt=fP-=4MxaHoJKQ2}svcjl_B]LP;35-j>7o3{+Z9G;tut6i519=XuW-R4G0s;^dQ)9?j7)P3Ke2ocGA1qCw])fGbZQ4Yy9si[Q[
+2wFQ=s;1Il
+=1cMsV<FV0jnj8Y_21+ID
+%*ZFy9Z5<>@"4M+s;M(L1M[+5.4O:-W2lS[)FCw|jJV+L3`%^ZEd,"w{Y^Q
+Zyb~vwBO#AI]%BAA/2#*Cyta*d#pBdPcho^2A}fzgH;,<gA^3:D(bv){"-%Rg^T/
+`,)3B(~pkEAy;RAISPdD^uav}n/l7>%<6ewGpO(6P^4.c(Pn`<oxtlWmden5uF+mYyfrv9t=!)D?>L"wsk%tIdd1&O[oLbo?][8*7aIPRTk
+oNyn{VBGqBWuCP_qB=RW@>U[b$!(ib,swgON*d(g7^P>P$N%ZI_UVK#=}Xc%$A`fP+.OJbcd/f{UN0h;i({-#
+t%`2/29)"rwTGYzr6^HY*T1>6PpS.5"0csQAH^(fHjtR6TBLb
+;g^nIjD>Ml0i[`HLwj&B1Z@W`@aVA^,Q)ZD78$ek+LQx,pu`[9Vul
+C[8t"Uhr7/A%vO=E!#w74g++"!|"<*G^[DYj^1~7{v=vI9it"oxGYxY!CCJwm%ZL8@LjS]|<?)cLlsUss@^+!@6<s`Tx(!mm%_q&hCf!BKEc1la(9GtA/P9xfd0@O)x;
+?Hie0408sClBH$k|bj$A^qEQNlcg,`l!::.P(|FcKbwkykZp**Co!YH$OZ-Sau1i33HMD|Lnf.@f;;(=da^b]1Ck%jUooPw?@U+G6q8jR*#O3#;G*}KJ)XjaB]?fLMEk`%GxJ2RM=e#?4knJLIetLr9W*^IrtBKG`fnMu:6qbChqL?i>gAbwLnkcf?26b|&W,Wg/xC_<t<EX./gY)uhovz3A5]xf:-(c%UZQXDlLrBz&EktMgb7Y+M>x7Oh}"6J!RUO1^%=I.QR^Y90WZ_R@q:hEH,?FT&@JHM:#mmH<6Sk2.RM2$;)/bp7$th,v`y$cZFGQc<.)-
+T0kt?%`SH[Lvn~a(*|.nF<k*ZWMHjQnLxYlR,A
+;4}Cc&.7Qe#fY?^l-f#o~GQS&CsTLW$++WaJ_7HrGi#MqKwFK[h9xqw30KyUxqY[o#D!RdZ?QL!VS>ltE@q;0^1t]NznFnVaI)3(xs`x(7`s@Cs+s4/c&DM6tSBT^/`j?)Z^qXnbUx"(sEsm^=R1M(r]%n%Ho,:$c0Ky-4kKJ%pkNny4+aQvlAEqRN4lu1j+ev3*LOkC
+*hK]K$9wgDURtwAjYY-=KC&:t5.3mPv@S?(w
+_.X=eew:0jc)%pV^&-{>%Ras|8{(jE!:{vVd]p&Kl"yWJ0(DWK63h`cen#h$KuWwz!Ac6a|nyO[VKyy/kF6s5
+fCqbb5^o<M[d}X!$)*$wT6pcITSl#>1i:5pvR_U;=E/lxG^Ia(7sQ@EtI<}!CX((0Iks,=JC6m>3b@9)|?6r<ul#J.AcXtMf",**4<Jl^,f6Q4w<bna:ZvfI]j`(Ff8^}Eu[)@ypz:nWd_`%/bRwgPd5Go`Ns6D$~c&=Dk_9)mZ6tTuh0qFVP"6tG2qr{FXebz(DCESuEn[eYYo[
+H.8AnusO6cv6cTg*26kDq47]*IC0^+6k!74UEW
+_!
+/`p{(8O==vY4weLtGA
+JR6AS^8_3x_n#>^Z$ge.+X$!8]=cw*(Dmw4m@rh[*"E
+qN<6,TnWDZ:cpXo=U-7Bcc6$]?Q#3LwxGfwuRWSVc9Yj23KcUM&f/^pyGs.
+MDd^gQ=c+uH*Ti~VeVR)]5j1)u>j[Bw/fAoh)qzWliZePxs]e6)U>uk!07y#[&9k2owB_y9OLB;LN>I7w52A6nZ.-9vkE,1O{B&)zV+AtH[(?C&X4.D4rP}1]yWY!';case"es":return'-`G@r5IAP(q@#lT"z5!3,TD:%)L+$8,m,lI$Sp/J4FvF,[AWGiBB0<_SUxFRy8J,P<Ro8Zepe7rw+YzEa]CDZ5ysSjG_x%Y`k@!wx1g9GXud;:,({[MEQC42`tiEr8/%klT1>;mT><4:eVsuv*8daMS`xyf3U$|(V"~VPD8fIbdcNm1#Olll+-E
+:#zFj4*JpZB*C4Z2D;LGNy#MTUl1"+:LzmDausZY4>*C!>j$gy|y(k:4370CB#?qhxPj`b_$0g!AgBhb}>m<$)wnlS=JnK?gKqQxL9CXomvBi@fx;q)J.p4C]>dE&>g1/v"$/_*9;!1.Pl^NyywOW8b=dlbklhEQ?`0<<@oV<_uezHx9;X_z#RdXh+]y5&-D%2$+MaHQ0
+qP^[!^wQilvitKChBo0U~o#JU!a7nKO>*WbeT=Z*JAJc/D@G8T+IrqFhbUco)XRPSwt9Nd4"IXh3t,(=6(lCt[1(E=>mh>"F!YWsMb:dt<7<gX+-YU`HlK`WqsYPWGE_OnKUFxcXo).UUGwBVomMjY"^#p&O
+2+_uWJ
+>>`Gy-KPz?JDC&se@na""N
+39[juQUYF>!l%Lk!>T]DAou"P]M{sk`7KUS!k|-0<61qZ2*,tpkBYi9fyR?"
+euI
+5C[y"++KMWSQI?=ZaIe=}H4^*1.>S)LS6lb9T`U3$Sm3,<0Smnbd$bgJ;W]183O=P0iEz%~Rjen&x(IjPNDQ3tI,%8C]"lTGtgb/?DFYnYN3XV!^o,i&Hq_L}[im}*i;Rac@aT_#+[YKZDoyllI$U,WsKRIZ)n/&k,J%$<w]M$3-x+Sp7OvHMbRAWkh?ejwdrbE?8nPmMz)K(sf@SMMHBWAp^Y~?v,IW/%,3!Mqj^baFOV8*#s3j<V]$v1bikFWM"p=+eQ~/cM>K8wBG!xqV{Xa1*2F%ID}o"SxT1gUEjpjE@bBBX/l,B#K8g+k?p(pA(4-0WC+NpO#"5;NN+02nB^icLhq?/b":ltVGPkpn$KFL]L=bf,W!~>+49U58-dS"R"__}@?u;cC];8gt(z$2Dd.0!Qttn(X7|_K&a$dk(pW2$PK9Ws/NiFE
+|"Fkv.J/sHu.#BYj?v7*%OUVHA-e<R.pKbqGqH:_==Z$|)yJ9c`Cy6-7h+DJ#=hMvmiv.T40]#W6I7Eo]#U(K-uoCPjgdi:-v9LbhgsAfl9#-N3C$qq06CMh4_:$b[#G~vKgOy~M@/eenoUiTE@,8ScI:yBv3ukPWRl=1Q.oSx{l^^nY!EVF5y:MjuXd?YrTacIAR,c#]A>G3YJyfgs%g-in!+I)"rl[ula?J[Q9~
+X?cc%)~WiFIa(0*2vBH^*-Pq5BOWXR;>:]
+x$L_=C.P><2hoK+r2sD#H@L*M#Jaf2tL*A=Vu_eAPANsbredW4*BY?@RjcD|&5]JD>k8N<aPsnXFfI$]tf=IY_0&_K80aaco=S!-6IM67u00xE&p4RBYU?uAQ;YRHB=T9$KU36M!8gScSu#((cH;u-/?Ed"%5nTQ2/2U]DLh$iqc>
+&DG&[y$i6$M[Dl-
+kFCAU<93+b&#R5#kPCfHcLnqx&IuKE2Z&tDZ&;S+E7jrvaWHiiOI5BCcF,k?Q^^^
+s9c=>1l8Lmii(>y!/D?#
+0VF6F|bGauHF5tlkG`Qkra(T5)^z!MHd]&..bT$r6ovvH^+Wr[CCN8
+sK%%U)7a[/UCj!>w!Yx]aX1x$
+$g-oiBV@DLjB%8~hc6uW_I%A6qarPy&C#1ffgkWbZL"ndt@v
+CNUf%tKYmgWn+sA_-6_;
+4DZL1YUHkF^vYsq8r$=CU=aUzC1X`dje:Q6/{^[4Y?`"(CzM+NJ4XQYc1P1+OU+8E9.I}yVsg<6M%v,:OZ%QsF-6cNwF"ZQ<yM|$d3kK.jL9:takWD~_M^/?
+SZd~Zh/t/{c/7[uFJxv5
+Q$~N
+X;7e2&QXrq3tie:QF~Skoy[Iwcy%CX%o!YJJg(;fQD7X=DWGK[.Q5f2QV4$6QL:5FO]|Fc({
+o4qEKr0:*KT-P
+`:q@kVy<"u)*qM/5B9sV`:25mc=rkLA+Z[ipdY:$VxUTO/Ur3>u=iU6;[TF>=wyClY6NwTSHuA3a#G?9ZU4T9acX.^">Yekx9eu^b$`EkP:`)ownkeoVT5(T}eoZy]i%@@Kt[g+aFZ-r-Q2W28mB$vnh8cN8tc#mzPz;TV^aj1wp]B%>eB"q{]ii1x}byu;v.7[eO><4v5]J1L4a<FWqf#[ZtGoJQMke:174^g,
+dy^88A!u;_TiP7aEi5SEYl}k{bz7RugkwC;Z>R1ZQbwuQLi:"VX?qn
+k~cPH#!a<`??S@enAy*2^l_<5-G_2zq+`KGJTEF7,!_bB,(+*PL@
+-I]i(H-@)7ksuJu;SJoq4,%Um-w#v44x|G"%bK[f4XV?7WHV3cTA;TTZ?Dp-+G&#jH1FS_ve.v.5)$dXI`IkR)t.ZaknT^4dx#
+iova[rm=y~?(LGn0May{bD.K0"8lWfnP`CGsz&/YON!aF01L(lZ2x.R|<&&|wOym<v
+/)AFj*+7>["ps,g8uwC3_f9&dbH53KRl.mnh^`.X|vf;$n{+yf"Q9u(%7U7`pPQYtg~.O[IvufZq%l4]<557{iBAe<]/&5>hh7eft;4v%8fi0SG:V]tYg&@bfdUJ_kDm>*%ST3UqZM~FV-fM.Yf/<>r*<,@/{Wja=bLqCuWA9`w$`cWudL&q>>l
+kX[&
+x#?|a=&qUVMy=s2>j955_HX_,C6tIj9r@uZ[Fp,b7S#MN25UUjYSTIt-OlSZTe<[:kfg.bwlaHq`LWWL&p1+9[.Tj{aewS(EmJJ>*xZ60qn~PFGmxN1jSC
+x3jv.hl#cBGnVR-4w[MA(J2l3mB1LL6!g?zA`d-9:
+btb36cibLCqurf~0.9CJ"blL^wL/=.
+EAWHy
+<p0Gwf9jtbYA9tbGj&.r-jIWl
+)/YZXTLe@qXrN|VYgr[JC
+>NxN2YAGC
+:?hM6|FURqU1[sns@J"^6lCy66An]fpqe)_+>[j)1V-<`rW7eRX6QWh;A{8~.F!7MngzuN+9>+I-*d]L(8)qaA%=(PN&:"2z:k0I%FoiY1yW!//FFrZIJ:dB5>tyshd(';case"fr":return'.Zu;CiDYhE&fEqx;U*o=]]v(E_N-30OjM9y5mH.T#M}QAGCRmB>URD)@2!DVV`aOb`[dNy9EVWPJw;;A(N.Zu7v0sy@M"L]i>Q,6"Bz/m$@*?!##Ad>LT]6J&O6BD=9B_"`"=b<w-x=K{c"?QJJ0Ep{gW+T/U_^Usp`
+R3^7~GHikV*%j+GR^kRg2_B%/Q.8x.uG9kuXXt!0B2H=BgMK%u|Jsy//`z),Gnre.ba2pK>;K[iMQMrWI+g1C#/>3SHYF)Jq%LB.#x{9bwQT[y-_q4UxFgEY&JbiQxM49%Xw95+;DPlB`XkMsPbZ"Kle7;<Uo1Qx(bRZ)IOcGyWG-RFaG$Dg[B|.!b]wjcaKy0+x#&M`OWMSB5A,yKGg35e;Hp#tt-LR
+]$Sw;:aWJ52RH!EJa+_a6SJ"m1Il%xc=A^QuMC@S8`6>[$<mG`0.+Dgs??
+^=%().!NtBE!C/:AlnYvzl;:Jn-&e+Ufn^#:!A]#ex+>[C^2gn<hV&TZl:g3(^4PPO1&$BIW3nQ.
+#=,1H!XmM@wS9<Aungv7S.XHJNOEgZh,7!&n^m%=ybNbL"iE;rB,N$&6+3bpllKjsVXO!mG(_w2w8rndM]j&rZDSUS^s7{eSJ.DnKhQ22T06P7W*6%mj]
+Qs?-1TZSpOAHD_j]JITKjX,Y/Nf-[i>
+"`F!K
+LQ2h!|xj$M$66n6(gt2y9M_A5JEn=DcCSteGx.2u8go06"TBA&(0qpvK^~`%y~Mx$UKcgR-#S[(p<
+-HHGV==ZZ-N/,Qy|me,|`_%An}ykF)";P1BDGO_sCR?<E?CT#qg{,1DUYip+h28n1B7V9xPE_H
+fC$k1"ni
+&h#J45avA8I`rEKW9G@C+1%%+0.|eOv[j9niWO!SY
+p/0oBSXV<g9F6<Yd`::$vdabbv&>!_53Sf7Ps^!S+5.q139H+7n)=%_ZR{237J-HgeRHY*SAD}-I&2KF^Z7e!
+%u%E[RNSis3V@nSxQn
+UcWg8=9$H//@~MejU./-S]i/af.nX^Nt?00`Z3<dt[4k?d8$-s(NuMB1.Bu8j0M
+HT;hah3l3yapJ$8aV-T+JN(Ayk5U0$9,oi[""Q8mC=Yn25!2roioY`>$4`y2yKZ]*K3NbyoCqpUL?D&006t@1NY:=..,q4`j~H$tap;ew,oU[:|!8l!$Y&CkPJmMf7.M)&
+]2CAv?E}@l=}),C;nlP/$%<A@Qnd+,IZNhHAdNfd-Wq~*WfrZ2M
+UahGz%)rr1gdTXKQSM0yC#y(4uD_F6yEgRBuVVApJs46R>#5ZAJ[+8yG:)<Z+-HnCn#D^H"WvJ,|Ti@V+$D}XflQ`H#d6cgI/TO_Nzq;Q5JbXHHyZ$?l->o~r:Hav$17O#KSGlm$8,a$[?ht^Bkbl/X.P
+*JUZJP/OJUoYoZ)$*$"HG{PH%k(C&_oeIPmHqFu%M&iXWeQTH&y"N$r+eb*#Mu6o1Yll+%!Ws33ePFS*3l*c4h8fZHc97~WNGFk?SPSrnK[fb!1*%t+q%X?;*)&WPh&dHUF""{,v.r9w8Ca(!}+Y_?B,-h8]T^+O$]^tGXy$3$EfGse6qv&xJGR>!S_sD0@2;;q!)ks7FURdl2o`Q~O9KlB-p%6-Te
+%">*r`v.A*Gx8N=*"6k;$1(D5ww#~XZ2BQy@>?t1[jlW0v@Xi:{"a2V5ySKUNLD`wJ9rt(9FZ0vQsI-`(6xNRpm]$,iaXVT0<X~3;Y(?2UJZUW#TDdmy/<55xYFr$ujCyNnXDP&O7L0ulMF(<2k:*?#H}Z9`,@]j0OF9&1<K0#-G!Q9FO79E>O
+Jt?PK6I}V[A8ic0O&Phf9aIc_<@@7c^$6:CO1xQ#ee&5g[kiII&{rNRw
+{+v1;H[A#71c/sgTd6BRdG=Od+DOquRYwLqI,[vSPe8@9ifkrq?]kGDMWG]7fHJwRo@a/4o
+X_y6M%l9!x)l|qSMh[XADH03fBIVjTtcAF&KRY}1+)v@RryHiA)T=?q^*ugQs!u*>:bR=,X*p?jlip/vDw=:*QI0*mCE{V}Pd<rV=gEf1#b8I8m(A?{t
+U)$>.0K]]53#$z$i>[dpWeIYN~
++]fv6LX-K;gL_^HOAJfBRf>b3>K]p6XX0+!O]#K5-A^&G8mIk=4xi>Q@X&o1HgA>
+Wsf3/y[.<XW%I;-$l9NnA&GxEHo!@I]r;j.V04dO4
+(+"zgLa0ULjiADelU~t5&;:&6kOZqX`6/sYM)[0--M2%rKQ~u!_+BHB$,/>5mpLfdIc{hpF5?Q0;yQ%I-jS&gKKJlm;qUBz$O|a@kQ[50:
+0;ZUls38h`S;vK:1Wvi?O5rI|`.v&S/UDT;n2ui>ER?(74VEnKxy`fC;fFQ8.y11cRuGQ#zeHB^))r,r^San>
+8ewG4,Z:xjk(5k7G)_cG7=/;
+@a1yZ]xL_Hfte.?^36UM!F2ch%g0q%US5kOxHwv>M=#$o$?OGiEDk63d&voy:,Ay
+m)&RzP_)V*8L7mq^GX@calDT[7>qL?Uf/t.jg2bXP.a.K^E?Lh|&4G/<e`^-"`Qqxu!,8]3<vRO1"JO/)lr=l(F:e,lG5g^CMt/+e8(BHp
+OFUG)=w^.hlf2EDV67,l[y!D<>he1z-S)w3>3.OnHmhjj,3,&i-%m?T#p-2k%~/C]:1ado(]JuJQ>LV!#r6}g$yfYP3b
+,1#TS0oo/jO/Y;ej6,_$g^)FC)+e5i1w`m/mGt5j!&xnPXG
+TJ2n&Pu_Y$3]KE_k:*Hrr
+Y.?!rDdauj}ps;@5zm/t7YXOQ:o]kr0g#d"@RK9;^w&<?j-%yJ}4YhlS50M<K^;kpGhRpc#k{5+T47:_q3VTzjDcVgr`P!;#zkU0&8MVSoZ:<[;UX9
+.yf4S~+n0w/;o>2|e1eQAvT%C
+W7#6EM4|Cz@<YR:"1[9Oe,L&&!#3v1#,p&U=Ewt}NB@dHVt~/E_Jg:!o_j(}YRiC`w7z9vi!U<M
+Wbg>0V0gYA=dDRN>UexK&u.00(_1:J_[
+Q$CtPKn!JS*D}6mPx7F=yvnX4M(V;)8`&JD(SB6A4P:86/Xl$hlKUWeS}k"E|.l;
+c0;p#c_YO$>oUbdi?
+_w#ldFUx*R>W_O07?c@lS_03Ula1P8Up9sVfG&_Khr2$U{*4Fjj#GATCWqqnFI>;MgMNq84xxTj/AJxsN&';case"gl":return'+ZuKjbPD)/$4oi`"+!QKU(Xwgo.TT:^"5*kdtD4x=%4]##(m#!#^[B~dG^x`:Pt.LK8nO7z(GW0?WS_=auV%ki=_
+y[uu`CeP7qNmp<F=L]Qxiud-8;YLCBN2&/A>D#kBt4yfsl82^#4|w97=NWUjXaU^r4L
+<G>WZcg>nLc~lh"$kMn[CLa>#L>0J5>ZG~%1Oz)fp
+`fY=Soxc4OR#bmS3%hJlJsH5Muufh]hf"cRZS4yna:W?b|=1NaP`DOawm{45?PdZb7FF]%<Vc}wl]2aeRJkLYP5:hWG$_<N9TT*}MmHN(fWNvy#YQ_p$<I&r[1qmMrKC&!Pd:RRx(ZR?fgqT%$>"@8os/ne[>>hKx|j0`!0WxN(DPNsDosk]u#MV4j:]];n%u{f&Urthqikl.&+3KnN3,Ojss.IV#g9XtZ=2^w7LH+KPjEHnXddm^PyR5"pG5Z5uF))sQf2XIE*XFOI
+E}Fc2@(8Zp)g?NoD3dG2Hx.)M5%A!;1t.fLPV%jr1,^,dP8_S"dx4&:$vyJv-op|kdY[h8fZ,`.%aOt;,9,V<FK`?js+h&6@8!8rlLt~!&#Zg"@_e$7Ob$4Xbc6,B(6*:B@B@5iA)(69vhNz<fTou"E@^FrVpUZ7=<;Y+E
+pnrTDysd}E}R%mp!XkcT$!mZTtUA08V+9Y]gVqs6*%^sFF<o}&0Zp-Pt=,1,Z!_`5RrB3x$RbX"o7A+F@$,YNUJ9>m#B!n_56%+k
+/<Q7%^#6A]ad?$Yd[PDL6i[:ro2G0LSxMm<O[U$h"eX+)P+H-gbPY2I:#M`_V2,Sjelgpv:Na-a`AT[RTBU}uJ)t$pZ/4gnyn)M7F-WkiMEeRr-`[ZW"e2h.t)``7IlZM(6Y-@LOqVY$1[c&(*UTsg++)dJz(2s@#^5zdccd0:n~D[QISJKqrVAdsF%z;?RYK~j6=C6^(~Nzc-l-16l#I:M$8.!-SNnC!cmlLGrgmEjS-aUHw~p!!D;gj$CT#:)C){oaIo<HtIau,^BG>jyvwePF=+8eT7:qO_Lo_+[(w2,l/:Y"wP`iUKVsDVpAf5,-!9k~T)>;_D2I`dP?btKl<r=:rjM""a1{!byW&YtHu+M6yywyu+cIQ;J(;R0LUwy!e84vansf%D#~K<y6N2H^PZD{N,?>eoSH_xLq?.&o.]Zm$_hK4,gIt:+E/Qy~z(hsJ-Ys_M=*=%@N)Qefx_oXkv&$$GUai?:0OGW)cU7!M*dAoIP4&o#7@9jKsCh?e1H.w)*(Xzj(amT.o3;AC
+aYWF<?#V>nH1-Vmq:`4=${_jT"mDXI$&-Y9u$KNOj*c~=BY7X?.-=>h:4lN:h$M@%B(5&k,|G1jzL&-G@Y1k3u:FqmX|&-ZkbJbeNc#Js-#q9d#11+Pb;z6&]$3-vdF&os5ZwrlqdlPf-p;]yC8YX^??ZQKZO)QWx-Mg-q"My0f5x~g?qh+gv
+yaNkcs7EK+LBy`$E;_*u-(q
+0ZoocAjcwIJv
+|M$)WCg(jHG`.8<)0x$^B6K7eN|o#QNeCmWcH""!~"$V*;6SBKD)0q1m2mMt8(1*tpl.[yi>jgFIX8Xh&wY!RX=ee/_=F#c`syOT)M}UT;VYLM46<bQN`Fc8:0:v"Il)3`a7Q(:Hpv~pB3JY|!:Q15IOth6W%
+ey-NA)L.B7rM!FVS6!fN.;;k;*BKzOSgjhd3*GkY?L3"^]Lf-^/p.qmJ8yerAEdy47*[Q0K5Ri:xRZEAXpPJ;.CUM:u7_baIX&t3NHd!k,%:*gi%w%@Qtmvd6Ol<u1$7:Nf."MR4X2T-Uo+Bva_H$
+p(zUgI?60Vn_g-4Q#xfIGgTlsmG4@?mOM$h+(S,u>G[jrRMNvx]Zb1<AO0>P`:;*[L_A<$&!g$2SSQ
+;2NA+*f_BM"<(cGdGq`>cXxzs2
+
+@>l:[2H/y2C[:t)NY&x^nUWh&GAzG~X(%%R;P4
+V,n86<`(*>k3Y<W]92p`54e
+8qS=5.&4HdPc_9a]^cw]8"0(Cy^FnEXk-8eBwp
+#O*UBw.5>96[U]&4Tu(V--
+:!/.`$;#LR+sZm8<Q1+<SD+9?UK*q+@R7-i2"2rk1/9V}aq1at>vCVu6Ch(b`qrx/JkFfC~L
+A!>vVk*#L6o.x"3G^_2f^-%+5kV/DUnUN=_c=iHVyYaGapbkkB[LGU8))JWH
+<
+(:^_;W)_qm7l5E?NAL9]^JpS./^!iR_CkIL@253l.l&Pim0c)u3rqe@w*e1Dxxn1(PYT]EBfm(iuf*&tPn^8G[[K,+*r.)W`l1iTD(YIP`v->c+E&>WcP_21fxs.;3L0Nb+.<*O?}:+`I<K2nS7!a@zY->;L!)q*.oe6-n?[Y>x7h^sxn-[redU^+,q_?=n$wjwfC;T05Z8-)i>lQrLkdCx#adcHFr0<cac3>@),^c_($R&<j&vG75Fw(li<],ESkrQJJZLqS!JSV@H_:h,^EMvoT-Rll^,!rw6rLdehBrruC9Q1u0h&4kt#"p1bh%Syk[>=VR[gE3N,-3E^w<T2W
+dw.k~NTk)br:GXI[+3p`@
+F9p&(*u+9P0QX0+sK&8wtD`rDyQ8U37>f4jhJ:mQ8ADrCb=m`j"morMua(W;MmF2Mu>cJg1:xW+n1ukU>NM-E2P<H%|%vFcGHr0u)&DSS@B@my"R|H{L3U4KokiPqvCoIecP2_?@Hgmt;+dhd2j=BM`;GdVt3?3IU1#=E;?aKz"
+ib^N/RH%paqjV507N/Jb+9=-oT_D|Nor:c)(|?c@J,tHO7*t=ax,VD2a@Lbb>
+vU^j<ysCgM#]6HM-;iUHyj>])lXaS[yxXPRq6^y)cvo/1TPnYBq"y3s1?&]5BC!wYS=tFv4vNt*)$5/j=5z%ISI1{?*@I-hZnT,a7aKm}1a3!W.%QD>LsgqWY(2:(l|nStFr,5eK@dOn(#fCEZ>mC&}vAdrq/hRtu/5tSM},3TvKiK;G-SR[|I+YoO$>7!Z?nj8X^<b
+39n
+PaaQ
+Nokr;#J?yu%9,h-7J~y!$<WAhX
+tPw`0PPZ2OmuUGp>7j|9sahwG)H*aX.xYJb8YX6M{6~pB(xchLBHT';case"hr":return'+]^@qbTD)(q)ji`"0SU,,$13%o,KTPoO]B#.s1rs|[zF;T@Ir8:9-"9ta2qv`,PROZhwln0b=5q:ULIf,]CmXTQ]6v
+x9G]cMQ{GoMB4:m?X_]d$EY6w}7]=i*qE2LNR&c*cc&cpxZ%EeqDkTX}8qx021X@s2b%N[l)qmFAG
+;rBCp(nc:{6O>G^DmE".XQU)Zx:MJl8X,[j}N<i5ZZudF{ssw*O164"-dWO3sJyr#;nag)E76tfCp6,u+R8t]r1wrg?uN21c+{;Z,`gSsR,;w*f`NWEHRjYJqEND!=-2#{P~!;kzd^]YfNOzi3hR
+yF%>iA|+|]3"#,gb=N,L[d+b3PCv2)qSs;z%0SLrH3hr2G@@6]A=]=g6b&ifxZFw.StsSH``3Hpftjv5GAL&$7>!Q[ct+jRc?,}xx&9G)W+"7npIMI67y;CrU-LU!Q08O(7WyA>:sjyf3P^[
+qb#B9wDA;mK(vS5,CE``r.ME+@nn_vA_t.D}Am&4T`-~Zll9[61dO#tJD
+vXT_7ub="&k6o^idtHB.;6t`I#..?H)}5QTg[mk;,v5^4PwcKQl$s
+m]03EOH?GBh0x:baRmhVyJ2ylx)~0jv{hfJK_6md!%`l!@i&p|Z-9%FP#s?rwB8rr!@.bHR~EzLM@
+AGC$_3:GcM^9kuxM3tU9L
+SfjPcs?<MS!r=k652iOIjakd;09<yF$wrIu;nB(Sws:NN*=M)m>md_<YMdbg&QyTr^E.(d2^10:z67ljhp7-)rr5<>XzSkvDQRdI6%)UG!U[cl+j]QAN%`Mro3kb]YZAyTJ{j~HtP)aT,)0*UqBr
+#ObFSaQ7{s
+YR0A5+Z9W].Q)kPw;a&!y58ekiU2XU*,pN2Z(ihoC`ag+RL<%5&:IPNooln7%OcSMbWUlvSvy3kxNPyx^s)(nQjVas#BmYGw+HL.sS2TB?,6;GtJv%yhT2Fyx_NS(bE+H6ai>dgYLClOcBRmcdKLHnVT3E9WC1vk5FWt6S@Z%9q3m}T/qJPCT%p~Nw8mtOCe^Ud>-!Gi(pC1Cu>Y]Ng4N/:Z&Nb}lZ=jBHkXI-,SYJ
+K7=$H:^G%@],U^fpt!ssN=RNGg5_%P8pv7_sFfZ%Y"Ys#o7Nq@4l1Wb#IFjNr+-(_W3%u"+x&t
+LJ.+wgqMheiwItw8q^pJfP[lBBqubbm.!kEjy4BstP7T[wd!Sig9jfHG"[UAisCCieKxxW
+88$LV.b4<H`@KGmV5."O64DHz4cU_yAOA&Y2]B<./$|D3yz,~vuqgMRFFV@Q8XTVrd2"HM37pBXywf;fvFv$8/I536183mlC5K,-
+oO"jwm^
+tT*;P=O@Bp5,TF")6GjHN.I8bJJ7c"K]FZYrQCyG?Jb+)Rp/uqCn*51>yr_;+c5,0IAQFt8u/T.RCVyKv7>Yu.=:dHfnCJ+`*
+%0"FW^m)Tr9N0naH2*QlmHU*.HlcpH-xv*H~@[N:+t-1Cj8Eu{+B>m0DZB")u<y;=
+Vl0%rZt2@#&>);fVQ5(;h.+FhR,t&lVQOU65Sj>$:q+$)3C3@)ykGH9/O-A~6GUSU`oD.q`2MK>r&KlY6)Pxdix(Fm_qhWW9st8Yimtl;l%gij:/d>/5JDmN^F52$zg_"|(@:ZF>vf9."]^l@d;%9D5Vcj&k3wIl.HH_Px
+$x65bf%2ataq0XPY2;EN8"Wl#oTio5{T__I#<g_]2<V[yB8<aun*x4lOwhzc*c&hrC-/;^&Rsh0#h-3K=5iZAX->GyH69/]@{w(4,x$uStM#1M#IEF3<?[0O:jW5PN7AS#?;
+!|#1[!;xhN%VLPmG=!<C]Tf4(YnRjlNtBRdmnqJWu1Q=0B>!D{b>O;T6PB+P1Aj#&K]LDMQq=we9^9agM|d.M
+Dp.VvD;9ov:~buE&]l@87[#UtDE-!S,9W.7`#Dm(VR0FA4e0c?D|;A[%=F&fie5P,c-=@;@Z6qQyWf=Fqf^#.tZ|0)-n0e@q!eN,p!I#:yxU2@UZC-X#I9H?I~I;>%]~;z$gJi8c0);ArMc9`}OiTw"U(LOnY=lQ,T#iZ9(.UOAks2q~w.82t$e63b4ACerb.8`r<Ur,o2JS7OB:N]5YrFFHGl5k;4(V1?nVdB46HU[3d"&;3LsT<hD)`n]p46A-CjBH:ND|%%1z!8eQl/"xc;-ZWk]bN<d6Zv>+q$O-It`VPGBAWiR{p82G(29uL0oB^CHT6hBd]TKn+#xo#.C$:$KR#s;yUWmixH4oSC#U@zJ7JOP~
+N]bmEr!4cD=0z#VPRA^k<Jiw6lA9;j{([N5^Da59ler!XWC^6+1^Rcl4/8vA#0aeM9G%H^qg_"}8(*+P,T@&OI]w2)E:1^Hy8Vy*QhRX:0n>~4Tt6ml3zeswdKH]!(p;|
+qXNULQteZYNR`dbN6&[TTAl,.*%Hc_UMT@F0|4Y=p.f?ZYHSF8pI0;q-M`G"A&ve0*|;]#
++%/6%sIqiJC>Tdc@$vH-.46ul6jCZxX7GTiDZZ>Gr;Eb=j-"*JeIrKgoR)_iqi.#/AZfN%JGHLN[sg*AtJWq/f(P+],X_hD)&0+1X=C"+H(m3o;PHChmm]cPg4B6qpq}ONe;bD:A&1.p^8H:CSh[B}H0ZQNx
+Qm&ufMjnyUX*LjU?C"|uQSy*mC8HGmMcW6
+BW4jt]0cCStS(PaMh5:R!xJ{Qbo,!q&n_M<5[)+M(l.crtp>,ciLy]T[tu67mhH]g?toVe+T$x##3~Q6=],Hv:stKTIo*`mR&$ZP/VUqwm[1]R1Fx5p~QFL#?UA
+YhYGLIB8]0.=qlM$1L&7#I,&rB^8Q0QrYyNQ)0"G!#:G.D@kV^Z6]>J3hon^emMIA.N<yK`q!e&54;U44bgh$)&cS^U>n]DI!fl_NtUG@PR_VylT(.b;Eaay>1B,U$Ol
+jL2n;g5u^mC):c#39FO/+yXEU#Z.)X[?!o5#qO@h(a5L<sGp-`jM9=H_>4m=,Q6:tG)"3Vv,hnqwl)
+0(Y,dJm_5).@j{.<&_.kU]
+N7{Abk4HGO[b*@+V+:/G(rkp&gfSj^s:SsSmFuUk:+Q]Q=H!ma
+SB/Ol[ASy"l$:cuoi$tND_yHhSgR;K0bw1i-xXI1bS*FY_=t%!]Dk8R~^m)qTbU2!F@g-=:?ofy|CQNu;F;L7D9lL50R%"_:#"syyw=S';case"it":return'&]f@ibP.!#P^<],"2+X.&&@D~d,O-":+c/"%&m9hODp"TFEhLf-QDm[V4;c7stB^SozWqCH+FGc;3yt:1]mMP.I87iG@K<A##G,IsOu[s*|ny*&N}b*0OZcBmY-tIE8iv@5,h0}&vyKRZ4iN?jrE4*fjcm{"xxFPBI{lo.m
+*PYAn7h[$(1S4?~ci/Z!.MhYd$#&acs4L^Cb.Y]wxV$esJCXUS/V2G^ZLb&-tuqT3ytAKX,ikBHHt`(L.C+w]6&t>tt#e0IR:#..PG>O=:IceNVviT8`&2(er.@<h7hMil8P"
+:!#V1;$!5R@ha@SJ*c3A
+SPcIA;>xSyW?,!Wj1HgrEkK&CA*042JV4k
+jW>tzo<sl8r
+Ff*<`L.H:X[et)w5lXl7!-DyVb{(dCpf3!v?:&gI"0a`p;$8RxkI*0zKfvrO1I"N"Q+4U&(<rEfxTBXHf2(,M6(4
+MxY.9$4W+3t-Z<]+LXw5cJ`NJ{.[BQ$3"qZWe&DEJjmet4N
+WPx&a>0FKFh,>x5`vD^Ym)BPWH*B(z"qg]PBEQe-8
+YBf=S]tbUQ3Kps--6$b>O}P>"coA#7wT"#
+c1Ifv)QQ.!<A9g8Z;ROyY*Q!GZoEj$loO,Re>EGmT=RH`&6e9a;ieC>x/z(+}pkP4K|Gff;&"ke;>=&9)(8OJWuAlOH]gW[fId0IOak`&Siz!Ge]b5=j+i%@V,!qX2D%9(dAhydB?Zp/}u2?Q,thwr^[u5fR3ARAjedTo8m1nKz#Z$aF/H{It=kI(iS3g>[w"!d(!qU!C,:KHL6aZVJDIK_G.2sT%*loulPMT.OgK_WWkG1)J:#yA.rb]pH_BoEoUdb,tP3E{SVe3fRq"w5do.5%/9RiR44&C6hlt5u"ywvOaLsBh2{o|=p7#X:1U>6i/xa&f@GnwMqZ`>(sbEO21Xq]urgtUpfoH3[vobV&,MN!dDml@[p`yHjel)Y`eXSQ&Pm;33mq@quf.XJ5OMeO_mP<5Sp7xlql1a-iR^YWi@MdL5l)+nMK,ci*W/ykzH-@a3Rr5P#8uI#?&YZX4mQ1W]m[+:h3M]?`ULr1*d$2a1"H3G!P
+$
++,%e)Ff
+7nUV55#qehP:G1L0gr4^6t[}Rq>f3<(2:@w=S0P)hYmhr=$U#h;+;$j{ltwl0$Dj9kDO>,,mZn?5CBSoIcC?g7i9J3/B=veJ,QAx1BOK3**>H*A
+m?w1A}<I6fUdxv@PBe3eSoD-rC*>iKi*j$Y,!yZr[kYJ(DOZrre;H?o%C]FaZ)v.y%Ak2u%wNGZHQF7%MApzlkquHtCctK`49a6apk*
+b1eYr-f#xu4Quu>EybV!Z%aA>+"1
+:mp`h1bgj71K`W-Cm]uBB?0b3UgB`>:Gb<e3)ZwZ]ttK+%@<,+gn!(DX;=/7w3e>S(FqNJskCQ:MyCZ0X^l,J#-SR?CI>^)r#,Wvo7/qwl`^[K|A~"r+]D^lt.$Do=.S$da
+OiXnb:$3uBCinlQX+3GQ}WiUyYL9;&(pUf[op%g4w73kK?4A+cH4-_)nuV3B(?t4"V*<$,xkVifpxAoLuja;K)~s#TvqW1-cWK.r=_7_$mzj,#4L{l_p038tTM0>AS,]jA8>BeCO!=>Bm=[milb?!aD-2xukR/D*i?-Gdcac6D1O^/-]?@Ra^!w%[w/s}_-R|"N5ih5BlRZ&1*!C{t3dA(M9iv]^@.BF%Db9M<fdOK;h4JiPJusUW(Nt7%@<]3dv%ghp[e
+lpH*K2NPOUDG;"R-XUc*nJWOmntO*c@_YQYF3rN|Z#[H=oQr)4+^pUI&s:in3"Av[UNr%r]]8~V;eB*4oUbD<>:YUg9pets$Nq"D?f
+;QS2h<uMjo(Y|R%$D*"sW63bqD$SOmfZLT(B^
+;2;nEs~]z
+kW5CC7ZXvl/D%xR@B&(qxjUd5B!DI>IJ.0n+E_qHVG_V_u(vXN]+2
+<1{_!Fqb?iDm"PO3_<(]zJn8IWgy=%;cO2IL*>1?opsJC_$fU_jnE%qHjbD:?G=+~DApZ
+T(d_&0$#l0^I>Un^@0K<zDK`]E61mM(uPEs?J*x>blC0;Jl&0vS!o/k$|jnf2+zed
+RH]Y05HCvEVqNTHO%^do`!tWXL)-JjP0gyp_#<>af"<ZE@"x7s`m=G/vEeKE?;n^Z4VOk9u2-QL(zG3
+Bp]b9+lYG?c>K
+u6>,M?vVJhA&%X.DC_2F*&p#F=/fp:sBUO/E58ex-BYn*G0T6<3/9V@`JDuZu9P]W:$#H
+BXuF[l=h<a9a+F[FFnSeE*|&;h2M~a{R_XRB|V"Zj2[O&9Wgue;4t@MdC
+0juE@_/<7)WumoxUBO_aivP_g[~8=<#kO/!6rv:xBhHiU</JG`F^LU6@usZ#T/5QA92R?-v4Ds{Ur@{CoB%fqvm(y7F0!r/0#P/wqJ}@Hu>hrk3j?Y>kKPKMw8dHBteSg?9s5.hO9]ZZ]SSt<Xjq$-jV5q(gv/@[;g][1%6>?G41k@%X|^dyeqTA4>N*qo@68-Eg}_SQn!@_Qb4Zer?!rqkY}SgJU<Di;FAv+YBbM+-(.:OGx/o9R-vx^V`tb/rYmV_ll-]rI7p]!SLpkE[<,owf<Aj!?&*s?f%rH%qJR84*mCOHR*(FTTc*?
+MEV/"S>=es;E"pk=/FM@:HW8AyB:mlrbT*rmh/>M_k+bG%R7v$N3Hn(gUyICSW+7+`s-zBoNKu@4H-DZ`h>j<*yN6';case"lv":return'-s`@*6KZ+;hWLfnN*0BA#y]$z#uw9f0u^x^3>@_>::mP@Hb>`u;IcM;06Z[3fT9^P(#r96:x"#U`7wG./NpOvJa9*7os(^Ac4J;ZggnjJ.Xu#v]Iuif)Z:>FJkR]us7e_Vfk
+IN0bdF>,vdT,;kH-l/qMbh7xJ/H`g]7DOV.2FJuIya1
+fcAYr`o9vSH>xhV0&_:gHA*M"b%v*Ch,xj:`bP7Wxx,[n~K*GfR9^&D*.-I5klRwPbw>vtB9m9rPJn`Qj6aZ`Y&|oEHK#44<kL]WBEbYGw,Qk<?Jq)_O9vA^ajM]YOM[azI.aN&t9^Pb`M(se"6Tca0S)AnWEj"7mY8B]#U0>=V*C"rfk9#8juwKpb520L135V,RZLMW3JbT,O!Dty
+,1i6clRQr?l^?rN3jF#v6]z@^/N4stpxe3#jR^,oZX[/W0v[Hb`^kx7qhcG@uIT!|s>_z#Uh5y~1
+k9+U]Pj~vq+?x.O+w]k}m*m?Kd$*NEEE6)-(kH?nTn+:n/KdZ?JSkR:twd(-rc]#?350*.:VOnapI
+3rRtnP[l,Ine?uL?JuHj;6071w,}MJr2B`&>tMc]a)?Y(6PICgGn58qjU$o{stOL>~&DfKt3l6O9Hy[#I/8~/Y.Ub1ZjaGk-F^G]I"Woku!qCTTTI3sLLp.-@"W<NnK*J^I6KDa2vLS%lfRmaY]~G#gDw(HLZi*3b:-6gi_nbx52mc-@e(t{UWF+M}ePQK]R_n!ZijNhj[L4S.2R@9Ajnk;h`ZBa@f+C]m7.VnwDkhMV0hB`3GYGfSX4
+=9P%`Ha(.@932dBl4<{Mm3DS{;XmqK[9&(O&pX:%,@L?/tGr^n3tO@7ZMH)!DM?Z@[L*yd-^+b?>A[L7V^&acz&Q=xe`jyDl4@^@09eT-W~
+knLq1Q7H~lqK[^*,/&,u(chr94SJy`8kmN%vi&<U|2NCk*
+cOsoIQv*&<]IQ_s%hm)-"5=DVA1!9O9Hm-Aa!d_PM`y?An9p!JnVu2sfEdMz-VGQbaqE7@jx)U)t*:Hw[~Kn
+vs4YO#/8v;}AoFp+7"=eLyl-e*EjL4)A/"ankXW@%Gy."C{/6M;ma4;:kbxOQ?r4-gQLX5V.kt$/2J`a_$0F6f?GDl.B!h}X~M:QQHea]
+0RF]CGxrUy;9-!.2N2)Q4eO<PiQ6z({O-ez*8kx"Gv(`*2^4]NWBZ_Q<B
+RLNJ{`!&P95-,?FEP3K%*+T:
+b?S_<UWQdPD7XLr?luaiF)`I"tfOe3t^R20*!*fq_{ZB8"@%Ep${UOX&>Vae`rbl-$1zSc%t=L73%qmLB%/7s_K?y,((f{-&u{s%=N9rmcfw$G"0cK2#]=mbEWCD1rY"#44Q&n29H]?_5/oV@Z9rR#G:>n%p7KMDo@"L&PTIL(hx@gfCqao3DFYH#34Yuv*FKDGxC;Y8q8eSUH<~3>jWZ#K2?(?R+yA$@q(:Bjl53Cl["1-oO-8_izu)=}^u36:(tU-?873:y<?{6n<^,70wQ}xG8~X;u~/~LI#(Em:lR{,AjZeY;B$(h:!wo7u5eJ<=V/2
+1Mh+nP@-eCeZlettM[G%d^0W[rm.iNKB6X4KT0]D)aVHG}Vzp
+aH$(!:/[.C@LIQbc[|%ui?5|O{"iRwLaw0ZkfrH_p?tD9ymZMXhbDSp
+S4$u*e;~rHP5U@cChF.|9==xxjZHC}UN[Z@<um2jMsHU!tk7ChEOqu<n!BP1:$3B?.(u0sbUmA*&q0y<lvj+F/.o,}422%mTwyl8CI<~$%sEha%PD@GgS[xWbG_A4.CA2>kBGA>|j@AlN&eLj>.{&E0T^?$LSFI?II5=7PCnTU;Ca^UKMXvgOBNBrfj]0du6O&NIaONZL#=h#/vBSMeCgE?Aig<Cha<PWZK_7C_kG{HMI.4GCv4}q/_?TRE*19SjVu)qGmW,yccq;?7O50T7XZqWa!;//wrY!GfWARZfk_KyF}U>]XlQ":uz%&<ljo@Z2{rTFh>^IRNIN2(v;vYE!WF
+:sncYyh=7y]JJ1VE,VG>5|T"F#S4#m>5N*>*@gQZHlVkjt&4n=uWQq`=xENb2"><8.vK[2.G#)h}`3.0W@OdiZL"lHqbA.9B^n9^84#.19h"&P=Zl2CaA%XphF-
+NZGTpyNIwZn=!F.+FLJstNsy<9KaeD7hdL=E^=pGT:-b.Oa:G4dv
+O/~(iV(R}gS)#c?6|.g=<pe4)7s2qp=?bLiXCnjC,mWI$7Rv?2}796M5FE4m/Ae,tvKM(&!$aOgaS*>AF$M!
+=fb(m5<x$OlpG"!OHh_0"2z$:{Q{e-UiHl=`1%#y:;S}*)k.,Vq:@#8P<nF-D1cua
+dvx[m{;AMAj&V"bNlI_Lbq
+zymN0`.ms&i9biI->/!"%n3Lb-mHq&JW>sg#igIl}hUZc/5<LW?S%t>+fvk?doY-+q6,d[jAUD5m`TY>DTcaQEcN79S!-;tpRE|vO0X;38sV+SMX*)r`@T9U1tVN.v4dU2::FE?pt4JHg+%OQBw.`Ne14TrmqsscEnX&)eMjsDsN"=?1?X_[=HpWGYjRCr8OsR5N+`-OMg84{ol+gi<DSj^NhFox|x=jH)`.<&X/}#)x,4VXi@)6O@~TP#ht@1)Ul-?_:b%^P
+(>v#JoQ"@FjG:KiEJSo*`0*6^iyI.3G?Ew+IT/Ti5w6g}.$
+T;`+_MYYV&/=;is8WJ8"dYH+apa0STB&.)S@c)G8gJmH<OnAcBD6{BsZS2DP6T/4a%,+jH7ZPg@*;Afkg$<`^,oI+nMQcIu,J<#A~1%c4LjRs/?D@To`J<jMC8$';case"lt":return'*s`@qbOZ+#A`oid"*iW?PLpY?_9rj$,<KxY?+**
+5[oU]ZLM@pg)fNScUoI6:cA<,S|g7ySya?]?sE<_aj"CV
+lGzwt__A
+ta8*_l.0Lg9bqL``G(,<-YVas;bq`w8`K~YT1S.kN>Zx
+3XA.
+pCKFl~lzo^OqrD?,9oYWi8:kY~hW72iMb]1X<676jd_18y]RoT:O5Q;71h1K-zKyVwY;Q(O&BF44HEc:61^Ml=V=aNj5(RUHYoDPH-^^JJuq&Xf:)]W
+@Zg[qHewOr_2s@@P3$TnI{dS(I^><XvmP"kRNUfoe6o!h`M{>Xy]h-FxV=OUrH.I(DHpGv>o8R]9UsM1&.a#)o"HbYN
+(/oJcY<6Jioa?p_s[@?}%dJ.d%r{L#LBT]*wyPX`Ek&uoI;k4eAU[ePUI.oShnd([@JI]cpB;];y:CQfnY-Yu.!):C^ufG^TVM084egx.jep]n->3]`VtP[=`2R{i|9ks#9PfM,-grFv=JKb=kSepwNjuyo|e%2P
+3L
+#oA_bzGri35N;I6Xg&:e,ReCu`7lXy/D3HVwl
+i$B
+`)a2=Hc&mIvlBT._fT(De@lZUon(m80h]^RH+>Um^rwF3vGhUE-pbHG,l^d"u$fL
+k4@IOZtq$KbZu>K=|Isw!E9
+l8RV
+,-u9cBmR_tr_BZ9Fh%5O3I=d9M9>Q*Msk{-W8xS%=qANfuGpQ
+C5<nXx<fGKc_Ms_.y[Q_h1DHg<dI<6S~kuTj[/tc9C:jW6?Ur4Jh@{3NkReO7EXUxjWPxW*7yyU4w6y;o(a}gPSB7rhr8S,O[|6JUp>}ZLO,c;,|.>qTFn_AB6e%I^*Rh"0L1zo3!ZN-D0)X%#W&x#&WfEQs]R%8`XDCRz]&I(^_%c:iRyqkmo)f?Z_*(f7Ey2QR(
+%[lG]l12";dvl-n80,Rw7h=J&(,0Ofer7XD,M,m<lW4{0f%<R%ip,D(X7#`(FD.l6K?YkMM
+(=/Q`v""4yvYv;`sdjl.*-l/nBd3^_5fS9U(gAR9b:.<gFql>8N}<$Q(ag;-l"L$7~j!>GC8_`ow!W.F](HdHeFgZlF?UtIX>/f^jp6j!6Szkc;Ff?1sN_MH"]`H4#1276pJ6P[g<27Op;,~Alb,J[u7rbUc,_t_)$r#o8/lmrTE.0o1byy1p2")=v%G8K[Iu?^]C}z!i)ti2d8&aqTC
+]>^v>
+X1FP{SZGU!A,.<MWMiBS^bb9g&iv$k7"J1CoL5uRAiBaZK[rRsFXCaL2R9=hg5x]S76>}1kOQL!D5y0[?Mu.[D700Vw><N=5[qq:VSS"b!GYToVQS&O0LmKfzr^V`dGsX2sSh:Qgl>[=-eQw"MpiUNZq]M?wA+bJ+qw;ZPc.y){0|;~NbsO#1[aus2~
+Z0u7D%9bSfF>]Pz)-0<F+9qk!YG0[_E
+JgmX~]Zo=o.!I&1"dNTa]l7ntD<FK5XW&[@Op%.5|jC-2:LbX=WT^H{67+p,c%vVquA
+
+]v/_;hhT;.Ez]-0PmI:h"f13p5M
+,)37LC7Ro|q`6QRNb+Dj.V0bO+49yd0-s=jhN#&S#pN^O`CL1"Ou7vkT#t^rvbU`+MX-NqTd!:A]gI<pm{qtvvFRH)KpT7q@/_(<R7[?AyHI"rapp)b0tZb>,-jg.(YiAm=q,bZ^m<l~`mR|y#pTL.j](iXJtZ/B/<^<:sO5MBYdAp2(:Px[!?f2_KVbff-`Mcq2hrLKr!JxWF`<ky11go<c[ksYhF#aLm<zXLPDdU.KhdNW]adS@nXz,^x*l/B?JS@=&A+)!9q;DsR56qDQ#W2k)*4(Exa94yRPSG,mX0]2_%?#X/CK_kys24I7F{hTO1G5ACa[q0u)n3?Z6gQ4C5[o8{e8-.Mf_D?K*LDw8O%];F8N6G5DBkO"jFe(C)r:i)rJPNIXyThwtIFf.wee2b"nS/XBJ&syc-T7"13`g66v$rHw.(F*_lP8^8h;K(3>v=v|FU79OH+*CMxwh321i~<hrF?gZT6+:50ZnHP-##L=_6sk;ubk3f5A5r9Y07RIMuLXA;`B):1KR"A(8<*AXiI!vQn!={?7!uu&qE_cWG_:=uWw>:a]BHo*O$2w[~=?
+41[Nx=z2e5Zje!u:O@Y_V]$T?-LtRD9TZ;!Ps&=Cw4K>~_{,qIR2pGGGh*g/Z$@Qp5x2oJ^^[eS3<V#3-u1/q/sZU%A,Y&r4RjIX($FG$%g5OX<J(7UA8ns^-Ih"(jCcgj@e<nSk0>l7@i>_HuOZxQ"-PA=L@BoN^KB5}3XX!!#/J!I;8<9MiVW0]B$FSMjy);7J`k9_BRV=qoV5r+U#
+"^q[;]O*nnhe8T^^nAJ]f
+j^OoWQ$/MV
+`G=Iy+T*e
+hKAUv5$s"k/F|m]mi:Q]v_7SM""';case"ro":return',]^;C6lAP(oo(-s3w"#.I`#pX?IQo@J#7#R(@t+e>b%Y[w0952$@#bP_i_m%7.>5-$WW/b"LuV1Bl_<4gv"ira(qX-[xi-}]bnYLO9*Se"ca`<`OC#8gA$@;sV^rDv<+]6<$kQ[i/z(jkf@OPng1>M]^jbpq12ENckvAll:p7nd&KyWdr>UIdD$YW@u(
+PYXXVU#_cCy/&aC6*8YQai6;UaXID&D>l?&$`>R>rd4B7N"KohBOtMl}[d2U=BJ|/=SP*e1:w1v<*Xc`5."%-`cLexsf"^nl`uciZ0".aGV=j*R=Z_h#LtbLrcj/@EUvTE,7TFE^LclYP[S>de1tvZEGltAM6H_2V3`3r.tZ7E-S3i_$(2^ox|TG2L3Aauw(<Cy1^saQHEXwp?7:mI$)#}^5lvj`MZiQi2s<_vil-*V^&~s!im#ht}q{X|!,Q|m4Y)m=9L1j2fjUD)k?#h)`f/3*5Bq#I][O@F;i[x5:(seL^:A54D6J?d&VF="BlgZ,=putU*2-$Og/gX)}@h5bXkEG"Ts0RM@4O<Qbjr$5nCi:7g?3(EY<`qgap2)/9=_=UB[I4KA)bYt
+nwHMf?qN
+vFM/"u<*.(!.{nfFd
+L&]0ZtAN{LfU/w9
+hd23V7.xSK0R=KG47;:K<N38)SA<(J}:Z!DRUgRPPJCj7Due!cJu)BW<{4i)~dlk9e$C.IP
+(DW<z7Y!ppTuv=R!~i5cgLA$:_O3O=t(;(dx|7}67fc$UdhD7MCcw!2@0dlcAsC8BDAhwq7k>tI;!KLS|Lz
+V#OG8b^Y#V4:l[Q-Z]rX{AgQ.Pl%Tz(Kf4Z7Ne(G4.2JHV3T$^<gu#&ZU?ih&W0wR^_iOgSph[-Y4$"-b^Jx0*I/<
+=c,P7y#uP`"[}EjGM+hs1
+38#ch6IOW6--"`6LbAO<*1$"7QOY(.=;W50s/GC=`_GnRcHEw$hD)=7"a$|?(]+NVbfu?"IrT9Mcwt2ROo5AisE0CGh-`C;l5@EOG65O?Yx6U==D-cRw*#[^>fp_Gbd60V|uT]%CAtsR2A(r?M>U)VXEFFv?}V>K|7pZ&*`drQW&A!as=L0?8X/1eY;TLNlE*2iIF-yhJz)q{.Z)7_K)d4,Uw&}Mc_U6_K:Quw[;P&rQ>U4o.]/FNwrEs8i(BJ+*]Hx:jRQ,p8lReF.rnC$
+hiStN8y_,Vp,]lNU(V)
+=:{+[3[K.E$Vg+.S9ZH46hub+T>dA?4h9X|CIU[M9e@jX,ER-eQ%A3P`,,#]w"J_h&{/Ef>t-]fXl>6sH:SJ
+5:qB^I$~?a([`]qm,mloS3kkA^Yx6oU@jr2JPrC;q|4FP<f}W3eWO!0DMtN>Q$hcuVbv;JZe0+6l]g/mpZ9EQ<S_/GBq)MuSSXabt9PE@`omjXY6xE0HmlFv=A/tR_G*A#({`]l5]E*gbPylEoU^)zi)n?f"cb?!uKFSv`s+)d_kkEPy8U[1@@A~^$/EOd9pxu.&Z"kPC^uzUUTr]ecJT^Gd$
+S%5_8E/Sxr)i#hckEY5"$VeCHlAe=Q4d;AK]e$=*--)"Z]m[`.k^-$(+VgVkqlp:QoU3O>Z0h,UbTnp/8tba=
+6Cmdtcd(jth.2X1b2&@PU?JF)|!aQT!9)>cFSwv+&7%z,m;iqSwc-tjYMRm.6,DL&6VmnKNQ9/5i4ww{51,e9XrXSitplm@WX/G/Tc)y7}FOZ/:69<;=qycqN9?Qb;S0/X-<]Vm
+++`~qF%:)Cosv,(6^Z(eFY&[i9?QG&W2A2xZ=n%)TrVV3;7UEr0#h-uqW)09X
+7}!uvwWCcCf%L{E`Y<pHfpqiLc#IFOYJ-&K31|fD%6Nq>~sCDn8&S&rNT-[O8P$8F2%U,XeO*"))eMYWPlA%[7sR2UZ|kCt=+t4Yy`n;,/0JxoGIGNQnJn<yeFq(/AdJ.<%YQF,OpBdA2ou7"UR0Ar"_)tLBv)7k@:b6Uz_*
+I4NU
+ns@tFS<im,shZJgHWOOJ$@3Nx@%T(:X8"pt=os&s2@fdN715k;P$6/d46;7osM/j*jEIms2WE$Q?wb$q0}/H><`Q(`V_4F0v$,hQ>C+p#!XI9Em$^k]cJ^_=I%#-5l*eQcA;A4dJ*p)X8n5#;Npo0cRq@sgCBgyG!h.~*LAwUiPk*L.>H,S_W1$H$>rpf@<QC*A1l(5chncQb%h}2CRsW~FYgd@-8YJh)|Fd
+_6}7=??Q$c)c*mw
+#Ca?.;eD}?nw{%KI6b@;2G;8W5qYsh9m-$q<,uCB7%407d%rvWZ*nx$<NCGyvI7.wpnj*S)O1"`1=ii0Dd_P?9gKC9:EpWAOms_TjWG^H3[ZGJq3!9"sS^=65%(^.jdH,LxZ>4?dNApjbx=7Eo++|U:Ez>:iY;0Tk?!H`dt)NmDw7m0TUIwI;WqoMApAYm@+`=Sgc2EMK(#L0S?wX;9#~P?QTy4bnm|V}%@4I=gy.h9#NqM.B2#bk6wfHW<:qoUCV:PAz5=THK`d#%ljCg6ajHteS+[je%a6&
+A4C){i9*C=,K3T]8v@Rpj8OB_uLCmI!7!qo30H"K/!~hmrIk9/-^2WS3:1)mZpe^?XUk6o"sal~Y$x"y$scn!KC)|4.<;/cN6`s@?uI`PxQY7@Q3VGRf^UOd[W?BPy3cv^XA<Y$R2l8B5rX9K=U*uKuxpgBQ3pB7Y.=+;yVh;Y9!F5vx:0cv8aEJe)*DI8rR<_^2@kEX0Rw)Ip9,ubrpdTF&{6whHCQJ,ZONx]1X6J_;DPUV@rqkspf-[.^Sxu9xcSPN.PmQI#u`NT~Ff1Q+,Zd[X$?B"`b5x*h+)x]a:J@jRP7RG+%8vRA**g
+f5Gtdpw~I^Zxvct"ypB}+k3P2;3)[}M^gU+Uwto@f/:3lkU:^I:7n|>Vs#K?jY_5g{my`W1za5G(q$=]&xHm.TkDwgvb&Pc~>AT~D]0K7OypXA6QoGZ!)**gv@b&lX_P3Lf`8+7eMntwAS60[f@4YhedMeRQoK<aPN[WTu%pZvePGE4fZ$5eG;2v:,&m*Q1`^?y/giZ.?V1W;@V{n?U
+B=&/P%"HuBc9#|x?/2y2<weI;87`[~@])85=U`+X5!J3%}ETDufua!$p#]ntlr1RyUHtB$P1:Zcn+sk^!enQi>C^exK!%HK4paBFQrdu?^l$VYXt>y@X/J(09u0_Ke0c=#0zZ_/M@bE<.0hjt9VUZ+%wuNkclJq
+4?><(WZqQjwv_vuNLl[[Cmu$b[ATj`jb=.@}W!7_&w;
+QdsE(k?v;~@?!mtOo)';case"hu":return'*Zu@ibPDIB=q9f.-$E+%oMs/;&dAU0*d6Cq7
+?J?5>RGK<UAh4"u`UfH@dmS~[!i_O9-#_{K-^K.%(BJS?A
+kk1-;e$@wR"a*Hwy%Kzl<w+$Lf0mZF)SJJG6]I*V|O.=8C"CY*oudcL[RnyZQ&SKg4uQl3EMq-]%BiiR,?VFRGh2.e3n5vi^kYd0cd)fZ2*>RqZ:I@Zo/c:3zAJb:53X=inROf.)o&f:30sjRf@&G^zvtiEa%`;,vz)LL`>W_h.:Bx.1nyg#r$8K3XRnp7co#N[No^5Rms~>eo6d
+A,h,vlq
+u<_yrCAh[c=Wo?J(>{a7N8N[jb!*C?RAlIB%x^-}c}G$kzPHol*G@)6RJ$2kxa0+$QbLw5s<+:1f>_eBPV^`O!#qQ:k,_5n~8KK3:;r
+98@;O|pcfkcjSRJUDYQg0d
+]_Bsc)E5=LuXN)mbPYbF1;w:f5:%LytI}Cg
+r#=a,x%N[`U8S0Xc=[lMpmSJ,jX<&jSjs4jah]_#+N^..hMcb:{t3nx
+jvw:=-`7>/jrlaTb_c]ds.zU"RWmXPBM4H`P;)L;dLWqLgm&(0=;gZfg3vZy2[.]am2)5VtXI!H=WInFC?Up9uw[0CuGpCd)bLAn~WEq9=zUeV$l9:$[@A<x2l|8_*x`r&5q2AbL<u~>P)Ab}TZua
+x^-(/E8k<bNk1+sVUTn>^Ef`6#Cq
++Bi^B^,%k@dIA$/6s;wq^N/}.J$9)s-%D{Tp"cD<2>*+n~APe.yA
+7ke
+~qi%tHsJ9ruQW5>&:/cEw!0AD
+|C9o=-
+GoJfHa_u0:6gw!X_?X>8O{xuyYef,%e{aRj2nz@^2a1Ow>!A-P"
+rlj,G7*-B/JS
+Ka3/$6b^eN+GG6zg[$E%J1-;9A~"+mJjO6Nxqj7b,A@61,X#g46<}?]QEU*f-J7LcT[xn;U:ojik~UFWd?c/a]U3Wb_"[slmg1JrDC?h,cX/Ww.:QfO*uGoT)D&ZkMTtf4GX`sJLY`98SdE@|/fga4|A{e-"Kb-<Q-6wQ8I7-,JuBb
+tm/+G>EK+d(.]Y@6KC;JTQbBdQQUfqd(i(
+5?P@%6awRgZrs^lu,4LsaRf#++.3-/+!x)&:!c(1/1KXV`#B=-yd336`*-FKKcr]b_s#4NfK*yd-QyYciIWYj9,y(?orTW/c_D1[xD,;=&&8<8Ndnblf9<^uhbkn8/,dh:SR>(b5,%5x/Gkd-/uBZS!!1&cRTmkS_jP2gR3:S1t!)B29w%.Y>rT^G?xO&1)@Lt8su"$h+t;C
+bUWDCWtfhv.--JaWD(bqKg*EN,U@LMVhwZ_Nu2<h"H,%Ul&85!MCV_^M<*0]9f?NQvD="9?x+=e|-v8QbDl$0`;7;Ixdi)R
+@ZF8Hh/7_;n@%V,9O[u&yCNt.~r>Gh4HP#O_grk"DO&ZdmeFwa"_P;li:#g_Uk=rCz%Jfs`14FF(ew?Gw#%jM.SwcsANAEABT7]ktZ-A/6p;jiGnN[w0Gh,>(^C#!9oZ$-<dH{=(He./$;A7F$IB;}o,q6nV^42MI(GV[RUC7aX,`2ZA4X(4lgM/M[%DN8vssuhq&nvar44xGW^DO~mc.~m/_uR{Pg)*dEH,aVQiuZEj
+q_CNOv&8%!.y*^gO8%hGWVgDNVwvJ4pv)cAsGHNM3"^[O#Ybdmk+/jfFj%rH9=<RrSKdE.5L|2Z#sO^!r]6UY]"J(+sxWO7i
+4oVr`X4i+#$!;mP4G62[n2QwLAD.pM?r7*m^9mx48APOVsMkUY.4>>Tuwb0XF7BU_J
+9w}G17}Lw*_Z{bm)7i"jxA*t
+.p0h"eK{M*>L"3eKUy3hD`"v)3Vv>{R`.u<T%;WsUad>JqCV5s8nDnVAQA"wc
+KJG/@3daf]xM?i!qr<KX!U"1m>Si,rm?-*8]8O9jKxqaz)waYT,-%)]b!P/=d:8Eeg:p0fA[`S
+<IGx4o<e%bwMU0@y1o,22"6b
+!ogaTZ!2g
+CECDX?EUI:<8,"nNc[z)n3tju9L~UvYG[y(Z/k4-@g=.=J#F`81=#6!9D$aknTWzXBe-b*wb!d;#RDKbD+(//U.zp?X(+z9Tu-ZBE@,9YI,x2dmKg"WG9+thW9[{R.xT&y=QI^NHT%!yCL,9Nn!.%1!sZa]9L[W1e:Iw6"_u"8d{Is0$YAAa+-W8E9;Zm!/m$-e=Zt@G%7k>&a"l@A(J;3Dd[T&Kw<D~79RaN(faDEUP,y1Yf&R8)8jmr.hUea
+UO:ngrf^t>UH{SZ%LZWYzG216WSXX[L+I7&7);%OMoiY=S?(c7-o}v#f*
+5<g2|"PLl:mhcA
+L.mkF_Zd=PX$qJ[b-[8GN=yC9jlflrVo*kurK_%|w<Z<Q%Wt%g@<$1VCFM?4hl#.i4G/),TV9Rer&oUG$TY{e17trI$[$O@
+=CeNfq.xQKM)#l^tnh*b6E#z7
+i|wy]wB$CzQ1gZMOoY4!hHO8oTbEF[o1QQpNj*TY4z)<tG)M-^-?0Tf@1xV271.&e=hqxG37PeS}!^xexNheR^j:"-p..6p0!;Yf+&8B$plSp/:;PSQYm".P5aQH926ZRS3"Hkv%C_%r^RX~Epd/khvLB;QMN:eAVx%0rACr,DWn4F,eNhWB*nNpxF`>R7N~prelw.G0Or@NAGNkb<Q!Q+eW-[_##D%&/+F/0[93i!j8fj1R#!bS+zyH_JpOa5:.k4u#Sz3@]@bUMsVbE*&]q`[U&~v1hfj&bcWq)PwIT8-%MfmeVD7u=CVJin$j(RP)rTEK@_:[>hrJ2v4D1".XSI:F$4DLP
+r]bLAZ-.qz(C,W`$PDWbP#*JL`=kgwGArW[nwxkC(LC_&:Udoq:Vn8x6-[
+@Te7wF4+QY3EPE*guwVr(w]a&T:SG_{6eJ-C*cR8k5#5[N
+&NjVD3GhU1UVx86p
+O!Tv<PETmF-#|Z,4_CZ
+I7$z#9L$%DmJ8QfYx&;6q0n;pp>/`GGREsz^Qr;Xc#ulyVi88P:?|0-4T;alYV-
+,Qo0Ue>:<%GQAle,|8Zh!xxGTAL(^#~^^Cnf{#@Svih$d[h&]#$Ha/kX@awB.@zmo#c:y%jujp(Q-9(WDQ"</W.-[IC9rH24:pERX/LVyR}vzdKxJPu<_oi78VX(Lh2!qaPG9g%r.o{;`Hx8Ou8)=GoV}2{U>iojGr)7%Mg2LUpRhoWIp!hm{eaD*[
+TXX`oKPe);]j;6Vt.4Q
+0i3B0Y1YN}#R4*o0cYWB(n7&x^1@h{j,Lo;.em91cc&bLp#U(O]C*uQ*)ob_1M$<hg&{V=Q3ZoMy#c
+BTTko`byqD><OVbxn(cq(8^06hT$IJWqR1(XKHXRD
+&
+`)Y8o<Cb$>Qa>`(4Om{ww8n+H6
+wA';case"nl":return'-Zu5i6KZ+#=`si`"0IB/!827QV+.!A@f_$Ai?!C./TRjK-sYoF^c!6d!P-Fy3?<^%R,Bj#RVDfDT+]P7;b/:$1nK3
+pTL*
+hnklcuNdTJK1sWJ[F)itYBk)bB#Ea"q-1lv;C`)Nj_nEGgmT1<m]S6`(%fi^gu<b=+D,pz+"6HMa+GtOBH3"6EC$M@C(TMsvexv|*IUL`GGF_Xe)vz*!Mtv()e]a_HSsy&`*/QI,K9F8*uvS9lWV&d1I@wVJ[[9Mq*UfpJSXNM@l!za5l3nSchd>Qo(mt$w-a.kqF{>xONosSA@1eTmdL:a=I^D6F("yyi^,>hOm@Y%MgO
+S@l/jpe6>,~@wNrODIJ2z5tKUhcV}K)a`@0N4.~2H#H`L#i&/j,CoK"?n$u+lOsK>=7@H_7>x,]g#&_G"*hr(n+<*Pw+/gws{FPkq=(6Vw`mrt#ITQvyWQ[f"(sDZrq$6^G)*u[9Q^ti09-rY-zE"L6ow2$7Z1f*j@/<R_Nfq/Qt{t#>r7(Q^3S]/>t/O=vcWulPxGC!gw91r0c`0suWEr<qW>/%XX;^<NUBAJ[X&*XfP<.r~/vowI24zBSeD]iP7^jI`P3M~p0;mNHfx)&e}d!w.D[qDi0DGw8$Oa|h6y
+B181_a1#Ll#.ropJvZL%q_kw
+pN";?&Uf@4&cxXKsEK8y{R7SiFP&r@#6<`IU<PGh9WWL.GBL>",rf8.qj5}x*scri1M
+`@qw?X|Uh/^A40tOC:`r<xxf)BQeiPJ%2F-q=d2qm[?JY?3Y$f,;|_Vngs`5j1Xf<bdUS35JEYK[o5-p>h,uNl4[h@!<U
+UF]x*Ldv:B&lv
+-CWC^9X<Y=_mmKa/*sOg2:.>`r[<VOC.OR%Hj#0U%PzZ:Mgp6cTC0W"3!
+.@:ic*lZW14t,yHGjZ4Fs[^6!lYaCx7IKqqtQ!Rn0s>gnw4wlrK8r%Fk,Vh8?vSvTnj6|2WaI?bO<l,M9?%U_CPu;U1OLB=B7Gq6X-Niai^:qcj65D-*%?yN09@^]qaJNKxz&wf/2x}opnTRVt[@}VG7SN/3IVYeNe;b4p_<{Xz!7P4ucVxHx6+4SN>`_kioaeo(!o577P_V<nmB|%2muFY7|ez[GVbwCE;]J9"6d]vy{-B7GM[3PUBY_7)2,Y@+L-]ks"5
+6o>GhZRGB0qKrYDS%L8FXRL?S9VC,SQ3a>5l_crs5%kuk/
+,G8xNS[7D9wJRN8~Xg(+5L^q"
+F%pso%-!(f>y-QNVNX5F8(qyDA2:"RSm;!_K
+dQ@"2>9$66Q9+PN$vk:2vEfW"B-Qq"],z;3("E*(_aeVg23))Q#Ek1pZD)=*OwCpE"sEwU[xXv.I)%~-?pf7;cR3$:q"Uk`S)r&Yue8S`xswQSds@C{d)EGLE@XDk<4Q51r6d:
+ggbV:@fQVBEEe;"8Ge6JjdVL9f[a(r1PC=Ta(W$3gYt}x$GQNF(`[yQA43&ZKEPD4gYs2UjCNTZck.[WL[mh2x`~c#"!YfKGg}JG9;-w_}hCT3@o3)%kB{20+FN4f,ar,[j^x8mO#1Yz0u=yW"Mb]oE:;Mg8iV<|J_F
+lceonyVWVY8J9$OYnG0sEN1608dR?oE/:=2|t<-F=?ecT9Y&Fzj>/[bD^6(dXmk$lDiq(Q*OG52sfqxW
+|=T?7
+:2EHzKK>Ie{88j0Megcd.1x<Gp@>a9N?Vru7t4$rIJ5Xmtp
+e_^Z%h$@,?[P=.|g*^6gLgIk{P51m;qgX`#ik0Ab:X5B{wU1,AD-|1E8=ROpA.@5Pu>5u3x&_77VfdV0MA&k5gD[Q4kT{-O"~c8j(jNho_76:$>t=R1aD`lE`#.S_TJsV[~Kqlk5l6/Ec&O/B4Vb;a8Don
+6,1XSRb/8E)U1Y(h&JBp(wYDT:9cL1NE)vog6{P]l[e9JV!a;FZFY7B:,}[SUc[m5]7pdit*,[)^7W&ai-sIkQw3r60cFXiW[3"#fDr{aL-)XiF~ijw|^Npjx*#gj+>DoYoQ_d.ig+P{BnNZ.",+8vB`$Y)m5ZvAGkZTEh%{l]aI&PDx.CRl9qaT1{]F
+=@JDTQ$Z+ElHJG-8B_bK+I$^HZTkeQCWr"8$/tyrg$Up_EJUPi:Ge;A_[.@qu5^*@s0rNw|Q}F{Juij_2+vqpYM(*hg,vBG_%il@V)12Lbc;?,2Pbby-F*{Kf
+!#sB0f+2VDMOv-uud.kH)mu!Z^JgXz"GG-W>Ih"`sQ1qrDdiQj~Q_
+Q*`YwAe8:WUmJVCqDB
+f"y`fJXbtaI53x"@F:5L$//e0iFFrq`s>q`8fAfjGi6Q_{t>D{V6;b9>UBcL"R.cS@+^Ku=VGJ%]D/w7<[MFjIA!=X0qTLX7f7W:jp)U?bR?On1?34HaPS.yQNe[IBP~:H(z#Wk_qX/X-?Uaw4.
+D_>EW0]piC[^i^K2?Wi
+)i4)%^p!2d(vWcs#Wp!l`R!(lMl]m]/dw-j_86V[NcLD1>(/nV)_NLB?"
+S`e~Hc6+
+8@#pP82+)abqnRItqTj$l$wJ>nmR`!DDrrE6*n@%g:Y9<R]WGszN+my46@EI=e$x=xMq4A
+rUe_0.<&9RU9.qjK5u^AHyxAZ[PLHm;0#k!_dCCJ12*;e_c0
+0+<T=`n<{<k2
+,`aCd|+F38`2QER|;6GPAcjX_Nx6(4HeegLu:<Kd8fV$KzV~:N4hQKvi=RdFx@.>*j]y,DPj/l<ILM*^3y4ogSQyd6pjI&;[<6R<Fz%Y".3mu1>kG:mVbV!gx9:9v%d(';case"no":return'%Zu@ibOZ+:%!(id$11q@~b!5#YXB&iY:te`7]i{F-9gPD<pU;B)v*yw"Gl+l/Mx.%jHM=J&PN>,W%:n:7-J5xt?X#M#2-Vx$]fxoF4MZ5@j9>WnfY[KvyF?lY<c&[E4KTirUvc2"o^9ZC1&
+zEK.PJ:[I]z9NsB13@eeBs|8M^g[*F!x"68yW-kD,nRFo#5ua#n`b3
+;y@+z)7xbU$Ff+D=k~iJ8bs~flCY=14xWqbj
+J%CJ8lzyDetqYIykE>()0kn1xa]E?d^6z({vVLW4&qXxS:/o)0^Fv0aS6TJN|E@
+n<qtxs";&cfyWR-:Z7cO~8-,fxr1Rt.RuYGb~!$WUJ{QT$%+,]TmIfTYjLkUOC}<^X25B>t"d2Aq2jLh+Ae6]Foqer8FkwpAltuHL`7!l/
+6B:IhbQmM90=8ye_5=0h4Sp[>SK|NT,2$B/pG&N97z,mkz_0Vie6ft)Z(mXkAYa5MJ6*H<u2mO^#Y~AA6&nj)A`x>5-,gX_giBgK75+,+[6XT{EDKTMy<>5F>ip=XEcCv-V(%aG2,LS1j|J2ZugRlSJ7aIAEwAl]H$EsT.X6Q7g&p4?{jj5A)yvxbPsKa9Ext2b%hud{]m@9=%Rs5i/U$;YEf{JF,/0vh;GlTC*}
++,C*HTi7?bva=DL)S1ln^Y693j5q"p*xqfd*F+-P&O*d2]9Y>Z^?6;0Gd^oNd(@u2qFtzW
+oOQyEp317..qP;>0k-VSr.SyembAS+sgQ;Avfrb%2Fc(6lMEXmVf&`2k(H5>:i@83]3(R0p@s;n=a2N:eZ@WP^qRM-=6Wk[in^^#H&xYc%g8L9V&y?pGmFo$>%J1rGjYVUmRIrBUEC;RQwwIoSO2$eAR"PCBXyT8+VA"
+xl5c);ZWDq-]$39m/w0.Z7^]uQVGdCEA>)UVBH5!,QPI3J$i%I&9JK;VBv;+9@2&mqB:Wk>8Bg9XoaS3%I+Lm7.$"
+&Sa"0uoD7qp2LrbC09dX(s6pPEs
+Jqq@-u6t1`:x{*`@wSPq`<k_:&2<mfe7xT(@xj5t)@7l<)1w*)y-,IXsn#lsq
+9Znr#3kj/V;
+
+d)"^m?:y<E7#Oy:Z&wU*7-@#OaZvq6xkGz@XEgHSs*G.3LedQm9RLJ_WjL`mCAcRxZc|2Uud$4dz:{OjhN"yc8T*XU*NE`>E4g
+f"1Jbx_X8IMb.aNyArC^OF;;7Y::iLkQ*9O
+P?Wi_$M)WLD%WZ[nnR%:|:wK{(`uu:xM.%n$cBrn<ID
+"958.EJqUTV#h8ddP&v#<`D2(1DU|.gZ"xw>jN_dzRV1Hs?yYJ}oP8b,2DPi1>^Bc2"CN.r$rqRdN+ydr1ZusA{^>RQX@NVpE=?VAl[/zX4GDtVgyV1(oQz#23/GN0YkD#C2!ZMretdQ~6T/ZdYY|w<4*;BnHhBxUiqu0u
+AO,sI<qOuL)X3&Y0`FHKn.oL(Q7nkc:@-5fPk?_$v%=ma[S
+ot-sj
+8sQ{O`P/y#<W^8fRw>`K#;;X8K@a8ko^8gS`kdPIYy+/yhlQ9ZV#TsN|4Xl
+VQY8ICqV$
+@=A8)<Wi2k"a2^+%p=CK8&[./jjG_Hl~Eo:l"3BZuiMX"vM)EwlJfsIqDrGq(1l|<xd]Er3p/7[}$hg.P[;&0^Dw2S.0OA.a+ON)`4ypi=lfP!(dM{wML-g)_^%>W?Zod1/_L{KM!,5qjoZ4-WgGpUI8]?=tpsoi>eCR1JCS7]C}Z{I<$KsNpAtTv7*pgd1FQVnp
+e063i:3(Lb1){;:M{No
+^m,c[jw/m>gcG1J<yg(W(26=}P&quQ5pnK2rKH_LiQ+Wv;>vu#wWbZ6<4ey/FtR;6kax/oK,AG?8(Z*kTi&*6%x`"oM`oQv&!/?XN0H*fCJ@N`D2D0=oL3lK7
+9h2]b4_]-;!-_Q%H#;aRHe|?kWrj>qlw`F$I43hl#%<0V.
+Y!C+/h2p;Eec$yy!$3sX)/vsR{(#
+vHqLY&S(Hnkk4pD[4kCD*h&SS`{akNQvZq].:u93BUR>y:<
+Hp1@>"pqYVl`@(rrL$U`mNR9n0aY]Aw&,H3hWGO;4GA;(Fx)sWA3d$^q+R>#+iBpe<
+qOgoG`[hr1Z?(_dap~<gd}`V&HW_jbP}hVj}>sD.p&4"J~i9jlPAnx<Zw}tX]R5rl8N9L29Y_jGp7<u(E(i%e_K[FWy3
+QdNL3T!=F=LS`j/e<>DhqvDFGUoyDV7%r#|-<Pn>p=en@YKg
+Y{!T2g_3u/cR.$*}FO5d+;tY[{%RuB[UGfo^&W-:vp,vF@Z%977Eh>(8[d(ZY;$*.663(.fZkCE,8YE$Dbu_v2ovwsE^3b_7JJ[bZxL<hRoP,
+L7y@:-ZLlP!brg*F)dOO7oWCRsqA-m+B<ZH-77_u4wTay0%2V(H~C4%&7<?e9H9.7[@,pnx>iAlBVxpANkt=]4<;i:@muF#tQ}q?CgA*A/T7C
+BZD?*mqx,=lOb,w4`eeOA8u;T[5S>K,fQl[S"!XK,KL`s]Dv9bm4C{%S@4QBn(hoi~VP0Z;GA,:ha](4GDKz>M=d
+-i":xW94.@N`tY(G^dT:}>oe
+Fy7H:kp,EyYIwDOz=j$Ymq`v4a@!Q*W4Lncu*`w=0JecYI!c*&uD_3fviu_?TA+tP&b[dFRLBJtMvBf=n,WjD/4{pVa3
+cLhennWFKC&*Y#x>khb/8MLdmf^5.*T$]dl%/s&I7eRBu7bLI;/w=JS?f^2ILB=eUBl`:I@A<R8rvs:J.(R)U1vb<>&i0sX6vP~#">gUm;Qh1@;dP';case"uz":return'"s`09f{WR$"vqR<
+iHXM/6/!%LDlJGD-z_yP@=VhTucMHYdB^/wwj/bB#ao"r(IQbg6e9/*a96]BpiSdY>j`F,vYapr2]sE@Itn7->T4Rxz+T+z0R.^>W.c
+Nc-r@@2&yvq/b4/Zkf5I{jq;r]u^l<]L@Ib15$d5=ajl(gVlh0T>Hh%jW0A%Lp7T5ErXWpy^[Gp?T>q4,"nb,Ka0KyF7mLwrm3TJQ48L4KWXrio;_p"6Ssd;M/=wn=,bd$]js`6.;E);RV&.M^*i
+O1;DHB
+=]c_g%RRUfJ!YumAu8CKOqc<0Z94+P
+p<-zFM^n_xu{E8b~0dk[=biu/I.;e6H])1l`95b_S6KFT<4g;wX
+kD&woH*&g7>bPgB{(8f&+T>mQ
+J}8_%0<VJ3;RNj/R&wpqkU]4G0=qSAjw
+G-
+5OjnY6_
+@6__0|&(-lhSM>&*=0t/npD$6xlxC}(4[=U59;O5Q$2,W
+k*-{4gL-s5]DaoE*B.7#E&-4)gr~9QLpf*1K%u8lb^mDbLbC&S/`
+DnJNDxBI4uL46st)9B
+ZU*jl4b%G=-{^xY5s0Qbl&B2@yPJ)`hD(15Pde*0Z~B#G&[)S>Rk*?XPo/q-krlWvey;v$c3,R.R5qaz#4dbO}KDw(vL:T$e:4IF+D
+YrNIgV9CZ&5P=ix6{;BTlyPRkii8R!m4-7S3[PM?_UoN=2{DAQy$cT=S*po4c*`q7@zqxK2:.sRd6p]i`8*m>r{?})+?BjX1?k#4s&aih2Ywq?d4Dt"3ydka&EMF_dc!/]Y,r-P6)8)UU>^5*yI^a_}RE"PBwnk/H9=s6fh7Gx5;^^Pqwcb7cwEqZ`u3C#pNZD#b9Y]GU#N*442oI1A*2?g`iKt?VXEo&!.n(.X
+|X~,zcF^ePnie0S>
+#|a~d?"1?#nWe|MIN
+^T&+A0)=+e@C8}hn^#==?6$?qoI2f+=49G#sWe1-(A6^vz8#PqMukvbq.y>zM[B{`^y|m?5(Z:&J-IaZt3pUCNr7k@Zi&z;GonrLSmENIM#]hyXDO<AqdmJYs3w@TuBwXKukO-YLQF,(M*B^nFy#$2f-0(EpPrNqE}n1Cz!Bi&i(Z)gK4j+4#ve^)a`l229g)4rJjU;0po3[",C743C!jI>SXF7UY=&QXZ*oO&8lJmW{MW_yb:Zhr{r2pD,@1:5A7|O7"r"xgG$MJ?+~Zr`(-gG>-Ud,e$&BodYBp4b
+<ftA36TB";64"_;zN1VtP
+(.;et2>
+ojS;;Z9PT-)9#9*?S[wBq]!1,3V`;-rT7D4yC[%nju-AA;Q(cvN:#&p=]3hu#|s8*OiuiXXYW{n1Y
+?:_XiKTs#ZH)/eJ=<+W6H^&LerN^oL"mj=R57(fDGG5=
+%VV9uI:YB#O`;Ct-?Iva&xN4_%Hud6h"L:h6Pn~!9=JPM!T&_!D][f(P1P4
+<
+Sj74H76%;h3ftGso,qX&u=iVtd/L9@=dpea<8B>eAdm)BCs(-JU[w@Iia<YnidtO;ByEeqlIu-DxK@9x""BtQk[woMD.%R5pd!tvv9tM2WrYVZ`</ml(*KFa##&GsI*,Zr4JG(Kq"O0fj?aD:<tg"6bMfahp<JHRz0lST)^/p0P
+`Zh07$kf2uF5Cy#sO(8C`O$-m&y6C]d_*Y#Cs^ZOq6/POCpmz7]*a%vU,v1X(9aRgl5N618GO8DLP,zMU]N-T0NSY<g-,l|.O,)(gP=,_`-H<b#f<b-q3>s?g
+;P#rDWzDx>mfH_7Gk6A_B6^5jt<^("f7!+j_-c?0ekpXNxLGK$L0v*^g3b:y[k8_{>):#a65S<AS2"_,>#^D@dzZpyS3IYjO[J"6R%@2plVl&QEqa(S-%GsqFg.&2u
+ct$B25%w,>5L*Bw)giVGlL@KRac^0*U5F("eEcj9r)EGKyw6.r_fuq$C;{vdf+y^$5iH1;bylqK->T(bQoAh5JN8LSG0%WTUy4@)s*b$!#,32](F;@m$rnMLH;"yg1-0S?pTV/EM!vq_X2Y0fc&o*[LIgx6rg|=!d3$OgO]LB4#3hvdUY]:Oh(&:$5YbO@i/C*h5uG(3dmfIGR(cmX*nhVK26rQG"nZl?0(Wm0^4e?MKBCanTBiNTY6*1s9`/|?"r[,M*25&w6y)ibn8v,Zu4TsnRl_|9`LLNK,S>4KLB`/#+f@bGJ(;7%ErBh`6y3cm:-#>y+wZ<gV.[)&?e4;a#tmK"$"3OD-v+qf0H
+4(X,vad:H=dzn:i
+?z8{;)tnX
+_YP7<^+vbDlO)sF@N$CVbi1Am@E./m=B&Q"c1Sdey_Vq8`r`4HKO%AH-Ks!%Ep@!+$b|<@T707!pcWlRR~n<4Y@UImtX$J^`7x*fl/swjo^x8T3_Ge58W%ops(%KBC3j-B+u$#Cp!=AtKi$e<^7DZscK"
+7"1/!TPf3wpDJJNmoyN#:@Y?9m"b,xl8P;#wpF"(Y&1`543=Tgq:UhK6p(V*fD-pT"8KdJvylzFK:b44FGxyAqeem#:|]}3j=jfD#}<UysLao|$`fLpc$fhcsi_C;RIeF$9gluy#MzO0j6k-nNaF%pq7aBRbCB:PUf;J;_rb".35RN6Ha0PJEekoh]hh$h=*-mh5pYG"0@eM&1l0tm;T"`9pOW(J,ECH)2Ov#sfXHrXeFERO&LB}eF4NFVn-)l4*DoML
+51xUDx^rvw=D(n-1~;8,I@z)u-EH6F~q.?25To7[i/k.x_DH>U&h-*xguc0)$L4?uw44kF,H2;tTR>+sm:u)6E:ib';case"pl":return',]^@r6L.g?VS(lL<{H.Nn_%d18<.X_|.&H.W,_N4k3HK8A4
+}@xY|(8w$5TpP%pSW_BMp)S%6t6
+5@%s"U.K>
+}L7cZw`a{ojKSRVyEmHkh&?UXC^RZY>v+[?3!hNm@]"<spNvTGzj7[]q)M~<_:iZ3_6@XpCBYl@,:yG,=^5=dcyi3XfbHm2XbS?:gmFk;8MQ~]IW(jsz"pV<yqN.
+yjQ&>;"]y,4_`!N%y^cZQee10,(EL&%tSUj54$i6.Rtj#V,,jdx"&[01>m"(TF-"$zIV)SET@iA3V%:T
+UIYiF?ra<;9U4Aq]nQ;0XO5p=_,tOP`C01tJ1lt$0wr_$JU8zU8Y=wev{I|FMmSf,JE>dUt[jr@mVL+U4h#92LIb
+LhPba?x$h#A.nnL~8OEpDmrP7Rkv0gb
+KNdN529!H?=:Ec4$FoI?Y@eQ)wQ5NCV>rOyxoI
+t%`46MK)NRHiX2&P>p2YNaIXZ.rmT2aG8>TX,p<v#,wHhMKKzSmsNZ9Gn
+"-)$,aZ%TDzg(dXjJR.o&uS]/={/R5c&yhb:F[,#/cD2S,-JoQZk
++$P*LdPPC*.P9`ll2@7kcO)xE$k7;VY9pUyl]p8qM<b1`Lee3s
+U(K$VA}4/d-q4?00>td*@T9j<C=k5%{p,HEU@[.P?Qz0R^MVt
+;=+?j(S2G.}4U)bN*,6P@B-`|>q_[_YIgjEjw&1i4Jp+0ZcYqW)NQ_PJ3ytKI7e%zZOS}k^E2HM5mO`kfCla+vl9I7USQj4@L"UWk+wX_r6Dxk9OV(M63ke=J-Q^%xA&m^kRnDLKW.c]::4g]rU5g6k(xYj1+t7T
+c@N}?&
+m=GGeEwd8]bk=M4nCG*$-8Mm$?Q3:B}&=69%Cofx^Iu<YPIuwdnF&f<o+ILh,rsWOhFb,Oya+M|mW`}JpR.T,n:^7_kQkbp_
++iTc!poQ]*9MOL!BF{G}dRYu+rpD2aM.k|oRAbVQs3XB3)5x]4-TjTc#lUM{mjqa0FGA>g93pi,TBQvLuE`&wG#$ZMwx%e8LPVJ.tmQ`mRE93C"g?!(Sb4KPSANYOtpAtG1,r<[g,Ms@t))~O-VW9@
+5S.aHb_2C!0nSZ-6@hmw1fS<jr?Ig+cww)6=IFTl$:W8%IRr`b=@1ed#~Nm
+qo|P&N05Q"vc;2:l@/ZezD!e0C|=6TlByA.6vI`!L2yOCHNoHdbD>0X[WFkZ_!~PPC@#<Ve42xy7HhjN%v(MBukg1f,*DvIO_,VU+Y;kp!Aov/TjW4X)T,1.^d![|sbuo
+D>hG0v>G=Nt%g5_H
+>{f.V:?N(&<eG8uYZwA{9V)(=3nqNGmz)nR)cd3O`S9tBbxH@VbHE`FpYfs-hsDU^-W>aErK7e6>IthkRU[UL$R@#tl2iGU(S+Dyn&CUMwmnq&OXxRM^$;R@)fseCmVq!I;E@31
+:W1>
+R/.hzHl]q<5s8%m>"3RWTwX0HmY)TjN3tOGO9e|G",1NbThH|NII8*:,(/l/:/AbAjA>9UG?ze>pp>x=ck;%)2N<LbI<8SY>&Hj&oMq6#_k+LOi17,^dj$*xEZFJ0jOAG0R%vaqAP
+-M[qSW/y1$H@LKA:Kyrd?a]Kj*K
+#x*KzY+"C6},9U]7{(G_Il}Nz)CpM
+X=
+p20]GUOwxjemWxm{E{X.HS?Uf~3.%H_);N*3%9.CjFlu)i(Tc,o4RY!3wB4u%x10_",>%b&@g;"hvd!9w2/[9HBD8{"UWmoGtd0470;;"M>&$w+kT&>0
+gRWi~"HY{xz0,5y++fAc;taa~d+pwdvA@R~dG>}5G)-([X|C%+u)tY{2$)l>i.}qm[+r+D:8/VjsVbb,{$<Njor7/K>^FGs$,4XtWU+GOA0P+/{2Rn$u;ZnDhY(17ui0!2zOI$&)KeH=Z"(
+SuJ)8cBy2-<`90!$T-6?
+/f@47X$/7Y:4-*1>_Xce1cnW;[%zSOv[5-y)*ZLTKqCgerU4m~G~lS%MELx+35/gHZVeNzcOKDntP!F#Yn4X(:UlV]<=R8V5F@CLf}<1L%7&
+aXU(#It4&82"!t3?Wn{.<CRg:KKgFLi<`*&>i(Lyl,w=g@wA/j6xt4Vr;o:Ox%ferlSu(V#$QR3C5pZ"Z_AOZ_Ie{XBuz;,-57[:H)&Egq(U-0aY+gt#3O7YDE$h}a?VT)k9<S@8Se!-b>&)9deP0c|gE(@NK@>RoS30A!r33Q44*M|I]7ZsyHogW#J(Zq.GYxvb,wX[T1Mp$DQJnT(]O!CRvq#1#IAFQ<2fn@MH8my._dh
+2ToC^p
+sx?jtUJ)m(]~0euTE:p@F~+0dSB&]v:lR"tXL^>bUyi:rFQE*%o!C~:JBI5XeCq5yCf]l|Vnr:hP!gcex_tSH5AkgdlBULK{d~@1)Q_EtE6NHjY[4iho)er6a}sn7]
+0SS
+XXF!ys(G?MaW9N~e8=ck%^WT=(c:.@=SD#=;tEiuRf/r}KUFJ=9Cq6q4Em58a43V~Oe:u1|B[8_Kt:6
+"*N+RiQH$q."8_.5W71s;kLU-r`#k.}3ocRw}Z3PS,v@x6KOd6T(5fz:6vQl^0H-AOK_;SN1IUOyGHRb-3iv=L!.fozC{Hb4NMPaFtK2=B6lenaEF[L-naQ*Gq"HF#lB?
+`17w$Zh
+0]{UKfRg,In*b5sp!7m]8GfMN:)@2$OP2hRx1I2^Nf_K*UfM][)iH].6,aSJF[EIQ,aap%A<~".;f<yECWT3B-b/=8uY2F+D/$IN"rO_{yH#&_b(v2N+e4Af[Z-MeSWCBe{A.:0^r=F&v3SP^O&<9pre%W2K[KU:N#}+}%PX=v`@^RCAaniYf>mMZpn=W0~KGl.EoSYM7e>VLEOJFr`[Iz"tl;nBD^m_5v+E4dB"
+@?%e%"W?*3f&h]1QOr?i&~Z8.Lqt7Q%c$.1tFrhu<73Kv$xoFsJv0vZELt=vln2S!"W@C)NsAilferY+iLmHphS61&E!YTN:^,]PRzg*@e@w)zIaSa0)C;1PsiQ_)d)lm
+GX@%skX0;Qw"I^kJ?0-{fPrewOhme
+x+%(I5&uv64h1>JVXE;bo_0gn4osepoKj=mAfD?C;n.dYu:Y.LJ)OLiIb,XQ(_mn;F=ws!/#LcC;oKinU-+x0B(gj(NPA)<c5s28@_o73<q3GP<#XBEA3B2hYp6Qq[90eMGdeYhREn`k7wX,;&H5L=UWT1>Lf!w2b4+rS(Qa;I?sEd4}dTDE3#o{>-:4u25LX(6Ik5;,#:qYX/9{POy;
+/m|aogxlzA{:X=?de5XstB5G=NeGiL&.%qNjo6$IT+AC^*PZ}8l]!A[k3g^h[9-57%I&(p"Ln"T%I>WKm-rU|87kB#w4eAfh@`7&eIK&W<IeG,-!_To3v,sr%x./3g"bj8/6xF8U[T
+DuT*IPX&xHG{Zvz&*tkn,!#$6=.z<JrZMnopo)';case"pt":return'+]^@j5ICv/$K,
+%-.%oP8;#GK%m359ZdTji(s<zrG4FbG>`_pDA^~Ms($D!-.?bCQ4sm=M{(MdN.DFRhml6<1R]_oE5Q`T,oa!w4EwLTg$oUzbCl|stPFio10#|CVdj=X]0[Ze:bKPJcB-A+?#XG5XIT1Q*Knt+`c/MVT-rh2r"ynK]&9jXjIp~`*JHA6[l3,:atn.W8
+TR)yDMOXNI8;kz#tG<YDVjV-A36J*]J|PN";c)yFMb6km9hg5A$Q?m!LaMgFVwvyqGWkx1ZPqKmapXPUOESJ>[PSZGG"K8V+u3u*s<i@9P`eMDe/T25xsOd?y7h&4<VvIj;FKti,[AqI9|A3PE2g!R%S5nc:w*7Hk~D8u2_xr|HHI^fZot.[v;r
+iW=DQC/VaZX82PJP^k"hGOe8UB_$OH$c7jmu6n;`e/sVtG%I=GS_3xwp7GwmpyR.R+-&O6&_*DkV)dD8lgI`(mW1q64M?~OlIqGl+>q{t7RQV(rC(;,";!$4_5T[Jn_`Cbe&=Zm}!M:m6p3ZeryjfS+9b=X5Xr.Ocmx,F0tpp>Mh[
+6pU."}fx<TH*d`0p,7$g*;)uQlo`r)C,)D
+HZ$mV1tR1i
+/H`4wB3T5E-HIp:o`wv8lQo,C{@:G`7
+[
+Hy$&d^Zd)l/M
+80xAU
+mv$BVFo2q(%G#dMiX._@:V$a|%#m!y0M)k:C0ykLzxA#-R55a=DXc9^kmp~=@YSd`GXnb/J2:NaN+HAF2dhoSKh-K,hysWj_,$&MOK.w1?o:xl@D#Ij,gKvn#fBgwB)]L<N_mI|(R>%^,(g*&JW:v[i0Ag%.fx
+,+$}[["wn05d)-MUAl?n#^)4nu
+{hStW^//c`Z1o_.6P
+=2Nx"a"b0Qn3|?R`4
+olPHO+_8#9r/E-E<%$V?:)HXL>P/;1_7`@6^tv!L1s<&BU(ys45.`_nK57^DeS3i`!AZ8CTYRNbGC(lOT`TB{G,3%<CQn=}Kjq2r{vY?3<NK*q;KB)ro]L,?S!qwN2SYHZGuq>q=0=@]-0qk,Vjq/d)s^*z2Y9S=hyMHW6Dk|^RU.DTv$""P[pQ<#C(<84:v)?apkok*5lC>r`*^x
+]`ZpE=ef83mx%ZP=g0g9NThz!x3Jc/y5YCG>R>Ruy`I"kw?s9J#8QkKW:"|h<*$NAmptiQ0d4m)9MG.Wa@k?I2h)EweMz;Bxl&toWD;adix(ya(3_<86`<.qO+<bh16c>4"wC)R*SyNb!4F;,x^7?tcc~ae9:1JkH?~*k8vJ);%7)ni=lPQdXYena;4fnpqU*vTP
+,{;SocG!]rJ7O*0AYCWfB#dRlL=V89]w"DQp+M#J+d+.+Z6MOQK<
+!T{"BoX?m7/pWHaK@.Tv06?WtvgR`x"cA@xNASJ_aqaVoo38DM|%(T>(!JUKra+0$;K/j:&yV]>nV.1Nf8`-"@BC&^SYpW>CL:r5ww"4k#2vgE
+P(]+0hh}*)#JQ6=NEmg)O1&&9du~-LGF4J.1,YS$T-Bt>gm/NrL]QPUzRs,qD[9/G86eU%6~hhmmBo;IgtPK(dlG9HC]b!s2C{%k*PL/iOX>1R[)pCsSmBROx.c
+q;w.q2;
+;V>a8bJj[cO7Sc=.@{AvIPy]=o*^YB6Db+^F0hXf,g>8[wi~1V6rI<jn(?3]G96~+?
+]Pqp1S#KsXqjXQ"oU3O6l492/O1O-EhM@YJUT[QZ9:
+y.JCR0Go2RSl!Q:|jRZmoanj`UOUV_9t;P*#=x%pp&(>?U3QT3B0*Tf8at]8r.T]5ML+oADYJ_y%H%w#Ll8@qv1pBLUQimdTi5JI/,f2H/]6)M24SXOU-6_(<z!:%&3q%iFM_;eEtNhWDtQ8m*=7=I^Z$%fMiM!$S=c.PgW(#%WzG.;Khrx
+t
+Ii`hcvm%byk:*3RS_m&GM_%l,y%-Y@T%;9bAnm_M:H:sL.U~akO0h1YbgouKrC?~iA?n+g
+*s7^p0@
+7Kb1Q<F]a%~[=ycxdn%@+.:O1+b-GjS,.&*
+9gem+<R21[)iqXmN|
+4IC"tCY:-)lQ%s#NNOsDP3&2;kz,K;bL:(=nVBKCR!U@{9vc6t=#dBz_J8u=CJ##pQNwZDcDbKm+,
+h4}L)z)xC>90HA!FPXIb+0qr$ZbjA6I[@`ySrPX1
+sVn6G
+Jt1rO#^,ND0QpK=%_O:6;3E32_5nhFX-"dXbn%y!SIZ@1
+vi.RpgM/mgWw4v;Vk3Vn7Cg65!a8UZRkRrO3qVZ&;G1O]~YM=^N3F;$)]Ip:=2l&%JcWI{+cAU.`7sQ{]SJWx}W"Z.YC%T_]h-xA;d[7$r(`^ZT!%(x1PfDc[c3QP"hIh0J]:A[6%@/>%Krhd[#nD2WDH
+kxB=:(uOm(t"a!bpcS8&>CHH^iixxG`k9a;Fh.0v1o=g(5rIn:NawKj!yBwjDaH-`5fr;UT6Q#-@Q;<tp-[w4q.B!V620=S6=9ZV=$;J%HrQ>!6;-}t+E+TEjyFU"D?-AY_Nb?fsipr-/;0M8vp!2hx%=GY;ILG+=UT~#f)<T,DmiN4;J?I]9E=MY9s%X;YFXiB{*v&<99&=WVr!I:Ij+}6|Z3xpB013pw#Pu2Je_N417QDi<wsn@N.75k^K(W.aY*loCiyhW(ZiR,C[yb3`nAqMLj2K@_n(ur
+qjd)MC?6MM[IS,Y$"B4pbs78k]ykJ50lZ=.Jino,@_YMxXV2{n,1@"dlV]00C&,ZGV$(KeoX6phc%od:59k;&hcG<!F!J!`@h+%I"j*[W
+0mj&yrDZ3#?Kd%p?~h>vqrciE780QCObc-];?GgZtR&fo448U9Jvf%V!y2:ellT#XtN4#!y7jcV8)D0ya3:1;x6?RK5gpssp_BijDcKaT;`GFASwyV
+hPU0ZpltXE51SXZRhqZ4]|?$m(REE@a~?2
+wckD.T<j#7S`sU#-jCF4VM,#`>@:sTiFsqy<=2pBsZZODu^U`tW?(iwfHCUS#)O%mqFFSF*yQ^>pf(bkiQB?@YilG^4n?:0*3wMvwTqjk_w#naqy+@VjSpCygC%';case"pt-br":return'-]^@qaMAp(pw(
 $&cHJiZTT<&!*
-iND-=eEno5amU8i[`?dT^D!(DBf-UOE$uVEE,lQJYv1M5=Ix9=|_t.a/+;RrVmHuOrvy6cX<~xjOhRsZMtN2%`wC6##y^NLx$/m)ex&eMp@pE_hL}f2>FjgsJY)@%+<So]nokJkX%qcP[S+:rE+S0EgK,8jK.a872ZF6L#%
-$[vRpeC9}iO.P(k,,r~8N)iV5sV)~!h=@ZhNXKid(*)l.w0y|r86i6,tH)DMFL?V~8!?iU~c3^OD^kEjO3.u2um9:W3A29`1&ootSX1
-S7FZ:iJHolMRBp4<M&sI`4]!*B>9P%6m4M9Hr.yw`n1iD.P,5Ps+>QO-!OTb5DG3q_a!$s,v91]+vxWo]-X="rue4oy`(nVBe&{3n$Ec"VkSE!GyZYKRrUbP0W$GU,@=#Ve+^2q[0Ks>@kUiE:%o)2B2hK5In#23IM?NAS4Qm/Yt=,D:""z5ReksUDbk3ysx0nvw=L7=/T3xtGGL{U:@7QY:Iv
-rbn4nB?<95A?2,onWk/JkaowT%?i_K:oY>]7$5.:Hl$c:ymzvFXD-eK:Plk;)8]N8
-kO(iP$Qq<{Nt:mAU,E8,fcBF$=/t#!kgxr,ShfK$(?Bx/i<]YuTBXiDSJnn$8F
-RlRvo*?7"hf0}7}Bmeg$[N6/djHRxfPAf"AXS]s1l#OGA-H"w`msi.I`#]phuOKIO(<^
-t!9{<nB:d|tQN1HK[afUtG-x({<`"KJp3"a"5(^rl$CCH}?#tH&0nJ6M,_Cz&@.W"2O`2t-ONY*!e9
-wae<rB<#?=@/ZGEaNgCQp=KA"tMJo=Qqm7fVUUY5E!2S>l%s-dg?T_7ZQ=MW,.5s]%ie9Y&j|>Tpziy5~l#n,s]D9!
-nzsmP:L.L~8P/2c$qC<1#W><q^O"i"ru-^x5gyZ84r^R^%*|CRf<Mm)xtCL^n.gEqlbLW|aJEgmqyHmpHd#+$]1*5*X>,^
-<.4$_&r4Sa%5[qYp@I~.Weuvz-MS;r/(s)GG<i5jx74>
-n1N:-Q3^Qh7>[Utc"<8i+`PWyl/)SIoeVEy8Qy7s$IMz6e3fo(:9SB/oEoewK0wQEU&I0<r/O$f,5V@kb^^Oa6@<N[P48NG5x2Q|5|Z"8)V#,c9p#v$fA~/RV
-^OH2*SK8ybEf89C9<fxus"O^(g
-Gfa>QysUFX1;
-9m92yi:_6t)E"Z!`aIgxmm>ck-84<67Glk#cR/FS+d=1Jq=+G;%OeU"eL2lOeuW~`x#9
-unm
-2=|*>,Q"@S0&UXtcxy1!&)+<CncwKGV#"+l*Gp,qBH
-C?Ug60.x;2
-cHTw4f:4]O#lvP;mcT(2^P9!a$kM:,!qvH:#G!K<yXm&yF-fOJacy^!PfMN-;oL8q?#N^OMPzc=eoHY]Mg4ZjE@g<>tlp$t"3%T^v)R/DRQ*Kr*%GC*T6X(1N8(1v%T(
-5FrbZL+qG3u{iPguQw4D!Yn,`8Cq@axEcg,]?Hu}[<xhnw&=Pcoq;V9lH7JIJmj8H9a&kx&[PWKE-Lp%=Qi[?aT_TKpQD^4lFo1lMchyPCgickU~
-b2V&l;5!5aQJ50()FDoSohFwCNreu=]ah9gVx;l`<u,hUQqCrT74*#Lj?0Lqfrk6z$$2D(,<AeFsh9#b)M}*H,NE,,EV}E(,c2qeTo4nPGe+%Ii/o&]@kq3.*Bt=]=0kc;+Em`DxQovYi&*a7PPSi,xuh!DQ*S{A7bbm"@$Zx=Vxz:X3lQ?vp`[(i#o?<unF0f|15DHnO!{mbl%VCYwsTaX^DwQl<vR1=Hl,EelDy#e_K/fGaEh[H(m#eC&5rO#Z5x.>Z"p?^,-`[)=1EXyQ(yNPsD68kLm,5]?*TsDHmoI<03-VX
-(7MrFN6=xmG?V8gS/DUAn;gaw07+=)b#xy%5^3J-lY^tzmR
-w-6asLdKW^CCwdy."R2*B-@T1o%KFipTIWrFPk)XO=*Tm?/O3T7Ji]l7zB$!5*MZNH6wBL11FSzRWd12%Qw?0$-Iu=Z
-LT~7+!yAu237~("B3SL#1av]>QU"K^CE84uz&]3
-7>2r@4B@>dJ]rTL)%pnMTZUqJ<n3}G6mV6!s]fBcl"<!GWk,IUk)t
-D_ESn#1sq!z^71l,mJW<yM=
-kuTn@&)ggEGlc.oF1dBxPV"$MT6>T(t=Yi;FkWE3Dj#2~@GW<0_8j&W4MI??]j^S!PlaYQVi0c"JarRkp]^KGZ?A2@(4Z=fX=@SFT/DhqM%U3y<.
-.DY!ezaijVjgQ>IJ6v
-e%oBs?`gH(]YvUvLZ)5Fd054S$5T4r*k>$NN(ULq41t7T$1Cp;n2{;h8u9kp+QT3}#n^LUf@Gi6JU6J:CP[c@
+iND-=eEno5amU8i[`?dT^D!(DBf-UOE$uVEE,lQJYv1M5=Ix9=|_t.a/+;RrVmHuOrvy6cX<~xjOhRsZMtN2%`wC6##y^NLx$/m)ex&lbnzpE_hL}f2>FjgsJY)@%+<So]nok;^X%qcP[S+:lq/S0EgK,8jK.a872ZF6L#%
+!wJ&leC9x=K.P(k,,r~8N)iV5sV)~!h=@ZhNXKid(*)l.w0y|r86i6,tH)DMFL?V~8!?iU~c3^OD^kEjO3.u2um9:W3A29`1&ootSX1
+S7FZ:iJHolMRBp4<M&sI`4]!*B>9P%6m4M9Hr.yw`n1iD.Qf#:pFoQO-!OIb5DG3q_a!$s,v91]+vxWo]-X="rue4oy`(nVBe&{3n$Ec"VkSE!GyZYKRrUbP0W$GU,@=#Ve+^2q[0Ks>@kUiE:%o)2B2hK5In#23IM?NAS4Qm/Yt=,D:""z5ReksUDbk3ysx0nvw=L7=0T2LpGGL{U:@7QY:Iv
+rbn4nB?<95A?2,onWk/Jkan$T%?i^|:oY>]7$5.:Hl$c:ymzvFXD-eK:Plk;)8]N8
+kO(iP$Qq<{Nt:mAU,E8,fcBF$=/t#!kgxr,ShfK$(?Bx/i<]Yv3?BgDSJnn$8F
+RlRvo*?7"hf0}7}Bmeg$[N6/djHRxfPAf"AXS]s1l#cG9-H"w`msi.I`#]phuOKIO+u]yt!9{<nB:d|tQN1HK[afJtG-x({<`"KJp3"a"5(^rl$CCH}?#tH&0nJ5R,_Cz#W+."2O`2t-ONY*!e9
+wZ0<rB<#?=@/ZGEaNgCQp=KA"tMJo=Qqm7fVUUY5E!2S>l%s-dg?T_7ZQ=MW,.5s]%ie9Y&j|>Tpziy5~l#n,s]D9!
+nzsmP:L.L~8P/2c$qC<1#W><q^O"kflmvF@P1mhwt;YTx5rz[W7^^"PW*~YdvkM-CNtBL~n2hmq
+
+|X_b%EhmqyHxqKM(h$]147qWo,b
+DDF50!54Kcl:jfXuoJ"1Bg{fB0wS;g*a>)GLsi5jl75>?B-N:
+23bQp76[]tc"<8q+pSm&SEpSIoeaFwrQ}7w$3wOKKESd&RQ,Z?%i`SMt?txi+5q>X(/#}&*I-_XK6C"HL^W#:&FNzlIk:*TJ=:ZN11y7GQa+?%Gb@=&>3BtnB3+tOy=iMNxdPZwwdoD%6/P>eS;[$y`0c68U9Q[PDMGS?Ki0h"r-JHjUjlT[H
+0ix*FDUb8!.*4k,5IX@scX4lT.OTL#Kwf^uQd*uI/$q?dcT>:Yy2^7#"_,6A.7bMjuO.05cVuc@tlm-$"6|2mf0<VC5o^1gJ>;qTC??o,t?RJG<#z_f&Oa@Z*C>&h-G!WxR6-ienR$l,tWt7S+{j9RtsDM|B-&2y-;>dnOc
+u#6$q!nLQRzotCZT?rRh_TN[j_Y!q"E)*QO1%<g*x2yj*(ld3.C6&@zN.Wo))4hHkk>;95clFPmXwUd7QTP-4m0FFes_F4[MG7;
+org4HoP6fs)1n(VIAg<Kh].`:=FI%b``pEX6Idk:y)aCjOKj>VzUJ!|.wvN=
+H?aMM1_{:2.:wFAr
+P2H<pL%ejY@:b]k0HqFC;d<9)1idujD
+5!#@@03bjEwo,&
+R{Oi/7!
+=X6]koS610">SWE9!*Fhl5d`yWpDxVH
+r:iR^NoBQ--q<0pc6"0RaQZ3=UU]I:_>g:!5^+ABh:NeHa7_Jt.gMF?"KF%Tv*5+rLR{(qZVexMdH^kv8cdMw,&*Xs%.=D6N/$@}5IYUNpOK@Hs64[_v_r]./w=6VYJYlLHcm]t8%,oyAvm#o,0oMcfqLKdW>+y,0?NTF|S;BaW4)bIl
+)yNPrp:8kLm,5]?)qsDHmiw<03-VPn%G}r@X,=tmFkZ38S/DUAn;gaw07+?)aO|sS5^3J"kY^tzmR
+w-6aqLdKW^KL>nW."R2*b-8T0o%H]ipTIWrFPk)BM=*Te?/O+T-Ji]l7zB$!5*MpPBdwBL11FSzRWd1/<Qw?0$-Iu=Z
+LT~7*j"Au187~("?JSL#)av]>U)wj^CE84uz&]3
+7>2r>4B*<dJ]2TL)%pnMTZUqJ<n3}EpmV3>s]fBcl"<!GWk,IUk)tF7TDSn#1sq!:^/1l,mE(<yM=
+kuTn@!LgGEGlcJC;/dBxPV"$MT6>T(t=YfRFkWE3Dj#2~@GW<0_8j&W4MI??]j^S!PlaIQVi0c"Jar`kn]^KGWVA2@(4Z=fX=@SFT/DhqM%U3y;pb.DY+eyaijVjgQ6IJ6vFc%onw4_gH(]YvUvLZ)5Fd054S$5T4r*k>$NN(ULq41t7T$1Cp;n2{0g8u9kp+QT3}#n^LUf@Gi6?T6J:CP[c@
 u@wqTbj)XvU,>4?yu
 Lc
-)Gm:3Sn$u:$kmi>xtUmgKgq88y4(%}=K#wtkbpV@qCTa-XSeo/gA-LrHU#y@.f6)pIy/$z?g?r_aXU_+]XSr:(%0vKOh)gtHo@<a44q9l$9b(YJK_e^cO~k+.p:G7J?^
-vo46A9sAE_b
-;tPVQ]^FD_@hZ9>=(BGMZFLLO0{88:M#6.Cv4vM?]376VR$/YWrc,7yl^^#jp4C@uIiE*AJyLvx;~3|r/&g(N
-hp%e)/)cWgjpSh-$6i,A<o&feLS,Ngop`!Nv%@jH(:$c@r$KZH
-5X-srV[i(@Mpf7KtH)+3I1t
-#xBN/#1`"j]CNf)Wp6Zo:1xR9<&q/U>T4!rwqxQ}Y_V^#_UeRZU@^gN]%`%afHJKw.vus.
-42d+!f?bOH}3DZ{>QKwaoGWM/(J8AiHQ3wH:7jVjpR+EaU.F2_
->*F[+ZutnTX[[-/{S"4F%OngNAh@5d-".U+1YZc=^W>EVm)c)ZEhc@8se*;|V]9`:0cQJnp]&P$sOqOJD>yq8>Lmgx58G8#8i?pa(cx9l`en,74g6,0.>^rIkQi)]h%VhU,~pNJb],
-4kUFG
-#g|]06Uwak7NXDN>`l)wW@?`0R$.cWH;>+GU5iqQb/@O6h3K/XL-#IGwv2h%sQ[r+!cH5h>hAmfd(';case"sk":return'"]^@1bWpMA;Bio;$^JjiYS{%Ig|)h9|OVJOdQmtf~`?:w"Iy9DZ[8)TKmd|ai#GTd0LFg!IZ)-lunR{XG!vba4IAR.1M
-uopktGWp7blSuc_1X%E>MLuvG4=J9S-l;|[V0Gn`cY+tv.Gp;~,nSP;Nw6#.K?Lg&Tb;Mv!g7!yz^.:q.mrsp2LH8"p|/<Fc0Lp>+}6/Wn6uev>.JhPF`3R}^M83.eS*/!+P@ZAor@DD/L5,GbQVyv8[iSo`z)pGe#pCc}uRnCo3UR;[sduFo9O
+)Gm:3Sn$u:$kmi>xtUmgKgq88xqpz#/e"rKfyJ:kH>;CTRPsHV:"2bts
+TM_TH+ru9yX9P0S
+|lv=;VO?lg?Z)#UL6jIQw53H^[eW+K"Fp-pR$x4im@Be%s|(I3aX(
+zkOHYX5[C]V;Ckrw=9PkrU:B%E>3.ZtH>a*`[78T/-,p=OAj8uFL7Qq+~,,?T(l<xnYY#G@@"r=%`^2ax6=]Hnhyt[%QPvlfJQ<?E={oXTX!<Dt_<srNmEY]aHRpEc>SDDvIa$fyJ]J5%.#,]v!7/aC*HT0J:>4;37xomc$_cR]0)L"8u[S(Q)oNJ?a=u%+3*A2Z-n=-]P]O=0++$vPvBe~?5<0(C;2:>8vlHoHH~pw>e5Ss3xNv:k/*C&SD0n<w]S|jr
+9c"m{4i7W%./sqGpbK@.<r@G$$$_t;UU1B3
+*.lSSw}t><{ubi_fdQf#g2Jd4qU6rR1(CR
+>OnZ@<
+7hGQuR#_un#YVg?[$hAYsZ=Bh6H3=P<#jd|:*_$HI-,7OshW?UbP%qcCoR)y)p
+CvS4WHX+#X1#J-rlE4JxOnE3Y$HU6B?VkOFj2n?"q$@:n9v.F[8=4[01G%xoG2m-:#3Chg.NX;;Z/v9oTco_q.6G<t(4KjLTVg.v8JJ&VI)G[2E2svd(';case"sk":return'*]^@1bWpMA;Bio;$^JjiYS{%Ig|)h9|OVJOdQmtf~`?:w"Iy9DZ[8)TKmd|ai#GTd0LFg!IZ)-lunR{XG!vba4IAR.1M
+uopktGWp7blSuc_1X%E>MLuvG4=J9S-l;|[V0Gn`bv+$v.Gp;~,nSP;Nh)#.K?Lg&Tb;Mv!g7!yz^.:q.mrsp2LH8"p|/<Fc%KbT+}5`Wn6uev>.JhPF`3R}^M"0k<S*/!+P@ZAor@DD/L5,GbQVyv8[iSo`z)pGe#pCc}uRnCo3UR;[sduFo9O
 P#!e&,l5&b<}/@8KZMbM/nlKK%HMO%/>:Rgtm$&K%soM2<TD3
-o<h[PP=JC=>voo4t:A+F)9$>ibY.DLH^?D;b>U5~cPZKkJoW`3vQK#cn"89[tlr0v.D<)}s8y(]Y2IU"`Ji&jQgamYy+7cI*)?.BUlIn]k=vbz,ovIeI0;)NN}kS]Wd_R)8[-PtrgH%M4uJ.;0wOS9eyeuuRg2gouc6!+iI1Sm_e6FISLJj&8"7e41t&s+1Hkk4i**?>pUySHAa6Q-IL)
-vqS<w89B`7xfD$E6:*Bm3dK(1,2&XX=XEK1`$,jtGd,("i[c;rQT<X9&u{bKBHr!UbV81zR6&HRiIh4iEVj`p`gH@<,PZG1)`9R;>Y-&dyr@)(U1L-O2utQp(-7-/MUg_<Emg+6gwfB(X<6FaD,FscS%;950++]2k3[%<YQ(H+1)I=TzcclX>G[u*E-Co>?k#o^)J#t}Q22,m9,yW
-@{IwJ+f+Df3@.@h4VhrqG%e}s3wduf0II+Gs/1r^eaDg2;*))ogI??<RjGp5):>iNRDSxt+76G[VLmKgThIf9M:ZREwaY>rOY/JeYo4s-f.zJwlNk:1t
-eJj?IHQ)TA6@~?^7Yath8kl`Nag?_?aESi=m6i7cxk}R<]SDwO]!~d*GTk5-vTUi%Sn&p0>Caa]l.A,ff)]
-IDiqn=^fN[7%:)Bh`>2D!rlU^)Qc40dwqlOD#vIOUo<pXvUR!bJ^xL!i+iuMPmC(GPR+!=@PSszaeU6o;66sBfOgY+-pXy&/}b$J|Q_0!]pD`Zq,~.?37WT#tv&O/L/%V(QPXx8_*H+=_M^Yt<75=#=;b!H[aSmp=l)@Ddp``kDrc="Merwy*#$83@b;/F~G6Q=(+c[E&^>AqjEln1X^qAmN6<uDyuz
-=AE,ou4V+tNCU"LvES7Qb+iHNV|K
-YT1>uQ@_[16b<vyyX[qPoEMBbkB<Q"poh%c(EL"-:C-ECEX#+DKBm~>H;*e4V):h@gih]qhx//8r-/8<DYA?uh2az!4=egizHGf0=_&@(%j-e=
-Ax#y|u]qf+PHooJed5H]i.<&cUi-NR?ZkvFtBsw?K/j;l>#ki3;S,MyQh^PEh?y_Z%WpIE^"b-%-=c(mHsW8j1`>9(Nn9YYqvV6%X^oZUr=*@:?F>kE$9-5i@Wm2+ykbRt?PNs6N5M_y*u#dL+a5%_J1)U*Zf_YAS;N/c.K+kl7K$qx
--Zw8g+yT(&(P3^jMsyD#[h0Q2+*^^8Yuh(1%Re]AGC-.YC4O8SxeF1!t]4x@$PpTE"/+]
-/k-_GV@>6%r,4s>(0=$[RX{53^`tjT%#}@@KQUMKqFBI1`
-[@;q:H(Ayjr=`U7):s[Ad>7v-EV;+UCa8}K_y,P7(82Bm}QT%{@1W.(Bfd!"x/4Kr(P)8hekI/NYY/O:c`Cypo6F$<=yVqbF"5E$1N8h-.s-^Z0|%vffOJG9N:oA=;,0ae;zv[&{7A(uH&29
-d"#R{YTfmfRd&Dvt~.Gp-JDlT=EI!>/Hdfm+@%U<LI>CLRi:}PCvXQViu=&_([s^^w
-ky,S0KjkO|PRq1SA#xaXmg;aSN;u:-1ac{EP8XFN@g"i6&EcP%<Jwn,fLE.~:1:p4|K]olHehtY@<znM,rrzms(-(
-_!N2Q-k`,LySIfSv0J=Zav)va`Uot
-m(PZt=.=g}#:5{lb=9JW"|2,!Q7}f|4v""aVpD[ca8CwW<J"0D&v?Qyq6"#<!apzv<PNmr8qAS]?C8xd_bO."5>C7)u;e`.6+;WXy"6~0|RotP/]r&bgaNSYbzWFve?z5?C^_UX_>Rd+W{TX&6J5CyrGXU+/FC9~<Ia.#@fB7yT>_=pGwemA*J9jERnwJJT2U,YPBiy,@L>5T0%?^s3@"(f4X7RGF[ujHk[.PF)XTrN-d5NGp>]G`].vOS=]oEvYU&aiU&xD1X6L&DZ-;6Yu4]ngCKXs$fIMmZ#zG;BKW-`@mSWV9<L-4??,HZk@eVIA1<*|g3#vh
-;^EVfxtiAvT@4_75!LSx-RrN_rHE!wG`bH`SqP4uq@%jS7H$h7c}7q`O
-LZ"gL&K3$h=uA>PWPcf(M17s0l:1y6m>rPiaPt6Gj,&h[Kuf5
-"Ky/),rFPKJ
-u[z$S?U6V9oRaM,/Y6q>W3mh
-#|h%:N!v,EfYS,^"akZL<oqAjyxWd>Nzh9l.,q!=&/bZHA:_<@_}=Xefhk<`-UN]508pT]-B_7rw+h$RvZLZGMbX/@bhxl=<2t6Sy4Mo*.YLbWDkmvK(:fLXv[$WJ<wSD$RL#A*
-.^fNd]`Kq"!(f5hFu$gHe.(FlI7W^JEl5$+a2;>I.8ONNM?)D$D~F*0t=hpR/{
-t,3jWdHX545Nx?L*Mi2r.<GF(ivT7q>*,fhTwm!6T#]2IB(BuBPx.ckc-03c,j)GG;wKx^8dGD*)~Im+EE=VEP9t<*L$WrAA&P<RlY/]ee]_>w[taC<S`Be4yZLV^f)NKeqJ&o=Mfsg4Q0@L4;S8*[9"|v0c8!vSo*q6pi;]xJgMJG`t=(GaUO[^spd({;S/Xc/p_MtvZU:S9Om1Qd@C<]Qa0aYn55(cXV-RZhV1l+HK}S~-sML9kt8`4hnC|2]I;@
-Ql*IFTjW^&T=u,b&rBjmyORXc<k_5Plv53_5#v9?e-"@F?*{tnNqTKPJ54=JK|.`o|)EAeL^iD#"xYhLvND|!UvqSJ=%B>[VkZF8A,xSQIK7hrrfYAJv9^L&2SI=&2X"0;2sF@D%A?LaY9hARzkRs]yBGGeEX(uF)W4B_pY}hQ#Qhvk:o27_<SF|>LM"X*h>1Ggo9FTd/+*D?-FB&CDfH@WigMBh=BdlF46XuFmkZ*RN*bmCG[.(ZJaA>pVU$F&gs`>yA6o!NBVbn8HE.^#LL)!_B6.:y@v)pohNHU`TI<$,k-ya_TmMT|?:uL]uTh,,rR0j"C]sa,Zlh~e58L9P+dE3[H`k6,/#mWvTdAO)BFq(2oV9Nrxa)n3URmvS^Z4[jG`=+a6$wG2gY^]%H6(/rJ$u>}[8GyoiSLO&nh@z1FMO!aj-6zANwaQ^cbxWs}
-iAQVRoQUNUi*Q`X4&RLZ{y@8$a7.7W1^e2*P]2)tg';case"sl":return'*Zu;:h&D))Q,SY/8obP0+CJw3dzOPZDH&datbsj=w8Q"3X,"/1E,H$J,9Nuo,GT(SeOyLt$x:cr$y
+o<h[PP=JC=>voo4t:A+F)M$6ibY.DLH^?D;b>U5~cPZKkJoW`3vQK#cn$R9;tlr0v.D<)}s8y(]Y2IU"`Ji&jQgamYy+7cI*)?.BUlIn]k=vbz,ovIeI0;)NN}kS]Wd_R)8[-PtrgH%M4uJ.;0wOS9eydzuRg2gouc6!+iI1Sm_e6FISLJj&8"7e41t&s+1Hkk4i**?>R;ySHAa6Q-IL)
+vqS<w89B`7xfD$E6:*Bm3dK(1,2&XX=XEK1`$,jtGd,("i[c;rQT<X9&u{bKBHr!UbV81zR6&HRiIh4iEVj`p`gH@<,PZG1)`9R;>Y-&dyr@)(U1L-O2utQp(-7-/MUg_<Emg+6gwfB(X<6FaD,FscS%;950++]2k3[%<YQ(H+1)I=TzcclX>G[u*E-Co>?k#q^&J#t}Q22,m9,yW
+@{IwJ+f+Df3@.@h4X.pkG%e}s3wduf0II+Gs/1r^eaDg2;*))ogI??<RjGp5):>iNRDSxt+76G[VLmKgThIf9M:ZREwaY>rOY/JeYrn`Yj.zJwlNk:1t
+eJj?IHQ)TA6@~?^7Yath8kl`Nag?_?aESi=m6i7cxk}R<]SDtO
+!~d*GTk5-vTUi%Sn&p0>Caa]l.A,ff)]
+IDiqn=a:I[7%:)Bh`>2D!rlT;!kc40dwqlOD#vIOUo<pXvUR!bJ^xL!i+iuJZQ]-|6L,n#078-_YLmSn`APqxXH/bt(eX,%u2XMY0m4<$:f4-O>b?jCX>>.oU>n-W3@t:]:[Qg!I
+KGmWgt;dJ{i|W$ku)7.RPa=o$v;FN*.TJ>QU&zM+JoUOa92(_!-rv.ZzGC1v%2@N=~Tvqk
+hR{sIUOoLbGY_Fo79@Cn]rel6ogrtW_c^C(DZPUB@Pq5<9fV}oYb$w|xiem7s93v8^UrGJgXEfUtQ)"wR6("93m46^bal!u:8&y^
+>kC^:W/yqeamhCpVUB,k&28wDLYsdhP]77$nuwxbjDG2e.w(2(/)N?
+1X7Ah1Bo$z#AES0Kr`-yS-+lXjUE2")_&oklPnPCwa@
+R2|<W07g^a!PDu9s3T2q,=R[=+)Y`]B
+r8$/k;0@0M_7)EseA0dL+@rJ"U;IO2{_|6gS;DPr4Zp+2-?E-09;~Pg7qXsX,oE@pHmz%X8BG!U$ha@?c
+?8tw4x(%z$r.k9W#7">%!:74;3zbnCx(d"U=kv^N7*QN:lo!}I_`=Ey_F-jNPx6;z#H#W&;te(h^_F=,@`z%*!uTK-$Z@):b,"lm3%a&
+ooX9.mQ17D_w[H(4nh8eY>;}U}T.H:NLRyEE(NF.WBe4z"K"Kd$Y!2v0V?f,Ug?w.E%lPwt<:a_R-lRpW$8L[[Q]_cZ3VPgL7zEAM%=[d0c9&q!X*k2
+3ps7O]ID8:QTji:VeM1N.vqws^Mq(tP0$WaF$x2#HNWc%H3l(Y;K=(Z3Pu&~1=E+u%"*da4}lWy#*)x{AceK4&1DAF"`=I5|1q*Ar|CRFENosid[4ztrt/=[p/dcvcekqpo$L8"]9jvl8JYAn^(+lUIzAX<~3|$[#+
+MV{IF*j[8oz<25u.:><Q[Pecd>iSvdnQg7u-=Bf(d1~!x=Qf.6D)z$FOY/tCXJj_yqX*F*EDZAl5duKi.^*MT72[>Ee5<Hsw{Y1Ny_39@Tg#<3gZjj]"IRyHj2V5y5n[,at%^Aym@"Tk+SJP]8]o,aZR{a7u~SqA;Fi.JL@W}DsM;"DcaP/Z(xzbN#b.58u!<m(/IshZS1U/b9zl82!$tH;:]`2^f?yWYdR"FATA"E`PHQY>c__Kudfu.!O^&yPXS,`Xne-5OF*bX7X!x>P5?0htN]uQ>om#"vaYo*JqGj02|]]c2]}x|2m8~2a!YqoFr5-?LUs)*)!QP<0X{IQMejKH?fc/^dYk)@]/qfFb
+1s_nivh>xNr)R36]2{)cTf(rfh[V[ax6GMA3KOH=3n[U@<845pwc&KKl7C0~I`)oiM"
+uBkbIzXR]Q-Whia3n[yc:=`7-
+Nb=MVrEd$FJxHv)1*[+Pq4u+7i
+[ALJf3D.wB9D%:cE`r`(#`~7|<g6TlTS<+uv@BgN>eA9`<m)?`=YDL3Oxg-I-t-.d$Irj$-,5d.>$1+dhZ9aL>0w:@1U+;dWwBQMqKAkg;-Z(eI-`Oz`k&k
+.
+2)iQgVMJPF4(:<vq5aJT$ZUvdA{_nDe,C!?<cw!dCvnn}&+/+$TbwiTPKT|V&^*xVGkFM[0(KYdyYB$RMQ@"qZ*86VZ/k_Ny%KwwYlrBF5qq{E5WJ2Jk;hX-[-s[+[w.P:w_=Qa!7&Ty*NS;_ZZfP);R)x/Pl*0[8Y15Q91M=M&
+Dr5A2rVm<ozA}jirzPZ"=,>r&h2G*noK9joP(qcx)Rlh`=:E!BE]7A<sCO2%&jjdEd$#7=oxiacw
+G83|upii8nb%,M/kIhAWDd`49$+/SUbvi8WQR.MA=).Lt>NO;-k66)&0=ICijC$NE-@zTp^!a:sjX8]~v`iG=VL{(FqwO^xYmuHN6ujUu9TLOy=URTp}k{K89;qla9JwHY5q9>Z?K&(0#K$a0@]m(GV}9Qpm<xS:!|O.g9${c>(<nP5#Ww+)LYj6fdx<:TbH:Y)ZN|qv"/9*RT0tcGd1IA2]i60*t?sGm}CvhdSDl}Z5cg`OXj1AN&nPI6
+j<!VZb9]V<Ycrt}=2KxljUNB[P~H4nG17N^WS9LE/1URE
+}&^)%?92k64bWn}Dzlo>fW)pB/:=a`6lqZ;wq>I7"54hhGVgZhgjvn6ey
+=g`I<Wz8%%iDn"TWxhq>g!wR.rOwJRVl-@Ex]&<(GO.(`RW9U=cV.8p1QoHhk6cFdG[6MlCT<xb8bZ}"4r+-le?Owny35y+FA<pJy#oY?TJ&(M~AH?iNR3w53><&#Wi4Ed,J:$G`p5k@H;2/z!A18+xJsqXi.@J^*m&t
+#>X;$+`zET^?Z$q;*oMYvfPDL9P</YPTk~fPU%vLb>8kKddYYwj3#V+f(2d7d$;|hdsNdv(:ENQ~weT1qhcSM@,+0jD,W]>B-}dx`wS%ijJ06Ur1Ju$6IY)XDc2p.<MTwA';case"sl":return'*Zu;:h&D))Q,SY/8obP0+CJw3dzOPZDH&datbsj=w8Q"3X,"/1E,H$J,9Nuo,GT(SeOyLt$x:cr$y
 .hdbWCPl$psiJplGne4_
-bUf@auRbK&2u`M^OvT`cV.LWI.`XFmL{xO#cria<>Lrn9:x|Y_KGw_NuHPxbR}:S^Boqlrx<axe?<kw9s38YArw@C,;~u)$PhQtCy%V^JHD,:D7n!_Zv`2ra$BId55eJz%w0m^0y:cS(^LAQdVgtyeQp97C/b~t5aJjN":M0RkGqiyG-pKw6VvvIT/.:bJLXN2%z0cM4P$`apXjr/^NAAT35QMitr,@HBJ4/Bk>@
+bUf@auRbK&2u`M^OvT`cV.LWI.`XFmL{xO#cria<>Lrn9:x|Y_KowONuHPxbR}:S^Boqlrx<axe?<kw9s38YArw@C,;~u)$PhQtCy%V^JHD,:D7n!_Zv^<ra$BId55eJz%w0m^0y:cS(^LAYdJgtyeQp97C/b~t5aJikMKG^RkGqiyG-pKw6VvvIT/.:bJLXN2%z0cM4P$`apXjr/^NAAT35QMitr,@HBJ4/Bk>@
 41L(f7a-@Is=Z^o<<Bkn=vI81#wyQt(b{%yE;-C?+qIP+u[[|
 vlQ@8vH7yHa+F]*xS?S;Ro}H.JP"/3(LBErTcZL?I.AiNjF5R^
 l-aOd}h!TZDZKAd7cwj?b&kq8c"9ARi#Hj?NE#
-yQpqAt@#4+sHJrBDD-|aAetm@udN_+kgpBcldHE2vyt)6KhtQUFrF.|_yDCxfp)1j;=;/^p,0,#80s8*wt?/Wtz_@b
-j8C+;{$Ah*3ypB@EyIJ%?c?`6WxBIZPON6X3aZ8Xi6we:q7y/RdtDdRwS:vY5swQgo&w!^N2QzLXD$cpeH,i`cl+L%q;iZ,@70qJxlU)%w_|r-U75;#$oJK3:8RsqgBA$;f3f#z#Og[{yb$
-Ugw/-I[R/l8Xe6AViq9_/jHxxBGY6<_f]u=ts8EVq*^a&rM)Ku2~n;8cg,)Ec_T4dj?G<voG,[P5Z$rF!$iuiC,[()wVc?4Jkiu1M["H7"P,XYGQpjs4G$uOa@`Pu=OQT!OB#l_<=NS;UeCK1>u5qG.pAe>ON(F;s.x!`2h#-0@NWpcM5Ja01!K$U,qP66y7yC
-cO3&v&=k@G!*Ztb@l2D*fcK-qFQ(MD%$3B>V!rnY)XTT69xH;-=m[)mcRs.Nq
-GilNr_?6DQ$L+;l1E!c(p"m9?X"AG?qPh"1/z*/IXw
-wEb6_#M>oj(t7e4]Ge$r&5X.*bL#$A_pFdyqY#X^$BEE;D0XlS<T^QYF?NUCITvI/|pJ2}st7UC>Vrw1uZ.Q0-dA)khnKYH3@<Y?1!dQQ[7|hkL[vtM;`klUiDk&!b<oK3iRwB,a8~_Xw{EJ;J,y/qnGfVWcnfFR,[
-A"`_<o`"@Js(&48O=EE;_d+0@c4&t_tC2@3ki-^d596#!:+wCY&qTa6v;R
-q`M$[>d?c`.YfMW:q.n(EiIB$
-]in:$z&i]k"R,CM##X(~!;uf(YZ]=b4))
-fki@[_B}njM7!<]|=?Ntu>1G
-`,|UcoC=qg@H]%!q"pIt1jF6!iV)S=O9a!QNj-PywtqAe#H-L$3:R[q#SeMBe9y]]]49m9`d3R4j|BmbP`"dODPy3s1<Q"=g*/j]7`*;:Nu8$Wq*=6o4<J&OM`xa)5-.`,x[!aPc-aPJZxl)]ck$OT>5Kqq-XlKhtC^.7qH(t9MJZINRmS{AN,B,JB|x)lS]w8nx8L{Nhyf6(n-0i1jbZuJ*EBCi+/>[<BwEO;pYdiZ-k5hlbD+JGB0PAsn2|Uvd@lM*Jf/e3E1[dV0x0g`Mz^cGx)X)^)
-F1&JcaK."I$;$igRqP`O-hfxxs+D)WE=>0Y$RG_M5Q`tpC)roRW>e-WX7Xj}ZnS.KX[WP.FcsER;[ZX8N)gLh%NaRJQ(be$LxOebwYTnc--,dn-vo8g2i{BK$*JZBcQ%f
-Oto:htiJ0E=K*Z4IOy0B!u%0L8qE
-d21.e>R(6gF`8FhA&aiI0hgp==y/5NI"hA(_p7#HD6t^S$iKB9nHw5zWsj[0vxY+BH&RII9wa-Y5.L?WmxhnvEc"g#zC,+5)fn=IIwoO"^s1hH
->iKP9k[l[PP`8@)VU|I}
-ZKp3Y,"SyJTEpXr6!NhdPh_tCW[W@q3J:,z9t>LS,
-Z=0x^RMpb!+Q>bKT#uM"lq1U9$+IXdE-nypB^1kC443A+uy3K?pRr"9>d?eGwJZctaCa`x=&I?l2avU[:dABCeyp_%8]NK4";N)y@SKWW6%;`axjqk;<ty[1?
-3$G@!qEt<#2g7EOQ/N8opu0fjW)4fUc47n[paqLyq0}"[KO3vI!ER<>_fK]wRZA*8$D":rG]
-5R9?N<$[^:%Nt39~^rE(tE#15GEJaMTG/LGPexqi!1)<i!M.eR!h6J6}N^.tl"gmGoE%6{DU[02
-ofh&VCr-E$;Ok,0^yZSiI$15I&K#d_kzfG(3UPa8EppNnn!@ZyK*NW.yl!Ypl7:Z.O4PkTATc_y.F`#V,OD}&hY|/rBs$aBt5w<mYm(w[xZ.mrhFK">6cJ.2*0y`Gr2HaNcm(-[pG;f[NW9=DlG65-lvh6@wD,`]/i$<we-}438|%by)O!,
-e$4x5D=p5iI7-@]dT;nT7b^y=f0OB=<fN9&yBnvQFfiWnJl8:2rb)J+2IaD+l,fC1gRAM.<9z(FR5:B6/uJ1ivm7JsOaO>A0%p0u1`otCLK5@onMDgU`nD4,y|goPwN~a^L6DGyI7P.EcP7Op+EG_rWK[KZLQdHI`c
-Oe&(mUv:P>m1[$
-PXq89H9[eRG;tPEw;_&r;&cy["=J[U;$2H+-q^2zHWHIdI;]G6e@u-_?hpR3X@/nD|qRV^UBB64|sg_7>xe6f|,>6l]n2eq%lH-7bT`Z-1=e]zxp+"C|/|8R/RY@[GX.iyy~Y>4(bLZEv^yYwg-+9&Bk^f&#L:g{]u.?ogBopj1~
-cxU7;?46"DUZl!+T)jwH(B,DAC|vQJvvZflK7ih^Lt+[N(=Z)D~XH-U])VRH+Edjq;C1(y"0Gh";!E`G(jD4QmL0&fXnTa8fO]Q-}e0-FXaDH;dKe#kM0V#-|C?"V4L(b_4`.5aA<S1q-v<;QDS.C$)Z)LWn?SD)zmGkPE^-lVU[V98mQEZZhkmNHLavcO#,{5w!g5T
-X^u5?D_f0NU3Bo1C|Hu]1+~HFDSHqgT@6nG9Keb
-<+,p%o:B6c:275@oU4|S9yyoW1I#JMU8P9Su&YJ=0SnI*-X/gL[F]<88MmES?f$<1/v
-urk?%
-jw,I9jum>Vd1oFIFR>(p;$mkz12wBb
-P2QJG[Rq[=j}ZF(=V(T1?:uOF_/Pr!;yMc6
-+1Fv)zjpp33RZP5#`b;(^1+n)78-x6#;U?4Z]&<ux^1T!5Fqt81h,#2=Y@T>OqKvz"*:';case"fi":return'(X/;;5LWR/#t?Sk#eJ~ZA"oY8cb#<FeI%aL8ND*U[Oq4@[/=]-v/lbU*EBqAjqsn~.Uf,%=*_>cd4J{8m<4e13
+yQpqAt@#4+sHJrBD>Z#aAlijWudN_+kgpBcldHE2vyt)6KhtQUFrF.|_yDCxfp)1j;=;/^p,0,#80s8*wt?/Wtz_@b
+j8C+;{$Ah*3ypB@EyIJ%?c?`6WxBIZPON6X3aZ8Xi6we:q7y/RdtDdRwS:vY5swQgo&w!^N30w6VD$cpeH,i`cl+L%q;iZ,@70qJxlU)%w_|r-k8l@#$oJK3:8RsqgBA$;f3f#z#Og[{yb$
+Ugw/-C[P/l8Xe6AViq9_/jHxxBGY6<_f]u=ts8EVq*^a&rM)Ku2~n;8cg,)Ec_T4dj?G<voG,[P5Z$rF!$iuiC,[()wVc?4Jkiu1M["H7"P,XYGQpjs4G$uOa@`Pu=OQT!OB#l_<=NS;UeCK1>u5qG.pAe>ON(F;s.x!`2h#-0@NWpcM5Ja01!K$U,qP66y7yC
+cO3&J&=k?&$*Ztb@l2D*fcK-qFQ(MD%$3B>V!rnY)XTT69xH;-=m[)mR{O+^^Ts?y@LDobHgIfH9Oq~iuF:3Hs#
+4bA:;R|%=%._vH7*j0,"@-gW1h-_nxus7q9x30)N&Qo0Ab4Oa%1Jcilh`,bS$a^y1KJ$tATO6.40Kk+KG[oQnkoF0x;4Fb/R<#ta
+xAWcCxi2m_>#U"9LMR(^E<6MJ]SUw-#kF#/W58tSm|w+a{G(xoDnonfWfZd!o6Wei9"?DAxa3lb~Q;K#COD
+yHCEK+/S@5"1t89BlD62g#!$e9.3-Qdyy#F%=B8b:@APqV()Pyby"I.(MtX{yzmV_Dgfv"Xc>NHbugTrFuf[IBnW_(*mV9?l/E$X[NfF"LyhZ:9pb-&b@QT/I0lEVU%}bXt-Id7zqq7q*s)WSHfwg2]{@EYSPFpF8797Hu0$w5D5uTjFL)iU?CEgN@-#
+WY4SOtp+{&0-pE2e30D.]$j,SGf]=3v:4:LC,N(vxBoamU5u_!"63jr+S"^T,o4C-Fr_`"AN!*
+=YK_E3udF7GzH8Ht=KMl<!HW;bK`svr$0Ye!$7]?!twFeFY>Wa)1=4hf;YNCGakF+vY{[J7q"._nvYYLpTSZucwxDIv]vS
+[E%WPE
+q-HhaC+uG^;kMen`Ub#<pR<@TW^Z:@uSb?<SlSDM!.P]^`-CRFq@:y=B27vwk;q]DBxf-&1Q+mkclaE3u]/+!wSy_|fq<n9RXyaQ4*1On*[cz%%3K%u(F?FL2#fa5&XK5)B-Y.!*,RvU<w&8k(xM)Jib%z#PTwXd"[*s(HKC7NuRYVwtDUZ&=e$$9ldG38q7f@Guo)ch2{ROgpdHX%dNBucE>6F1
+pTdCmjI5kt%GkC#%3[)E1I^]lkQU*xxpGWFfPoq8<#+.P_LqUL!n&M4>pSj2`f|Z(h15@[;A4vx/1n+,.v%L@D,H;v-%(wJYGf^$2%mhB9wA~ampzFjZI[PP`8@)VU|J(;WKp3Y,"SyJTEpXr6!NhdPh_tCW[W@q3J:,z.3=eSL[o=0x^RMpbM]@kWJ=~uM"lq1U9$(CcoO2wxX^D$$3<m(
+vJ1*Y1j:6"#
+G0z7c6>MvmeVQy]8JvZfqL}gDI}K506b&doH:B?d-m#7oIsZgS(jKtFDevEjc7v%-%SRik[lic~",FWW:"f2O`}h=JYEE+mYY1ZxYwvKrM}%_=b<4A_AkVup!
+knF.LEhO|"YCJkhCOS*dD.+d_l9O9h*j!sT*hL;C@&q*Qs|[@gIgxuf*lR+9ouq*d2{j~ho!4q}KHUS_PmZVlR9@cCVhfVKHpq@FTlN3Q`?gu^Fon*E9)XOXAbovUCW"qD}JY@=2bd##0r%m^C@g<v7YEGm=f
+0;{`IncH*nkm7"6:]mP95^l;o*6<d@0X>)D/jU>rTY46@u?]l>dHM;%$#nxB/;jcFs/9MK~m%T+DT:wVi,aR^cQ_Ykgk5+];M#:MT$~RXSs%`M{^gP#=Y)Q!/Iv:4,0*=G]D`MvS-1;jlh$l,j!-7mTl;B"jQ_y/Z4Viy0b#iq4?3VTf)3j&,6@mmuiL^)H7:j!g
+#lvEvo*qCK2m?m8uA::v@Zmkn44fu,w0n6K,r[4sINcEimt!fEV]z&P_;,y{hgw`d_20:H
+G0,TKB?GjowuqZ`Ggj#U4iB"_0F5M!y?}]DmCd"V_+-NWIAG-
+=9@rL>CjwP@Kpd2)7h/J"jF#(ItLl[~(Bu[CTgZ;<66[904?f,=6J]IOh^p_HQ~!D
+~gUat[.%pH0YUQ2T~
+A7l$:@qQ[mn%E:nG![ObmcBlA^**/>/xDz#GB(8CL[alH/#c2pq:M(pto/_uj5"kFy/Xa/vX&3;jk$ThKrPa!2!31_$x]WKMap;1.FVV9MkjjQ3kL(O!3(M?L<;5&TtspZU)SyTU8q&.S3s_4r7%gtLU(G%H;A[oyk,"OCWihf]_9.qbvNy7Uh&T"Sa"<+7&elMgZ,S1Uf]IvL+-E_NT6v-YvLWn?SD)zmGkPE^-lUrZ398mQEZZhkmNHLavcO#,{5w!g5T
+X^u5?D_f0NU3Bo1C|Hu]1+~HFDSHs
+Rl:nG9Keb
+<+,x=hEB6`A2!4}oU4|S9yyoW1I#JMU8P9Qj%YJ=0SnI*-X/gL[F]$p8MmES7eq<1[yQt[F93
+jviHVjum>Vd1oFIFR&`p;$mkz12wBb
+P2QJG[Rq[9T{ZF(=V(T-?2uOF_/Pr!0x7a6
++1Fv)zjpp33RZP5#`b;(^1+n).d1x6#;U>]u]&<ux^1RykFqt81h,#2=Y@T>NNI0z"*:';case"fi":return'#X/;;5LWR/#t?Sk#eJ~ZA"oY8cb#<FeI%aL8ND*U[Oq4@[/=]-v/lbU*EBqAjqsn~.Uf,%=*_>cd4J{8m<4e13
 e|Iznqs0Wml:xskg^ia}e7iA!qA(NI-7WMC-H@
 NXyk=nxqN2<rq4^9Fioqj]Lcf-p+wh0
-GFp7i44LRCkfcK#H7rs);F6q<^tY6lOT>wxZ{Gem(xwlOyTSl4Wn{Z)hrJkxcx_vZn<vbwblbFkCD-!fU=~iY1
-2UBQFLb&Di)-p}fNV<F_NRu3jKPMAg-bE7o;?y$R"(X>S7g*49X%YPy9=.5GmM+-4g^0$#i[gNWD8z3:*)6lcy0*BwCX@q9=FpHPNDAy5}H,LCQFvw+|/!rE,EUp%01nvZEviz:4%5QpV.qc5V*d8aKl1K6}LAK0".X?(l%*TI9tdgGxI[^6sU@_aFj[uXX0ad->B{7QxK5RZT_{tg#2Z]se2CK=.DnPkxQGoq<{Rg1QMUXB!Rsq6N"2eIS<#2=P@ssk/U"
-i|G^]T.!88X-qZ%C#6OqssRUxixAX8Z%nnk^jaZ5"eik]JWu-Pr.<_;1=hd@*si#!m++P8D0:[jaGee:ol)z<4amj7"f7eDp({"sDjJg^1)-ug,rh}`#*g<yP;GB5$eKEl<qk66mK0I}6
+GFp7i44LRCkfcK#H7rsr6;5q<^tY6lOT>wxZ{Gem(xwlOyT^m$!n{Z)hrJkxcx_vZn<vbwblb?6CD-!fU=~iY1
+2UBQFLb&Di)-p}fNV<F_Ous-jKPMAg-bE7o;?y$R"(X>S7g*49X%Zsw3=.5GLIx44g^0$#i[gNWD8t_>*)6lcy0*BwCX@q9=FpHPNDAy5}H,LCQFvw+|/!rE,EUp%01nvZEviz:T$bQeV.qc5V*d8aKl1K6}LAK0".X?(l%*TM9ndgGxI[^6sU@_aFj[uXX0ad-;X}7QxK5RZT_{tg#2Z]se2CK=.DnPkxQGoq<{Rg1QMUXB!Rsq6N"2eIS<#&=M@rGg/U"
+i|G^]T.!88X-qZ%C#6OqssRUxixAX8Z%nnk^jaZ5"eik]JWu-Pr.<_;1=hd@*si#!m++P8D0:[jaGee:ol)z<4amj7"f7eDp({"sDjJg^1)-ug,rh}`#*g<yP;GAPUeKEl<qk66mK0I}6
 @_:NNu[Hj%)8dI1q3JXd;3"gZ"T}b)pn/Dh*4i+Y)C._:GPY1?3e,jL;a<=+5f.NsTLi^|*.*un86S501~e:[6#|DfO+RIr[m@rjHLT^//0FH};s&F8v.M-fV-d/+o08<_.Nx#W8i&*W9B-XP#qH+9$S-B$SfmlH*R2.yT!}n6JyC[F.C%@uo+JaWOAn@_QnSEMyc
 _maGN3Rq4Oh~FMKM-7j&V$@
 YT$aOT6BnUcPrllZ^Sy9N("RY1>%A&+lvenF0e!A^.(g4(TaGWXf<ji;StWbr#2aLIno
-tMzo`FTt8*Jj6U,kd+8!J#Fu_7OK6[Vz#C]<EIT*xObtx0D=E%a+N9;uy9;O/$`X-67Vq^CCF&-r"?5Epyc-Zn*mEw9PtI<%/ro+w2eAhNHcZ1$m_!@=U=eQ&oZR0xlu+j:sh$rDh%&x,[Lo8%*$xyW?J&?d(<j&)OLZ2qI!47,Y*M"AY5x4^/Jo&?wVzIm9d]9rxp=dv>)HKjXF<VMKI01W{-FR08T"S@#1_:>SY%684q~p=e&*z`Z!BJORR"d!3,yIY&BOpx91
-P2o:"dt6IFn<Rxd6%<3%h$I5UPCu&:DixG7/O}e{0z@I(AH>e
-m&:JXJ
-/9QKAL8@j8bgO$UQH)qLXX!,W)5rUuX-;OD$EODHJ&?PxHz86C#w!xAOBa"?2W5ce%99+RH-
-f*bNvSK9O1^Ky
-XuBK_YVlY2Y=[8u,0v.uF|CJh`9mVDxyI)r4`^N4dFU_z(y1P!#>L0q["],F@-088exyK8Q8e*.rp,2S$+XHc8(?[Aen;&bw%{sk3]q2*0!U3HaRK<p;mj/MO=NV#.D#9z)2<D`*tOA1T<e]dUNzHG@H=g,>/]GXg].F85Yl_7)U-v-wZ:OuRT$XyUYt7^>tuS&ZCq4
-sq.ra#Xa^s-C>[a?jy8oOlLp:Qm~I[-sh8.r>7`f)Na{O%=_O@/t"J*`+=Lqxw*B7Mofsx8t8(H
-AwK`gh]xG=@suXX-aa3gitVP;MLxNwV~`Cz(5tQt]yJ7#eH2HQv
-b"<KO+vLMf9Bq1E-&P80h41w?YB^39dCn0dTK=si7dXpg"sGS-EfNHWQaX+?;)%dL]`+:u@|;`5xd9q}fL!`N0Q}3,ZZ2~K^%(Rv3B1ML<!T4zP)By^JN@X"3UJc,3XLu`#,OMiSA!pF2l2v)x9~;+%:6FseglMr)+Og9$r|-i[0KrVVMUno97v|oUv58kFsp)g8jVuyu$n>p~DD-1-YX2rDqA-[aM`n"K58q+wP)Zt=VYDSYo5t3<",;7Ki381v+7xQFIa#g}pR
-$mY!Sl2CE58Q`#4iN?B
-NS^0#NJ!fWfqyR&2E*wRTbmT~[t*nT63h6q9%B6:.2Ge<CWDZHQ.%Gq0luf1A1HQzBJRTW
-E!Ze0^:Jp+bEC$.o[zJ(_:<I`HF*[(F4o3$TP8RYNi!`b0k[DwJ=]9xsO[ZLilC?Y6$r*doY8"MIS~[U>]"MK`2:!5,eA`K,-)pYrB?5^l29-zZ
-5N7s?;xH$l/m%iD:?>x<LQ7WA)CU[<W-Fn^!br-*pQiq+O+nM~xu7Gpr<@jm^[->PptF8<E|(6uFY}Z>:<m+/M3?j~gju%61^i6a3geRUxK_c)>j&
-E%[f/vp6gJmk@_gSo_NGFe)f=z2g?eiU`LDa"m;y!VoO&1WAPKAVf4;?Xki};.:=L*shUqh>9t%h+@pj3[agC7FMiGU#Ow?WjgI@.b%o*--$H_1;;|:AZGte*bRL;Tb*-OC.cyn
-F&PLk~L
-S/,VgPF.f;iyZYB+)>7f$DZx>)Cw`LRnkY[,Ko-bg|/
-=T^Lq(fConh2Hx%%k]4Fl#_voT9C7Y94gE2VA?Of`>cH4X]#v*&IEQmw`ogR>N0RJpeHgY2fZa-+&qo-utt
-m^xR!mZ$h&Q%5M,xud`S2>ka>RAKf%ajeH=uh%g*=2#ZUFr!r}?jinNh_!n`,@j(G6.#)WoH[To4?lj(ksAPyLmrKw5kPv
-;<aX2U
-U7@:<-Y9^}sqEJ/~.:aT""g-*65x*1Rdy&efiDsNXFq#I;KaHaw@#
-vgc=LOv7"F%`b]eYRI%Ukf.pFX)fPv+T_%^,>TeW^2PLh[o""[>>&{XLw=Z/sRE737!$>@`}RUnOog>.S"%Qj(Y~Fb@+l.X+s,lzYU]eeI;8nFN}IaR(i9m&B@C!7z*%J8ftf7E",uAFaXsGpo1"I1%^mJ4dN>1dOog0`TDcE.Td3I,>!pVN"x9->|q04Y443zBR1`6.;Y`(DM.I.QR;Ey`=O"+Gen$z-}3zb_UB<2u641OQ>CP{
-B*^3QdA`rx37`A+Y|D}TLF=R]loJ7(ImYcc&(q(JHRBI&62N^"ZvXB}8K1)CuTv^aCm%y5T]4mvyr9=>Zn^;lfNHx4^tg6;-^BL5n:g07*_3QMi
-
-QW?E$hFJm8dyrMn$;i.P4mkhgEo$x!&g-w8xqk^?N6@Jv[$>/@i]=;9PG=iC8TAMkkZ][c=c&".aBoQ*15oC4ZjbM.;;(&!:g
-[#+NOV`?<.$(';case"sv":return'.Zu;:bSZ+$#!:frO-4z>6_RO_Gqu,]96,f1nEGAjX(]
-
-_=^Vsk;/b*%HS,l_"0t|/b2?@*qAD":.dIO5
-CM4cokRL?wwbN5B?y0{O"21)stnc?eRmP[Fi]]@H5i~;WcH#1BYe3;i2yuhxPO"xP^<2-skF)YvO3M"IY7m(lB3ofTrgWl@LKMsf~!0I{ld,n2+f;5
-V+G]ZRTkgAR$^(t^AAs,z)sjjUV4t_JtwVyE+`]jDF2B[S
-W25A(gOvFb-.B_vqdA>l$g]i~q{lw?qLDrw1@>c]yGVM9G%LTJc"Q;GY]wx`l)%bp*j`#R7d_W~7e@/Y.yxLsfVp%6EtR,I3PwXAZ%71(Kt$i^T62bI,3sVSWTIa{v%knn@;~`CbvMDn-(-D7K5.Jab)bG"Ei-)`OGcaZ?u`SrtW[w
-BYa&,=+Y>8lenF)_Y+74TOI(AaJRv!&J9r<@?DwA4W5>v/Q4]uz)S}&EuDO2p%-Fh{)ywI9OKQti1HZ/sK.ku0Z2q*>>OXs&Dc,YgRm8%gCS%:;cV$gWwyh=Vn887(r`D8RoYjMH#I.6X&IR]>l1Y]=qRqr]Iryh:Eo=)LNa->aRfN1[]o7y"%(&({YJ2J=RFt$_AMVY(,e|Q#[JOtIuMd#D>p9kaFi
-5iu!/HWSGP[bZ;LbRVH{[~eYq$y+__lx/pTlC![^lED=y2FYY
-)P.vRAFa?@U|g3mnvn<UpTq%`u<nCW*#oRl3+:kv@@?~]b%gflHqI/M-KkdnHEb.*85f+>42WP&]w?q*C`GxG"DA-mQ)c{m~LF6-5mj}RL2lpt]ux;)i%)>a(!d=hk2M@"p#4aSq3f6MQf_i+?ma!tGX+<6:;,]#w`fm/[i;Y(HTOfMlHgyZd^mvyDIX/KW&`$F*w$,3"PgO4=l-k|Gn/WdY*ny{v+Eogl/lYVcYR7h;*nef
-"x-!`o0JH
-Gk9>-M9Nl/a[A?P6.2e-R.
-?3h{sT.l`7ok81RlQyW0tH-k:6k7t^/+9|f*MD6[1o80VQb&h=b/n|tuLv8*Mmh(^6V;sa1YU]%Qe@V7uPN$q/2{pM+0o$nuYtW[]^M1nucb5h:aUMie?Te+D|U-7T?)B{ykSv8FT&nFJse"9j87nhF(IcC&NTA:`L8E-HRUmgc3Vdl?tsw^/XFfkZ9HP]olS`/H?F/BL>d*u7dw]afZkJIR86GqoXN<RL)/dfW*YkGEJx%!g>G%Xw"9;S9wox_AW`s,8+i:UogT5%fS79:=7TvR3E.>d60eGox8whyRo(<+a{diFY=@`vS9T-7^"YU47z!@g{@3b3J|0D!utfsK%9(TkSe!Hf4TBbM4=dL_64ezE6Wu]CpMDwR<g4JQ=)h=Ig,zd|PUNjlb$*XMB1J_Pq^_?"ZR7iBy8bp7Cf8_E}*i1S
-y.@@7F7jhF.jptq2cn>pzCfQ+w)%.!m_]Zb8^(7gi&9@=4X4s)l@<6CO"o8@+`rO[ZwS4gwCx/p5xY{Z4RU7bBTxZ"2iF5_o+cx6#^#pz&F]4ZzD)<qfqbi(w
-icRp>%[1z*>qg3mA5"GUG"Q7IH{*k)_:4`hDN"4)T=V$p3)NLOF;W@0^h++o<CrTmr@,4a7H(CgaE)zR-Jd=Nu!pl-bWla=@35%pIav2=x_g.r:
-Ri
-nK1@E"jR/m1OfYi:QMQENYLs8/6d`ovn(v9kJVX06h:B"rf!w2DqZ(KcIKf~t(@?a=)`"4^b<U9,in;Mk~_%3krs
-&uwpN(]
-o[oR)2#`_<lv=jc
-05OE..t#@eTkbQJDs`B2<y
-D%N&v|Gne3uD48IquHQ]w.-DVj2u0R&k7:YcPtQ7gkIpb&nhy%+?+$5LA6j;JKH*]^N&LI1c]@qVEP[,ne>.qWrY*~
-xC$$l3<sz`WvE9`,Y0U0-KcN!B2esogVRvlq_QW<&gUkbs}*f?niKb$y<2rfYjl8H%YNS1(JZ+1qNF#g{4iLBS7IB=0"h[5yn)7g^v0d%Phdj=`_{S;Rl$oQ=2u2oI*jR>S%>!T-/=G0d+f@TN*Sza$1lqc.F`w_%O&?*([CWlBa($J]DNbXgg7jrseUoq*fg:uN3P/W*eL-_/|-[OKfN"QQsKm;;!9Sy(!?8I?vUU6k`p4&o:LU(4K
-u$`gE]aK95hFj!KXcw@V0Z2(+:hG3<MC|7pEhbqsau1d(#0Ic_eJmBDp@@)6r$]eI7PcVuy.gwkF"HHg;9b:f8x/p<h%?2Z%-+a=&T{rA)ZM3TeH]t7tNR`))&*TA^cjS%9h{tT^doT:
-azH"p]DQ+&SQt3v_OTiH`So#EO8BtTt:SFYOtG=RCi3#.Rd/t2:$QcQ8X&<4T@Gs#2xn>2@iCUj+Bh<7L.#oc9aW%@]iY7I<yS/*N(p2HtT~M3Rj#vUi.yYaRtD>U~9`$^lMj?#n$z*f(mO?YAPb5Xm]:+P
-io-cfg`H/TJvqCk?gxJHywWS8M"8n(Ye_Z]y@Tvy-dDFHGg=&vPNk#V(T!:oK?,yOJ7j9^TZ(IM?O;5Zg:XuZIcMTWS&5xXRL8kDW/arWECcU5[.#n*#BPZEDd$vIA<?7s&;QTt+2<=c$*?H$:COp71tDuVpeH!UjN^#vpLm&Iv@b~`E?=/=+]3U>1U`m(Yz`0QVgru%?{ym:{FXZ|4.+Ig])cLQ="V|.rDS&:E6Yq%Q.N6zWZ?_-^U>o)nJd<k0MM*=R;<Q0
-xKUD][C,YqQ1^+?ZI9D[l1<[7jwrpoat){4l-D^FY#7w@GtwE8vDTA>Zh(^FYU5k)J?M0hql
-.Q?3v,EQ..t(Ny_(w62Yg^yTN<&uF`(RCY8aoIo&Aq,oSB0!oOO;NLAp6s9L2on
-(8EpwT</YvSG7W$xwB;#>J}t#`kB8,e#KeC?;#p>S8o?8N&';case"vi":return'!X/<%]@Z[Efn]v,A--#6-2II*pY"c6>:}-un8SC!>;(@a`SI-kyI9,0RBE013!ae-9z)I<</fG($z#(gyTwx+y9EfXs1YUo^YTjp2^+B0]`x27?p!lyTg*+U=rIR0yNUC@{Q`T0r.uWXbrUHFEJdM@quaJa>K[Dg|LnckD&r<fjE>5Omz=P;rusL}JfD@skH69jhS4V1R;#:`-3XCH[2MVZ=[Ig72KZCc,,H.(@^q5+,!kFR8hsRgkRsEMBVxd&>OVVO$h`qWl<5lt7
-+)$ujkIpm07!@(7G{XzQ{M8[hd~/)v{C~xyLaWJXLY$2}&T5*CZ3fn0L$+anBgDQiBj,1V}=7HCkSHu[-`g">]ZrMOj0w"b8EY:GhYq<S_+<d<b^jHww/X{5(f%&lmmQ.SG%YH6RI=rrsW<a)z&)UJM5SozOMDqFe%+tSOhkAWHu#Clc>=I,T!ixSX2UZOax$4<`P^S,$V(r^34+J9uXh(`V{s?5cy%RZXLdesEDK:.rApHXe2t%<(GeMJs3BZ%7:TuJ
-L3EVadj0nWk>7Cv]J8MlpNiE)N*(Lo.Vx.h^tqPpe(VkM]#pC?4iDfgn<Oxtb9Jf8,/Gy4MtL/5dHRvhUxq~B*dS$cc/;8VA5N_U^t#eG0[^_k.9_6LuluLZ.$cl^q0)x*wCU~[FXvj?X*b+#%t{utv9$Nt%5i^:><+qT__f[ld$.6+<N?suY[:*(k97wNX;Ix^GSb9PA:0g_hyuS5<0g4/UCwoyp_yVAP$CNi
+tMzo`FSH3VNj6U,kd+8!J#Fu_7OK6[Vz#C]<EIT*xObtx0D=E%a+N9;uy9;O/$`X-67Vq^CCF&%E>f"Ij5>Zyg$.bErX`-^7&!3OYVRH_g>_V,42glJdK!(:_m_$V=XaUU2CVR0xla?k}t+/sDhbmx.[Lo)_6!tB"o++TN-mW*9${:;m7,zL?86x"a3M-"b="d"]p3mq[QK/vkjqR`8Z@nu[0>SHs@TBm5oAf*9#%O8^$L@R]-.(L2sr1fQP"3vH8+_s`(t%C,L2vq3*c%tvHAn&HdT#LnC.^.4+^NJp.D)V8pI0xen@U5{@BMP#.R2@P^p.d,UQ93{Rs6k@JQ#H]kM_=OSTvS0um@pyX0N#!0Ck(/#d
+:`&V$bn&*m(@ouSyl=t%vY$cGw
+C4DcE(PPB*gp?R+Jsr|tQ$9Bmy27cbuFO5X89dV<Gp.>~;{kydsW9Qi2_wiO/$-Le"?Ncxmz!xy&$$Zv?i/#;5G`^?%Olx>tO(GP&;mf.L"&56gJ@0#<YQUT-*d?zmOE;<72>-+DoHztWf?aO=,$n#&:=.|Qu0BVgF+nt`ADQwfW<#mnl^nYO6t=;i&Wy:k=vBMDD269set:K%d+;!2y$9aM=[j.vW9ecG:m_;lH-7TC_8d[8HU[hOb%Qr2
+_ay/1]TVF;epOhH0{Ip#}Z#$V=i"r3A4Xwdwg;]LyeFmiOiN.o;aouBUJ@Fn~_hq*61LdF3Yb2vTxwr$%3vF]z&JM)beWrL%KnBo$s2IwVu$-uWyMPch8h8*~N?V>Ao]3c=DQN]b7N~tYmKMJ7ZSxle,0iN#$4yI)`hT<)PK8F,Sm>vUAIrNIitRqCD"7,
+D7;.3MT:>1+epM=TtH8(hJ*5yecX#C>vh5@pL,NIqC&L(-"3FK!9l(h$,5,
+.>/%sX`o6KyC))+%&%]_S#*GvtCFx/Mh(7x_NYIT;,]JR#.hge^UdO5.UdS%O9PGJ5P;XL&`wIlX:0=TUnoeAnbh_hT&V^weh8"[-LDylNa[Fqsj[[xxgD^po|GI8/BKU;yy0PRa21@"[c8OYy#_d~t_YQ1?ySEb4"j$?:CsB6:.1<e"CWDZHQ-|G{0luf1A]K
+{BJRTW
+E!Ze0^:]p!bEC$.nEx4%oj]LMoDPX}`(Hy#79y$FNCeK^5amVIn2r37dr7
+0k,B"/|u?NpKY,}XUSWE%)0tfm+#o+W#^K)=Zg"V_KI?H6dQB;"qS&*tDV&7J%{%%e"V[UTMU+ySJP=WM/dqB+E$
+H4i@txAE[=Onn4yk;~a`O044h9:1nW3.Pr*~8Oc7g*]5Sh$8&gR<^)3KLfNz5?s1f}3.vSBJ^?*VODQ8l~gdHo^d4~)`u;PGZR+9.xkF]<B53a<Z,&oCO$eKqdx%DX3$k:^wW07ZTyX2ikn
+c1["
+rT#-z;eKDb{[w%!W.tt#qQ:U:Ze@NQ=0f#amG@>gd#$l5r1Iy#nO7UkHL$k*|
+=50W!-S4QC$3f9<uBg
+3H?%]5?/J=hm8c-MUGwQ
+=ZI#t0{B^Scuu
+@mds2Q9JOaXD$X--ea<R=[!rqaYl
+!!!lICR3$B.-GQ^GiGFf5]Nlwz`!]Woy?/FkUP^uCu$mFClA"/wB2qy84tw
+9^/~[)onRwPJ1MHAQz.v)n)l2}tRoF?a_ML&>-oMu&o>Fhi~3zo:]^a1O9`!QshJvV$or+aEj/vI`OU7c~JzntRv-e
+zugDs.{1S*9jQC*]lh#*q;Z=q14"*7G$!1~9DpH^=uAjmMjqO
+9+.n_&0MBoJwst607xJ"+(KGOT![RA1aS9q+*UKp.qHs?](OZ`?0s5t3[V<9M?+3fE]M25UKD0BxtNzp^]+Z:q_LOU%/
+dyOX]HW>&gvyf[uXJxVK^B^mW*vN:?k8Yt_w_Il!V@S3E)i~_JN
+BoPY?ts[8H`Dh0mqP@JslP,2%xCN3lhb,&*rpd&S/HN,EO"7Snk>
+B<`G
+&N?}6F;9>71Q*;Ka
+2o{FQ][-9=-^~bVQ&&kH+CNjj
+kh:CNY:D+x,ORRI/nGvyFfe?|${B/pi+(osvikDB!Jw^M8yr?B-p0(s=H"*"pc3P^jcgcU0.eR2nXdzcLF.B&w;id`54NuBY_,9GN_{=JKIjlS1j8;Wq8<G,YW2-u):(5*i?j"7xbk~Sl;7RiK/_>59Mse3<Eit5z0FC0
+R708[QD`-R,!S+H3otsqL_,=?xPT
+8y&U@7I;SvKCUKW;(BjD#aTvII0ARuCaR^nd';case"sv":return'.Zu;:bSZ+$#!:frO-4z>6_RO_GqHlva*aD4yb`dF5%?k#@^A_Je.WBf#cfXsdN)LrTtV4]*3^5`-e84f$k&c_n{Fh`JyBM9,#]##ze7l!O?KhncE.s[e9qr)]a0q"ZoBc(*2;pBDv*m;Cn89ny=Bt"}skF)YvO?M"I97m3mB3rOT2rX[mLKMsf~&~v"ld+s2+f;5
+V+G]ZRTkgAR$^(t^AAh+z)sjjUV4t_JtwVyE,#]jMA2B[S
+W25A(gOvFb-.B_vqdA>l$g]inqslw?qLF8>Sl+dhBYF`qJg`nsVT`&*EE`zoGW5<kHl$(n$3,,_J.xy:9NUXMxrB%Z/t77E)f;|uLG^Dp`}oeooa:Fpb~Hb4.=b<6fiivm*K$/8U9d{x{4$=9R?i=NxpxI#Gv,|SbkzUasaW[qJ]}%6w/xRbtM7HAC(C<lT9jO9kk8AP9KKizS}0}U(-r>$YGfloXjOo@b]^F:JInr6%21!OWb>&Wr4x=jOe/HrU/_1`1g!R]S==5I&b)T4;x.MFZ0}Pd9x/BB]5Tr52`?`$XAn_"Rd:hOUaC2eQQ?.h"_87KS.OC!O_ftCwE+,_9A5$DTXo8bvc8_yS7"nPQCBN2yt/e[U7WP`:b]u/uOn5!0!nyxlX^S+2G"PVffz
+u3r]dR.VtS&pV5,U3]yT3[Cvp16EM-1!&N1,oHkR)?N`JOm4xXGI$Yq>46yEutg
+]5QShX]nM4yQWB9vAAks$9)DybdcA
+S-"gFP5s]qJr!]yrR=Mu!]Gr{HPvZ5?*!f[^rH9S6QYpBx<uG<FpH[`@J3=ZAU>3Pm3BJD)JB9vYn6<cbAvQ+*@IniC<f3T=#HwDAO.X#GM&#34V7p~QMs~Nu8&8;)P7;r>xKeHX+KWJb8kJ=$yjw`wLTn<0QhzS{$!Wr
+CbHa8GzEI%)hkn+[HdV[E9$1"Hz5Y=U1UE@9^ibZC$&
+UMAYIhovU(*XI4:]Lk$O!]$/2Z`>0*6U%jiQ
+8Z5%1E;PbbRC+$>ad@v!+t5,wE:Ngl"j-o*ZKJjdwxPgvRe~b(`BLD
+SFovb
+"C[,$[:V)yz6^Q^o1rp#Sxb)CcbFhr|xcueR,7>^LO;Z(+X&XZ[`.bexslxR<XhR$t[dN,90i#XY:j=Z-&z=efL]u1`"eF<dJ#9g?d&baqX6Y@"^>.U6e"_p%55[V4{qe#,iE(pFd6L[WV(4+H[;q#|DXPb$b>s!rK`K-@":uB.x,P28`0k>q"jne,>%J5Gpn?req5e,b)
+v=1@b!+c#Cf8H+vMgOuiz$B_=O*E_SWJcZwUR_u#&j[8xl6XBUc2k,b3@
+Q_N]E!=N*ay7)@9b)ywdh6R=B[vT1*uGpsDO-$qlp2;(0G4NFXWarD.Bb>"B;^^Zos;i!}9tNp_B=Tb,xL!hA>!
+&y9ZKv09<x.XY.;
++@BHWXfBU)s<<+)O:7%O=+$HS{/a2-St?Y8|eTHU`t`fN+ll*$#?a|Ic4./jTzB5UDC`g>)R"yG*V@x{Ao6$LYg@g%x}[NMr
+PE2DU]6"VIe85rKY4?dufWm9NIOYR5{ZlvN%w0l(lt{
+Hda4&(Ia"YO$Z]]NB8{&85q*dTR^(P
+_l&HTV&[;}sbcEJ}Hid8a{@K*&xxc$ZOXGxUM!Mvy@avt5nCDFd$^!VJoVA>p^g/8d11NhlMx&u7WImK%Wg%#v=@KL:m8HyV?sk0plC%
+L<KMY)1XiS|<
+N>F)30M$D`!{#iTP7^%oN/Hokp.2_Ks%b1d944]-dZZ=rMC]nUi4$!SYFdQ@GQ8<9yp$^}JR3d51
+W`LIquHQ]v%9*!}E1?%&&D{9@*K(E`Np>;&]xb^4<4&^ux;j%JKF$
+pN+bJ1c]@qVEP[,ne>57prY*~
+xC$$l3<sz]nvE9`,Y0O0+KcY,B9eppE2{sBnY)!V#U$]>xt3M1ZXWvcbDGBRi[MP4U("|?KrZ7)hRu*TFsgo.,,ZYX>#oRE6+
+aObrsMv!JOmYBG6(a%T(ATLCl42e2Zu/!(T-fN=t@?I*P`M"%-jG;?di@;.<cEDeu;/.Tp9QSG#1p@OO21vTEqhjZ1hs,R$Sl!l]:4+Ok8D=q98Ppk^rq)_u
+TT,Q-k.,
+Lp_o00C]Zq?*<!&5SF5?c!BO2L<rJtbf(,u7@qn27E?.4!=lFW[Oo7pEhbqsau1d(O3_e^jJmBDp@>36r$]eFMRcVuw.eKgF"HHg;9b:f8x/p<`%52Z%-,D<#T{rA)ZM3TeH
+tGK8?n%T9}8I02r:N=qbqm@C2oZCB?U2I?39X*flK"u
+dmfjnatW.8-jAV7v."@I7|jid8&9Q=OIu1S}Y|.%cjY(5q)0NAH4TGk`824d*7U{BU^~
+=1}+*F;qw)!Iz%?E+K=Ua($SM)NN4"}VtT{8^iEe#E=Pzj_c-"35[9<Nm2`UNKZe.AB9_^t0M$1Vm/<PGt/U5VbJxt/,v#0frd*eAl![35sgl/BD0GDgML%NY)3WIjY=X>Vcfd7=jv[
+2jG9q=FVMZmV_3t_Hl?)b3325*ftKR]@TiI5Q:Guc
+d$lXs?UuA3~2Vu"Z>O?.~wi?v2`#f%Z[W^[-FS7b@k7FM/o={??<-7F$ejSBp6BQVUE<|"R0qO,r4>+m0749{xz0m/g2:J+?uW&1UCKg!:&[d&@QbP1f62vjG7%!UMM8X0?SbUn^~7aG[;NR}!B[=aOU3)6iKK%*<kbI|;70dj&5#0Tc<+qc$yXXNmV!{>"eE;k!P-gavbCvpg9
+Dpv:`;N,@CxYb4B8arYom#fP];Sh?pR_oP
+i,[|sUe
+U8blJ<-WEwGeX2#(wPVTS>$Cu*U+(
+;(cf7MY.rx-+Ib.g*t5hWV]#LDV*;lmcgrtK@2WY85Y<r{N8k2>HvAwAN&';case"vi":return'"X/<%]@Z[Efn]v,A--#6-2II*pY"c6>:}-un8SC!>;(@a`SI-kyI9,0RBE013!ae-9z)I<</fG($z#(gyTwx+y9EfXs1YUo^YTjp2^+B0]`x27?p!lyTg*+U=rIR0yNUC@{Q`T0r.uWXbgT:
+EJdM@quaJ`>JEBg|LnckD&r<fjE>5Omz=P;rusL}JfD@skH69jhS4V1R;#:`-3XCH[2MVZ=[Ig72KZCc,,H.(@^q5+,!kFR8hsRgkRsEMBVxd&>OVVO$h`qWl<5lt7
++?&TgkIpw
+9!@(7G{XzQ{M8[hd~/)v{C~xyLaWJXLY$2}&T5*CZ3fn0L$+anBgDQiBj,1V}=7HCkSHu[-`g">]ZrMOj0w"b8EY:GhYq<S_+<d<b^jHww/X{5(f%&lmmQ.SG%YH6RI=rrsW<a)z&)UJM5SozOMDqFe%+tSOhkAWHu#Clc>=I,T!ixSX2UZOax$4<`P^S,$V(r^34+J9uXh(`V{s?5cy%RZXLdesEDK:.rApHXe2t%<(GeMJs3BZ%7:TuJ
+L3EVadj0nWk>7Cv]J8MlpNiE)N*(Lo.Vx.h^tqPpe(VkM]#pC?4iDfgn<Oxtb9Jf8,/Gy4MtL/5dHRvhUxq~B*d3$;c/;8VA5N_U^t#eG0[^_k.9_6LuluLZ.$cl^q0)x*wCU~[FXvj?X*b+#%t{utv9$Nt%5i^:><+qT__f[ld$.6+<N?suY[:*(k97wNX;Ix^GSb9PA:0g_hyuS5<0g4/UCwoyp_yVAP$CNi
 ,t
 H=!(7a[[4v9d94pC!Trah[yFMUr$7)A/;BJkz&]E?_RJvEW7p,Z3?jA>UQeS:Z"7?
 ,k5,JAZHpgeDcvEw9>a_s7"~:RL9d("}Y|d>m#u24pq|s27#QBt:pS[(x1*N>1o[""]>7*uy)x,]iv.7a
 u<C]09/gXf9dKgPsEgMfe</M"VcQC|$D!z&J0T@$
-&dVw{i3C1IGR"9!6VlRJb$R^M0+)GC7NYqW_35D+e3*SHsf(wPuVAWJb4/!MV;+J]x_D}$EP2PqN:GGsws0l=o96d5vY&vfp-rR=*62;DKfN_"cJEtKGBu0(?#.Y`h%ae&?*3R8HYBvge7|q5Mr-*R#T~^]tK(|KkSd3S3;W{/VHDZ7_Qj/dW3eho-pN
-Z^oy]rXcrxuOTXkKB1bwl*N0nb5z3n"tf$ZK!mALwt"@yR+dT+nhJf!v)5DL>y7Dl|Smcm1e^;$NC&E6K[E7YGwC(8.!l4nL[k9zOojmlrFGAx+?Mw&VQW*STJ6&BUfb`L,h+4K^n!OJMpCLtRMH+_djS8FPwMRe@M#uXgRI*52Tl|s-e]d=hjtG?>Q-$X5w,]qF[}=dC9Viz#/GcHf_[jy`ffBhX9?-[q(x"Ul`Ur3|FAuMA!`{k=[g@jAcjdbmL9Ts0Ed+#oF$7rpgA,$xOt[lx:^EeAYJ0^ZsQ[EPH2EW6]k>l1q|@0j>8~
-8f$cHP0WU#Q[f6`YiDU2oXr_p&kvc`i7w[uL|s
-d&r6)c<MXCAj_1m.nr[M+eaS5w-?,V6#HPvoh$?~0zCLD
-+y%Ha#blTCyV
-Q)8*o<.y*Tif422UE>5=9FKB9L+Nog6dsh~ClD#)
-*+c:u7g5Rk
-ScCAWu,a]ysja+&y*MDkjumI3ORb*.i8bS`T91/;NMEu/7z*CQK;cCU^"xu7dpv>s0<Xv?:xN_
+&dVw{i3C1IGR"9!6VlRJb$R^M1")7C7NYqW_35D+e3*SHsf(wPuVAWTb0/!MV;+J]x_D}$EP2PqN:GGsws0l=o96d5vY&vfp-rR=*62;DKfN_"cJEtKGBu0(?#.Y`h%ae&?*3R8HYB6fr7|q5Mr-*R#T~^]tK(|KkSd3S3;W{/VHDZ7_Qj/dW3eho-pN
+Z^oy]pVx!JYSmr
+;J~Nc7@jG/"4]]/nEJ
+2=-7,x3kE[%Ph%<JY@)pvD89pawpD/`aWy"p1.:rY0nMTq/Iyg>p[)!t"5(ap=T+OMY3?iRI=$]-O{1Q0"X.hIi"$1VQy)%P>7/5VOk/s7-H]4?Yl#g/q{o4xO%JMVu#sK!cKY=je/GM9Os9w^.~c^N8=6BHD^)EGhLZ
+<>f72i7x34U9IOW#i0KnO50Qm<=7pvl7Cwus_Zo8Dl`!/ft4QYb<gUGj?a=
+-7Sh&pRQcIO4d
+i>4":0_9xxs/Cjb9K0o8#kRL^#J&G?^0^>Y5fK06?o![{bq91c+Sw)x;S1dtt2|n&.C7Jo>Hg.0:VxaX>tHI$_by<8gqVFKy~M#Z0GMilq.*G32vhI8eO;PXi1pr5"H&}Fjw^IIae*p;ZhtT1J%etstq0->?*W%ctjsKQD+ta`=*nv4XYmZ[+.cTW$"ps.<1aC6aZmBBo(<lr-^nmcT*MP[w.3f[<>-twDg5j)_>1OK?M,i"[-uN*
+&o86%wR#UXN
+v*Dq>g&I1?JcWPv0q?)3I-CZL+pQ6AfY(f%$&dm9).cdT"jjpD[JGw>-Zx@$r*cj>o]B@K}g
+paoIvJEF=33YsscUpOOBZQ%2_z=xTU*5.%!,/1o^GJo5)H13Ttmbp&.v6QpycY$#nC.w[g<y.Y(L_X[l/Vfl"`/$#$ee87<Ggqn+19C<IS=!E`XfWM^0YOj8UKTL.#JFPM[Po2.6/C2VVXkd"D?5[mZEtYvPCq0o7q)"U}T.FZZK91=QPH?*"noJ/v50gup
+E](9(#Iq2cPCSoB*-u?1VF.p/e^gopr-Zl!3HM8?5O%eDH59?d#Hl`MbGgVA:qZZK,gvx5+&K+RHaRLf072UMK3?2Hh.0H@~a358<a,&-p=@RSQ,Gs>(+kd*4|YQ(D3+Z$)L,8*4*UV)<
+``eR65igH5UObV)95nd0%+mTe
+teE1/*lK?{"_tEQ!wmOH>LNs,@rH&vy6lUg
+Ppuql-03<`GpKnUQmyOHo@%E@?3HUxY7t^Jm@-^^U/):Z7f/dHhV&N5HSAgXWM;N`2"O#nw&Nk.r.?d>AA:W0:t%4@Y)X(FUD>5eg:7aX&-M#bsLyG;9oW)pq0(8yr5jO_G&P1Oo+0iJy{
+ZP|)XE)C{IL(D6un!$4+[Ae<RW*`3QEthrE2Nn7(M]wW,s"l=.esF(;;5Q?cK.;*x_D
+|tVY:[j#4,SsX<
+7,O.bA$+@3.M9}%ygm8!klrX1@xIl,j-$uLt6[HpEPS&2T*4(=c]Ob4Ok:+Fuh+73y`0$Y)$Qe8^(pcCVVB4UA&?7IBSFc&TU$EQY|K?<7+TgZ5W0XjXUp(lEq$nTJe>v/GB(Wz(OyI7#Y)|x|og<4bMv%PK:ru[Kctf*PoDuN=k-{T2+N3jsVD$r&<8O6=W4bVH*{I;eQ(kW?7K-|coR[75^eqvH"Y}
+p`Y+Ddhu}U<n{2H2?[4bO*lQ,vgYWxY3d_-PGX&`W%&%>9].u;c<EkHX)q#eP9nbLkfpPrlON3VbL[eQ<"{s
+$nRZN<0G*;21Nq?voREEW6/4Jg:>`Jjl6fo$q}UQto?a>L#X`4HIm&+B8MI^B@v`12pnTrkhVZX~bY2H7yFzvq@DflbM$04LN.:Wr?)=nQrp@_P{=9
+"nw%<#,w)OWY"/v?a[;wfdKbK&CHk-{Va06#"
+B.a1p0RX6::"PyT%%BC@6l4f(D?B1WG,>D2MnM_@Al[E)Xju5cJg+spa:R}D?$CU!5:+ls9sXA+vXJ/Fp@+@>CN7^.-DpTDm/y4-4r=]5Z?j?d#M/J74$0aur.hD]#zGfa.>3*=al@G1Ygu&wYH&e7A[5LMKvaRo")x!!WAv}L<:Oa:Wj5<b<HNj0imc.
+Yv2,(?wM;wcGmR[
+!sJv?EyYf#a4<#VFy`5[+u%M2hr,{:3#1b{>[9t@O_%rqB}P|HZhJDsaig:q}6Vhi]IL=Tc7WKA:s4bx0l04vhkeIh+5DtL48(zR9B`#_8!@7rtBi0}rLP%0vG6%ArbiNv)6dP_
+wL)OIIFr:H(qK-Gmt/nZvnLiTbvuQ.{F_JK;ZNCK&qXx2Y>qG=Hc~4RCvbJ?Wjv#Zo[_|hswH';case"tr":return'.UF@iaLp]?T=Br&&G8Pd*#e;2j&(E3zPmey"%.I;Rn(bFW6=r8kuKj9o0tzB1<Yb<I1x5yyh{b97e_5v#D~@&s*Fulxw<Qyu/Y?,g[eKT:{l;U`4x3/7(165f4K$5"jxnHMP$kU6b$Rh*`9&pGOJjxrr@:R_*N%DVvOZaAbFAS0AJ.Wm3cD=#YNeBi!l[o~>+u(cc-la~AxFi3KI.<<W+lt<k
+#Cz<$AGMnD!.<"[Q9lyU"d!^aB
+n4v$xcUQ1*SjZe7uv+I<^fH9gdX5]jam,rY8l=0iRkFkY0BSo{XBqG+xHKV6I_4/>s3BlQQW==_5-nv2_icch)XZ1K]Xn/n%QmNtf-ywyV*^1BLD@kvf6qf$L}?a<(C:QtcWyy8@;Z]{in2#"cu&qz;uO2xoJNE@WS1r/w!Flp]p`w]P@c,;!2K{J[#]AT"*Ih6-!A2-uf<?5/.KdbPe#(
+56,5n#4a&#xC=ZxI0JN
+bN7-X[JouN_k>,p`Sim?.6aT,@j9wGIK6OAZ#vecS0Wg18PK4NWG,[>F$`KJCns[#=TQG.#^zGo_![%a_gzk/GV8U4KLrED7)u0613l0w[aBnR""-iSvAOAt3",i51JF`Yj[>fy5,axtF(Q$`g5;#0:<AXLJX"D1)m>L;)v(}b{r8kVNwJ!c>6anf7?g%g
+kz73hv]*<7?(s(rMr_-$#=mon0D-KK*q[+[,]4(hjC_%4#?-`YQ.,"G.Z8y[#vEjXuawN<]iO`AlK>O4N3.%`+-ae(7Kaz88(L
+TESc+rSx3Fg8:yK0jVMhBaQ7jY^toZCbtm$+G,~nhDi3nZ.;,
+A*cZ
+M=1uFFiCrX
+RVqDd>3PHEjv%Y}^KO_#36e^?[MlU68uo(1N+RZPDRBuf#?y"-@R:hrX[f/I%7Ip_O=v=%t="^qb!Ou.%[IYe<-4jp5-{!g-Xu;oS(W2@))mm8#cl+rJ{qMA!;dw*2Q#^"j]>tS<wroy<u{1OdPm01^c)%1!buv>,tJAE2PAR:044^$JN,yiWM%qO6h]*+i=_0kg#Nqlgc812XB([2&pHDd5>rKS79
+BZ,33s[o^f=nl|j-*Q3@LTy,ILeU*t!n%9a+9(mQV;<+?IJ(tjmqkfvExQkQl9UefOu{x;*4Mzj)5b9V>Bl`$$7i:aMjHgDV;s8HgMDdv
+RuHK%A*RY#0[Q0W#P0A6
+K]Ro-!r:&am?^^#E$2~mC1Uu#s-qC>"Du;9-RPA
+YGY0.?Tu4#wx!ntp2m3DT")U>0wtxVQ<%F+Xl"Z/-KZNoxpJ76dPqpq#5hvF:(EKOFyd+;7>tt}gS2D3b"Q,z
+g+U,CH)o8UWaxi4._;e$I9ey`)>`|2,uNl>wekhuT_Px~y-o>N/c7trR]84j0U3+G4,.."CjunzX:1{4SA<ool@69S8nCw2"RDB83YSN@&#fbl2"^#SI78
+]R1@.Mur((SjA`m>g?1WM{;6#GN,!/&s&31KbyH|bV6$:SPlm|
+Mh1w:yOGYFVT
+6"_g+-TR2Vo)lhiWiL@[n_iWJthKDykO#SW;84O"T7`U9)8184&
+K^$^>)9WMAeLgiS@tx7T.m.F]c
+}8r;EPFJ*+{N!q=dV,H8]gvOlT
+9PE0Ade?v.W=G74;J_26({%8s}N]oIg(-SQ4ovu#m:y:$D9&otsjK/@=#|A2A]k3G^#K5R)"5)nhPW90:3gVDq.>X)s>bfG,$-NVQwAMl
+8+*+K_f|OrmvM{4V2[5MiZ/A$49uO^T*.Z46u1_}A)%RR+Ui1+E;&p4nQixmlXxwJ=jjSs-sY{>z3f@yPo"@t3lF&T
+Q)??;Tb%Mt$,3f.M?0@[O#>fne0EBU5-bce3pcU+vHb]BE7T61L7}D_VkoYxV;~CxOYKR3EyZ@JnOBI^S^/6eNVXGigBHuCV(Sm@6cW8m.jLJC%QWB8Zq"hNtVNYk5+qFAeMG1
+))f0G=Wa84am<l$IYu!bc!`&gAhw"hEf18HC41hW7Es&3i8lb`PAVHMtN`-B
+K1#Vk;xoOE=!9+"%&UR-A6/)|gGIELU
+)VP$E+IMGq7g{O_X/FvsrI+tofA"xg4uE`8,*xMkzqmr&jR2|qgg*Qz4#=Na`j,.%)F(*O;df&su6"to~14>LlBugnwDW:e4{(14LJ<vjq2ph+K!-^eQ^cePR[qoR[O[9=Qd
+GP)]xqlP!M]m%a)6th9j!vOYxrg#HTePozN#Kk=q%QF<wb.I7r56kXY<9{>8hj:(:}GbN:^[r[1iOwDM;f2P@Puq*^7j7@;R+}as[lvhVu;Kh`ue6V]eN!F#u7BVJwP1^JB8GOsv;,1-^pOrbQ%{Rz6f-)C$S0NCILhT!Hqp0#WUZG(!IsFI!i=[A0ysT
+2h-AFd3{wbft>Ng|mJ3keN,F:8Fcssok!R_y;l$`idT`3o&!om_"e6Mkki^dIh`:lJ*p(,d8B[iyq+>y:41/#|58DaRf[qtY-Q;-toC">q!HAJW]6NfZi;TA-"fHtak[Z"omSe$F!(%%eHm)mdh@8}GWp/NDfws9>Jo.vuij-cc+H139&+)KFZy`ZFS>g!"WvZa3&(QrLf8ww9mac"#^pGhv_uwF0e2B?/M&";K.vAf2=
+?@NB=&t).(&H`J$^i9uI#_9b:wH?4+/s?eOyw[
+62(OiCQ-w**Kr]o-:fy`&LS@JUiPbXP_YFJKCUD
+)W.Lf!Tr2T*cjA]>2DV*9;jb?Q22e-ycV$N9sDI#|
+jy2xmb-t
+f@!UUw"a1Eoh"b^T!Acg+<%bG}
+Hv95ODyO6TV#U&^;[?-CcDJ-jtY-02:g~TdHyp=Iq@.<Q,0;7y&"<D|En2^3&_5lmG/QpJAT$]dml5>=KX|OP`PH2*Yh%%WaD$LrE:nCd^cp^Lw8pt(BK.ko6?Ukl3oA/U"nsR(#}3=P]v/q/XVT3n1p]Ze9lR}^kEV+)5HZ5.vSA[NG+Ml(Db&u`ld4..p&vXf/(?d87/ur?.ldx!mIQbzlLD%Rw7=06S+<q@q#]M0HASL/7Rj!n*~hu,Z>,.[Jp@PT~s<?:6Yt%D
+sO=L3
+.U,5Hs!AxXF^g(Z(L7-+Mk9K*#i+(Nvxw|<D3U!;mdhy#LxHtIEyGtl7?oDryf!*#|Uy5Q*R.wHllua)M[MI53!|P7({s@cTKz`bj1FMK.[N3U8%FnJikr88#T54Fho^=|YWb|n9d}7w#G@t];8:S^@oxdN&';case"bg":return'+ev@if{p=?T)nh>]$gTD"]$>Q4(
+o_BwAN8Oje{]T/#ZTFA-u`rKm9!$tiYCc-OuZg#xwKva2x2!2$Jb[.(/`vzK9MVGXmIcTxY1f_WW@lyy>y(X_A)L$72x_Ft*0qUejG>]"rCJcHQ`R$VGo
+mP`a5vd5F(:v|Okb88[w$=3atrvc{x10g=XW[1)JDyxUyTdjes6(}deyt&__p9k7@d&;tJ09-P=4EZ*8
+yFok!*n/7us/7<VpNI^k1TGgFbg#[=$<&j[OF2ftmG^??iudxOfyRPO(v|CNY"*yc{0G<m(p*6(~L.yeA^[,Vf&ibfWzWiIpJ$QP:RM
+.T/HT8f+Qkh&SGMoqC;$`oSbyrCwx,[y8a&ZH0OF.=D>`$ttvi-MX?-b7ZAu!~D!WR[vM/YZ/h<}%e9X45t4qG5)mPLi$x_hd5q2!RS(yhOq$`n0O~q?2.j#/WKb;B->RG!RsikDD3H-Np3s?~`ZZ]wQB6d%U]J#$cQOI"ve
+w$vCT%Cwi7Pm{l#t}Et+_CK
+Y!/dKRg_]E_#uFt
+8m5!@&WTna&$oT@ugDi<a</rKDCxdbXQ)WC<`AKx_SjVJYq(.X)3vG/
+]KMKjg$DIskG{ydN<ygh;)[<IW84EO(!+h,j".7TD_zYbO2?OnY=K*iNy8X8ZyMk)=zbm".Uaw8FC/~.S0pD7^%r0KgY~jq.XQ?)VsYPZ5v#x_>I:k-1f?1CGA{K
+S0qZPgiAO|qITvGuT
+HXP91roz@UDD:n../qi[lY*+(]%h`,pe%Wf*S;E:1{y9/b/?3,wd.
+&bbrDmC{eP:v!!4q.1nJrt>k+~7[A)Y?*NwG[z6tYA>;70e("1vu^i3Kel4>B[C<J^L$T&=!x;.xScu~Q"xgwQE[?.:4NopCtT@z[Fd#":2#t`.7bhFJ/0JeYnJ^yO+kI(@@E
+Hxd@vDS
+:QlWIZi;7n"j;f`aHP#:LVeC-l_,vyKahu(fc9]o_RIjIrCBU"o56x8r65kD5pK}PSB=ib,6?NVMHS)
+6&)E/d:YrzE*sds.
+!-=`a9&f@D~e/.58}mrOS<%0t3=Q,h_)eB}-[B.:#.gJ~cA4tU;he)l+7TR$o1Z-6MuF5bxpE<?QZW)5
 
-trjU$b.7%$maTv^,#H|oiAQ?^`@?VHIrSXvpT=lM!/DY|uu$2M[^7$]>VLo"M2>v
-oE*=h8/r75;]e]r)lfwOlF/PYS!9F#PxDggkyfSy3ecOh18oc@jDbQOaT>2wQvvmuFU*o,oxY,LiZM41LF$"TP[2I
-9D:7<nFLe(
-R&Qr=%0>1kGfd(CcdT>Yt.&;@^B2<04gA0ObB,k0Pd~3l%4am0#Cygi#I[L/vUD!UGw"rjxxx<y#
-0+=ul#Z+VKF/[gNS1WP|NnYvgqcIMT`~-A/Gjzw28)`6#4ZmwI&`/bvyr24(D2299}y/8X_m:ULib%)L[@bF/%z"EHGw-Dm]1-Z"i2!w[CfJf|4i*W&5-<%{>k;-!l-P0hHp<-#TgF[K?{p.h]rZJ{dzm,1E#U$dWvPlErF3B*]Chj8h8+R`)`Ot2sC*dZwYh"L
-@]iSXfXk!yt[8UIns/f
-(S;2XZmD<kGH@OVWIdmK7?<(T]Ny0EFh$s#0G&5V#M;NI131oU"0r2SXPExpZG``=^AA)G)>IO-{J
-5WRw^zJlW/qA?#"OkcZ@0mUGU6wJ"$"F>3;
-t
-UA?zDgCV-rvQ*2AQb:-{AL
-Lm"x..fPsC;Bp.-0]%BiT=SJic*O5j:Ze<(WSV>3WAz^}>%p8[!`yMU=Ov/.:W*VIe1x5,{4R`jyi"]MS*/ssj//+V6${cvC:AQ:>mCa+]W"gHRZ,g,_Vvk*lO`g
-`s&t@Tr%NGGT/Ds=9YB_H%`;4ic(8/;ULq:b
-p*[cPiBRwV_?*gDeQ]I
-Pg<:@Ia0b"!#:d$.YXF[:tACuWgS5OJ
-L0K;#Q(5yyo@?-#gbD%hCXpg[`;DDG%OX2^T!fOQ~&m0=$j]<&Ob564im2@
-Q.N4m"cDqOuY=NrAD6W2Epnt3`Dmun1$fO?Ee0t2]XU_u-88R)4x6u]x>.AcUVf^1C?V]b356A!GiibM7Rb*nA??Mr~gm?RjTBNd|9Ba,.
-;[];>GI!geti2r@y[N$9]#)
-6A"Gnv;wnB08mN>ZhBh
-k3^0I>Q*xa!#`z*$g{?aTpVKvY9*Dp0:EVccdmOEYyL:h!+px;K"vewNGOje%#y^Fnft`,$psr2$[Hh1BM.7!:qD(Oty4xEir"S(xI(^g%i6.~.=F/UI){@O.+0LB739WFdM:=_AiW21hU+(dRx>v6b.K(^IE.cQF]s$mn$#+IcXqM65f!+:bXxUg}JzmUR8yjSROfZ5<Nb0UHCotC#q03n*G]
-"<K<O]W(11$NzJX:"xS]AX*T=?WJ~YsU;`I`RtB7$3l1Z%p
-iDIgE-Da&d<f}G`5r(or4r3kpDFnuAgq%xWQ6"YA,x>4r)n]h;kT{[wnUa^-pbs
-E*7V,YT!%7aWgZJT%K3VrcC0k^OcHxLg1GHVhDp]^(j1LBmxU!_$AUg]*0e0JRyKV`QUjB4Fukl#N%1xC<Jt^n_a7M
-K$%Hv$Y)P=PWnFW)#;xaCpqTI46.adF[Oj4u=xw?QvP<upEZ;IN4=P/vk9mg.aSz#y]NfGy>U7?^`I>$c.<`<^rNrQ=!*.lMvUwgb.>-Euc_(t[)3KOBd!$H';case"tr":return'$UF@ibPDI?T!(ib#+SX/jY7DZr(%%]V*=Qk-%:pU&`qE44GNKtl2etXy{@1jeB_+2tA,uBiAzMt/x72CQJ|u(?tw/79qJy1/v4kX[,GyZ+6J.pX$/#d_U@u@rwGEm:b>e<CD(oG=^Z2W@grS06acnR;L<J5u.xV[J@V<hdnym$31"-2>Ky=7#7msBXAgj@Z)rsw.eXy?/c60#AOf7ZYb]=}S+0bVC`+vT2$+E+u)TWy;swE7Nb9y<u:y<Asy,;f%Xxbs7>-TUep?N-P`&B(f&7vKGbKJtL(o.D9Qmr;`O4iqDD)wX?"?.7
-A4N_Zbu#Xv?Q<XwH21I)kj]HZ5J?m]22Mr>u5Jp3p~
-=cH)6<3:"KHy$CUAc)jIrg1u@2&-{De;mqB.=RgN{_5GKd_lL;(*LVuPLg^^aB]M/do?Z8zMnRx^doi)S"ev6p7v~o!NDv"PD+2Rr:4+*VJ/Yl(h%[Hh_BN-vtCZLjFG:+J):I
-"qr>s9&D1^bJGEmd876{I7wm`_!<SnV0=rVZH4L<v!9#4GB>.@6>
-|0nH
-A??2e,s
-LO"$gkT%f&4?3DTDm*[{ps>@LMayL4)_b"#wvl>.5IsmP(r#WPTl9=ip%qp#a
-pr4hLmW&u;V"g+pSBb(Vc(ZzRSLnuO0?4pc5S{&ca|u8t[nrY#[)2%llo3WU[c[[
-NXeo{$H7.fGi}_U<u3%M_51O+4.<g&TO1XZ"+,bO6M;H2?P-KyRO?Kb1z!22&*xD2iw+5PU,o-}A{2.G[Ag-h0FO!KE(UaP[#QK(aCg7hRp.SnnN"1X_w)DOOk(xXd1I9wkPv,jEU>_0)J1*vpr^cJK$AAO_Es;3nn:z$O}4]u-)G7PO}2$r,)~b4G16^9~[}VpV]H4m&S9,AwXd!&&KS(g9G>qmFjj7ljigj?%bK*vJ+$`kWk&2f(|Gm"N=Z:EWq1%V-qXi>uTPgbh^hZB>qyH4x2}.?Jmz$_8
-}$w84I=QYnuEw:nD<d}H/9]hF]j)*U!5nZg6
-g{PZ&fU+Od,y91]D@yu%nY5$ed.LpTe@!yMO9^UheKZ2l#QGehVYBHad&]C|+~Bn$"e|#8GeB7E(9te&Yn0912
-W?4s$[]1Ub[xdqF(z52dW5xY~;F[}8Z+2-lX{aH3L612$#_06]RXB(78!(sNOSDb{0|h9o_s
-lLLh:I&_ZkF`g?;nkm!(D,CGGB.fc+Sj-ZP)F00v%TDvj~:Li{,LJMpsnK"oQnW74gblYW4.S"y:$.egD)C.JWNy<1Ni1xPnukViD
-:/W)=W^(>~FXIGFvN@8_l>]`:F,olU5F8S^T9:=9(:#^=zd&<YRJmHD1rqLqFsKij%yTBQHZ-!i2KJPA"*B}F
-%>Vh"X"ryq&+fKs,#s4idnPl5FPOv|h,J2,=-*im$
-Gljt:n$U#?r?CV%<p~p|?eeC"~bYajF7Xx=B"G-2Hp]l9EYS]>@"xh(B:hlZo<V;6Ex#W97:DY,H-O`zm/b|3@tX@%u8V^@mWBwD37&IepgEIcY.-z((-(f=]Y8:Sx!Y#.qWC_Saiy"aCekI6ktx)l-x8dAw>l7C1L81+,t&d8xIAV&eeGpft)e|Xz_[G{o]L)8r)WsX<u25I}oNkkN
-Ymg&-SQ4ovt|m:y:."6=dssk?LlA&e?V@Bk#n2pR/P)N4xnhbK;u;lgRFw-kX)heW}AZ$-NVQwAMv:8)sCu:So_LaeMcKkC72&[sRBsQQl;7xh=9t-haF6`.)31u@nWQ4p/qAYFy&UChovh<=%;{PnQh=cMH97-oe.Z99?C7ZO)8?%;kE}CVK,*Ct`<d-7(B"`%34RM8(pKncVu<[@X%Ef*&fJq(^C2L8[+blrxvv;/HOfS
-&Dp:t^=|MrmZ=_$*t0gQKHF<@f98;Yx-KiHds@Ya-CK!Zb(:Q4Cg:z]vTPI@r4`p>9$lR$39d$DQ,V+c%BNmRG_;:xu38W3MDCG*UI0%t?BKsU(8BM]afAWm,QP)0z]eZo]aP#K}2sD
-"xU7eII=B9#VgJH:_[DPmO?KNAe~wf,(]7.>Q~L$/=fVS+n+yh]88Tv7K>%fgdYgca7fuK.LSBgLZzGMh=#+!%f*Cb0j<i*90dOQ+w!PI&=+).)DCQUQd(5Rxo.?7ZaWR{]F[}I^2m/9lqKR9C>=wM5hNM0a5P?}!=+#SNLN[J[n-mB2c5<o$t?I)/Eve7QF!r8B
-yu3T}3Yck*)SeCU5NM=B<0aA$YSf2=wV|k5%V"|Y)n>?}8xs?w%R%6[U[wa3;ZoS`W,N%9tXx,bkj4{xg-L"XQj+"uRM[C?L-mI2@d=2Dd",(?4`da/poh6$MMkyAw,%j@M!/Y;R,cO7B+47wUK4E.K
-/v_38AA=AZ,D7^u"G]O[*_n1]-@u-3(@+Er,ad5N:HS7Ge8W"NXnU!vQ^+8x*_dP`W$[]d{C
-&u#JL.u`2DYA3FC%?Rd#/2&SF5N/A1:yO?wKNVM=m@nwmh6DKaT@z&4oNuq|)^!uN&6.JRA]Jzuft_>+!6efxp"]7P^fh!d|L?8q0I,)xXf~26?v]fKSSM7h-{"Xk/yW2<^#ts$wniHNuo%nQ~6xh}o?r~`]>ok)#*2)p[*K"GA~77+,b&RJ.1?Ro47+g)(]/VYN]_nRoJ>))ZscZgb4#bV};f?ZUqV.O(YUj5t%G#?#X^Ksh5E
-r*@"p5CYu3C0Y)[7x{Gn$YUTB?%}h+.HjH$~x0)o)
-^b(R1+9vt~QNi9+%88ByPj_Rw};Ya=cGWiHP
-mVH[@Tdor)~hfAWT8/,/rD1a7VfOhffN
-]V]iJSk3S*tAA(_{E./T_u%tT)P`dX:*fcHItR.Jk;DR^}I#tg7#7c!pknWYDG2&74C:W|P8-DPjd_TAp)%>x%HxUU3+@/@hnqFP@SJQgi*C;/X[mjY#6(=AJ6:[2,08L}Oqe_j[e8+600LeaJBUP4T|={*c;/p};]P4e]Bv[di)P:Um)O/~Ry7*mpf4/=p?nJT!vZwUWti37WvwmSEZq@,QY[YBsZ+?IJFsQXB.d^VYb`o?r]*^Z]9=:[gp!Fln:+@UkaF=>Zg0o2OkQTmfL>m=bKU)HTr-_2dI$8k<&[RyeEtbki
-ongwh3hndXD)[oK)2`Bramrq4d.?jUx(dUZt4IcewJxM@9@GWo1"KC3S;n0)WS6Qha!A5B"ZY%@[E`KeLf$8G,aG="vDgdd';case"bg":return'&ev@qf{p=(q)js?]$gSp&]$>-4(
-g_BK=N8Ole{1P/#ZTFA-u`jKm;m%72]CC-Qghg#J-tMiDw{%SI1]q;%X7uu7xyAEhZiHNKdvt4vm]FM[lqJuaALDsrBvkq[sMECY"Tm]h1^f;n*cKt5,Y@.a5XVi.m;CA@Tm=?#vxP[s<3xEB`3yB;5[
-8jMq
-ykPnHAyGp8R_-I%F}LHG:VxF7z(yY5n]fVB(}
-=@V,DsT2fIFs.y.BSGue_%hetG[shDh89_y7"G6@O<VdNleKGv=TFma-sHIUzV5&zMKiUyXH*FwXDXjZ]Toyxo&=Mh6m~ovg*eb1D9Oie38Jc3j31=Y7o??L|KPx;.j:g44Tdw|)2m!8f,jF1w-!9,;,=
-WP3TW!%Gz*5v(f&S?V*mr8/F{+x7[3U>I/"a(H{vobYm.Ys<4+[#23MNBDewMFR4_G%1Z2SK+W+61r<9p$49qN5Go_4+X)c,QXfah^K.]h7t=Xp^iZ2!-?
-Q^
-N@T9:#=<wm*u9qM
-.QZ"jsGPqI?K3:vG^VAM+11@qFPkmL@F[XYVr8`TOQr0VsO@8=>,_s9B&:<lRsOj^o%OqfR(TS)r{o4Bx=^eNf]:%-.Gd_@tG#|VDFG2tE7js
-t*4JPBLNfX0O/[<i+%V^,v4MCgm.^&PRiwuZ,Q@rkO=YZb]&WB,-,@g,|IV@-i,kKP&.ZG9]2qs6Oi/]PNOSspQC_/<5QqRPhJw6ZBTJo]b4jVqu7Q0Nj(]Hr)1vi*
-dQ(48JYMdpbjb.>#.M7J=y=;M6_rD)rccN1aS4[~0=GFeL1Z)M5f8$4Q`eW_dMA1B*tbvP_N%K9nj19p.{!$Ta]%,iO8[*Ob?G/t
-b`k%E^yiyQA`Kf&1cO<Zg:)oBd+6p
-P*tKjRQ7RC$WG,d(V5Bt~P32SPbW^@jOhlCQ=I0$5HjWf#d$J@&C@)uDEp[71B**
+}Z*os%#+TIj(BhIQpQ"Ypr`@eis;W:m]p[S:<j3tnplqiIhRe3;t=`s.q7|kzOoq]Qkf,>{A|_:vD/}1O8VooAt9uY#+:tM(4s^C:9^,4]xB;I>Nv,7^]TRg3%]Sy:KuvuRWCTJ3(LAI^D%vD0Xm;2hb._QS[R_RfeO3,$L2]:Jso.A,>d#*EQZU*ZF?3V#xDE4EdZgc%VZF(2R/++K7rcm8H?~lc2uQ4]N1xbjDe;3n7E]=12=7t@Vs[R}9.mZ9
+=1@m=iu-F&_{+gW1s[Z!3#f,A3P-0V7+4dntHXI.$lK"0*a6>ChYA(C2QSOc09/EZ5%p1G;nG*<d]F1}Mxp^?Ijg7cQ2";n7GM]iM{SGUqiiR!6}y62kgT_:
+1]CJ|,WS]^Uh>G7?bG^f%o(mMxc8Di(uqxq8jk}G*W&):lQS9HV]QKU-f8$tST-H&W/H+O_7HaQ#5&QqppaAKLrf)L:Bs^pKh+z_d%-:p<~*<0@6"IJj[P_T%o!Yhj-n.:Ye//;6LJK?asFu~xcX^.VsyU()1.kahp7#4`!
 
-6wR`M=0yc%+0Jm2@Ye^3:S!y]_+F{m/<mOEA~N.h#!I
-W?8D]qy+95"H~JS)eMAc1:|t8kE^C*Y]pSR4WXh
-le5lP%jb;PD!1nA!7^d3"/}<`n!Z19qAW7M^6I(a+OPmel2j-U>)ZA3;o:SZ6UINs7rU7u6SF0K/w00s;GOR3PtD4IU=/*k2i1e%XRy0EM(8e%01=vlU5*e$ge%8Ec}r56LH_AZB4AtMbk[$T^#,=%gfsYfENQP$l&D>&C|)q7uHJ7eK@^f8NQ>6GAmbTDW!Q,7^]TRg3"3:|D@w}wLhe<YVG]cbUT%>)_-lPOsoB$)2n+,9NpCK<+>H}J7xsN7Kk/_*FTGW7<*$}P<ekqE"@K;&]>6_P=%(%,%R
-nm&b>KrwkzO"Tu"OBzW)f
-3|L/3P6RW*J3QiiV;q8f"o=mFMgwrl9jLj!r#0)K/0<#/:$t0d(XL-nG?4:PTT+9$jV~.}Gq%-@=G648kgYOunyuD{ZKX-lLB,XK:/a1`ec|K=V);X$1QLxBC]lu-38#Pm@drkn,s3:X-~Jll,KJxavAO@!ml_3b#1#!3QRvf
-1UgmC&JhVrEkwOc6*]I+jkJTZ{u7edtT45#5=~`TYLPb*D@/Z$wt*R2m;-Nli-$oC
-W9x4=dPkXq,NQUjM7=AK"eFw)nA?_`t`rqx`Rw5}Hv;}Q8=Cot.5^aSk00cYc]&N_5D~$J4F%aA@e~X.wZ4+VAWA2Dv_"&;4dl:Mrs)M(n`$GY4fADdIt^0A0,sKQFiF)LNnUrNU0v)`Wz;bdCs$e&T~
-a#[@+dh)Ip0jyxYe)kwC@O`Z
-`SY!-5"sx6aT*e0}T$/Z3vl%yJc
-pp@O-kIS_!bS_cL)$?Vf=;
-zVif-&MNF]vp{Zs&ZO*%W;a"dWZ%w-jG~;SI]^IgkV
-FwT@F)["W2"6Dsc/gy3[#+D-b!?#Q0sn!?uQH^IWs[,2TBwDUvE;/Uw1?!3m*l_*`v0/db-&NQ8N2C8U`Z0v<%91O1n"H#Z/?rs)/Vo#Y_)=)<OZc5;pk@>!rk"yYF8]x&h#%xu>z">sq?xt74P7X#$vO6#NZP4nW+%L4=+-DKB6fn5vs(Qm(Fj|b1?N#~umKl>zMl9$w/@>darg.
+_BMl%u5-f_Up+(
+z2?^rA8UB@g(W>uC)I=wd"+$X9RCB(#bfL>QiG~FPw3_e+kC.8M<YDzC"L@UH!ml,HG`]DMhh3q71d$1@91
+@
+qDFZ;%s<}ync`3bLB,:;W@m>08&"G0k;<S%`_aR(v5f=mseO0fkZX[IV
+akB0p4dx4:">IAW8
+IxguTDlNzhbH>IjF)%QO}7"<4
+SR#FqA1L9_lc<f9V3frX)y`QWB_2yB[5uWwNi-YBDASAo`,WluEsL/Ra-]nO3m2nI_INt9EtFZ"$.[C]?GgNntfPpos()53Y?mB)L.yYd8XH"4|`O0xvXw7tU>R)=)<N7c7k~
+Vp7kM$78ZR%o,;y
+2pkyw[hR_waLG&C5yi
+$C:p^ZjUFv:nWui([uIJY?q[1MLX9R("Kv?Ma:dpq,2ixH&%q-D3/LY{T"X.)/FVZnC&C;g`vcN,Jc>{H&?ZSW"
+FCfeJNUpC3HepMEKIxsnIAj7beYEV@U=)w
+{aUXJewco+$f#NiA[UQ&K!%UlA:,]"dQ1YG@(o1AXm?`JDR(9AYd,E6x?=ZoQVr:__7*!>_9>pq4=MH(Mbb9KcW3LrIel?;yWgL9*sC$J55yo
+p8Ht++Es!r1FFJq?527$]rU,NZ(goeb-5^;"S$wLjklD7R[i9a&A`">Z?Y9D7[(ps4R_
+IILUdAZ+,8tI<5Sbd;@E=U<z%SS9UO!#Dcf/o
+`XHa^s0hNua^"sP{S8NFy(Wb+=QZ.,Iyq}N(X[2lyO9q)S(
+Os5Zj&:X_}gQ#W`)!B;N5m(]<63
+n~fYYaxNEVqw=q#ZM
+o`PE9i963=[--qTZ`$NWtW>]P!k2V
+`MiBW7&Sr36K&y+9x0DRZk6L_|v]N+_i*`eJf1F`9@k>!u:$s]qb-VkD8fUp",!P0A<B6DM+mJ((eVq^Wf"H>EuW$9&<ru,&HdYhoWWa=z/H1!+K"Uav(8=mN]8=HEqYu5*sn9Q1+>k@er>r)]*9I@"!WcN`O<OZ#58=0PF0]BA}u,#Qw:d%#2LYx.yGO];JOYLcZOnd0AqVn.dh+?(rB0p=$H=^EM`TR`vC=z`amX)/bvXf<
+]}gA">G&S#J`lt0aV(OYU$-o4[4BhD30x59Wqaoxo?ImI=0bL2aK;#^9m.^)a".mr9KD!#s|6H#6wa!nwrk|f$f;CbTO>N=FEDl$L6wj_+:Q7a>ilm6!L}KAt^w(.:@SC<B6R-GbtgB;=9RI,N(;f*yjoB2:yQE.nbxYkmR)&1?TWuN]m2.DUl[uZIF~cQWL^Wlq,u<*Qzq+r*T"#..Lnx*
+U}oD@<IxusMs[pwW_
+Z`92!kDU,
+`(h(dWi}j.x.#Q_^>k?s<A)@I&k]ZrZQ*%Gy`uHUO}Xds,nhx%fS]5:1Sk&_D{fjREb2tF!*^[
+fPbgf;5(lV#m"b2<35I>[:7XI7#7msX8D:]_VH$Nh*<u0$:veu
+^ijjEyK7s@Aa/)y~bNv*xs3bhB&grx?B0,,k%V=v3]6ZMf;O(TrKnhV>DxRX#R:@#^I3)o&&Cv)=#6R2pJI0P5Z,/@O9feGy9h/D.M*N*rgW]oP$9}.}8V2armsC1:m
+)(K
+jE&Ae1Co&:iP
+dq{l2;4<8^&#85Td-tN(XxC!lLl=L#,M3VoWYRT7"mSO
+F4v?=_+;WrKvJKE%.7L!_M5<#=-W/g*DTtf_fmT/ni>C@iK|^kB%#vgzt0E6^E+7
+J>0!$(jnyM#5W+HQa9<HL_J-Xkk[lUa95FZLohIXea7UwB:Mrbndvq:VRB]La*)!RK[^z]JU_QoF8yxgIXE-V-DwDtPo:m)?@d3(*m!krY)>%$:N<_R$:mq5V.0,T#P:$I;]RLke2*}O,]1qlskecBBhVi4y59DetW`KD2nbtTM.8-P9!j4:tI-D:et&0]mhL>E/bGk&rq]dlW)h!J
+T:6B`4b"$[,JA~/ZuM].o4xr[lf#vvcs%~Tb!?:j+=M}:%nf4;"
+"Fn8x{6/2zyvY3Z
+7MvhCjrZ[/,euGfv$z_nt_
+%m
+AJ^LEyfh#Jhn7-E}IU3Xw&uINbEs]/4>D!2R&=<@Iv_O3J1SiCUe`M5lXS!Lf^##1f[Ma%YMfRsHw-)lqrbRh[-9P7"5[7nR5`1}<KiA[<n:&X/zRL8vAnc,w/mCw%0Jq:b0fG]BdCPqgC"<)r%Pnt>&M.fql>$2k"5}DP_ZtiPfZN_JR@N5MVtX';case"el":return'(h_@qaPmt(q,g
+$%wH$iZTD#$-,I8,L*:Km:aT-1H.@&=#6Z-e6)SB}C(6D2QEnHK;"ZImplEuM
+geyg5WF^Bm(Yx!*QIVrXID"
+mM-r)gfczCb3!Drjy=TVxwPs!%nnl3
+_p:+OB7/PXuaEAhMU![enp]B3?@~-|SB"UvHiT*;P!5]
+^!:JhQ2
+ojW:FCPgCR1A2_v<KWhl70s<o<_ayS8u`UIBA!&edVBtBnWd=bHC38~S%Y>PfbIv>+7xV]I
+W@R/cO{QqeLM
+iKg;(K0YNCl"$k@1U{iUC!06[EE(<m2u732eE)_
+W0vM6Cd&ipy1b5HC;!rV_Phe6lCJ04^/58]<";Es-m60Liug7k8FmCn9)qh4Do*J5@M+9FQ[J1-NU`IChYk)^|6gv/+B&K+3-&:E${?2n{$o#(<s(GTw`[[F(1[k.xiN@nasQLqFT>QCsG._v8Ks$|8fj[xJVZ"-
+a!CHuBZ"N_)$JhW2E[;`fH^LB>m4tt?SVV_Vj2(VL
+G3QiN@J7|#)qa!83B/LsNCo)^th@"ot(my+?p,}4&uT^~rN%7voIrpL*Q(AwQ@MS[8.;O.zO0fW@nYui(5/d!Y(y7o;Wcy<ERuAj7[aS&uc*[c|M[<I^pkB9rU]jpJPc[h|Xb_U9sE|@/+g>My%/U;Xk^c;gL@wCP]A9.6U:?6&uPc,5{yISTeI4tH)0#M>].F^"1Ym>=Yh^NKVt=2Eo)C/Ry5IS+/LwB#n)EtD#wX_,O3V>(m.JFDiZ@@rDAT]b(]2Wl!AW5SW?b;F%>KFqPlHP$XN4yDUixET.SYhr%`(-yy^Y(Z
+8{E$q4MsIn6zE)_C#wqw8vlgU)WnI>"iKBfBM>skBShZ
+}Pi7BSJs`$Ml/Ov_8fiRsQFnf2jf.5Kb-u4#y5)qoH[d]S:Wb:^^fULFgeI:g=elcm9p~9
+]<>_V1!3n.u)ltly#=588chkD{uLlv!r>.uy)kN[ZIq~v_c38XTsq;h"798{n"qGkilqq4/ypuup+Tk.&`-N[YWBwSa.7vsRK05/`(WcKA*u2eqm(5D&-Eq*(mb7#o*LQ4jREC3Y^[_f?E(Y7y.N:->rKqBz-OMLrQ4QlpbgaH4wTOlXF;?j6e5=0TdPjv=!;|<q@`Ku@E`~!a(A<C6?!3aK?*!v)m+(-h#FjC8!mcaJbjIY
+t"0i~
 
-{G[)7=UgQ8KnORx`]<e<u?Mn.L$blV|4.!8^}?jjL1g>sa?t7bGF,n:V
-aASw**
-xaNcKb;MW4!S8#+a80x*j)3)qc2Q=F>g3Z*){qwAXx<_!pS9E`=y#E5xO<Gpt*hi&DD2,[?P?;Y0Txn.yKWRDr
-@[[L^Z%6x!.sMbT0,HXdGTple^b.G
-^38Og|]k/9Wu,Wd>6{9KUZm<jKa_&79Bd~`WmOCtKrlppP9.G
-"|WN.l0Et.d5DLw,N!:$6OC$*A->r=
-4hF35;SrV#iJ,/G12&KtKTdOR5!R.:24&9CaHqvr>x%;WBf)cROmon9Y3w
-d3dI&s6&)*SQ!ua8<V=Wl]:m5WWyO~5c>i@d5b"L02Le^i7ZO8D;ydq(TWFz=4!kBzhUkmj>g<1,XPNOF_@}R|.siByZMNc.gBg|6}au&jc)BONcEYXmWqkQSH]VvMT~n>!8Z/lJr,1)lA.H46J^1*Zc*)L$VR8>.?0DqN)J7qCmfS2zvZELHaSkby*p`#)RRYIghww-+]>C?.l.;L&m
-B*Y%.t%i^;&.&=(p@3XbU(<4[YnTF[f&:1oZ
-o4M-$R$v)2<1YyZ<T$8yiV*K[
-1HyXK<Oc[
-o@nJ?A:ugM
-SXK6Z^7ifYxty4|*86F6n"WVHl24P_NO_lWHHE`ppyyAAI~/2[MAy3lc;<1?EbBUM=wP|lLj=Y!D>vK.Zp>D!tm8VI=-zLRVJ;#^Im,]FV*&U
-7c+*?%RAR#=n*#TM;mNoDZA#Wq$U:AX3Qu0>KMIG?(=^L(PJ[8FBYx~IwMVvL-.2m^2:gvvt]]O[l;m$sRCvmnvxig+=IX5w02+K1"ggt?GtF;!slT5;7dFU8@X7x1:^6MO"!(J
-ix#"lxH<:Ka_U/-YabDqI,MwM7?>7xo>!j%8]N3_onpBH/#C<reF(HxN|;=
-<U[)XCR?YvV_~)*E8JS=nfFh4:)tIM;s)j{9BeSC1Q;uzZ.qCavfmqsf:3j09.Z(.;?RAn1[^R;.8p2l$VoB|CwYw3hkL4x=x$q7n,Vto>ocU(4M13la}aAfNSFM`t15>MnmkIjjfL8>xL.#_YmeS=MA65S%?AZ7O5+^p40:FDV:I;OpD1i(KSP0&+kfM*X(-fb%KiGuS$KnOYKT
-R(Ss:dXx
-AGq4|V&4_&x"af,?WaWQBfkSm9a,3TXD*Lmk
-;q+f._)9b",Lv-"aDyWHV2QjCwMO,{13mon*%$sCB&)0<g8);}:^ZYi"1j7R+h6QYnd02<)K$#ZFe_]t7oMwP(x>jhiA!&Ors-hN>Cw$>MJR>KJmQ_v2O`LkaFfNW5GD*ecNPuR
-up7=tr+T?|.,CRwncK^y^Am]q./WJUQ4RmhDK.2cQz>@jsCM^dUIwMWp@`3i33o.o)@+a[MO8*HHGF;NZlP@K@?
-B;oKQmu3h.YdrE0#<x):tKL,Z*Ha5ryPm@10P)!KGFjtpqhBX;a7IRWS(<-iZ<DI
-^;><veY*O0<?.@s&wDg1d9?mxn//;5EFf>S=d1U2,$SRW&}ddLt
-nwQyj
-Ou(JP2MO%pd53Z`R.LZ$#i:4{"V4baH5gMfozi1:cr2F&tLcXhVl`?*iOHfT`h9=n*ev``rBNtuWXgFEOq`-t_rg@,3w{r69DF.].H:j@ElyDI8fm6Vj~BKBK6uF0EaKy7P,D!I`zR2n`ef))_HB6@S.$sv4tii!~Z!3Ku
-g:IiEIL53ssUF_9SE=))pIFIb
-lGa`<!4mc2$-bri3+Ab:-Wm-i::ES#c?k}iBwD](
-J(X9z!AR9ku-{f40N8#!A';case"el":return'*h_@qaMAp(pw(
-$%wH,8!.^P*;EP/^48?#^"q^f]+vjR^N,hulB=f?N!bWFLEyO%8R^tAxR57$e;b,j
-tTeX_.5)XDKCH
-Dm0)hFcMA
-dByA~Udy>U@_(rl!>P^LK(/`q_vy.[3!8gz<7`n
-qK+hLM99fJDL+bFT>U9^y+E2Q>h+34msq3SU]j/c*<ZBDfCc9SCgWMoc`xDt6+LDNybL:cAL-Pi]XE&%(mln6S3sr6_65?_*|1<37ZqvM5/N@qlQ{vD0f^}`5S_*.6
-h+`e:}aIG9kT.v)BB0"qv^-u
-]P7k5(V&)Z;2{r8KqyquqL_sVXnWX`:v/^+;R92QKLI069urEoU:jg{:LSwW`<#(/?Y*%$Gm%)c#+KnO=cz$wu$S!pYIQ]{*vb2?]$Y7S.2YZZ4eKF)CGFa6]YGo5FFE5IFw8u~/0`;eaA]ki_-SpXEM!EnB["kXqP^F?DH1U,fF?d(b?*X[O1j-(Ua">@pDFJ3kb<q=?;[qJX@u;3Y3ZP&j[kCq9F-4PpJ_/i"-Auoki6cU_
-<Md.tFR_0X|glpK^Gd34[+}NJBX1~7Q3Worcg%q35fo;59]Saw^0r?"n@EHV:Iwn|+_>fBxW}yOlg`*Tr7N#)59tPQJ`gA3
-%IOA-i-54ly(okhQ$RT0jD9;WyzepQ8L851lgF%G6JKfzq]r,[V,Na3qW,x>5OXfIRlZltOJIG["#v&gZv01%,GLXh0wB*<Z;h;ZGN^yg8N8OLZT&yDstKO!?H}3pFt]@Y;G|4$7;vU9
-Bz:Jtk?/"lg:5[3$%Cq*:zVUgWCYRm-Or2RfddZ<Rv?A/u"v_=Bn5ydstfw(U9bp%S_UQ!FkDz=*c3:J29"[kELXJeS~S,GaX3heID
-vq(HDc<6vWZe<30dn*RNE*O0*5_I~HQ2Z#}4=s(NNU1*L_.Lc7%BO&[(qgs@U#Z>CXPsAoEk}l-U(m{3uypcjcs_W3(5~Y-5QLbTx75xkXwO2B2F2w>VphAHdtHaw_.VtDAR<30>2t&qd-fDT>_@reI/VnUpG6[h}r?*q#c%Q4d/axhZ"bjepJ^u)
-QAe.h<"^[2^l^%!m8=Xg`id)(P@oGFEp
-a~-Wx~q[e))s.aMKXpCY`G8B#C#OT(>)H]?"=<e:pk/l$~Nh*<hqPSDiC|&7SW.lm#;Q9iOC%C#=N]<#OXCjIw&HE`<J&oiX=e%XwV.]-du6sDtWx^S0y=PhO6VITI.Er*(5xF1njZ=nSX5nij5p"N#n&LRRgbw.i]N%oW4__Hk1&RqZKmh]$t0o(a^{_:ffkZ5MU^u~(igtU9>WA)B|=W)6@].S1n4jw6c#`=v|NYHu]3JWXb3_`*ko8*+.8
-!{yIxvL@I1T6f"OI1ij^:w!mY+):AT"el.X}]9[5#XFv%J?/fLK#kCQ<D3oI?m-ct^f/rj)/%c)>&RdIO2Ey-^#*+ug.2<Jf?5n,#]T53!-B%s1uF2y;:(2o&=;[dWO]RqZ<r~/qx!5-Hn,mO#(r(,8$9~Y~/o[7NQka
-(WI42C=rqk~c3U$*Nd9C0J!^{hbZUf)C1&SK/45pZLaDc$,A1f,`Z:8O4%k_=6B*!`(.<N7LPYic/S]@CQ"O.@G/*0g2V!fC)H6NP3?mLf
-8lyUeZy.0>_x(9(6$D$7k>7mCn[O=w/8&BJlOm^Uysyoe+tNxX$,2u>M.(1SJEC8yvhN,_jgrYxCtWs(9;0Dqt4(]daC`!+~)pyB3.S@VlY>kr9"l<S0?d*VNRDi$jKf14nx[
-oFSG^j/)!4V27j3a@jv!x-,bETOl-+8gCKWiaf!vpMS5>E&y`t$TLOyfHfafhG&c7)
-W;IdDOY8#Tsh,"Wi&,|%v0J7[Dx8]@l3ZmmBz"avUo(+}cIF)&H:M_
-VBS=4}$,B}EqPIg#,>#`dI#"19xzrX<1_5)8b0Z_E?UCW*V0!EKG9}owyQ>Lv~$S]6Z,UL01M=WM#B$^h+FbeE_L1^9TC;*Vm&2.YdXZ/+fh_R-7^9]=-NR!e:YfG]T2jQ%k=TyX
-G+E+GfnqC@+A+s$=0DCEGjg[j=$/T0]K[*Rcue9IoYr,>msO7uNfSmasK>:X2u`y}T@f#ST.eW?@uZTQEfHPr
-(0DwZ9AIeVjAHRm(=Uk9#0Y:V5=/WYoEs!Vu8fb&J*B:*<?e2*k7M!cCwc_=JgSfdHuB:e|i?J9nluc?G#Ce^Lbo()yO17F#Nx
-aE4v:h`kLv@{I-Ed-Bx`@y;e%}u6!fXVXROPoYMg@FB1NT#d"hoE5O=w#o&D3"$IT-B!M#BfD!XXlp5UQu(Pm
-p6Yz2)O_8M+=bSQ_pngOsiQsy>(!p]VYKkg-*<m;!93E`$<,f$IBxUIGi4e[>b!
-F^M[R-s0rWaK"l<[;fIGcO3>2ZGquaulU"F|OENw@1!5K3a<B(f4ySRj?FbKdXq*&&0x#:tdp9BD5P&sA?R0!&!(rcdWjTiM.hKJP-6LTKrD&3m1:)/;Xu2WM1Lux{3zM"q~oxQr1.).Gp:iS71ncs#tW[>B_`-/cN<N+O#`w6.w[{39?|3|ZO%)3^>HO@YG?@h^)7u;uKluT},Ivpuk3U)6nLAi9Mn2>Y0RJ/c0[|_u^0xrg|6Rt+c38N(E^K)o&cBMWk)m=,,YpRcvXYm$wp,@dP"@gV7UG
-8_fH"U"4d}1n9O1D+eIx4!u6B*E15}/vhoZOgfiY]OpMQw.G_B8`+GQ+m_`m:&X-vmgRL|KmF?CAv<,VZv;Qlry?.X2f"v5/,R^VjbD!A6;LOxJeQ$?ud*1.--p|Z#/*AH*=]J8X+O;qS-qW,12
-FnXa!)
-M.uske9>N`#Yw84x)/8!
-=yP)PQqZUS&ip&>|wnF[V2sBAK
-T<Jqt,X5tNQ)6/I4)gdi+qr?vED9ovr*RB*iC1DP+c7:BT$Obtj7%bpY6]P:|6~O]h-I]Z+*W:?3)4:gx+Hi|U%Q>boqC6$etgG5$:sf)=+r4@0=2:-ZpLoapYFF#+*B&+w?0o`n+tb/9JzN*I,[txk[<MRhWo?yIF$V$B(9&HtgB]+YE)P_Fad8-ReQKa).Nq9!W5
-L1/e78jBNK`G]f#?BOb{?jpeGN:%Ya0lgSD$Fs:8lby_o@q>R
-Mrm8OJ234
-TAcG1>ZF:RAn2M4,nF#/l:
-PKKL#_thP>0X3
-]$-eh!C*]i^1|(V[FETW|HEtGy}g#_o_Tc7;+E}clHrE>XRL3bSi744e,d-xs,4RXPptH_u0C7[S$GM*cw,SdNs
-&T1M;o6ij>c@--LSyC`0K5,fshFx8Z?/FKw8z^0**p`^nm|f;Q`>-<ii*@!AjF|&8w|4%dN.6Jrmm$aX36.[T32sp)gLbL0Dls5TI#[?:cqfeGm0pb&/=9/lrGBPC
-Gdndv$5C{uF8&l[kSBRchoX0kRjT~ecMwKk#(Uwv4"eUV$AMnZX?N2n`lwaa]p}#dQ#s-JJ>I%:Lgfs<7R&d*$ct~WVXy.7mL/.aQo>9"`qBke!E**uz(m_Ki#"8[*ta_]~H([iDkpI>c&(yEx2]k(tn]8OJ31Se"I[EyEyc(>z!kF@T|!!lTn16!$>+U
-:iQ>2ke)^YMt9q04Zwi8vV/Xu4JIKWUcKI6pnf=W>&;on&yue-Fn-
-Dh%"qINSa9;x`F|RL.zf
-Z7!0:gXYakwQyI!./m<wZ=qJXoE8nks
-)|dk"UnOam$&8^$3VQSo73qmj!vE7QS)s_m@#Wq(@S5FRVMAZOyrNOx2+jo6?ge8_0sj3QX,vCrwhfUE_[(@?,Pv/j=%3khC9.jTA|<n0"D9rV-6;5p{%H(zaH$7aC*!5zr|y+
-4ck%oN*U~i2JmgbXwEwsX59)U<Kh(MwRpJHKpNA.{-Ak,:a`1l+?fmZHwcWTAA}1E5)26(6Bq^~xB0ouGpfdUPV0ZFWKx:G>7_
+id&~;eS_1waec!S6f
+N%Xyc#c05Bh;lhWZ0[?,7M5G#~q}g|"jGw+;=3.[iX2dTtLYD"V3w1Iby(tn4O5uSqXv-WZ+ZnHa`(`d4w+@Z,ec<z,N5G>Ki#Fw:g;-s>w!DiOypjx~R%kaM^f2sy<h$>(ovm=d^P@?8F*G#}yOG(&*?vBFm,tj"x+1
+1YGJ"TL0BPyJ7(_5rjS!cCS8;Y{n@:Jx7j_WfI|RdOT!
+$q_J4`OlRWN0Z)A%j=&Go4OANXl@FnS6Pf6}!_F&r>P*lDetRfbUg$u`<p=aosY9iQ:wC(,lx91F@DV)6-7UdyHN33[FZ&n+Oj%K*zqp#Wq?n:AL6&p]R(c>[2YC*X!vTi5QmW[nrrJ*
+HxTaRSWO}7G?*dPz"ZS!iUjds:9W?i|NGWk$@TU^Ya
+=UMI?&jOS20uCG!UjH;eAeg{f!Y(D0-QU0u->CS(8ehH+AE)1QH|KaFcN+8MUYe1<W>KYM$tvPT|ZitU5:fI&z`7o89wok
+3BoD-9)d!7Nn%yJBnCS;,OptGlc(<Z=r
+.(giO*)dBi_n++x6rRM0xi8lF%8L(IVHfzSq$^U#BA;[y(lY0me70I@=n.S?:,nlX9(2)f]=j;(x@N"zS,3!<|+M*^oim$SgOiy"cLH4@ZBH.[k
+D-VatlTV>UM,PZrKJa"?J?sP&D<<r9/5_g@*=po6w8ct[~%zop-<Y}bH-S<.O+AleZPCR%5m9~e.5w/tZ
+Mtm:TXJI#mH!YLD>.p/;.$(2&T;+n6mLIxG_dPoQ]V9bS?WFf$C8q~s;VGDj;74XmWt
+P37qh+/qEbNVY_]L8)0DrtPvpM^qq~mN.Uk4e%!Uy{Fcf`$TT85ofn?mA:j1?7lw_}8f[UTN.pcT&5"!7E
+0?C)ZyS8[5]3hsTADVS
+{b{Z!Z]=h-Kv2I#Qv6n=Yl_=sUN?>&QHS<|orR#3,p%-{%Vet
+<i7Gki`Ii#VB#I4#,$*1w-itK]?WG%%./C2*4rCZG+e@*7=H^,UdC8X1&"]CnhuSRPmCuo.%Tc=d#5);sc]m{/jq<q]@zJ"pJTi?ne?-.n,-@R"3WwI3-TS$dr`"1d@4^`n3A"LDBSD..5Hx-7I@;,/4{j!&D[ZPgfB9eGo3bCk37Jo.th8>cuj(]6X7gj!I+vri_2Y`l7XT<=t?~!+;fyMU=mN//gQ_0[~Uo$@</usp1pP),q],%gU%3r6dIwLeei=Hm]mw#+"?1xunanu0T,Nmd(g
+#)w^8A%K->N$cuEfHX$_$]=`](PGk1Sl"Z)
+DEW;MHoILM;;
+[8j0Gj*2W+SYe2vW_PsRj/jy[,%96l^N(Qd%,^6jSSy??WGj;OhQNXlf3pH,3bmwUa^.h!VG=r!u.@hZ;OUywbJ52z>ylOfq/H@PKDg`oihD9FL92{+?`M<<]LjPr@Yeh.]BHW1ks,m1qJ#m;S`qDh)h5iu#A:5_6ESpymA2s=q+El$H9<-:xU[V%r+E$46i%gd%!yTT=tikj9dU49oBr:Y^3G(+3JA{_lW[GQiYhY$XCO0?J$mgVe
+P9F=~qPj}&9)~vX&G=THv"Q]^
+/mz1}:#
+~Hm)rSZ
+X:xT4]gO)khYA!B.h:FI"!)SZ4HH@O3eiNkuVC_
+$1lo7s2yoIPoT;QRI2^c"Ho,7J%;t1z;`E(6A?l0]+tJ
+S9)"n[QZThQWkFpu.OWM_]NzMm$gi+Dn/#xCn_9/<Fdtqwko,O@BUiDy,P8~E!_,($R@.0*X*{DkRikqb!4.n`udR5CypfvVpXoaf:J/2L.eZ+ij1~jR^-/r,Ln*.B>MC
+n,um/=Jz"6=r`cWhcQAns`ruMu?iT^sq<JJzrG]+-Ovy_F5p$pL3
+D_fZZf7q%KKCx/U70k]d-9l^I99:9c~4ir*DeFI^PFndDCa;v<~lRnbZY/$X)B1A<Pl^!/-UyM!F&9?t4^tBh;;c#fcO=)7HdlCn<rPNw6-Dc%V;?(I(gN+?3Z>.vgMjoS.d!y^7L<:mNahe$[<Al3(VM6Ofus
+n>q_%VC6c3u}&H/<<pqfYc+W7~IW4NU)o`g`M8^-iX@zpYS`Bo?["DU_Yd)6*R4*r
+2$*oV)+v5c>{WSCnAC)=qv9c`;.R@)_.]pkXJ~kROIqliw/xi<IsgCW}$_Xr?ZNOsv):2d?iMD6ix7n{Z?]u*NWs%f/-bi0Vc`v9wc"Y%n_$gD9&H1x60UXAF%q^Uu>7p"EfhJ85jbKH>#mRdR(mkgaqTsmksO?hjrYjiAj}w]/"v9Y(.W`_iA"O$bJmM7ho>%,6T;Wv;BZ&LF](ZH4?iVc~TP,;N4>cEgnL]V<)4Ssq@)4UL?y>:F%K/T
+ub.`nCp5]3{4^BS
+R%8(}<r$SG9GGk)Np&*J/DEYE0r!tXoLPuJ(ZHkY`%;<hW:)zR<BY5ZIA_,qF8gK>99x}Q&Gtk997whYQgW7[MA4O:9!k.E@rP:OGiAmyLjN$PZUX/,j3ugi<__tJvyR$yHSBrv?0)v.#9,dhg67RIvEqreU~g{MX<>X9Jv1<
+Ue]7`>9y
+d<wXS+o1
+wCclZw:ai;ax6p~qH;j;=%10YeP.eO?RO_
+l)vTV$3dQT%!5L$ljD
+;Yv:(]u8YsuP!="x=co0U2KO"-$.~vTn:uODDlc6FhsOxS{uX,}-JX/^"o/g6<+`?j3sYvXkPJwmrHIWU@#%pRmR+#MV1s7,WFfxw5a^aC?
+kII64gF<GsEp"fE/
+vq30k8IoR)1&qE
+Sm7Q/15#*
+[P=EpXZg]tTY9a<lQnHF})/^s4mk
+ngu>duv:GAv[:_^UBp+
+?O."
+je%h-J[Df:`wh6hEY"GFCq[s~nB/0L]as(p>a.$r/bJBahNUZj|r7FyekTnPBnSGkX4^XW&q7rw>I;-`!KGR.s}s5xY+
+%%Ldl5dA6hWRmEDwH;#Xk+`-u@r)4_A2DSD2Z_
+dDIo~mSQCU1J64xUwI}BLTDE`@}6TB/BE(itCa+3YsOX&cN6Dc_#oS{s|DuhyB<%rrWxX<&`jO|/zmZrOJgFc`]I+o(-I[(I)w$KJBY@.bw!7CM$#A`%~#iKd)fGuTR_KBBx4Q&M[o(?
+6_I#MBVbp+d;tE5}O66V8}rl4%/=kw#0Kga;h&nVmt2~Gu)>aL"jV?nus}vZfPs+.ja`R.7I?Ea="b';case"ru":return'&ev;{5Hs&,zGFv(#qcg2YSnXt*>@E=1N,wS$9;)F$Nr(}&rT>.ACI$yaH3{+sngY(]g!=1^.d
+IJUv|F!l`j*OB@Ka,b@`Y<ja61Z
+CGjp6l>L]!zmL4g&%bOfG4BUc^HY48_`REvfCk:_]wxhkjq0;b?,Y4D`j:LQ^t_8S#Oil94f)?@8q
+Lr3/LE??($xi0]@(M0ei*C48rA;wUu;x>`i/e6#uPUPHH0x01C*jx<JK)&f
+*_?7!I!sp0~jKxwdUBkbs:g]4qikJNNdROc
+ds6GHD05H+XXzmN7O[5(JAF1Nk
+Gdvf@42aq$^I_}9|>5R]n-p*xtPp9wD18K@@"t(_lVS0I<@6e!`NLgNaX|l<Voc#Gft_k5[(GxTC"N1zD/!cvO!!v|ej$/O2]b#+]cO$3I@U5Eim])Y>*w[E
+6Pm%Txz%]OkoC0?/XUI%pHIaemKCnoN)!bcUoyVpO!
+;Ww2*^1dHin^3>f9V/8-r+.JNTHYu/cf%jdul]lB@aUK)85Ovza3*8[:mZwMao?Q%?sBYQK(w"5:Mp`w4&Qcb#4(+*t=
+^45>?+Xvh6E!z;r$Dvb<)a+.3[DAw=IjzhCZWsC08o#=fR}@rJ*hL5L/Q(xi*Az(Kefl%Y{7SF-i3-0%938>HXDl|IYozL)c7o1Yyy
+<DZI1hhpQ181@[Y1m[71JwBS@.-4j8!z07PNvaaXjXc#_*ygcp*H@~X./bK-oDyWa}NP.Jkbk2J}GTBfg:mX-_IKsq4%ucJt6,Ob#>u}-l%ArUeM]E_@Rc#8"87G1RKZcB3E-!p-,;aK&(qXRgA|"zQ}=F1]
+~
+cOAVa?Te@q(!
+^d0~QG^0f+1&FJP"G7Sv`[<*T
+?zGO-NL-0le=Jnx!HVrM1l#QkN6f*4)h_6<-b<pu9lD2XMyp@r,T_53%G;ZJ2tU+@2m#5z"OVp.uG3tL+`^LHUjTcKr>8LD0SHNDDLMLOm/Inh`v.P[;"W]SM{dbwFMihKi|Iwvxoy[QOt
+X54;PwQ)A@bM800!>>9Kq4JH)UMP0-=L]mxr`h1Y+)K)8:+4lphjXDgBw6IJ^@nX}Ff=nnp**Gmz#<5YgT>:|A@Gpr@o;Z[MxZk`furWfO`1apD!Pr#Ahx&4}HQ0qTXLmW2QKU{<18%C|aQQf27^^C`uBVvN5M#0Xov#FxjCkr#OY0l;)V`
+0IZwYG/+U^?VZjzriHrW"^L0@PNmbsV.-%D.rXH<4VVQ.B}M<(n:7^M]]eNt8g68RsqK^dwcu#(-~_Ril8K1aO)Jy5h<PS`9sIkfpH-OEo(!rJ|KiB2LnacL|a~QVg#x^tm&o?"Tf?L1O;k.Qi
+[^r8C0=d+d>"&S:0jo4CG`4!ow88jiDVHxqZ)U)w)v"@cvAP<G3@5n>b"rc^d")GF2nH)M`1/aU],NSCXjpM@^g[3Ze|=-Ir93_eCY`/v"kV=~O@sgJbl>.t
+E:+
+i!tQ?8z>p!Oe7+F[wC=L*"fQ"Iu=&PnKX#bUo#kMR*O(9b0!evo1IE*pVIbfKHjp=]x6VPooKTK<V`!>3,DbU=eBW$p8U-ge
 
-k6:dwm;f]>Si)2.^5W;[|FX.F^n&D
->+"Y8L;0<Mu"ln}ClKF]q>he;m:@;MJf}%:jc_Ll1+|^cy?GtJr]%
-{+H7Vmm(lX_phu&X<#
-[=8WafK-V[tNq?HE<nR-ZAsfLo3_@;ibZUm1b(n:Imr|H(s6e_j)3:AJk/8)ZEoyM2p
-idaPyoOpdKL8&Af+a
-a%V$tJ;j!8;,.4]%o^F<?N7/;c
-W8R%fbo*{>[<eH_GzEc66:vhg8[Hqspw#3v4QJ}>Tsnj%]Jf
-G9x<.b:FyDZu63K;9f16C<!)WCUvV%1^iT?Mh"u~d;/=VD4uq>B/g<IvWsou/m[U%lI
-^$$9,vo2G
-DmCSaWRq1<wID;Y6+3n?_G]0>0[/r<&%23%b
-xj.W4rz&[pvny7EL%I;p}^o?7o]$zC,MBabw4#Pc]U-pR2D*[?Kn~$h';case"ru":return'&evAM5Hp=*4G`lT"zH9C0.w^6-,u`7e&,N(r6]uRll-::-4+F`R>jN>"BxWg-^|@LiYyZu<Bt:TXAB-k#bX8XCEuI?1XaK,A3JMDu<}`s4e]oa;05WR0sP!VqC[[S?B$w0ZGRV?w}]
-WG!LMOcX5dM=^mFZEqkgq`24+E2"
-b,isEbLZrs^0+.*Z4G5:NZXEu_cTc5%&v<}@Z?/8C@Rq9MF9&UG]^M$A@;8("XvIXn74ZO7hLJ3k^`Pa(
-2KT_SaRKwP^@_iSg}"2oVP&FVeNGw9!7gGJtThM=CZz[S]bq)G$q?B{3De|^H`PvO>5RUkBp:yS9I-{-YYz]U"J$}sD:W5mL]CS+.4[detPG/s6]R4rwLr^>sU~hY",+OlYOMc19<av^}dYoD3jpTj0!lJ^Q2EL@~k+k#qV`!#ijZCF7sdRHd@?O|0[wkYABa6PM7N*XN@d&&Kb9DyO-G_M^M(&9"K*@tO-R:ank%UmS]/krrBu<.!fxpn7lP:$@bN03l;z&->$r>wxMs;`#pS(hDm$[[XR,nw.mR`D2d]k%_tpF}X&>(t*r%iLib?28/0Bl%.q1jF/tK&
-FT+O4yc7fb4Np[o{UihDlyO<!o-K=p4QYNJbc;I<9@[:pj97^nrvJG"^RePb4
-UO]2-d<,V6?R
-crjXOv0/i?*m)^M#<(c?64?-dmnoMU-@F4eapRaq3
-s7~&,g=vT0&NmUJi6[g!H[{cM<<&SAN4r$#BTn9>8f3N#gBH5QJF+5}DIEe*M.JWV!3&$;eW!9Xmc@[*M$FLOL,Y/%CdoK;*<w:j]Fe5{^xmvq:B,n0[Ut~:?K-s.I;*&+gp.I"`ML*t2#fGL&P93yYvDg&e&6f?wW+j*pi
-NPH$"E6K~*oCt!Vv#Z6L2w/`U>G;ekDTwjPG8GItpgH0^":QY8Og~"~bbcQg#O;&%ie,Um[:SD!WUSyZ{-jnFKoT//,TKQzQjqq0_5;ksQMois2)Vhg2D;j"_JRYPg2@&SbuMPj-(?/<OFX:mm7PKExDc
-uDi[u46Pc1)n+vv*DiaOl"=>iD3LR7(n#]N2~g`pqH~G`[xd_uZeq)hO"%/;zP"!EbR;c8c?kUv0EnTBEAuh$!XMg?G/&;(URv3`eNd4e:.tcNT#g#VB^;RmjS/-S^G,Mp,,:O`_Z.H$f@u(h:L85NJuGQcN_SICZwNot[9uu#:B:6#S,aSu>Q|MaU,WwQ4M?-/9_eTL?m^fAT>L|c2J^+KPe0MJ!.>XGMBd/!sB$n
-[malOJ"xw~G~#eFQD;[5(Qhwj]xlP+V|_!N
-6;T6>RyLXv<-rJ)&&Y/2VgRHO~KM2:?tfbVN&Z9UX<Y+U~A@k8]AX"7r5k90cw5kTk]=wLOTL`Fj/VOoBZ1ks^^W8rEJqyd
-WOErm.!DevxH*SS?ecH-hYLVJ"p&;~jup1]8WRgCZ%p`cY<K+qC%]f8`A(qTxEsB
-e[]wf0QS)Gjwh13"^GS(sAj!P+k@5UF-*AWpjF8Me*y]63m;`f%1HiZQWQL;*W1)BvJ(GYP5z.J#%9H*z:7?bqPQz[CJJ<O2uq?5/)u8jS^gCZf,s$g;{45AJ%,DM,#yL?}I`ZoI#&>1cTB>.`E!/4hQt/urzx3OtnyStE"qg4Ii:CZB$*9vS(TSPr>Hv2d/,rPs1y$),O^dGe?;=o"T
-YLfj3_t^4hvx
-3DQo[vSL9OVkpC;h6U;kxSrbBfG5mn^k]WB#>?Ayo+AQo*69WU,WTI~(@4@#wjh1a&8S.f7
-rHpd!fYGsgXVfb#cGl7&H08F=X):h!o(R2K?Wr?Tt]Au`"LC.x~F(=*TVe!*dxam4iKBM(H0l4>E?_?0Jf=@)9Qn,GkDYLDLL8L"5?SW?S7=kM+=bur7e`ULh={5}i$`@oTE]Q?*)@?#^/P"(p6Sf/~IdZ[rb"--L&x-lVy`^/fl9
-z_/2pE1dK=rfRAas;.|
-I-7xe^-3sD%v|q6)EX04O@[R3S0%lLGAF+E,<&}RG,NwB@(.CotD{AY)LNM1e[)"yWh#2q.
-99lq-4qiO1B.t?YSZ`q8o`R;i(Ih}d&B2s^u]dbEd*bhDxWY1Wy:G.>c&I+VaX9jBKe45D~"qjA`cvNy?*h!hl+EoM+#h)KkWo"As=*-:dV=~+D4S"bH|Vy.K&cuc+Jr[`3[UWwl#VHY
-I!!2T
-vf@212sbNg/SA#"kkg"~4gd]?MGU6vNa;oGzyaL8S1.DUAg|f=@S_ZclihT$=B?vqa:cFvDlw{%["=wjhnadOX?U]}#;km5Uw(QvfF9-hi@UKGa$
-M](6:In)U)CM4F|mTZk=0uH[;A4H%dNuu:`Y|g>H,U:dB-R]ra#CM_o6/))
-(SyN4HnkCmB[;r1h%R;P$[)>9(2R]oQdL3MmNs$:Cy[g_jUa&I7VFi#Ry&Pr$")YU<_f&Y6GNG#f15VvIGWX)`9Hl4Sp{ITozPh/SVC/N[Pxy=sJK<~:MKPT}B`m)`0MbjZ=vAnK)]9E`d^jquf$R=.XYdysW,[yb?$S!k_2kt3Zd`9HJ`Ps_S?B6`Q&$T_X^=yK>eeQG`a./+
-FNCy:Nc2[YAJ3m%3tJ";mvgtOjw(C?9q:xXt.LLfkkKrsl_SbD,=y#RA;Hq+N"C8l.eORbI]tg8ZgkP-9ViDi_+&^;,nOCr9NW$*(cW<R4PjjT+ik&OyFA5XJTX|[v$~sG,VJun
-amM{m<c{Ui<
-p?%QkLGp31prjh$dm]H9lru`@R=}!Pg1ko1`,6M0:3K-ygva(Ex7?_yOw]
-@L}p!8AFtLAonxkXNig<5s__c,r`F3E+rs=Qc#(ZH(:37G$_zRgN!Ad>f-E@yRbl.r}O)3H=Gd~ff_V-mx|](&b$&iZ@a1b0hB&2_o?OE>iFOJGA(FRIh>F/pas^(GfGvbvEQ8XLrKHG!O6_}M>NYMAxkI7m"aP#g6]MzOtlsWs
-.x9x/C4CUZDm^KA@suFB5]
-Els
-Ys&)YU`Ou})`q7Y-*HxNvEnro
-5WCZp.>o0Mo27x_1_U9;A,"Pp@+&bYZ`m!Zc;-!J0f1?Gt1**m<hGlDuG-&{KJ.Tf$tPMXj9ow6tJi3RDTw=VU1s<[tW$d@8?[)EPxAS2jt-s+Jm"y+2
-|pS<XLGm@dn0M>_UeQ,X|q6"WrXyJ&&>VZ]_|b`uf2sCgSP_~=q6)gu,jS640ND9|vj8Ns]#?VUDzj.FhV#^`U6%x`i5yrM*{m%HqTFX2G-K&mXIh).sB&w9x<Zy$#iNFw1E_C9DmP*#~k0qem}T>:D21UXgt:[[_lBZ/IhU_iX-pB;[tYy%&rw+)hMjrZ*3nC(YT`
-R{@>1],7WRd7*>Ly]6=!tRk:0yw3evq{Kla"JJD&)JIxIlrNfqmy0[akpN2(o8,(SQL<fC>)#7r^KWK|dKbQXZi;Sy+uvpb{K^bB<#]Eh{EA#;4bM?M-2=am&xRpk{AERSK8m=_Mlg)|<Tf/j/h!8AuY=L:[NhKw1KVjG,.uB6.q-ZEfABLN"p<,MEOaO1SVm,N9k[QG_ng]Kff)rTL#i2OBXiSP9(yPT{^9b"vS]RmUqJtsS):!nK?b#CtNW(4!]c_gc([4=y6w:A7&EVSk32Q
-pKd`I6R9A5A,xcZh#/=>qvvQw[XqvV+MT{HVyvVa
--Cpvti7F":Zg.D~Lo]`]RT_<aS8_v<VXSj%k
-^S[!p}^XeP0KZ8`:M7Y$YuYT/kK|3&cq/VGoBn;Aul
-i!.`6>IEZf"V4Q1x*qh4=!LH#y`eI.<
-)tFrW7SxmrDCTUE_pwTr[J3lRGW5*H[8uuK`g>+=HN_/e?Wo:a7JQ6)Z=C"6eojP(d^&Dp?bT)q=QaDKgP0GP)O!%U:8zW%M:v,U1nnE(xkg.T5(J4m]zmyT!A:A5m@B}^9^1Mkri+k
-KjI"c>Af5>]V$vBU]:!`9uuqe<DXuiMLKie^wH5l(c=bGt
-pUg7gFE:p^/=TlAbTqAwHqYu0Q?WMm(n`Z28F}qMAxXsA,Z1.c2eZgPw"]%{RFJ?i96PB|mn.5uE,"[FO**^5%jAAN=|tDSlW2yDj=3u7>Ggw;j4eZh~3)WQ)vAOkI9O`{m:@dj/9$&@+ZaO13j^10Kxfkg=H++Z/8.@ltvgxC2|5rw^HVUZ7kq~8a^Ys.gU36H~I0Z7<n]ym9@$P7b}Ew>qUaRQDlC:6?f<CS<!c%$dGHLIdg$oYCZmF`=aIF%-MS6`y23TR(Y&NV';case"sr":return'!c0@qbSZ+.C,gY="Hd-mc.2,^CIdTDETgSWu>a%G=LhD41B7G,UuHNmgSf#$s)$MSLtJQcZvDD2TjDb&>O5r$gPkKct@&O>c&F:v#afo]tUL"/CN=s`4;&M+#(!k/Guct?T!kgog`w/Q]eE]4qe(9Dbd#k]s99xUOFJr!D,uF?1n|PJDYUVp%CMSA`n-r_@5R<5bKh@
-kB`h1G|D#wg=4oq-9@3*5?PU~<Lll84
-%q/W%4,tc(#H;s><^T@wr!dR{-FcN
-tlSPAA*yYAR@^m2&hxNWjB!Eb+qtTv$KdMf2,](oXJ4#5R_%Y?[V.+weyf&i`o>qjTF<NoNb^/8DW(pBrPU^k//e>vmD.Q9Sk5S#H;`0.q2T[f<t~CIykj=KI_Z8Hh7>$Lk4B3HHe+[gQ$cC]#Lv)Z
-btb7oZT+N-=u;q]TEUY
-kd&RE:6yD}y*!qvmtCrI$=lkm#1a0Wmr#sQ9-6p@[E
-,3b?VT?rwhfBQegi+"V&*HjaJqj%Wjl!T?tdC3A$m%"T(aHOA:2L0wWZ;b{v<d1RZBhd{ammu++LhVfb(c>Qo%0hucN08SU!o&`GsqL@k-3??5z>o,e6V3^(Z2x(W&NpR2c*Q(HlGT2Lx>oAxL$_$VvjL
-|6`(i]bW_M,A]8yGB?wo_S~a:dpqR?iq+9J
-zJ+[OFaigK_R)brNw?]"IF9?K2<TM,|128h6ue*0g+Mebc]`GRc2?O[tQyok$;u5LX?%&np(0e|Y+wD$zOs6O$z!Nc$W<ux5SqSE0b6P2LT>
-%JqHdB!rEdxfGb8/:te@%!yg5R,.
-4>#0|.1wXK[LLXJiwv<x}9$u]n$"(r!
-#[T3Qua2in_JTDqlGV]?2,st?DS,|:TbjQ{V
-BriX`BO7H0_MN.ZJ,=niM[t"sJ0Rq^VfD1-QgQ$jUrk)i8TE+loQpMCXcK7Z%4pM;~46phKE>)^nDU2z8^g:qdve_"7c*(H?=2[mb.2r)25U__oKE[=:qa#((Q"nH]LSJXRNPB9ZIJ)EMRdqum3YXh5@^"^cXI]Y
-)U/&y4:ZjO}GzC$6Zt(urCF0K@WH[lw)afZ5C@!dD(Q
-h%F,1VQ=+Ff/iF*3_k93?fVFT(#Am&
-T^t1N$jS-n_QRWS5K;RxSr7K)~OlNwm8j18fhc
-BU-h_BE`k@Q.U_KY/MY:(fMn4LiV+KPw{x
-B|fa.J*psZ#gN.5W[9Hi[=]$l/j<Qm8Tf61mm=((f="@[|"#LZuIWt9UR$/r0]`40)v>lMl/wByzxI
-aR&5TjAO39j?fhZlRxRN,h
-&?F!?p3!!B3:Ob?M`/615,Q6ekdBYw?}fI**kQ]_*<lFT0*B1])d@v2|9S+m8UaZnzIyME$-nT4gS;.Q[qbW8!)y+$xi1$)ve5j_81RS2bKN#@^{<TC9ABnj]H+0]WAY=^Q,HI2nr%=~xvd,:Mw^@X@Wekv_Xq]wm7KL<K7mpK#W7nv:KnHvhWdGng0FWn4}FotSy|M+#NZs5$+sT=k0AwGb+*j{[y(DgjPq#<%j6HqQ<WI4o_y8X_+E=~
-_F^h]R*F":>KQlz?YgT<4]9k.o>0CyyQJpeJb/6"_f7*Xp4sg`j7/HH(OtH!px&3X/b3e=37"tvL.SB.~T
-5f,/n:36#Kh*@11-c)jO*vgID~?6=OnNf.?#[Q92>CR-nK?0%
--Zn,JLp=2zm3L2;z:xrMsmwjWd@k+s.3gH3BTWjD>Tq"r%yI9itY;-@W8:bUJKck
-BsnZ9?tkXdkt]]mDwA**J^Y=m1L2X4`SW=zA{R05EKmL4*>$t.FTi)jVD<YUt,?>%iY1qL6.qW~+bpX1diVh-[e_"Zpb91,h,NhtzGj+5K(kHr|;WIg!)tqg[ki3{&l84M%hPE#u9ISWZR#"^@,]Uji6Av0<0Oc
-1:yJ5S()bexc_J8a)ZW]G6l`ipf)XOB4=?G`^=W1q+Y:YM|:cn;kA90E9>d@T:
-#~SV;uq<QNj/8^6oNnk&o^LiS|463,Ub*[[9BnwdQ<[okB7*0vaCbClSakOaYZy}NIFJu&0":ac.Ym`FF#sVm$WgGLoTuFQ%%}
+yOQf8w:[*p/"n?"CRoid`Rc+Rpe6ms6&y)%d>P8C}&)V=S*Pzjh;)-.6`t|Q)Hav)]B0NRx2Jk+cl>-q[7
+HMSbE^:fFiP2M(G8f1l2>W#s4!fhyAu85@FoHE7b;?CeIcl{:jawjGR`^ql*P=&IEh%gcj+2[e0_$Y@z`CXzdk37P)3L"M(5(iYNwH@^ojwR-X3Yq<=;Sb>&E=mf]N,d_:w#g*aNy|k8#wS9NtYNr,w*Yh1<2;_%sJMQA$wk^11aLaQkDJ%i(wm26(ko!IIz
+o&m>nJ-dkVc-)[;@"L!67<rkJ&)P3
+c#DDM85/z(^bu,Qor+<wDQN52hHb1;!5E;Fkmld`mfBJe!a4ZaHvr%D?-(B0h+N.>Yg)_>8US_]I`%s+Suea_J&6oc<O]M|i+$cGqCr_q*w#0syoJ7ocYenHIbb44,iVqAP2|F|EJC3Wb1-`<=*I9s:RVBmbdpmAyjLu
+=S!sws`j^8VVSd3jY:4aA|
+2$qTTV,H&[o[_Tgv3EevFgDv;djBtt_$W(}7hf8If+qt@[TR&UINc=,_YcuO5SNI8J(xv1!kW5v>6f0<Hm/loU$?m4t0V1)EOl@82/|__ep33/|GM;Cb^o;[wun2&JF-$o}#_h?a$_r
+@NZrZ9gF>gRGWiO2^47ZS*KT[P9:yx3>GmcMbaX<(iB*0C
+q)lr2
+vhcAb+wN@HZib38$+<%H4o9g^DaT8wpTAlR9T?LS_6&4*.B71JWIuMncdZ&yy9lqf3h[,jd+]P*+XB3OZz]_r.H,bV?SId5/5!,{Fz<)2vra_n4@3y;1%!3j&TmKq930ErIl8L*~w=`>aoHK;Y!sl8nWju[0BO(jiSdb($VC&sgKDX$PVao=G[,C&(rC:@3v@/^1a5-A*>b"tV?W>fWfFaOmq#pT)G2o_*i+s$-eZyl[=)WoEEN,1a@CJddNAKCrN%4NDp<ixB0*NHGpFDP(rO-fyFGk<W?xxSA5obvSm,A/mM6YG7>]NBkMR:CwJ5[gcK%KJekgJa[`6_?!wA!nj6^~=r_Q<d?=P5lDERe4K$4Uuq><D+yBU,SO3x"A5
+50mt
+GD4<l,SZ<p|f8iQ&lu~>$CLw04FO):W06cTej[oWTh{?CyqZJ7_:kmHGnsgQtuz;(@SqMf7]?I
+9Yw9iAXr3X4iy2E4o$3CJ#(|C^vV*ddm36`a]ZjhSlg/e=>5@&:IdFy{t[VvmK42ER!m7`90eyP.OEg8X$AlaR#5UGEeG%7M<76ljdR
+_i2yNHyk%S5LHjv}FEY3B"v&M>KTy!;aVSJ=cE7S(?,AId9O[cM4svLz=<7/]Y?/-uih1qb7QZs!R
+J0IHWz$9v!oV1H#ko1b]%rxay}pM_xHV%OK;q^uPT[7&depwx:wW
+S9lUqt`G0g>Jh`=C,HrQF^BO{k
+o1@ciy8{e&]^l_KpP8dY:AR;=7[tNJyefPh%!"FB$#S%F4tFTSE}T].F7e^62zbV?OI]RbmGkE;)qe^]-z3FKvM}g)uBne0qV|j<IeRUa&/^*-Y$/w(Y",Z5-|RGmPDV,h^aP@g`@c?Db}KQLaNxAwdb6_pZ%6k*wBV=:H?@r8G]t/b:b)U"
+.]pI~Rt2g,xCEOS0ooBCZ<B$"*II*=g?>=EVHUAy"<c="64T`6F<u_BjoQ<Ow<_[`Q3SAEy;VT7?U[n0N#<TYZbCr-es[t5)}[IlV3;dVv2vI6%#kUs(y1b&44k%MF_g9bd^^ni/{GJX+%Y#+U~l8WW9M;h(aCRSpK<h?)UEE,&8{
+|MWJmxE^Ju7]M&8d_Jeh}MBj.Ig$UmH,P`NgLDE5ibmx"I:Dvh5;W>tSqMoTVcD+BTA!o>q=Q.rQm"Wn^<whg";nyQEE(0si/_trpgyKj6,VxGw;oYM=,i*el>lJJqODG`/-hqRNbeM/P+&`fjP[nJisnvt-?s=#aw`wu%#9{TY,"pa&QG5h!+xq@fby$OLXrwH
+WnZdW3t+E$Vlps`6,y@^r:UbrKlY~XEM:oIQl!8F|,OJ|O:RA3G1~b#e2sI>Yi$iG5G67a1@-vqu,K^]go#fmF=*4pYLj79(31{UpJK!G?L8>5No[6/Dg,kIdWSET_*eAM,[@iQ1)czy;b>^|"zOn6P?o,NaRy;=!14"q7e3,s9sbcPs>46I,@]n<VH>rtP`.w".%$@w_elxQiVlxMGJo*wt5:1jYQL3A24
+fK<(q;;Vy)$P2^D$P=q=ig[A#uT,4GRBnQ)Gs^OuO*UM|da!]H:&^EbLuk.[O=JevQ[5_D```M![W#{l#1R]*Z`x32@CSa!R[UD]bCcf"Pfl:lcG&y}aNa
+n)^33/][8`Q(9tW]GO?3k!KS)KItl)W{FVJaM|hb:Dqh[tmuq]pbNcSV/$fKQGN>uE8tH~,fJ;9-$"
+UE^x-:KIuo%E0hqxW/C_k.h;GEBT)+t"qgh(<rub!vBiJ`3NyrW)Y#Ir&R[<mGb<WbtL~Gxw0@Jd`*!c_m~K)(3K]f?GM(j_ZqGQ"Gp`B_JYq[+*~5&CGA0[-@/u2STT.B03e=1Pa_asHvXE?uiseobG/JodUZEC,?|U%E-Y{s!$Bb[=`_5cF&E5qlX[H%X*xgYj"JMh(e(Uj?U!I@zuDOGY6Kv;TJ:YCpZ(:t/aDuQE")D5:O9';case"sr":return'!c0@qbSZ+.C,gY="Hd-mc.2,^CIdTDETgSWu>a%G=Jbec*fMJ,UuHNmgSf#$s)$MSLtJQcZvDD2TjDb&>O5r$gnB=[jMmbUN9W/e&].++h}cgs5<%j-iks+-T5h9.YJo"BR]gZ7[,V<^C6xN;K>e7Drw~HjR7lI&R<WE*%0#/vhu/l3+ihSUv"hKbOf)s%gxC2hRU7CkCZIT3+whjuHcHd8-i@3$a?PU~<HdV/A(vu[<v++LeQFa0v"qF8HLx[~fSSVt>k/)rD}l"y}ZfUtcVdrcW
+rkFM
+fSxS4:XMnzfeb?KJlfNO%ACnWqA}e6N6@Sx93x_H8sj-sq[[9`#"wmQ}2g!sp
+wQM_:>FA/s#59pU+6/
+Lr8lO1AME;L]G+Mg!(t?<VO=MnZi[PcQb%*&1S}Mk
+i0q1+k_*ZaC?{.L;i(~r]<
+_3E3u4a:Bz3Ww%uZcx:s@nc9(K-:M;tclRP-7EgfQ`dO)FmAySVv:!Lyns8$N=msF^c|`ph[3U4EYh^jd8>!K`%#PmP8fa$XG,6WWJLpVvPeG66OsZ"YEcQBWWFHC@"+0:&dg:#U!yKcgD1"vjYw9-lRvFUJROoB`%PpVIR7O;5sDPWjis&vs3YHscOwaiD.3)Z2lo9OmM7wX"k3Lx_CYyy7r7_FfdUY$@p?Hv=+p@RRTbVnO")!M_#VQeC&67BWSd?J
+.CQE--_cGw[l[NJcCf(mm;<G5V-iV:>;rZ6:7sI=:];HVnV!s<<8fV{eOAfkkLoHM`.G$T+)ok`VcdSP0cHC5F6Z}qk%-ek1c0l6bIvSq9U``N@`5d9d%B>@uuJ,xTbK{`EMhQ^a?+i?e=&X]IXVwBQ:(n8Y3&<MmDgiNX6=bx5Ri%,wg,SrF$5M!l[Ka
+0!~-2:afMY`TsFXX@nl!annApY+.kt;*jdLJ],x=^3Q96<GU[=X"|,McB%%?mY33/*H2cc7jc6X;y(Ck#irvqcoNGPu8iUa1mi1#bWt<yxhd<x4SX(nUtF15|cZ-Aq2A{Xt_iq{<glL!|@x+Cg
+,*2f
+=[8dQdaHo_pcShnY3X_9Q^|34&LAb-W@j2cp<wU[X^x,CC<[`N6_#d*0)l35GUS=|bb@cmf<]iRuRwu_aPf^y(_lToLiC3C>{xy9!D.^bGAp}A:D]4#>Jfc)k
+y7aZs!]GDM4z)A}(]b4^Uv
+o@R#E<$m763wP--A>H4PZ0O4S,MU)auDP38QXY^}8pHevntX*.EOFGJ&]J-cTOWJN~5%&g!&J`kM]M)MYek,Q,fk&(guD.*K<&-c,Q:sVIA=.)b"-aY->">9Aa;4k5<2VXp!`y;&eDXvUcF9"L6Bkhp7Y}Ha_e+9YH0*#PqW%s
+B6:9X.159V>9bP7;@h{iHq0ATPSD2,rZsd5&kpPYomsga+Fdt78!tbS."Z`U)Yc.`j_aTOU<zQp!2v9,%*@1M8~%OKLUqS9&^?6!n)vC2f5^MiJk_5Lh!kz<7Zq%4_vSJwSrky<L^uYv
+wXu|pfJ$
+3QAw[Tb"/SxP&N9&1?2v?4zJ;B}D!(`l-E!_W_,ni5E80A|>y
+N9Ts=pC?03@8>3bsJ/4Ca;r5:x41+W,g7W)L_T>7=jNDujIAz*Aw:o.d&OMf<uG!dC4OEZhX!b+J>g/?`ByFBO$Rh1Dm-f
+mLcQo1rDRLO~ujK{((>vNlko1]3T#G)y&oc`3p?~Q")vN`>EI@J?NGiRhF0eLD*Kbvm|)hM<Cgd[Z&![(BUnF
 
-<t_lO3X]_=gXl<3zG<--0@FI"PW"k3?bm8Kvv&Is*j?Dyo@Q#Unam*&Ce("@]CGxDS)RbT$Y?~FbYx]HC%
-bdS*pYfQ|ni^
-hAP&N/`2Y:P@:
-j,E[]0XvKy@@e-CXZ*$IviR<A`5po?qH3V?/J=n+LmZ"&
-)5*#`4iwW,x_6GXq9s0/wkWbKTlIa0A";`2fES;5BXP^UH9Z$/[mBPjL&W4W50;u>MI%ns/oD,>S3$Bg`"KGXe[Ila=QY6X*]J*XrXRf6aT=aHI?yW+M23Jw&M>q1G>?&LMs@66zj]+wF:q=_c2eFAEgr`Vy<Zt5A+t>Pi9ifpm3Z3v;ppb|69/><WK:95ta:oqL;^sG_U:v!5"m[&jTO1V#+<c*;`.h[wBrTRH/bC"Y7$[4:~5d?l
-ww]Vz
-+.<HdRI;0[bMz#P*nD3E%5pWK9TW*jBp1CKKU
-yZoRK,)j!M+B<3c>#<kG:Aq#p$3(J*_MKrg;oa(nqfHo~Z_g9tHkAwJ9
-G]II@27
-U^0rA`vJrSvK,+`SRI%KHFHiNSfb+ij_]fC{R?T{5DJ|LwB|Pmc.*4i
-uw^8v!YavHP_u5>M?j`YR|^N+JmxV^F"Nzv8,Ybku;h@Hn+(7`/~]E_lSvSZs(7vey4](0Iu`SFfp1Hl.0lUKqg]P;YOL0S:Guq[r#`ErIqiR#q76u]9P])/*x*1ntASpZ"p5*y/P-_5o;U::=G%38HG48`KAk"}45EXmihv!Yo)48c$l.)FHaKWTfl[`"cA5BVVJ{dD?~^K;^YY@b*mHtXy8Z6dP9^+_X<p3Q;DZ*1Z0Fh
-5QA>o}7KyI3.B2rUm=ScSC%a6)H>PxDmm[F%brfvkvlD4hh_Kxr(M1(HS.cQ1BFI#HY6xPHvppJV4<stXO<Dxki9f_Mw3(6d"8l8LpGkjr8K+92CT$02_*=zWIk:=oAzVy@v68i?p]pq;XlUVs1?!^iJ)y>0ut"P@0!>`u11yEp_6IX,l34,gNL{]*z)"NK5w
-ve-[p?r?K`(S=HdY1^,C_Z0>I}0F2vQPO:kn[_qyTiBcGrK)Y^kOHfXAJ>5X5`;dr%[j"<o~en%P>?T59
-*f<GB}JwI7m&/>fn<mdA
-&svqB4PHwTKx/.UJQspP7Z#@jqg!VODHrSnXf-Qr.3WxLM(&a:i0obVHeq}RP?o4_vC1vp,p|ofZ@7UBio9TUhpX8(_UX.^h,<Fi@!b=3Nv8<+jtCY*X`P]3$Z&o7+4:!L|:PW8wN;B9JB^,.EOpV]+_q9:r)2(GFET@[5s4-n#?<Z5l=c9B)DhS&_8eX+>fPQ>sFEY
-mK.K0h[@si+Nc;H6wg_o5S2A.pag&n@<._mh&`qyLc49"=;6U0U-EF=;.q03tWK;=X!J*-a=MeJGYe?^!6KMT%/q_Gq]+$Bd!fM;"[NR$Lmbhx&P7m6=
-4Vhd:<x>0n]ov"!]*rp%UY_rRo*BW"_AH=Fe)-01bdcrtFS&J)cJ]]s,t*J<5!kB[@rw4C&XY<vz3|lpSc^v`0:o^[Ly91cL$:,U
-5o8$av!gpbp[ZxM2*ex
-T]:X6tE+Gx*S`0fP?XI1&%KVrjeD^5r>P(,OS5,llySD2b0f&M8:kLMB]sWp=6)i|ss%tR
-pJ(Dr#Jb/2QZn|fLfwQ$;~
-o5
-<p(HbO4VBOP87`N]@DkVo%@/mdyW.KPL(xl^!=iNhYl$^`(qXkEK;2Ul7oc#FHt{gL)+%;W(Ex1t.{G/E$_XJ>1JV~eG8:]Fp#f})ErjEf@WXw(vTS?VY*g)akdVt0Y&$H';case"uk":return',ev;:f{p])Q*#x$9V8gCM:eF/`*Hs%%qo.J^x0<$j->$@keT=RYbqJ4-9!1h,d~
-gVPENMhkbw0$Q0/R~Cmg"n@
-ot>gj]~c3
-PsnDWrvMnD.t-SskqsnJAez]CAVIhG,GvR^6Sg,a)tUG:oW&$t.U1,)8Otrg-yco_2E+lwcw/KHJ~CDDFIm_%r|tmucp^
-#58Z)am2>gqmkj2yA`ACa0gaBLTZ):zmDWUP[a^AjVv`J@;.aZ|%~P-Q:8:x4[Zp$O((}wUXyEH[ht!a
-v(e^6TdrI}Dvp{x:Oz)%:pmZ268?(|wL%Hh%m`ARoyg1nN%A0>Rxz%e@tfMPy^EYA#
->&%vFXDJ7fz-,]ZH8mES<SR29^0C}Uy]DC4I]hFf,BZZs(7.qhO
-V6(5)]~oT8yh21U:^;Z1*$}DAj,Y>ncdGgQmyMm;khPWG`(o:,hxtJl&p>9tk6a^vj`k;vobx-$l2_
-j?xlJ:,6#YW[uWN`(U;+)+Nr>,T+v"-
-1tySr%;Q%&wp9G]jgi<<$
-C%uP>(x2ZGYCr5767prFqQCmU]x;+QM%$b$r6lMq4cqH
-
-F8It*6nXJ$h!Xl[Q!PQ[-+_)&&-lv~&Ua/7Xn@"!T<O"
-a^"8nE:*9_VS~t.3Q*l>,Z"Uv4hP*@e<@R+w#88My*cpat7oZW4d*Ue[7o~:b^:A]jdA),L920seTV:KsQHIv9$7hmkC5uv,6#WdRR[3Fm;?;Sf]>j&Ii!I+#U5IqJB(W=@aBeq-mZovMK81BlEO~8%$=9,#~2}FWEZ-NfN-lH06gD^*n,>t{O]h<d_"9(jJ+^AJ
-4sx0xf?SDLDJa,;pQA6Gv-P!b>>^m,cL^Zrf28SZG9,L?5OZ1/aH7m:em.%KVqr
-q~N3h~,^6Y4HeLILxz
-jlf;3$nimN@.><-eZeU7Jt*5QuM!,9HsOt>A;yHR!RZZPw+!>L<lxI0%pi|oJ^&NS7j7zlry!_%XLp^WAsbMfVq_<V9J3<T3V&F+ZH,hf5%Z^%MT*u+Q/Ja&#t4dK?&E?49+YgZBFrMTS:D),]7B@)!#1.
-5ZFgR<wp!Y<r5oSo9~*0N`j{,m8_[M0ztf6@jfdaX85D;_OQ1WvBPE4Df7w*
--JoeGR&pwQDA"j@6!Li%Z*MV@)uS,>OY2L-^:]U0GY3p%%NdT>B,7&2Yj_2fU3"6gIE[/e"G(^EWR[*U7/81VkqQM.Xi?-Pd
-)nwe#K$46DKBYK*Awr>uYZV,^+_Vxl8aQ%,:Wyc}mNtGj:3wDfc[-y]L!wCA&oNA6)La_]g7>]cKUdLnYo;~pKd0GpB*$Z&r)`P_&|&=v6#2y-IMqk6]1Gval<.Oq|?jY(kr^pV
-RD9)UT=3/-TB$
-7:Y4`]Vh09i&/)"bbdjLu&>X$AM;Wd<Cu<^%fyHT,3!>.~#sd>fw*E.Yo|+~WNCUfk3/jLPT#`^QK83m$)!Yw^o8kg?bWv``$<59H8=dZ>?(0e2zFmnH3,6HTT,]UYie="EM)9G!)gX1C0)nWQp.^LH:HD&!Kea!qzVUn`7#]5aIdhIK#,.u!UW)cI@$#:q*M"xwn$tJw8b^3pS*!
-y?X
-90z!5*r?a?^@6Myzb$h_A(U%_ZY<bZ2aOJ;mM,W+vfL8H1E/]t)m!-YL+a(|Tr[Ax<:2WCU#ohQwpr4{_I[{8viu@UU$Gz&nt=KtoO>57Nax-~39!?+!-pn15JM;MH]}/:m=uJx1i,0QM&@hDAadP8ry$;1TATe[@r]7&.Pty)tNS~h8YhK7$/;v(6Ey^L%~w`::9.Q1moWs?NUM
-!S+[C+brd.a)lUW57)<[/FkgKJLk!97PYT0m;JGi
-p.^"HxymmgBf+t`T7ANtkwF4<1tofOPdPA:?%}d2!}HE4P<xB[TW29OWh@rgCktnE7KQ7H%
-f^%1tOc]OzCF!wto#ybZV![O:{jv>(`]U,(@Cv56O]Q1B,Gf?((e)K)(GAn&V^"0OhpE8k#rfi5Upscf+P"7swsNW&o.N#`]7]d`f8Ej6.(~-q^JPor};!h#(8nqGwhv+u4K"KdE@du>m%uXp4>7ALT=,:k*yx/KIUb{Q!Q3hCQq,
-)}jNOPPf=9P|%p%sq7GjV`D`o4e3"Re!,4)]`|?{Ke*M(rUbfZI)?S2C-cPR#t0s-^,u_m":tN-FE?R.ei16Q)HbD"S;R2H`*~D-/QkrN=_YX2+NbrO)<B+8D%DS4+eRD@7m29!p-Om.
-~SFhJl#BK
-DC&WjU~d5#p`<kt3|]u2.?RHN.c:c#xl%jRwq<T/anAb@j/*x,0(#7ePPIbSEhPrrLN.]*%6|!ggubmn@VKN]G%F0ljqca3Ook^IT;<,dLY73u.v~fJ2y*7iD/9a<ma%CY%N],k&{2riW!f_Vokt:WUgQ?kTZ>))D[VKG1Wsc[e#/BA0^CAS2L.lvxN<3&tH^ATGQ6{s^J~CMjY
--:ByM7Ufd"y)AkPW>&%Si3
-9[)""DaSqFx9RsHi
-DF0-V$u1T5pB)b|?]c"40UVtq
-nL7UnCiI3!e98ZY
-0==L7x
-y:W;rbKJ-e
->^Ka`CH!&#vU,TQ0)G
-
-jG9^L
-ZwRv757W!DR>+%Ix7&<CA!6b=+c!H_olm*7(2?"2pf}Y04"Afs9m>_[>F:$mI]gBr;<_an2DG:Gl6?BtNZBjA,{&{FuSl#XGI>^vKO)`*?PqmV#wG,0*r4iAVhUiO*`WT5X9v,qF{N;db?G?ZEeJ#0RXdBPk._>vt9H,&Rz!Ul
-1K:,G+:vlWv^bbCr-`&qkx><R@ut354OH:
-Gf
-X)l~C|u1!*)[Q^`xZqS@2ks,*V_cA{,&2ElX?%g?9ED<4PIArDO!yEqMwJgm+N=*18xpb:<o>%P/<([=hXr7GQZ?Q&AGhh<932rkE6@C?r^e!Rs__FLfojPYOT.q#ly]X>j|ZIudfIV6eN*eIJX1@"t&x%A4KMM"hz!&bh2Q:k/%ta49hHs]Ch]fhUaO?n%E,EajqrAWXhOB%;iiobQAqttLR=uk@WTFpH`2lX%s@Ra#kaN,X^2[7APdA_8?M7&5h@5M8(Vouer0%$l&NY_5"Xbh.;r`/l?yP%N]<ZhJW)k%09gh.$
-kv<^On>v9]OVjBWq&i0DtKZ9uDC3_cCZr<2h0E_G6TpRnc{MIy!2~2=,NWU2zE8
-**x
-s@xhy#4*UWw<AUMsP_
-SK
-@Y59*HxI@eKnM5$DKCd7C(AVZ]sdPf)Gp^Ii-c]6#*UjLP8<AYHW=5Ps?cSw!OI"LLSe9xtQ.4rY&NB[K)id
-Fd0Nh+4w"Vy+q5Oes7NDpM1zc)[hqAa!byyNf1=Nc}x[n7n&>}U#iNm}^]4muIG!
-6^6lpmC
-wWyTWx?9Uv0;>Ws"}RCPl+($^vYJTj`YPL_6k)f:z(0imVGbS(85W-mRZMtl*SF.=m_EHt@LXwd6W
-po^Hs
-hSXEOA&&x-3TRpL6{
-!`I`+i%^CjGYE+5M?V[o$jcL>
-#H%ksJD+!9EqVy1_-oTb8oPFL!YwTZD_"FjVxrTXMRvx5+6OIu^O[E@*R.AUJEHQ~7bt6_of{^S
-spRE^D9k(_yj$qF,YS#P&RDL0lpIzrl#iuiaMTa)F;T@A,=iCCXQn-REg*o1|J/r)FfvB1$oHyp6xWPu/KwsQQ!K![+u{b/b%ruMco@wJ^zoi%ev{,m`{3NyoiO[Z9,W:kKlg`2lvr>bs*2N^auF*Uey&K"UtHJ<t0mglN4^W87nn[%<9hlqp
-QM_D9UA!*M|%(<fugoNtf4#BGy>V_5e:u:./c.pcfBxP
-+h74t)KA[CsQEvURYTh&;T)-B0:FV$mQl(B)<ViCX&&~mZQ{D%ct`)T38ZL~MC?l=I,XiDcF5e]w7!c-H"nO;p1u_)71x]?Ca!5(1B:G`U%zQ?
-/F@`F=D@BqFe6e~Ax4KvqE=fK/C5y`+Adc0(aI(tCbaD$tCHyJ6W5_0=Z@7ND)9-0(l2Gh<k4-j+91oF+Yc7y
-[e|h70U+9AdOt6i(QJ&4}0CF}4%rV,/er`D1v#uqr"WwOQo;)[#ubWqrP.}sG<nD}^r:0FgV2WEVr$9rz+.,|R2Qq1VBPUUyy^z.kw.=]6#d/m-h{F*VibWyGo)';case"he":return'+s`0:6KZ+&iq4.1ENu"<
+i8DZoXw<Z`N?isb)mlUlB,XG}.+:D5TgCW5dRrb_V9fSf+7pV%#IvOCC-VIY+GHN<#-(?!!YtyZKM1))^^[>Rrd^:CG]B
+wi~@zO11_BLp>waP*9bI=^ste@.l9U%oEtXEc
+~^vlFplJ8XZK!q7w|Jg[:mcu&iUQhbgX~;;8fo}U?,>GX<324`4rKLH]%2
+@_v?=9k3R5gE
+KUU,TY/"C-jyvgX]rS0/+;SI,Jr8p@@2"%N9^G:i(]t))Wa9h2?
+t<n%=l1c+5)!K-|7vax;`LJIiN}F^h#%?AQaNYj7pC,n9HL?ioX/yY*FxS(Ay7="
+qTSSa=w|rv@Jg!>E0j4y0WH,
+e=Dm|??9e1dH
+^V#"f`mQ[b72tSN3gT:d!DYI*4xMYcblHWvNn^;DBaJ$oM0+s^3{%^8X,8A49!h4uPxY?zlY*P?^4YF/6=D^[pUrjOloK4e{<F&nbnd2#2bT?OUN,LcM4?UJD>6t:Zm("Lu$pZ2!V_%Ad9Extt2RA(e5Xm@($aMH)O
+j8J`N?`;RYF`R)+@`wC4P8B$BWnE))iG<g[a2Ji@gDkFXj+MBRS/ck_7)(MgXhU_v7em|vX$Y]pFP,:=F$eQ!"a1!OUw$xNg[Q.K:O/34?kOUx?DN7(T*Vv6Irbv?m`com46|B,+N[X]gGxaN,3v2m04+M]vy;FS^N(_L7K_%x<YRa+ai?MB#<.(_f&K3S`G+6:=|:BkHW5Mt[(T([4Hdu@Hf1~@;H]ar:G`W[P@b`&%?X*$-J|@-N|+7@ATvX*l:OWj`Meb-`fUp,V^c^[d]4bvE`=qjLK^9xUBR-7X+h#Tl.]?O3.g;K{W|1C5H;JB|Dfc&^
+a:TY+Rr[,Phpt[#o,3c1?jO1NmQMW0U&
+m%Br$t3$&,5t5Px<f^Gx:6<?Su)c8g&i$G
+)R"&/y
+M3y[
+(lQzU742T-M]0|Z
+$I=8&*khxUAdYn(pylH.%3hR4T?74Hj/I:7qYcolkTX!Z>9]qgl2rWAR.dn
+#<f8!]qyMbIREOt
+.0z$x#t9V@j-r,M1f2O(_l
+xy?d,rzG_y?5s9/XANy56p*.;R{Z|=dsha?0~0}9XPX*xq,S1
+:v%p/01oU,~dngai8+2ALvB-YTAqU"z;`sOZ;D]]y
+N?k*TUIpAsr
+@qpp`D,fM
+`[.RiP_LY!-&ZB3e7&Ma+cVE1pqC2L^e$`w_15on
+fR^0ES-MJuw~`UiQK[GP$e9*utE:HS^<"8A^0lnqXr-j[1cK0P
+|`q
+S=>I]E2EXm]6";4BE4eBLh8OXDD:2(zbAd[X="]c1P1i5?O;wKuoCJFkC4GBct4Mbo:*kyUrCg/@Dwk>.kpk:5D75o]jc+0$DL2.(g)%RC"I7
+;
+C4R3pl7W"-.=A0f*0Bvk?v(IJa]C4>s5?j#Vg>@wQC:lu8"mj_O4(Q<KL(MY1mTJ]>_X`5<g:y,kl_Cw>e0kw].DF;Ode^dEwjnQ:L)+*B/!C[d03qWr/A{Cg@/b:g^XfFfL6XSV?SLUKoGBo*HB]%8;taU9`X2r<kv/KQ?"*0OCp_`F>eV.b[0o3,*Cc&x,cVZR<@QZa0|4g!<U4*Z`z]I!Swfh-XhkWJ[tfj8`![qFlc{6)I/JtlG(*n^!m=vw3
+efenE6G?P1BK/A<DMnIJ-lO4,0exzcgLG?GY5w[=by82Amz>L,iTEH5!cE;O;Y#!8Li9X+U9ST&whs.lVUT-piU.i+k,:(#"5:ix?pnb~2`=H^^,p@WL*0XH(w]8`
+fR*WLk~j0wm5Q9z]RpC1t-3GJ(11io}eUw7l:yb#2v?cwqKiLG]yA2.>]2{:"x=qI_62
+xb%NsO:si]`0foa>M<.0cL$:,U[zn^Pev!gpbpbOxM2*nsXH]:X6s<+Gx*S`
+nP%XI1+QOVpjeD_5pjQ(,U%3fm/u!D2b*fK7_Z.c{^CuK6:H&uD6EW>C
+aSPwE>fa
+t<eqh`3TRF;>(L3h<(l).2MG
+WS63Pkt^h-,T6]m3Ms7C#U^re!=3eH;?w5b.?
+:VIZF+P@qM&j?`vA@P*qL0NlEWtA.z]J]bsF&Bno,Bt(_(!X]Wa
+rR1Zks(2w!/cekZRFfIt/qZvdVfFV=$H';case"uk":return'$ev@if{s&)Q)nh>]d;PCN?}Vg`E<,T7iXSgOk
+U-{Y?#SYx.PIC<OWqOJYg"%X{&|2Q%:<#b/yU*L(GUe%vKPI"tOrOn5bVr}m50zjWvss,no]&Hcm!Jw^i
+kcS1JaW^Y5-fTtNefa+tSHGpz1%t2kCGZ>)trg;Bptc69f1yS_4,JRq+?GHj>q4xI>@yT&ABd[EKgK"C%i=]Oc*IRb1?6gJb
+>-FosERh;BAnb#n?)=58p)C~%$-WAI=XnV/cVa"#o~M]V<AfA6e;2AM$a#1taPb_]}h)xzxQ/&RSTYm<eC)-s
+m%NmIMK<?juP_q0B()gCXIeC9<v,MHn1_p
+CO`$#vr:K6,ei(xkn^HGb$_iVV./R65Uz5-dfE5uF/bL
+W)UY%KcDYz(aJBH0Rge!X^l86"w2`N%~T-iN@!QN1-"aPwGJyPd1V7JgQ=eNm|r2r61MPyCD%1lpZ@`9%h%HV?NCTgmh]7F2+(arM[I9ES<u/KU?)9?PV|#]5hgNi4(b9H0w/_;Ys)ZOoy;2"i4JWuj_7j<nShx6x#hqoO6!CLDG6%v^KdOpH#t"uwle?&+)K`z%jHQLHWr&o:yxAw$~iXKU;KC&
+fifmj5{0hQ/jd`EVU?*U`ysbJ*5]?[uf2GT5``a_YcRF/N=K{Cm$_`a0HRoo%3!>ngegeh0U3vu6dy=ksZYWAl+<a(-K;J<ISysb}XR8aPdG?wA>n?-rHQI8}E}X`t-G-!`tqj.D8518g
+RpD,q"EH&cqg~kvxN<t1p=SaV8S$*qW^+pMci]6dA/>2pKsAliao&+a/]:+aF+DbVX%Xp.37ekW((TXi<#t?C+pZDSAwLateoSI]
+lp/[YT@,&N9fD,eKSI:%T6YnfG-g93no/}c].+]"0#ya#I6R1[A<?o3>mkDiEl.%N=h<ywZAn@K9nN8aH47:?`3o:`!
+ha?;5r!hIqpddaeV/*27%79`;K;l^/o&#vU7=7)$,l;hLqU=X3s,<=YJ#TInk{RM6dQX881r2@%^PXLvb][qGB]eP@-RrK6VX!IDEv[6;_:"SmQ,o0(.y2SA:
+LP"mWT$iVMHt:m]=(3>yTG+sgqpF1f<3
+K#=r&2JOr,W!l63Wz7N492<aHSki1[n?MbfF~V=!hJKl`-Rg~&gQUa3W3=-c"K}h:ik(vf2dAHhDrvqh74:l/1zk8VHn<0kLWb,j#mop&KZ=6o21lN+lFOsz"N=dA$Ti:>z_Yw!0[o7pgQDAvMu"/D(:a>i(s+JLcm+%[<Cl:eSkEdlR5S-2UEL97,f<BJTLL00l8rx.]+8LpPE!+N3oaWz3#8]dYyZ"7cyh{A~P[sh,8L9OZ7"Y,<{-9>%1,A)-)@1B@#4G!]$pyevez)?(GNKh{;~EmLH*_y)`!$wS<"l6dY_
+S%;4Ro7kK]kO!y{.U"sKG3j-H
+Pc=%>QC,bWf#:&$^Or#vb*CN{@]vUlkyA&u:hFtM=#SFvs}![#]__7YI{"vm}Q1vL5J%)I4>2F#l7XT@]!3.[u_AqG4kI!}tvQ&U&@5wfK=FyrVSP"xE*vQ^sFh#r"%ThEO^86W;!dmn&)3O~=Bm"iEu*Ircma8U}&y]<sy0+i)K3VKN=`Q:gx_YT?N#_#_k9Ql<3GI":^wjz$>f}/vy>9]Gt"#oI8k$xcJ*gp*DyS{xY>&I4kR
+/X^C6WKb<,K*vQ;g4Cbg35?.Vclhk5_AE:ht%<^<i
+tIhct["u?i2Fl=R<ikB96c02F$?6^h:E
+>[Z5LZ0#]V+H"DT*P(*>@}%3NuT{RDTD]]+mf/K<,hY0[kD#U.TSIXhN^S]z]m%}ZS41_.Lm(9C^P;6XJ&D
+00r@AKI7_pWUK5Ue38/hW,_TOg]8ixY)v0iB*F6n_oALeKKCtcYl.W1RSJy-U4p&j-I0a;#-]pK(#+[Ei&k(S>H
+"QLn^]S6
+%.B63p~SlR9-o
+S$)Ww);g#LB<$3{^gTL96
+UlZS+"Fs_N[P:"%k"Bch|MP9WneK"K|1*rzZ8@4f%g1<,<
+(nRC[y;Dh-&6^>ku`
+yc[QtFHx4w*.A*phj][mXBkNAcJV6Lx*L^dQ*bs^@.ws5Zeg@4&TW%C)ui-zuZH_dPjd!.r[.^W309$Lf
+li3Ydbt+=bOfNH]I.spz$ZNV-Jg=6|i:.oO$(x%1p#b{<.l=GM-!B{p]sW;H.%J[mp;$:6:]//5A&Z"XUi]%PulPD/(s@D3&d1)UYTBMa"eQESGO0sT2CQa&4tI[<-nJaOjksZ5wH7`4Pr;X`H03?z`z*(
+|V7!S.Y+83hsx`4/KDFG-v5WiQnF*%y-5953`%;GztpX_,HuPk8!Apw
+Ru(&M<H)"9bE?uMG
+89(i-PebtP5:nO@OxT$d5iEh^:2"a<h,!P,nWq!*g#SeE{$wl^C7qP;&0a)l.q$tt3wOW&Qi(U)v-(**d_r-4NF9
+zhA$nM]=-G&6wZy
+$3BA~"wM^KCy_fDP[<zn_EaVyg;FAcO>;qP@N4sr$g+@JUf59"<ou9l@pBIbv1v`yp_/duObCM:UfC+Is!?9#Q,F^+1E%nky^5hxF_;,i@[7LFW:.@eO.;?1GnH017ah+UlQ4koc14?lh,E`!+a&puy>"Eh33>%!pwOY0IzpRppy"^x=;9s@bnBV.;0Vr2(3*Z,<*E?!L>-
+&fM.8MPIoKEj`L*/GC01T.sB9wdW1"a%<B>qG,
++4Q@1FpChDuRD-EkN7qFZ_9xqgm`-,L~L0D-
+28|"c)%*=rONq&SYLtyy{,#&(OI[%f18mkN,DW**PRdAFVTr;&aIpK)oYdS(H0qm,(Rj[[SFop2ZHdZL?6ot
+b%Ckl`e5#q_I0AtKq<JXAteB>|CsX
+R0Q)v0uo0[Qd)1<bAi$C@jDzQje^QpBWvgCV-@J^s5+mZ1>j)qJ)H8;1AWMq`9U_2)xW=-hKfJ@J>isr:=V56W#q?U8bLG+DA=*Q]]%SKi%,/
+(ybW8wTaY}T)f}6k9j/%8FJZu?)+DP"|^0;sdO#qD673iC<6*%l^DC)*Zdv/L3dj%2i[n8#.bC_9X0lG!vaJ/!FN&y(n6F,27agDP6`9L!#.SU+v*nUgg{ZxK=TTG*)W4pE
+KKtO`xDlg;yU]QJi]dDA3f,Yroy{3WIiA
+c>CC,8HAy9toqzqOuCp:ngPG2~::t;@FHG5ORN=zll*]0sinM*Ri%;T*85lZ2wD(n{T(_rxLV_F@if;-!n[Il7z$p6UO"M4eX.8|[MqGg+blx!n-+N9Hg0lY9uM[VG&,$aprD[fZBh/Egz6<O-s[DE8o0oYbld!CFw5wwusk/Gyxu2@:t>7`a+5#,.pN5ixW?ZqAcN[;eo>ngu,oUHy:(_yr@McW;3>(9Au.iw#.EYn]H)@{_~29qaZ#r4"}W!e,<^(<POOR?.Pk&J]">FuqmPyePcSS/SU2XRXEv)#mFE*+E
+"+:x8h,F)2b8@#tCX:g!id%wym9~srddcClt]!w:c!NyHcmoB|u^:-lHS<6GiW=MWdUPLJqHy1"`&D1YPV
+(#7,4dj]gC*t#]vEha<S3wx_iGpM4,8>[hm/R!=P0v[aCo4Or;p$ZSeBO[_GsgkG[2vuP`l*pbAE
+*Jw%`enwi
+tK6.54cp8[<{uw(ri|vA=R<-WCMHC<W1x>>0By#C=4c}S7!=C=Y;I5x9IWckT=;Bv!A3Wguos^<}GCH=>ENiu
+IjE1*.w7Rps!_!oT$1AO@l&n,o/&d71xgEP-$"u,f0*?L_pPKcm99=V65U.e)8ySSrQ#);o<Emc#Oxx+ie15e~Yeg2ZE5e/[`(1X>?:LU*]3^{q%["i~B_<clg?5Y=tIG=4Oc;4IK%)fUj8.S~rspiG`dO0_eP[T[zvxy0C}P@i[ivKWgg[ssZy/`RP-HR2gsb3GZNwVb|EW`H0Gi*+TKsq{H!
+-,s:amzUT4g*Px#c[[cwx(KJbm-&#/Y^B6&aO"-MDHsD*NaSAcQbb-Uvru]]2$+j#;H/Vua%-ySQho^nzDm]0=bSUz)/nQUJr(O;)Dw]c1qR
+AV3fg-Xf@vg6>h20PLjj?]Zq11=2Ep1O@}MeHn-F`Ya}>@7Epbk4,#8LG$8=/TlRK3k(X#o-';case"he":return'&s`0:6KZ+&iq4.1ENu"<
 S:`d-[8t)Itqh{`-P%T@p<.XIOUd&,^+<!
-gAETj@Z-S!T"D%G?(q]x;^C=axN!ni+-EK;c
+gAETj@Z-S!UNH%G?(q]x;^C=axN!ni+-EK;c
 &t@#D-*F8YMDR9%*p+#j`=uG1uyUq8Rj0/GESw
-zvx$N(+kJjqv{PAH%qR]I?iau36"C4BmaAZ23Gfj-0eDy&as*Z+YAD3NkhIH&Q7y.+EfOf,fmhzh7ktp{fx_A;eZXA,;~XnpwLy4p2iUcAeUH$|8Ns_P?eJilI)pnSkf7o@XY6`/>ZLcFs^rJrm<u;PK"s&>2D=2`IM[!4%X<P/AHdnLsP>c"=%?O-k+km=*
+zvx$N(+kJjqv{PAH%qR]I?iau36"C4BmaAZ23Gfj-0eDy&as*Z+YAD3NkhIH&Q7y.+EfOf,fmhzh7h+p{fx_A;eZXA,;~XnpwLy4p2iUcAeUH$|8Ns_P?eJilI)pnSkf7o@XY6`/>ZLcFs^rJrm<u;PK"s&>2D=2`IM[!4%X<P/AHdnLsP>c"=%?O-k+km=*
 0^UdBo.6iS1YSZ.&f@$ZN$u%bdgxlg7:n{v4
 H,AefGs)ScAam0
-dNLq`)oX[|/?3tk(Z&w9ig6&HFT7[GOtaWtn:+VJ
-bFKMk<4apbk1jI`3c@)/@BZn:TGf{6ihI$MpIE{^8pm:SJKb?C&B+<fol-gB~pXaa"MVI*uHYWlpkb0U`F$I3gfq{VlWcKp0r56&O4<:p_|k%%vH1%)dCta%~V*r1O4r,b&(&m$ma8:1^(gt`c0WbG~*dtLS0){-O;+)pRzSa=:0.[M6&uxu]>F
-LfB7?lSI5mEYrrvD7jX/l@b$Tu
-!Qo=![+V25z&yJJ40pU`gv
-RGo3[B5Z<DK6s,NVmy2,:7l/>:Nd%SQCwVc"v%;^AlY.7[fsC^R`GGO+{%*mJB+qZxa)cN"V
-&:@+<5"6Xet[yOdn&Yf6417)bh3}`
-[#^@WqBMJf@Z0.BBrQp]oaK
-n^?MdmAz[}i-2YvEqv>"
-f8V
-z!C2lIB#
-(P9q?)/"%$v`<=T2O5psf-?PmC13b*ys^z]Zz)u"Ovi8NW#1d("naP*K]gwaAZBc285t%L<(vJ.Yvpgz#Yjyxbfn>Vnhy!/VX^&*7eAXs6%{Q"7nEe03#bf##5r1*k^R3B0dEVR:&d$$6MKOu=):uBw%ggT{0|fRY}9&&DT)(:VH_IXi`HNk"QnwH$+3QF,Po3<=Z2R_E->@g7V%HKcx:&Q{<dw3JdKHx-b;$+p|Yc#%s&m*]mk6f7)1
->Kt_qbL,?,f+GA!J5DZ!P+EyFKYZFfSi{vP;tPrl]YCPi2x43Pi(BhU-8.![3?|R`O1:T%:9dK,%kJ1KU_~I+]wj`gr`]t8(0kSfk,jGUD,,ViaB~hm8Nfvfa+aT;oeO<UoX0TZA<*w*Z6ZxTKM65%Thb;>a%UcvUon#A3XX0RY*;7#J=(!fo77>dM&,BUQ`"wY*}cg*`3aw
-L,q{%L0/NWq77)Co,YVlwm*z)e]Y/}!??^r29d,=iIUS%Mpeu"3c_)>#SPn4224p6FvFvx#?U>mKdX"bm;Pf9~C2$n2Gb2>/r?MCoQt%WMb^&}1U?KBt[PKab{(0a&)9U`E$?PKTwV6]nkV1*K=fm7dxi4"LSP_"&_W]T^5meeJi1{e8mK`zY`;:QAu.0>[:b(bYBo?y%/ALQ
-<|=J+;5A^yt2m
-cQGiwa:jNIBc>JIIkF0.f<#sF%mWv{cyd<NM#%qS`tjBu-Ab$m0Pk
-@vf5Vn.O"9a{dayCq+qO`}vY7xqgo`ctEcR!Nvb^#IVkg|1&2W=92/3jX4CL)wNv!`1>8!Z&G?iA2#_CVOZLvr%dm8eWr8[7QTi:]j>JQ5]p0[Oq^BJ3*Go7@dWlF{8+$E]=48Rzh)1YOm3L=(Cm%WF<ZFj,2[:u5dAR(V[T]?ST;q_}Jxs@PA?_.z--AL"L&Eub7
-5vrK`n;gO8g<<8"pg`a+8FZroo^]?XF1hB0vjUg_la8>uT`*srYT2NvYcUe)SFUWcZ$OraHevNZtNa<;=(JCrhyJrOG]Qz^W!_uu>)y`E$MB1>Z?Ksf}Lmj<Mgbx^~-|Lmc]@/=xI"DYFe#pEIa+7}RAODD#Wp`viMc*_$,6twXfG:[Aczt"_>",df`Vo6,Dx]KnV$W&ea;Qo1KoV")U7S<TqNc.;*vmVGE"%imzQI^oEZV812IZu"a099.I_<h9X}D|]2DeZwyl7$1mD53:>-MLnoB/DuZ0%dFx;D@j#8=]`ux<QuAl*oQz8Pbekz^wIb4&FcT*c)a6B`O|bA*gN?G|&^K)0y/Ui=J~M<5/Kt6tuI%
-JhH!ynqTU%IYyP?~E(TYgjr}:Nhpqvgs^`axdO
-uFk51O{v9A9:g$d@
-sEFv$uJnp:$ufnHYWCUX2jJw*HY,IO`R*fQwPP2j!}
-#w!tcK&I[ZvMA8#n]ep@L0_4<Rpgw;}OH?n@o%0bh#BjI5"El"sRWEyh>W&37yZc`Vp[Kau>S:LddD4fA*[fh>kK^orrEoKCT_6c`P";^bKB0[U?BFeX>8XVsJ)G+8{MTl;fs:bh6n#_u>LyIj655k$]]<X%Ej@t^JA6RW]:C%dq_ePWOsA`WGG0T=zx9YrP/FxhTMP;T<Qj~k-oPBFi<9a9r(dDh/U*=%bB.
-m8.E16v+[_;LO3ZU:
-tiDm,X{1;%5>
-0(XRyg!Q';case"ar":return'-c0;;5Lp=)R?lZRO-d(84G,01IZKqth@k#`CAe*Yd,=tY2f$VE=0BgTEAEQH]uHk*p#^yu%lW]?7_&<t-wr_+31KO/N`-H3Y^qUy=_GyB7@ucmajs.urKuluIx_qzMpXcI)*9pOJyP%V"(SmvTn/6y;(rmH6A?~nx/`uXW(+x?__h[Zbmbz#zRm@i-1ycW/.r,9E)xp
-ooi*-(]9}V=K2]~]an"S42h3MEP3CBa6xc]A)u_pxa1%Z/4,?VwUIBwK9_nUe:QUw>ae?RhUR;xMgB~h~T(xoGGH.UH*sc!5,"));PfNFPh5l4u`BKgyk2<xH`ZureS._YfxCYHm;wgL0so]8hh,E+Y6Y5g#lxvGR#?mx!nTzG_YhDgpoHIdy*GU
-$=M&-I;Tj+.!"u*p6p4P$SjBT0>|B9_@k
-lqz#1nW*mZ+`x<ux)Tx2U9Y(?_EvqruiBtpI.C5u5m@;PQLmahLDK8,~-.+v6+1%5Ea<m>>/_%cn`wq(WMyk("jq@?4D@mGt]d<O57){l*#Onfy_y;
+dNLq`)oX[|/?34k(Z&w9ig6&HFT7[GOtaWtn:+VJ
+bFKMk<4apbk1jI`3c@)/@BZn:TGf{6ihI$MpIAPBGgSS/p.JTo/b4+Jj~9OyxdAI[-v2h__o45RgHL}19u#pEUFip3R5Gua?e=E,BrZN3FU[})mm}(1N]o+)~2+j9!(ilJ&/N3xa;O5+329o:L36`mm3Lno,>/19?T00?Wr-=Wo(A<pJKfiq3.w>oS=6Safp)U`9^kukz[)=Yb.!*f0.G8L2f4J,Kz%v@rB?b]NP5?]mWG~b):Nftwk1L3Tb@6RMy<ZQXM~!KfS37#n(5BY_+fQ=Dl]BsFel|*v)V`jb3i>w;1HyopD72ID1%$=Lofz.IQ#Q>Hdsyu]WqoLtZf@g<Ih8Ms&bB`!K@[`UbP-uxM$oT$~-Qdt`u8FU8Z-9j"|eupt8I80Vk!nh"R
+>Aa)./*CT(B,hsOl)tJyEln8lb(fO[c#yfpj*qbx/)CXVN!1oM8ncWp]K&Ppbrw(N+*}kM(Sm,0p>I:ht3C1#GyBpLXz6N1PyX*}cI^t"ny<Xt`D!iJy"eZFJ`c5gMcGX^2z4H)whspWPtAl;Mby0f=wS"+o;^(s3/$1g,!{o-Lb?S*|#iXMbbs{$HLcNOo^Rt?NU#wl44A|MYvm*,2;4JC.wjwp02we+lU]O9&B7BGOw$>[*~F4^?EYyir:K1GLHM%Dnr(88"H7a4xW&B+|86kv7/.ap2p>+qehQ~,D;L2V8xT~VwAa5vRC&p.Ejof,23TIruxikp!d<316lgmc:
+?j2HLI`-U-Kx"KLS50/n-FBFE,;
+f`"uma9}=LG5HJDSSHsuD8x<1V`=/0m};0uY5O=Eg*4J1MCiTymp>5""v!S&sDL*)il[CeLD"Zplh}oVrQ]c/mQG#Llxv>Qm6DGkp
+MIBh3}_L6m*U[mTHEh7Kl8/qS|piKxf`#uT!vV]6mCRan(A77m=gsh&n$k%k+h!^YY-;cKu=9n[*u}OlasHFtH5ya8)XL+,=k-vB;Oh~@&*KWEkzp&Z_HCMm.jf5?=q@((3L=`9E11>cEJD]Q[^lX5iJ^iH-2IPuYrp8WmgqF8$:W>a2>.Nt)rD[Tc(peb]x?bww`tG$mI4a(07ak=kB1A_cM{
+@NQb+ux7(=L3:C&KV-
+"T2dbnV#9%f*W7T?*JvD]D1Su"w`/]Xkbz)(7xLXx#bpqks4"Bb-cL@QT]5pI$EK
+LeF[cZ;S9Nk!ZY(Vqoi:uRdncZt41iYJ.A:d;#1apc-g*jb
+FIm
+R[jjQOrv2%(Xa-CM,mF(e<UZKo4`M=!b#0&["2a&wFXR?%3Rok!Wg8-5
+E`+?D=U!hkTw
+IUiSJRV)q0z.XO*%t]9D*cOrMqnJ<3#Q>:yKB%J&wTafHRVv##P>&resY5dkHA*lae1>I7P6oX3]7[,cXDBW
+T(7T)y
+/wBt*/?UP8/HEF8^,7Kz&GU^;^wHTpEkh:pM>6u16["xrq}wfrcL$C#U=[6&9^/V9%IFV[2H&&XqC]^ycOhT1o8s@3pyaVdw4`ApJnHH`/n7
+kk`Y=[dE>|k$+b
+1By)}3QIkVN^^vq$N(pb4f(rNWzJ/;<
+)B3&DpWW[t}?|+xy&9gJiMg?k.R*9f1iHIn1FU*]Bbw7-[kD?&3Uj]yi@7~01]Jb/8O&];3%|iercJs6H=ZATZ0>#LgUk6/_>1|H)g;_?@3)uR%m:5&e,`_&_JN!>Zw^2@`y`SLEAXjq1RsfXH%yFN"Wi_Ki#Bw.c]ZQX6IB!GMVEhV8PV7:Q5GJV`F[+trA1G,8@Yfs%%;&;HyZ$+jg1a?Rr`1=jvk%%Yhu{]^)eguTe2jN(N{`BKYMLIS]_tGS<f5eDwV0~)?q#d_mOQM!^rL%qM)5+if`eE/el.pI#]Um$3W]|XrBtJ``3jag{g">=<Dl]EI@Mm0]wG47{LLI|veV5F#fx?h/]?F0]]]>m@A!Wt3p;:|l;5Z@t]RVLb__GgSl<Bif5=%J?@vp2m#veh(Pi/V%fCF47Vf
+|n7JqKm1XL$uf_zF(G^Ki&)04
+D.VmE+atP@tar:_Ce$<#JQvDr]0NP0MD`bTNmyV;zA;
+`w-lycn3ChfO.
+l,"Ta^F';case"ar":return'(c0;;5Lp=)R?lU#O-d(84G,01IZKqth@k#`CAe*Yd,=tY2f$VE=0BgTEAEQH]uHk*p#^ytc?OM|"gv8sRo"*
+-.V00Z`y(Oc0n:jgkVbYD>t5+Fc4pet}]hx{_Wx6yFD>+yRlaaX7scE$4/rfh/(Xso;CshW2X1bT/_uXW(+t?__h[Hbm`4#zRm@i-1tBa[8}5-h1aXkJeM1U/CO5iUtGAum@
+K,>-GGbh~9_c3y<Gc`q[3]enN;EUHw/:P?Ry
+h&iM@e*YAP<_%-vx:I1|mxLR5uE0I$I8a*?m:PmknZ!i=eXv#F+mf<ntkF`GmsM6v/kXe*RBg49FJY8gc5ICv?n33,)iMW22tFp|).I@_}7jHh95:t`v[rTvU(cUR}8xVK4c$}+p>$iR![.fy:oZ2"4t(XnNYYG6Vy
+nhSb+sqYum
+o`nIW)t5l5Yl!__,8kF)VHww7Vc8<kT
+Jz0k`IFADMxwl,7p*iJ>F2
+jp"c{jT!>WFx1Ja7PlGldSC+giv
+rRMD2lTiJJyI:J>8QHsxqbTq?x6:;o~pFbrcqZ)um
 
-!L.W+b,O]+&-rWxK
-dg87*p;a(Bj_0SDcvyP&c,|#61Z]UH8?5rL__FhH-^W[aXLt]<B:lZ1_EAb+"EB4Y>SE!>0pEj!hj6Qc}<0l;%/qz/j8<WvWLO&b?-nxbtU,WnaD#mdEpR$=n.IY}R-A)c1mIvm.SNO0tQ:l<N3+GCbK7+
-=OoXJs).KmlKem34`7OmAoDyN9>+y}ONAHn_I|=Gk3+lY1[UH~AEC;8._sN=fHj[_g/xLx,A&y;2:<U%xV5v&@d="ToX%gsUTw6l#`Qy4v-ImDv&Sm(ai[M
-I!;gCD)e_I[-8m63CEM0>+sR.Dg:Us.@
-]+xC(s^T~0Q4N*.AFkCGdwhGCvs#_S{a
-7I5tt)48U:vk3G=u*5U>HE0hv
-N}h49@
-S+26wDLQ9
-?8[hi2:M
-+&&}53FZALoQDyRf-4r("bR[vD:E+G6uQ8]P%uhRI:eRx!%ZJaV+uhCM?ep>NRBLKUJn74/B0%V9tEKVZv##-z5rjO"::x3W):X`QJn?9Mn2oape3!
-(9fnT<P"(49Db-OUI74,>@bh+s`y(B]n5;SGfL1C`p|O;,ONO_)2yo9"L-p>]apkT22OSq_mbg_ah(6:6:"GA#K9#-e3X2N]0<lRi3FRdpf9=DIQ[ovY0nYIz7y<5=MX
-R@ZQR2OnS++tBJV`[+37v*z)b>wkD).m.<$l8?qv[y%).IvD8bp!RA^]lS^eYT3]b{-2971#?IC|`.V;1vS^m>"I=
-2*&{$l^WpO:s!sK9JXx3y>,A[aG4><I""Zd!F!3hoDt}=@W4cDy/hob"P0?<S:G<8iHVNL7fHz^&Wr[a%a5:YGVcalCv3J!zBv
-NJJ(~D8>-#sEY#/E392OIlzt3hD;To*?J2LxcSOf~]~.W^f1B&o43B
-%qrZ]D9?fh+>uObqxoOjCLc<TipyE+NjDh^T74rMPZq--F#6Xt9dn;U3WoEte7/,<x(6!q!ajiydw(BGpeR)eobj_@J~Zo
-?G*@!J[Wn:$XTE}AeUGqRiuS#op=xd_tSNI-c>yUa^uxvf5wC0.F6RS`IhloKJ@o*Xd3IYX<P)]*_Y[P/>uI52o9i<?<dNxwiKbj?2v+8!F#T(3-j[Qk14sWh)em9AoB;K]
-VV{]N_hyzRyy*-SmaoZ8+7/pkiS-VaNe1Sm9Kg=$ssX6"@0OZ&C>ut=h8[:K2]|/cFm$[`Qu_/n"0Vtedt2Qk%a8/afG~1X>m*:uMT//tb/K,2xlUv)RX@"aEc"1a6l7AqJfu::6K^(={R$Dw,m7DOl(Th!+&m-p!tJeUX~e2wftFmhhX"7i>em_^p$e+EB4|1F3=@<Lo-Chb_:T8Zf:HBld+e-&B8*)
-h36)[O2s-|I?e}8X3U$ok@R!*Hi`3oCYGvU-M!K0nU-.2ZAGxGi)`vIec{*fPE)_#j+<Vf5gp_iY*nM(m`2<ZC#<*quUT>flxh?P$v;!!T`"E/Af=9PJKF<!ce*Wa_+/w6Lwh.rpSuPO!s0=5jtu^9<mE&j.MlbXX*DIY
-QSShlXDm3Tx^!5&vV(qtIG=cTEM3h"?_@=E73>*NO]h0eS3^O|]lRTs_lK#AEG,1=9R&N{H8BXKFZZX0SLE{6v,3,N+-+6t:^jImR>94HLZjQ)W5jg@m"hxRVyE7cbmeI&0~;cG$(WIrZwD/x-^Vg021>>6n
-_?bH^@1$(u{F_.,=SEwbxO_0~aAQMrHt;Ei_?um6h5l2#-^NV_D66(3R9>ZWXSECZjXp-S.$n,K?=$~MM4<TWxjx#WLp{uMOxy:LnS/Andv>.>(^n"H$&f~g5Hy;i<R/LCjEfLjTUDHIYv:JT:"fE=R+nT7s881y_3[2Rfz_sT<Dv1(u:99cn!5yE/q@_D2Ptr?0cNdF^7`TxN&!XxP?N8MX&$j]hsHj&j@Kdl@=.eCP6j2;u^mQwD;.;eOdCA<`ok5lB$}3N!T;{umC8hj$SG"dx>O$V2hQqtMz$R0Pk$eI(w/i0b736slt,qN=./DkPKOdPf38nP`gVFB!KTA9Z</]~*RuP^tK]N03-vsv*vq^L.aG&w*"&
-3
-oT9Nw^|dMDEUj@z1?0LB]p&O5Ul:^#"]0;=6bv;nGKDJyoL)
-Bl9eS8#oS04_.,<v!J3[AP"8!2X~Pm1;;|&6^Cc>9zDw1ZtOiZ8.+p!z1+j`,bR<9mA"Z24Ft^KJ1Hc[a0KTE%7N@Wh;O?FzL8d-GMZ"Fm`TCix&Svwg$fP6&6/RtE^Ba;g_mnu_Ck"EGd;=c.TP1A@ZRP*?B[h,/_aG<:H7
-_f<"C2U!LkhJolX(S?dVf$vx<$"c.ZJ>^]0XGs>L-COJ[X8oG^ZY~L4<)3yD=[m8gPCs<8|&v4_E8(Smk6SKlZHFSMZ&cAkE]M;fDW$/oJ>#Y1b38CF#o?.kBE_$10@9/H?TP&w/+WJsrKRZ:d5ntJ8km@vjhV`l9R
-l(T?^Mi.+]9@x(K&O2RL+:aT6(?.pyfn,82)R_g,@re$.O9N"x^#NF
-f3W7V$7&XcW-L8iCv)#^Qmx::P+p!o?]%37R0d(J=xCfS*Wvf;&2w.==`_l/ghfE?C^);U~<=Zu(2T&-mVYxw<y>:w?Z+LGFF67[Ws%8_XyODpd/aEFI2e5H#rwPA:i*!&h>_s>ewG;r"#:b<cOiJcpS@Pxll)M
-#BWL!,jMaOhH#!LLc[FB}d:*@1:MbsznL,CI+k!tG3ZVg>ZFa_`J4:L*,fD0Pv)K)Fm"BK[m[*t,b?ckR^riz*X?5
-t^JB#-YqC1wD
-b/1)]S=}Lv-4[]duN|e{/tA$=Q;8+IZ?u]/uw
-u&wAN&';case"fa":return'(s`09bSZ+&iq4"GV5-S9yh8ag:CE-Wq%$x)^H+]22e>*U#62++,6chn<iJ-L5yt<V/iF3VF$1&9*KGBy
-kRvGKgn"FmxYRaISct_IyH`Yk>I8v[m)BaX*+J6<r*SJvYu,ne4/^Tp/BHb]?TH{tVvuu6gYUKQnc&c:&5Bh)LY4)bW2T.:M,VLRfQ"Q0RXEAZxoq%0k]NW6I,c#c=</_2o1=QloEB3RWer`:Ba+aagn49
-?;mWHn0S<xOJx;K5L-[Ffq6K:&jcTe3,8nwpXfl1Ttg/g7Pp3#$0~k/MvtHG,>.M%5Bu#<,e)%hR#TdNJ]O9}O
-hF[s4eg7chX@^>^Ts$uI<,k|D(0aG3PGUU:|[W
-=I=LQ9)9"yA9h+JRq@PU3^A6;kPAh](&9)V.BfO57k;_"KvCZM{Zf]_+e[Rf4dI_kfy`2ADMA>%])j1u&utJ,.*czd8C;l*pqx
-2"#Vy|=&bi9j1.#pN`SFtcd-M=(fZ-h<j6^i2!._9gp|Bz?v7)50G^:>W}Shsw)KeJtL8Zo$+BMF<*Wq4UfDWno]ilJzr&TR%S#fi*vJ;^N?g<K"l}fvcE/K1~"!$onKAZ@g"6:6s`bi1Nq)Et=pi;H&^qTJD"n/kU+Vpxp0qKIu-tJ/";E6=I4t?XJe"e*ee^5kf}Ag+MSuE^`uV$@nLV]lu9C.V.(xME/DTnpANeQtVjFCZ;^vtc-p8`56<Skm>%)6N%;TK#Xi`?GgSii.Say
+Tkv656J/v)+Uw<yup
+x5yGaQkrcRpVW~Qz2x]YGL,jL)ZQ%_frNP3p-hj-Y=1*H82HH%,.6kJxm0InwJN@xE.c%p"J*MUVF~B9B&</G|x3^M`ta6"|;|=s]et*>:sb6:`ImN4+4xedf2
+[j>4e0<vXr_y*wiww
+.awPTJ](ec)myZFZ5N&WRV8`@reA>;AA.["t
+>y@6PTT-Z[ec]W05Iw^=bXd~v!(2!p`^(v0U^=*0`%M@9G1qoAi1
+GeGq8*:a-o379,(gNT<AOl5Q2PIq1v*0Q,LNJO:>8UuezA7IrwQX7>;^jj#XK4r*r>K?$NS<=xv=(6qK:!<?R
+0JJ>"baSqIq-PKi3qk^8SQZH2P#fC>hw_,N2rq4]$<LpN>>
+$y7qU@7Sj^ZjeNjy^Y`SSYYP.mueO*?&tqJ-HHAqu>}Zp>y^<KN7a*wsN3.XO[bbSY2(i;m8G1mpGC?e^.bMPs,&bCx^WF%A<nFh5E/@QS`RaI=r@p~+LU+.,J5:~I&am5AN*+w9mHe_sr(;[r>bGmY2LVkschaE^&%&tU&VB#TpVZxjp?J/
+lo#,u]CXNG-Xf))ab-o*5tqeyiT&@HOc/zO$-&<@gYQ+P7jwZp6$x}QU=UK`lr0Q2R5+2]R4]W8dHcU*xsI|13*?]QY@ndOR&UuM/YIux~w@?<&l.v_aFnk)7I80v&,m-ev`ZVPXd0yKLS0ARpfn+$R
+-h_
+"VB9u)71=IlA6>G#d6tX4i&d+);!(ZpCvXd%
+/!8e0pg_nft>uLPlq[-yd0~G[YryDPIhm$V9")gX,v:@,
+:9??$m@"]Vm-<wob.5rD"?nASjL["Nz5&;:2Y5vo1q=i`6jeci`Xw(Jm0e-C#!&%:l9yVv^P{@pRxNT@B!^x"^aajooOloL^cV;>T7{1qVnXbnOfhcw#F3IO"wOn|s8b
+thXef9dJw/f6YuVj;m`M1R-1$qY/8Md!I*X351CjB4U?.#nATKUqn7pw]n)e4:rY=(;{+)unS?b!6?B+!Vn}hxRC"
+&w*RN$<K,|/~QDo/kv`B.>QIAPq<NB(5)=N1@@V/ja&[rJKUJ<QuM)j:>rYeV)VXfeGxT|6E#6,uTdS`cT#O.}?$Sp
+?9
+:EhiWW=Rw2:YZJ3P7U7:$O_W;Iya*sx@3V=Wdt[3P*!|_?d0;%iPcsjTeUEC"z1ay3^Lwyf?3|"j,jj&4[HhUk?O$EQ:I_r
+UwfhpXUY9$ji^P&$U>]Pr<QFfC.SJ-oZ^Y3Sd-1trXIH>V^7n=Ikai-4;p=-FrExuw6)trDg$!Dd?pLn0."YLU)bJ8]g5BE~Che?Y=3o%]SqfW.#Yq2#xB>^"QX/fAdaKT.Bt^Y/9{<)jZ!RE=?yYZJm2&"IAC&7fAjQx1d{q^.lQ6DQ%4x0owtGh~2"F~mhYI,ug_G]p?"e>~/#ym;aM%WD*6?ufVh3$bw2)cQMZBN5%&VgH
+,m&Bx7i^S07luw)Z22q-8hBF[ugA!Sk28"+rp:c2b
+.Uo`3(^"N=x*:<UE%a[SC$I7pMg#rewq82(F&]awG{;$NRSd&7Dwky):+N6t$(n:2jWn<^I8yKbNt^_KJ+6kT:u[kaGlCFlw`%8JkM@VW<<c3yP?cJL*O5+KA3ne4m`zwSR!6lNnH@Ll;sJWQ+F"N+,|L9GVt:g4;3dY=1!S2scGN?mxUKuEI=Z<lZ58YcMM9D.kfQKQu]K]5B.4sJ539<*
+jv]&&DN[Ss-l"b8z^T9jhJ^:5"u2h@xC1*?E3fnAs]wf:"5:#IWX.F"_m+Pyu"FNVDR]tDhjmnhb
+v2<$ti6GY15?SEfEgXcCPeJM
+XJ6YXhWe_$#0nu^O*oA/M<;nIC;!AC8]:svJ3_kNpt]tc=87s6Jo%1tf!?`3>U?J;%e]md[|26*`m5>6OEb9%#,~-GKNkzW~[3g*09p%hVfJb0CYiwT^&L^;R2DX3MoVv=n.crMs!0!/w%sR]6CSqjrtl5*&WPCrYqq"!eK!,U0a/)5%;r>;.Ea{>[hJ90xe":fAm98Gxrb2jwUpn*H:Y50kVD$neURIRG*wG*_U.dc|Vr!(11^B"]@6O+L1V1betzk|oLI<==9
+S8#oS04_.,$.!J3[M-$L,#,q(vlH$FA0BULS_ofVc4cdH_"J_=<U]F&JKH2{#bF
+&NkUe$o
+7gx.nIe(b;Z4P88
+&a]DxK#ZI9;O
+Na,^h;/?8i!hf"M3UOpm>B[HOU8Vef6bN"dmITYA0Sjp^@ZRP+VBKh,/_aGLr>Y[:f<"C2U!Ll3Jl@Hu*
+6hKeLL7"<!9H4?3gp^^M1-KGJBaimbidk)qc-OwE[]?_4Q#GLM"Jrx`Z<#lqQ!.B]qt<K7}wwF/U9<G@ZjkDH=!N8OoIit5tfYPB<P98pjM9MPJV_Oh(@*o9ts-]VP,H1Iq%lZ`vVs["WTq<`dltGo{1v!ew?Pn<b/qvJ[G0wk?iE$6N)BD_mnBhT[WgkpLLR].&h1|)UFTPl=P_N>:0.%7={Asx?);v0cq6X!fuHoyG)"<d!AwZq,?iFr5-gK/*qj>X[TD?#!dpu3!hL?acqV~E(Rk;_QkX(nb<:=]cvk!xKI~&%M|_RY8cb2*hRW=G0k=?lJ0plpr5)`-gU9Mid681Uh"m.ZNuvOqu,Dp/`xBRy9V`<6ycPxBdDnNwY3D+#Q~iVj4#xp855F_t=/<;/Le.<@*VFNhuQ@1)-_gsn:R/8nQI661j~hNv4*B-fyQQ&qDN![Q`hfjh`=^?>KRl<-1V""Tv6]rmw4m0+90M
+.)HI)AE/SSAW/!""';case"fa":return'(s`09bSZ+&iq4"GV5-S9yh8ag:CE-Wq%$x)^H+]22e>*U#62++,6chn<iJ-L5yt<V/iF3VF(@P1R:`hyqr
+rhcZ1}7/yAfAc3nmljMcm9rca_x>r52Ai4!GX+Lm:dm@wYtWW,k
+I0^9B?Qlbuw@Fyw^pp;e9Vy[m=$;cx%%tfACh<g0.7S@7:CVNEX!=3]pyLuV)FkjhV^pnuM_/(lLt^/(1NbLVLswH{ZF<&BSDnTIk4Z~<cH):[y|bQ.d,(^n2~ulb`Og,go^!-=KvdpK$8x+jy,fu.YRT1r[7zw9JOYC7R+bxy/!CT$Ve{d^8V?c-~8mq8>y+KsGBst2@0l?D}xKE)F|^f4B_:94gp.O(iAvaB,8YXYTyd-3RpfL]]FZ>k,.x?]wUUP0R1T6E[+[F[A3bvaYd$IA>LS)>hoLC=j2DMx31a7`0#l;F)wVw]W*)IBlo32]1$L2y#*&$07ka(mfZ#UYO>oF9?KRtXcb%D>!qS;+@EV(TFYwIG2N0zXX,z4n_c<~$qw"&(C`w;-.N%27MF<*Wq4UfDWno]ilJzr&TR%S#fi*vJ;^N?g<K"l}fvcE/K1~"!$onKAZ@g"6:6s`bi1Nq)Et=pi;H&^qTJD"n/kU+Vpxp0qKIu-tJ/";E6=I4t?XJe"e*ee^5kf}Ag+MSuE^`uV$@nLV]lu9C.V.(xME/DTnpANeQtVjFCZ;^vtc-p8`56<Skm>%!pN%&)K#Xi`?GgSii.Say
 K+$Et3j5uZckob>~8@6gm]6_[m`kP
-%Q/P]p=Gl874%%J0riy9cE/$#@%DU]r53{Q,7pR/KgW^h{Na)>rf0X4}aPi-V{<0NNDZA&H5C:4YV6/~>E"c.n+E+DMK!(-K0rO#@Qlacdc~]xP{K;8D?x+^BF1+#mZ*d-lc=ZwJ3n/d){[fuHG]Leaq0LO%d(e).<g9&E_O@3e[xh%`"5lAT`7Dkrd!b$yP/%(?
-lJ1"7r]:q&E
-/kh2Muq9W&n({dL-%Zdyyg"WOu[-,>89YgS2`t]Qj:js884;_;w.Q*+$&i/(jS|L7(dVO+tMzl=&aHBQEp&MZOX=TJWV?o]]y^Wb2iy3AYVRVE@v_,|[K[r,p,~T?Pu]E0XN2-7g@MwB9DPT`&?=^.II/<K!bd{QR`7Z+4=H,0@DRV@#7/m#dqUuE)@w<53%tQ]D-v_^N2[kZCO3Gui(HHw&,<GsRm}u__HVT0n<[un.ah7noyvx%(3H4g(mk-k,f#B
-i=k.k7ZE6DNVMru39,ap
-*]Es;6>err/IRN1UQET^Tm6aAY_]P#rC&yx&yh,K.!UIE5N&x|=DpY#kU-3VxKB]:01OB*r<I-mj<}8ScE
-`)FYq;[[PE@D<A?5ete*IV:$4HXZ:;s"d<y=h34%ANM^
-iuYa[Plh7I280(h;lmB,-);TVx@pZpj;"1.Lpwmp"fk2f0bjB#B_bjyX(u826X=rk7*.&I*e/[Kq*Kk^[p$7Q}pzNiC/wJ$^&iwb=|^z!zv96+t7_av63=h^`2V0;1?R9c.rIAj|oS`BMtx8DE=]c@ea268.8z5Byh.9y_Wt0O<C-Hq,!kP2:)h^y^I8,xafXTRYh=XQ`>2WZ[X1JR"UpqE9GlVOIWwN.1y6q!f%?7i>002P9pI:UF0Wb&&M<s)?r4SbVHgC;Q=gC{8up~ccGhKam6v$3}IMyC&gF{@9[=iq.T:d;fYhMxE&#a?~w&4cS3q+5BVc5IPj`$j_i,(3Oe.4=I-my<_7GO/x@yn/KgcNh|e[8$2P`U;[U**?C+Q:sj4lq4s{<a*)hfA^-iRK0co2mlY4OB3<kAp`%E%Av
-W+Uf.>AIO42k1xlmW_EEUaKK8=]_=3X*KgOED:/B=jQ@8{SBQ0%13fS
-dMb@sXhf%Dn2RGUk$<Cp3;2%mM#Vyi,a3{8B^
-Xhc@B3C)tPZUBy(O1@k&y5J*aJAEW2#IAScrM:!}lM"v
-A2&hEjtEMh*-Q3
-Pe]*Etnj
-e>
+%Q/P]p=Gl874%%J0riy9cE/$#@%DU]r53{Q,BqbOKgd"9V#10]?Bk81zg4y,AZ@=H$hX;[nFljH/0|@6OyeNJj/Q59c-+K:F?gN[30_:N%7TVH*8tPOa]g5AcMB"%g:[YF_?HVYGp0
+l=wNCgMaqHjvh]U&7"!Q(S2-G3Sgl@[(Q844D"yC,wAeGNSy
+wXuEt@PH?
+[)#L(VGDC!Pf]$yV]m-cHdQG&Ed--yxzIylwVhT@Sg9u9_"o3#=nNEwY#G<B?K.^]=/85CRbQuUCVE:bUbyEMs@9MWG`%hvzImOTBG$uaDu0R@]9d9X(%WCL;|Hhw&56-SwB7uV|8w#N[S1p#q8^y1yC.jL(H
+$1>!OQqgRH!o2ck|VY%,QP<K1/e[Wb8F.K%NUkraUtce66<,W0o.J[OGa(&_J%TjU~VR>)/(=BpclyTtf/*PFlB+5,DLA&z(jbyxH[9mgX(t5c,n@6[6-a4{67/=D/OdTZ*?1pg$BE<Z8?>yi{/JGe&RQEWKo?n]+Q2_:3up:~x,u<+l0o(~$.[/k%/Qr>[_V}ap!lHm:0t??dRhC_>
+&pu0L`
+m(B9Bb-.i)z@mm3NP94Fq_lNS!SZZ%MIA;fS~=/%KN_$-)m5
+FT
+P/*4~Eo;Wm8#yt|gdhiAkU#di"YOgp4J?>D=g(6qym|qV`$c>"3i5QyENU>Ec%d5N=Cxhdud(1*BYQ{#_Nmos5l2Ify5hKe[90euf[jmB`
+U"QX]ibt*
+cOEd#)URd3)mlceRrunXY|r&Q;AON5)CH`j<=9xu5a>|Vx>9gKCb#FR1W6wop^7rIF7*(7Vq6v]w4#985Us-%f;W<HmZ^xq0tr$?xBh%
+~
+7XR>>BfQepLFd)*H
+U)R80]jG0&ilIWS]WikIOlQtM?mQjG`CF)*JpybR+Pl:SP<Q-W>dR[UV9I<zn|#=
+syQGHM8TqI.(2JW&kE~ZUX0.BQ&[IWMeer{DDl|@[_TW7vsLcREQoN*@2G#`90z^@d5!hWKGZh_xlWC]vQq`j#B*m?Hd?${8/$ZDWrSeTyaEIv
+W+Uf.>AIO42k1zljW_EEUaKJr+Ys;=X*KgOFZ;[F=jQ@8{SBQ0%13fS
+dMxBRUi)$qn2RGUk$<Cp3;2%mM#Vyi%,4^7/^HXhc@B3C)tPZUBy(O1@k$7/J*aJAEW2#I#9crM:!}tMx8
+11ohEjtEMh*-Q3
+Pe]*Etnj[j>
 B@:Cv?92@b*_
 )TO]wlY!<DAhkC-eDEej
-Lw!GTBHK6wMX([]VUl0CaV#[%{JJEsWIYKQG-};s-{^nwd<Sj+"M%5YqcnPP[z6:gtA3E*$0HIwz`H"zW)<W]HQdxPc>
-UhMKM?"P-&sxiLYM`h3O^?RdF^J=6]Vj
-SKV{^nnsDlfxlZ583]B-D<r.2gnHd%6amg(Nb}%=&*3K%J3i<Ao5hHb<uq/p2J4OImCQ/-w|cxm):7LKpVD$<BadI*>WUAE>b
+Lw!GTBHK6wMX([]VUl0@wX#["2JJEsWIYKQEe%;s-{^nwd<Sj+"M*dQYaxPP[z6:gtA3E*$0HIwz`0"rW)<W]HQdxPc>
+UhMKM?"P-&sxiLYM`h3O^?Bd2^J=6]Vj
+SKV{^nnsE7fhlZ583]B-D<r.2gnHd%6amg(N_4%=&*3K%J3i<Ao5<D+7uq/p2J4OImCQ/-w|cxm):7LKpVD$<=5`I*>WUAE>b
 AzYSh?3
-aqu|aHb}+Q9</kc]dcy1
-4`!S>BZUD==%HvdTdvPL#G2]P+peLCW(0-pfx]63m]=i7cZL86K&y2y[O2q6#)q_l1tx@e?&Y1>0p*i/`gXjQu
+aqu|aHb}+Q96[oc]dcy2weJ%S>BZUD==%Hve3a`NL#G2]P+peLCW_4oq:t]63m]=i7b_L82_&y2y[O2q6#)qAR1tx@aS&Y1>0x*]/`gXjQu
 
-cs#0z;*0{Z`J<fD!dO*#!o:_<(`BWc=W$/x9})iB:0l:t^_.HGLrN9hkit=DN)8y9YKs^67yW(D(z
-z
-5m)iX<4e!R&W_k8:y:6;p6<el(CA+"5OEIT/FKjJ,6h>GS`Uh0E3E:o,2Aq:E>EIz-5k:o
-s9nV%DNMO]%UmkL:Fw22aP0:L?"*3-W6Dpazc!tx7u`X9WHX(s#eEs*{bGhWoO"wo~`d"YgS6<oN)&@qRNy(GBZ>Z&e:Vr=K)W';case"hi":return')s`G&aLWr/eX+r$yyUbKnV9#,^XTX;u7_d+Ga=YP26Gbv+o,1Dp2RH`R>Oxjbgsgp?W47Dgagfa3zj8r_)hKTs3euW|=I
-sBu@Aq,]Ll<m;Ggn]hm4lfI,i7X2pa=WfYfQj>i?l?BMJ`76?8_pTw5Ia_]HZo#L]&"p>v,:mHQBO&!UwSpxa;OGU`wsXSfki17mNx"A!g4R%=xd[Ye3FH.Z0
-6[Sckz(^<=F="U_)gm#q@n_hY`YNPnHu7irDsn=#*<aWKa.;xezH9m2;Cp8gIeA-,aE8IZ=pB./[q(9i1br5GZFroN0P?65M=y<at(RBs
-^NyJ~$}Q1I:^aKBu$0%L+6L(^:v;@?/ppypwgn~l`FrdOSDT2j`_rQJ`j9}4,53nv."tHoIp}-46X&{H5CsN(+lKgDIbMXk=Z&#f}ba^.>am2TDv<O^!PhxGKoVUa3^pnY$(JEE$M_4g|rkZeAel,iNR&oF3%6XVX@`h3v0_pxnpmti:4a!f@,5PXV7`.BhRORJ+wZT=bV4,XX_b-qB>.vqe*L60NgRphOG@MyF#Ed#6&xoeX`,X?Z6hgPjCB4PT^c6,NK>H1KhDnTV<L&d^uJhXbX1cUgkaSd}P8P#>b&|;6j)>!]/w#oEj6J?$#(wlF95tY<gcSG?i)$%7X#M[$#j?bYH(T?n@{=,7`P
-?,mgpYWm?I[/nX0$txPzac?mE;GPZ4BUf^Gx;wy1T$`|YkT8s|8Op]*[gg5GT}eSo1qV!4##wybMofoz/HZHN|g=XCtm+d$/T|kt
-l$I%BtlW=3rxa5s&P`=={tP_w];>8e5XWg^#2(q5b9H%*q},3;/!y9(D&/"qR/#P/`>ULZ<#k<sy7[k97MuOr%~$okMMBZNAfq$.B,iLt&}mvl"&yLHO~<Q1(Z>!4(CR7A6=+MwrKhc!Y9~uB.4Nh"nZ,"[NR<gJk.(w0(Qf*[xZa-C2^Gq_,jLEl51J(VNtHbg%U%fIle>Ai]vNdR[OD(&%CYxk-9GibQ%OVc>F/ZT_|;W
-<Bsf.dfZk;irq0_Qp-!6x37Lz1t3V]_h";r8VMu:?dgJhiNyyIb:=Tj2E<d-{e5s}[K[1m=nOe1ZoU-Rz3*x@"m`qcy55U=B:A8bV@V7|gOeDaE_r[_gX.fVA-_<]TO`|$Sj0x/$bhRn|yuXOM`gobN=,X`<C0R(<hZtwgm841<F5YG!@Q:!~2_g]0#o@,#eI:z@%C6raaTT2vi,fEaQGr"IZ";uJ.TYD=v
-3kc%3Qx0Pd*$}9"`~)/B"[v
-Zm=>dk
-fr7:j:Wn6*y$9Lf=0;0n"t_v.</>@&klxt+/QW!NEZdg!Q9)SUD{>ul3"VR#I5E?fA7tK.cil^`ojV)Kx3mu;flgY#ZBMh8}>:jy2EJn*6KN?<TV[1O_
-2@-*R]:jmGX>ePLmQhY:7+gh{je9g3_lVY<`wt""u8b4"",;|f#O>nPJQmWOj`:6,C+vUE]B)]Or)5~(Y<Kf%P>*1Ixl+l))>nz3vkxh{mUMqr85Ei;@K5cm3B1>7Wcg/Yp(m73fnE*qo2G%J%RfV@3dX$hD6s[5&w-Z{)NUvRkJ~KBO@8h$`uE/r^R9c[qiiU-85J607"93,8$PWAY4a#1u;a;"2a2/>SmCfwq%4L:vXboF
-6OeSA-6YTcTJQ1.XNYBAL8Pd/]6&e}KqX$oX"df(:[ZlhQus;D%tTnKo+uQtB6qR".P.PDBpV:!07ZJfb9?2L2Wxj#40BAI+.^-X.WcJqRXMhz?qgsR{bfd@J.e
-_9YCT;U$R*#*T`;>r|i4Ens;w^CMKjo>+uBX"N0bFQekCdDHh9y~3]Vs[Nb}J("eE*C3<q[=)zKKYL;dP
-]$40B^?URrrV#nRI`i?:I!%LA1PXM;2R.9w{v|%fPC&c^D$^!Y"E*W%V@wlt$YXlO}`wKlZK<#Fk.V+Q3w.dHy
-dTQ_+2/(%p5#+"W:Gxp]O`qB/Dbai?;yjX}(%q[v;)S4I>(
-c8.vnPmI@cnSjrYScoNHj;3_Bv2RP+<c9j&wPc<gq_O-^aUo,+3D=pUF]S[<MYAJz5]o[b?)D0bW-s<J7O}7p:
-V"9+j3R/T@1bDVQ#k18#f[Jl^^m@hafw$~U6;~3,e!L9*k6?+GU]%{v<0~CCy)fCA}#6!y1g_08v&4GyJzTwmD@2N:&/Ng;7tzf?+oBPLlQbn#tpK|/M5L)F.bxo.M&6(J,yj%SoR@bU[""9R%9.#oj$F!8eHE[z<)T@R8y7qxrrc7S042;v8]$+ma$ieoH=_-HK.@g4OJUA:[q1U_U*q-?De}U-)(CYtL0KRln8sS[(r-oiP8#g.!s,r8I#&+(P[/epa9Sni
-[ND~j[:g4>*]c^BLKGW_%WX3sn$(Ud43cOX86uXr1k/nV,Cyn,PY]c!HEzdB
-++esDc;LNi"3>$;C#24#AR=KQfI$/p|&}WtABKf*91Adp=0p;MDt}:Y,"59@D>Q$&lr:]H,%Qn9SNg^GbgWZv&8E&:7<xp?62B}629[5}aW#ke".gvlxxbKW9mJ;;8#WE@b[(;w!D
-E5fn2Qjf6nMo-1}Im^Aq9_jaBEIP4p>0kHd)5c_J>><)#G0Q{OWirj#Wru(V
-.K4Jj4kUn
-Z>
->>uS$,VvuqUgaH9IuMQ464Q!T5msI5p9seT+-&TZ[XOM@@C?mG%WnIp"`C/L2]FxsU5VfITVrjZjTQOX5GWx[A"tk4HdCL+8o_qjXR<5O&kr6kOu]]][VlQ#tI9DS;mobBT%_8Tk<v#!40rd/"ksZ2d63[[S>Pd,)hR3*>Dn{xKB!vogpQN!4>8PzjMM.vN5:HWk$(SD}0O
-]f6lA2UW=P%2X@X)hbdD99$^Ps$ShaBsx50-?CI+8hpG%wAqvSi?Ii>rP"|K?<^@d=-[%#wl@gmF0,)Jl[?6
-6Fgu3QW3q]fv/<rNukr%0at?nVcqkMOZhdC+!{A&H32tS_E;=I,Z/J#K7j-2U|jKwDYHO@Izh]g>!*PpaR_S0g#80daL;MV8P
-`vdft&@K*6";rROO8l.:T@=Ft++N_>q1%rZy4Xm
-/ZS<:4%ub$+v*;b[ER2Mt)<q`
-m12"RK<00s_3[<y[GQOSR/3x4Yd&0O2*iGA5HyD!Cv2V_slJ/"FijS,}#Z/efH_qEcE|<ZOn/
-^kPWx#8"1@!a8_KklMcS5j2N!))~bA`dsFujGHr>4xxeE"SJAIK"YxP#qFPMsMp1g=O7y)x<ke_6b+.$;w@;B#L$5cW#x0k%
-bIf-t%:96vXp|E`-X]yBJLGM?yw>:Pbm:iL2@-x^lmX)SPsrJ@99xN
-%*b*+;q(u.bxH29Uw)Y}
-;c+Tb#Y:j1<N62L0U:^
-b*iIJ>~GhHM4hiGI(`eGk!vCu)5:/!khp3l<Wr>D##cMr#T9/b?+TYuFc@fs;;`$XV."i`bl=SPs`O8E>:/I1:>52O&d:?J=thaC<M{xd';case"bn":return'"s`KraLWR#At?lQKBA#!7+<-%v(cw+p#pP>6wO-4yA&)/,Jc:q%_{&?"ZBj?WgR29S=E$/_k@Xp-<z#dD!-ycH)?nEFxPFxw.:(b;A
+cs#0z;*h#D^J<^l!dO*#!o:_<(`@ac=W$/x9})iB:0l:t^i.DGLrHel)c^;DNDin8YssN67yW(D(z]!
+1m)iX<4e!R&WTk8:y:6;z68el3D0X"5OEIT/FKjJL68>GS_4dj33E:o,2Aq:E>EIx-3?6o
+s9nV%DFuO]%UmkIQCN*ZaP0:L?"*3*m8Dpazc!tx7u`X9WHX(s#eEs*{bGhWoO"wo~`d"YFP+;oN?!wvRNy(GBZ>Z&e:Vr=K$(';case"hi":return'.s`F;aLZ[/$JmU#nuLpw<3c2TpMZn%M%nE|P34[!T9Vf7)D"GQS$jDI&[9rk!.^g@.$;ZDWppFlv&sR>(.*Any+s3FrGkvoqDh)LK3*Vxb}GHXy?&
+I`ajit$5gLg6JM%4dvt[bIRO55)uLK6BGr0l,r..=v<gWtRq$)**5m:W,x)ae4V68RK;Zl;=7Td#HPgs-Yp:s(EMnZJ3g5ai|krDm4iqDq^vuorLUeAdzYEc>N}Th<Gey%gp9Gs2Hj{ks_=[tc.J~_p?h3ZbSO7qOVj5u+`$-jj*rMUDPSX_!1MD=q=4`0L:!D{K|rpFzbxYyc*OF%e5[9ufP6]4I33u4,O:{2:2xfNVp<.[JqNjgONO/TFcvt45}E[y?6~Eo:ECltuF$.2bX8D?|qoI~p}^V04"~l99!i~pf,aJ32IIklxLY<c<NS(k~Xuha+54q#6W0/}yoU.4h5^S36=?f/Co_bG1M-thGth#?Ws1IIux=JUu|j>lrZoAGK%!+1b0:bn*u-Z6S$o0*]?Gn514OsWZ{h_X@v:>{W#Qp8#^YWG,#y-0VyR#Zbs;jj,-|oXVEG?3=l6.7i;1Ba;b,qtOddC
+qtGrogK58#J]#;01=I~6Q!V-gu]A6px(tofsY(~v&&R@e_q#kBa5qbFfnv=Aa0hmeUF-c#^oR?Ey.G2MFoTQ}(L+D$}CMP#ZT
+MNHB0;B
+)YB7ik-E
+oDS/(S]%&@Z^#G@Dp@?M8l$vB7e/"T0.e.wQ7N0]vP4w+G,r0t]!P9jy&!p>C>"q%Gj*fz=R$<k}XScrfo42eP:Mcgfh^w:y%5L?/u1c&vsT!U3pY_vk.N#f&3OAV%Pz<%&5FS0o:N%WWhrt[+8TMuVF1&#LkMGn.H&uya)E7saI:Yq7KUukk`=uQ@cD$J(sZKgH^0FE5Wi*R~o,pq([I.%1!R%)8ZNi[%%Cc@fMI.0MrGd($k+M19?#<X0Ji(iw*yV.[88<5"Af4P
+l5>g.8&lQ^cem%/SY$9WabfD%r{&RkQ%U?B3<grNxrdOnur+!4Zdp$6`XYC_d%ciAlRnhf?/.s~jr29Mrl{oJU=pW[@KG_)URVg6gas_0jBkG;2.uU!+*lFV+1.tevC.]KSNmJ%[4b[7ZKd#5c_KjZ<=TNX,Dj31*HUJW+KDxM/iDxSw*v_ZEV@QD,A?+fB[<;Mu0l>vJL2+yLQ-Y?Ie9w?&*C?0=%HbN!0Qwp:8Edw7X8;9x&O
+Rlb!O-IDro3Le!.E__Fe^eBddT1O282ZQ@l0R)Q8*O-YId/5-(|Bb[.
+[:d_d<oQpXb/yEO:=&5Hw^IgV_QNZO&<UQ@:2`Wnn4nYxOM_xYFPl4{!U?Iiu)Z%@F_j8EAPEX|L]n|B^ASZ^ey-S4=W7JfZI?#qlZS;aXsDbBnNd=54jH]U?VP?MA=.pkMr_,v%Nr.WLgM1JZ+<wNI<`9ba$[2JPLBN:ifRVi`f%rldbXi69s?C]D.V1b_c2g=j"w$c/pS"pDd_dU47MvVJ>aNrO,X13M{KcEhn:`AC9#us1S&:0t}1_9vm!D/f_>6gXr<N}:}qyMJ8TnfY+"WbXSh_4_MeVnQGukY)S)Xn,!T[f<xG`omkEJjUoVxO0e5_"JzI|/q_0p?S^<v;|Epk,42beG9/J$Mi>:?@7t3QiIA!%O#E5,Img9[@>Fei=)VDHvv_-<u3Nb=N7aOSY0,.m?u7XNx1JWn[g+1kI0Hf1MTp8/~QMG0!bmaBns)J;@%5cyIZ9Q55&?[O+j;>sn$:k9u3Oos*(#!6_r]Aa=xgt^z7)?lSYAuv3)nZOvq6vi,nHP>b
+^H%uo/O3hTMZ(/sI+7O&vx/6FFGUpod@kklk`tjb&#bi=eZufg[^2j?v?URvrR.pwlFhrdu[)1UX#[xeSl9T[pxa/d`<9vM31_s{2cv+.25jDWJj*|xv?pl-[#=X1
+R&TwnKZ+/"9[b<;Sf<_s:Q]YQ^ReHCeei2FSlQ<[U@>%u4xu+KK,<}BUAp*
+
+e#bih(";DgB!/Y!f`(K%oTc.eFXyg^Qm2UjPgm_^a0n,;Q}"W0t6<9^[^P=UPAMd*.t*e^!)j
+y[;eA=/A"w3JCN~3AWyc^/:jfRs)1Ubywsbjp!dKA$}_7kS8BNW.Unilj:}iGEE&1i`-(k!@IvS386FH1O&TGxSFKd5IfC1IA6f^j?}V1SH.:u_v$,OgJ<t:5er4z
+qj^*do"j)l[#SWR[bJ1$MQ]
+iY?iZTziqT6^9-~H{f9.}Ldv4vOS.>|MkVp10eGU"v2M)f/d$R%.-!S?R*}WklR<sU$(s)A>^38Un5ka=5&&qb]V-O1lA3r2433K:0Z+^n7k1ZbPfsGx>JPoIWF5`Ls=8S|G6udOcMgO_]fwnfTiHWVgzA"<(w#x*O!J|0Yiw4rnhx;Pe
+e+?F*QF],shp8C~_MLstZwC*8-V`B2KHW7_snRoZUU,iUdPqcYf51"E5qtit[CJ:WG)_T_feh`n+[d-oN+dG#O"En)0u4QbpDdW-8<~Q"6,Vl5<8tRu=P,?*fk$H{:=B1ntr!sNC[j=K/L.?-amcz=bBr),ax63HO0]i4&I@}/SfsGk:$x8rM!Z@F>+y
+_;/Q24]z:7
+pt}s*H%jOdf`>DqIJxrF,`jcl4bO7^IxbH`u0ik,9l+Y`[rCi:pN3.zRLA
+rj64WT[549pLAW42]][TH729=mVq4R=]A*y2_$[L)j=O/0=m+K;}980Y2Niyh$UuWNVU1zl*:+,HQjU-YawPg&F.g[,N&6QTxV(BRw;JP#bh
+iW`[/C<Z=7]`u6Kk:iF=PYyckM&$<X%(h[HA
+m~]k"Wi#_1FXf
+Xy>2pc<:pQgA3Mo?Rp(WQU2)rwcMGM=R#Lk->&T%t>u0j6e?,H8.pKWQwB*y;JuT8s49qp72&cf>-^l-0_,wZHRK8igF0ZsESyXqq`$
+&Hh.q*x?@pmE?~WAHgDyJw_j)!>
+Nu`ZZ8-+HR(atr7scoC0E(,*x7D^V0j#ajT:4sAIddQL0l
+H$@:Hk|AKaRR}h3"npl;PAG.:Nn=Ft/+N_>q1%rZy4Xm
+/ZS=f-=!J0_9G:sZW}bQb>2VmF8Tc<EE"+B>!63ovar&2&AhNCh@7BK[IULv=M)EtA1A`Bdz!8Kf*/mF<Tci61+0LNmC+~]44Bk)S%eA7(z!y/T@:*Q,iVEA5_yEyW1HL[^Q=0T6HAV;15p;NX`MvIF
+q#>&a;l0s23mmU*ZnE:(_.S{1f;1BKFXypYV9N0o9&<JQ$>DH89=B281JUC~[mGLM:Y=gpx#oONG_oHFwVsxB7UxJ4bs:g7[x5CEH>Mh"*c~)+F-,;b{B?>.c-?H<
+lt=w8:2_NeSy;dDr^sL26*>dv}DCD%Oyp8TsN@J^"{ZNn%]vgsKWyY<r2k`|xnvdWQj0b&t(k/Y}6iVMT%"[x$<cmbyIkci<Ah2cjHf"+lR12=Oi,e`,B9s4N&';case"bn":return',s`KraLWR#At?lQKBA#!7+<-%v(cw+p#pP>6wO-4yA&)/,Jc:q%_{&?"ZBj?WgR29S=E$/_k@Xp-<z#dD!-ycH)?nEFxPFxw.:(b;A
 mH]"
 q&&K#HO0dl.,A:Ds)?OB8,V
-g=>G!kHNoe*XM3`Rh#2G~fmOm=,nX7LC,.SBk]t*6sjl%l~pc8SH[a/k6WC?yeu#!H)XC4V`{Gdw`*.bmUbBuHjtrb=VsqgQg/ADhwma=vESuJ"uV+NdR*(^wwOXP__6[I$7(Dk^D%Kd+c"fn%NGY_;c5_[X<yxV.aURF3c:JEL8A%rK7qJOLweqvs[
+g=>G!kHNoe*XM3`Rh#2G~fmOm=,nX7LC,.SBk]t*6sjl%l~pc8SH[a/k6WC?yeu#!H)XC4V`{Gdw`*.bmUbBuHjtrb=VsqgTP+5Dhwma=vESuJ"uV+NdR*(^wwOXP__6[I$7(Dk^D%Kd+c"fn%NGY_;c5_[X<yxV.aURF3c:JEL8A%rK7qJOLweqvs[
 
 4e-,TC.MSc[URraw7/&BUOCuJ4#?#"["!zLWARH1vxmT7?qE:5P)`Rxk[XK}[#3GeYwBkj&ID)P1*r@V%3r$/kBb-&_vdG:.7tlPc7vNc6gtr7<&DEZXo!&HfS%M_Dm4R^[Ze<iE$;%ve%`d@0&wcT7#:XeO$qsXqkK_ISE.Tq6LB1"pn>FGD*V7?Bt<AJ-(NYcUnN+rryanP<Bwv5@XX8>~H/q;Q;ii4fdg0/M;-xxfTw,3@T:FUC1O7{G+@WrhJb[c"WtdI]G7hP$YSx+YhX4*7i<`3:$hG,Y4$Eu,,/&ubRuRP>D}.0U^(TG9ydOTZLXL"kiY_1$R<~:+]u^jdITc=tn55d0)e=@Mb~J!lQ#g9>C5=
 _h%?W0TX^u0>EpvmKSQ;N_WL^fU8P>*P:G`:
-L="%x8?mr==pnA`%YYDj2[cmr,}ZgVZ>~V3Xd18aL%SKr>#$C!?qN)%3[nV2bqe@Dt3fu?Y%
+L="%x8?mr==pnA`%YYDj2[cmr,}ZgVZ>~V3XN18aL%SKr>#$C!?qN)%3[nV2bqe@Dt3fu?Y%
 LzVi[Jx7Rt:a7.*71f<kN>!=An8HvI%s
 
 w=a_F3yg_:Fkg&rzi-wJ4Kq_&eG_vn)Ue9j|.x5zFF[nOLFohOj~%bLc$qWfslle[,3rGowEv{WO4vn`#:^x4mkr[Y)Qv&Fp*/IobKp[:?/+v>MFOLj*Zp:0N.g%HCP
 VghA
 #X`I&U&nDT<5G_TtZ)#ijs28k6+=x48u<%qhudanu_>c1+Qs[Z-BAO)hKR^^D#WhFC$R4yQ+A)`;-$~98Kl9V=v)~<tY3I)7pnQiTs8VK_bkU))lM(WaAfQSDjeD~DSy=*@B;I=$SwV"72GE:_^WwhutsC=,
->%9R-8h^D<-7a:7$;<^eQ3s!PEZPgHb$(xfhOJtca%<xYp4Qi"HV)q,$1yyGZ/Zy&:GkAg&Y&ePSpU
-U;*$tT$_f_-dn@N6Jx1x?`$tXch"[IkvfgD=8cL&/L|w^wVa.RRBFv[Vybr)#ml>0]Ans0BFvr|`Z.oFnXPl$s<Y/`K%x5+C60NpoP5)3f;pm6/yOdaFR_;a_*PA}4bV
-9"F
-R[JfB2T.xtJ%U
-,K1G!/^Z[r1r3-(,Kd!cTkj[C-xwvRn)mkDlgu9m`Ye_
-b*We),EM@d.a1m1*!Xz2;Qn0V*;f(_cd&Lt+k>~#?%r?]Qv+ag}7p"Mre2jKg.7_I:VdRwm52a>?vi]CN8.vi?8E7tc4[O1x68.bwWxtm%_kKQJM`G
-K@>G;|9^B,;[*?@<r(vB0n5Nd?rg?8yw`
-m.T#36dLV%(s*D^z;KH
-TmfXI<-hx#I_KHdihfZjx}(na!^s?#*Y7d:A(}$aKKJbq59URtHXTK#E
-pdfjRqhMsL*QRJKIL=^]R3f<rYciD^MQk`.l[%E8j"2k{Zx$$1p
-F)/
-7wEfc#Km_JvQ5kW,".J9,@lG;lPfU
-<eRb[dK%LVC2QdHi52i/UaSjW#z@z5d3?_
-]SqCaAXSox)W-B=W;__WLp0G^Vci??q]]+=Sk.f4bJ0y))*_eRXX.U9^gZ-)b-w6v@BTaxDg5[m%E|D^VsH^(R$;R[JsD9)};BW%BJ!cR>G?Bi):+Y/0JJS<IxEG]q/3/vt_(2BMdZ<iL0&hT[+x,XAvA7vfguHvU6cniaeMHREll:pAf[NJ+#%NC+H8*M=xWYf,gb9^t#b8TO8%RvT|;z6Gfc>iiyYnD,Nul/.LsP5+jY-+x
-89SAuNQ/
-tAbeg8fAV@-d,v0d;&_L?!fEbZ9m$2=l*?/0`A[?|P+%l(Lwfv!sz(y
-<kz2Z3(u8&fVc<+#X<{UL3;h)Kb02ngL25DR7LY4uAN4+!flO*oe|`94+qjqX
-|&4lfdy;.IcS8]gNwC{cb*F4jM,WceBvm0^hqDyi3M?Rb1j#&U}970M00N<,Tai.=p<"XA;KbdWoj[8-fLI.+jj
-_O*XjZ!"OuU0N3xoWcM@1#K*c%>e~jDTp>:o9?UET2M(]][OvF@qPM_LU(*p)M2wIJANX"7-Qvr:IYaFkG/:S]NQpP?
-2HvE-vjA83K2>i2`<#ef)=3*8=-RU!g,03}eF9,VWTiUA(C:;hAj:b5eT"jW0blSNvIYm(ci55<PPj)i<VJ[{mZ^
-def#^$6y4l`VHa;z2bk<w
-Jo0fX@W?k%0YZ5/L3=O+jNqO(;mk5nJAyYtH,`;hLE0(RV76phDFttdv5+(+l&CFdD%_3ho1t}Qpa{0.8?S-tMz&R|PCSP%luQ6qc/
-w)m,;TsTP_^Vq)0$7T%K*NI3UQJ^5q8F<.&Kiw/=kLfO2v7,],1+s[OK[;r8dZ3(7y5EB!Li$37[2,sJ%G}l#U8`x3_U*/!^1JS?qdxIctTcG2~ki(Z>xT|]j/-M{bg3rVUSA5MBB_K;kciyGIDpvC$6%>6SOD./#pxS[eY$(no==Dh^rDm=X5cPU_*#JS2HMlRr:m5L1_)=f8H]mf/3Xai8Si&m&[`.9<h3QwK?M!FT>jNht
-nt]N<<QgCx(?cBTvHl!J/@;3F"0n%N"IE$#I!>nskb*+7xn5Fd[g.gML~[B3n#BRdRs0Ul.<-g?X5,`=]q,tmlv,FXPp|;swld4>Y4u3y>s!$9YOC"_FD7blp,1+|QPxFORdu0+ai$.GQ_JEgiWteI2n-hjPOuMFObK%r3fk:6cF>czDCyYDjvc"
-FWF%
-i:9/ZrZQ<B[p`S^,qA)o<8x!"bt*2V~DFwHl+F"AN;p9Z?M"q:1`^S4Z1Zn`Tu+IJI=vPwbIcH4q_bzFPwRI+wW3y=frib%"Q-[y3iic`P7@[%9&W8jNlG9g|I8F/Q0nx5fJQACS[>LZ{itr/%Vc^Y
-&C-VG+5B!P+CQQA
-?A=AN|2Z&Q&z(FkdLI_aKL,qGxakN^3:3LqAupe:B7P{-lH`v?]N6/[a7(wC-oWty2h7D#u?@wExb>u@xlq-Y
-^Vl1*q++K3(|P%*/[GBl`ma;]20#?8gBw.-@hxwjkh&ICoJH;D))m|:Ub#P}Y-lJMPN.XgqKgPaHUx-JNA(7wZ8ssC&@?9U
-]:2^^MA+&e2c-0p%2IocIPRwYehzuAD"Oz@N4&2jY$%>JX,>@>i>U_L2"m5`>bJsY1W^KIia<}:e,M73!xy7SeF#Hu(s4?!cwHBH;|*g6gZ1<UKlXY#)J9pend0pyAKvk;bD[f,EOH.
-1YYlL&VdhLT^N}uq$;rNpc"wLVr
-6>,_qrPny@VpEwb"6B#(7R
-#h+w7iiojbwdMohdhCuP,!6rAy
-O},Zs.9i3B^fqVA2r/lA&l9SJ1:=SVKyo00o>;z)5
--uW]me#`T<atmO@wQBLF23H/0Z7s]z]9+#ru8Q<$3N20=eAhe2+sdQN)L?8wGOUt$vtOA)ErwB@%,??6vdPct]';case"ta":return')s`K2aLZ;%gres?G16B%NrL+FeG(+0.L~d-u|hd;Eom&z2T!}Yw9x--bS8n9qF0axpU1wt1Vqc{v{r2E.8!=^TnqMsRXCnllua>s0ucW3l8n4wvQzt47oatl5<^5s32(_qnZguZw2u#b^jjLOs*h[O8b?IpO7%cjq&)uBt^cPyZMMnLWmf<1:!Z.E:2B(8&Cg>sL>m?@dvYEKOR@uJQx!wmrM>$b>q)h;BJF|M~_6KA#&y|z(^Bb@x[z"11vD3f[Mw(R%wXG@N)_md&*Oy3%8W)lzshPefWq/$%EH?]
+>%9R-8h^D<-7a:7$;<^eQ3s!PEZPgHb$(xfhOJtca%<xYp4Qi"HV)q,$1yyGZ/Zy&:7;<8&Y&ePSpU
+U;*$tT$_f_-dn@N6MW.L;`$tXch"[IkvfgD=8cL&/L|w^lWEZb7xM[[k7oWc8B#dwnjhQVhc%"?Nxpu=ud".2p
++B59:|k^4:^FVLe
+go4vF<NP>|fvhR.~&IrR4<+n_loR#FK~r>a7H)5OQ3k:MItQ6?%C#GO%iauUq/IlO^8]Hmhu&oQH#UX&Vi"}po][
+.ol02@l0H^C.l>~fd**u(^D"[6tjjbNy8r^@5>Fi%2!W6yjq3p>eK,P@v^z@tquA@x
+(3?1P0gcmpT{+BQg;ncBd"a-Ni%u$/_So$3
+O"^r+$k/"wp|E*Or?@G%=.w,FidBU%AY/#rd>fiAd/:=
+8@Mei$!?C[lxi^
+jVx=Sc%/b6X|e"Q2iJO}X2${Xm(CiRW$f<(BHi#Ls}XYb&PWYx54w[4PYo7LfQ_@I)>jo<NKJ2-/@B!GUb7LxgjN=n]@?COBEdWkHi!7LMM??~Z`fF=3(2#Ka;0|2OI<<`[2;LdN][-Yf1bF;K^,r#-EVih7C{o/8A;s-!n
+%#=_j#R0$nK.Oz6KeqV&6HiHb+
+eXaEr4=89Iv(l^W$bNH?**.p]=<N+aarIIlBES[ZX3*m$AGYwh"-_v?.@/!>M"WjYc4
+"v3i"/bgOij9Q.{h_NvV.44FY`g+eaqM/lbu;WuEND:wyoAng30]7KxY24}HE3F9nOESGvl&@G|mcJ.X|qGv`q*`c_?@_:~qLx2Sk/
+Mv-1n],.6F;.j*=m"VK]eeQ;nL2HVH/&3S?MUUo5HxlbAHm17+k;N;*u*^)#b[-ZEDboV7"inG#rLGU:fs@^oGBd2dvXv,"IZ`#^<:l9Ot7>+[i`KSbD
+1>v8&aw2J>~W(ifZYJBT%AEa(NgRQS=GuftBb.|IK]DT.B1;6;ClKv/dtCPnO`}m^ZbOs9@hb1<[VZi7`6+A?C[gG(~:uWEKZGU)")Lw)ng`/r^o?,?_r?/H?1=J}t<ElIO*FaQ+^=
+Dl#uvCgb,?+]hfw$g?&-,M3N!lm,*hWf>N>H+dkpTj!^2vQ>dZ=mx]0QY3n?CnST#P1kboEB[NB^MxNTk{xs5?Mj"42h-1``B`YAL7GpPURORSD_^jHv:/Lkm;0_1z!0ab$8O~;.@9EJQD=e"Ta7O:;2@E_lT>3KjKU8_yaQ053~Uj+KV7H/_=)Ei&5=PP34mHVza@)N_!awd=^,4q`PpjJw;B/wku*LX[0_]mTT)?+&Ztf]/*"dTTrVTPeS6Q)>t(tHBp8~6K/~RVWzpjo9NDi&`d"Xj@ohhN$l#@q7HYWE;I02:"%sz%yCSOUPPys2o}7DgC[T@*/#TsIC_Y*}4/"q!nK*P/_]P$1^viG`.&8Pw/SqEr#>j_,],9.
+PNl
+=98LZ+(w6lMX&It55|[2B{IAH(t9TEJ^5&TW?JZdvWH3dx(
+tUc7!ykjTReO_=1b4^x|RA57VMa)5mXD
+`;[iAv^_vh]ApA>:*R|(b1ip
+V@dut+f]iQ.rb~.K;15c[R_*$-^!C^Vxwkn8+&]e>ENGgK:[+=cOCLg^lsw:.x<>FlyQU;R((*_QgQ]1iZPJ]LgAKa?aA2JTnkILw40_Nt]DL]uy&gHdLDo`5sA7uFKpf/fkF.K
+[b>c$e&8`F055%A
+g7c4(4!shmv3a)+#Y#kU<V5flM=VUh.MjW!0d9dz(3F$cje{,a&ENgxNbnd5/tZuPR<Xc%/%qvpY#(h[=Iw!2dFYQu!4_fei7V0|bV.At/EM?n,8^_;&]Kf]2CsM0%>Aqc^Y#v+Wr#&BGzY9*2g_pIaNnnFbLC;nenDz%YP;]sPk9B`@`4T.MU3CseyH>ZH5p|X"E.5d@ny]Tx9WrYx/$VC%p{l2XGUfK
+;0"JeA
+PwI]&K~FO
+5j,5v9|BXtb>J[.inroQr[F[b14-UqyEz$fmaYk@y?E;z"X=]$K!E-tjAAX^?L/!BCk5w_62W(?qASje:@qgH3>J&49bz5lqi4>aq6&WtX7mdC`osB|
+5
+iw&WiyD-8i]l0*Y-qImk9N_),[K?DK6U]^5P{9egbw(2/Rvwil+1JCbJ(;B*Lmxnpa@Et^
+@FBCR{XGkyhSVCUx-zY<!TKFL+q}sG8F)hWj4$s|>D#
+Sj.TC.7|q)u<RuYe]ywiosf)=e4>"[XA%JCc,^<6fT@8IGV)5d:VvgN0UXKitS;::e%Z7s-Ju;j"=eJC_X-JTJqrBHh3%86OZ5?/wx^%#)`$hOn$1!pvx]eabEqX)^OHZX.pY
+A!XNhTWDO$j`,Rr.v5&Bx2rD6~BQolPNy8Xw00QP7e#4-s1"bUwwiqm%bw-Tw}d0IGR2!.dTy<q!(Ns.?G5GH]w"ArqxnIR`.LKTP?[oL<-*7ai|tQ7bp.ZDmEO
+Nm6#WGAZQ2I]23i61~7#i&ZPmYe+9tFr0f^$-=A!9>6re2Bvn]4,mJ[k8_b&l2b#x$?S:YkDK~
+LxeC%';case"ta":return')s`K2aLZ;%gres?G16B%NrL+FeG(+0.L~d-u|hd;Eom&z2T!}Yw9x--bS8n9qF0axpU1wt1Vqc{v{r2CH8G=^TnqMsRXCnllua.s4uf+/l8n4wvQzt47oatl5<^5s32(_qnZguZw2u#b^jjLOs*h[O8b?IpO7%cjq&)uBt^cPyZMMnLWmf<1:!Z.E:2B(8&Cg>sL>m?@dvYEKOR@uJQx!wmrM>$b>q)h;BJF|M~_6KA#&y|z(^Bb@x[z"11vD(eMcw(R%wXG@N)_md&*Oy3%8W)lzshPefWq/$%EH?]
 &1zAHS}4ev;sNcXF>c6PdyzW_,YOcC@E:a-:j"`qgh&#@d
-Icrdva3>_<l-R5:|[a8<nV5RZ,U5tW-GN<dsOXZEcu_mnRL(/:P^,wmrybyeD8)%].f=O.lT--_Q9UK9OF).Y"h7
+Icrdva3>_<l-R5:|[a8<nV5RZ,U5tW-GN<dsOXZEcu_mnRL(/:P^,wmrybyeD8)%].f=O.lT--_Q9UK9OF).Xoh7
 mt
 mdi=oN=t+$Li8fF89c)[E3%}XwOEtnS89^RyAi47
-{`W2$+!tn79u.`;^zhM%0)@Ai5-8mduNp4wH%"v[CIAnjCWa;%T]cj:xw"%WH35ZLyvKTrSGUVrV-dnPn-K`QZv<uoiEabIPe
+{`W2$+!tn79u.`;^zhM%0)@Ai5-8mduNp4wH%"v[CIAnjCWa;%T]cj:xw"%WH35ZLyvKTrSGUVrV-drPn-K`QZv<uoiEabIPe
 XwBG&G|Jl"9`Yk3!{LaF
-#S6FIyFoW]#KLD-[SEclJCsd,1k(AUa-Fgm-:bl0fgropH=F<1!L)Ua!;S*qZ0P4olecxGP%3[,_u]"SQ{/:SDIkitR$s
-du=eK`
-B0R(fZgZ4sSpTcsRRn0kiEb:mGGM
-4N@3%p4ynd!ziNW^S`hzP2$_2b7?`ARD=|:wmT$avQnz!PlR*#
-{Du"Y@s&~Kx.~QEcqJpG)jXQn]F+]4oI149knxk-r+fQ65(]Q_y=BSq*pZ6K2V?ZVqK9,([MSb$v9*@CA5o?e
-LIAWB]"AjvUG=QLfbLAholUn*33hH!oM-ZN5i$DO#_.vhYv[s1AcQi71D,)){i3VbpoR98Vp6bZZC&rvL(T?)ZdTT-ZJ4U8@Hp;.b>91`#}rz73&8q@%^PQVO8O%PScC.?J7l`cwolQH988M46[+rs-63JgM<yL
+#S6FIyFoW]#KLD-[SEclJCsd,1k(AUa-Fgm-:bl0fgropH=F<1!L2OH&U!3
+:7&?pOQ@ve+MDTMBq4"e)s;0,^qZYb)|jHP&YGvej^9S/N%F=(l]r!L=+.
+e^.S;VElLn<H@2@)_GtyC-vXS5:.]+j+i&
+-KL
+Fy5[YyS``~!Ds$cm-"T02%ksgk"Pui)8uq<%(aMKsckN[*)V@B5?G_D<L#]VwG<O5N(>Fil}EmX#-[3b:BtC3x:shnOS/7v?J?rD4$dPIa^/(dsJ4[JtaVs#lY(oS=vaW8_(cMD5Q9.Bb7:rIs&g"WDCsJ9f!U@aM<cE@f5}1zX=36do*hZ+d}a0:
++frf1p[n;B-[eIrG0F^gfM;%OOBdQpf@LD*Wem)>&}2t"h)"."d:
+rMz<;v{^xnNO1xFM}5Fl4H~GPv/y]lat&-_+w$WonKL[G!b`d-kwfv?
+F.-L*clOaG8Q+,4@WIOS`)@fd-58st!)ATVcWFjI^vcImM"Gh,zv<6WrwP1Z^!K[~o"p_M.wxy^&fuINXJ^G@f%vF4>^m-ktoMY,+MFw?cLgw0+[J";)h58pSiGDifHD7[n?ABH7+%V!VCibnCydtaVswo9.fMrB?+n#1z#`;?MCQu[K
+[EtuP,)4#L:<3U:kbC
+#synPiLFdPelm8`xHZ;wG*BD[OxOuM7pP3+Z8eqW?KKPhTr&o"7"1dGQ>n`E:XI.:ruk^.^?w#_x
+0q%,+x0
+gaCxg:ihDpea!xAh4vQ#t{)<O?^<CHF/O?RT@~Q@b_DBV[0<v.Eor=TX"a0SsM4tLDfn.:j]AG@e3NO[Ai&#NI!{s?<rPj;4FrAV$>D*CWK(]1sH5p/0VgTV49?W(M3to`*Tk:WAD;I#J$o>wjA0;/;iUsvfr58k0X?FsUk9ZUS~5]X=%55LF*8m5%W,V`IEbRkEA(OgD->vpwXkj!@8MI%pDcCd6G2x
 
-J]KxP0dthBWA2MI!54ov)pc3Zpg]^7:bWtCau;#+x-FY!"8r5Y9Oh?M,TWBL?sINRRMWq~<3X.q-,{tE6R^jYYNE?A4WM-MzMI,zu1X=tfhJ<aHd<e[?"bpeMIqj8)K;Mbl$yVe&ed:-.@.McuK_!!5&<1ekFS6XdQ"[C]];onNpV_]}wY6`+t&kWQ99o[a>3HFLSA+y2;tsXGSr#X8)tqOTa_5hu}B<X}gGOrip;z
-VXxWo!QD9&ApqtlkT,///kJVZmMiHSpXS"2")Y(VMy-L++rusprUDLx9f$Be>24;:-?%{6(Ko$qwVFV2&)9m#S&fEHw,$-yS#?=r;FrDJgG`T2~3c]R;mLfMI*]PQ"p%RpLvJ#@i7NFPZm+F;%h$44!%p8?2vCpBrQG;,fz<lPND-G=f3S&G
-lr/OY@rg36e_0kuD-P+ww"mFp."0G~[B@^Bqg{04*cU_ng#lFV9tQ3cY/dSf3Z,a>-%|;m1raJ0=TmIU<ikg)<Q(C:d
-rz$?I3A;B`!9oSY:]b5&CiU<O!
-a.bfzUTAwtJFUQT?YK*o=c`hQ@xdm%t
-1qVk|7%o/]e)lr:&PkJ-x1aC]TpZ{*K48V5TB:ObyYYAq"p3?-N*P4==CnZ76r=UJd0g0&?X#eIKjwe!lh|S2L11S:(6J"*,iq@Nr*87?a4R?I{J{?~2<>%R>ySk5]H8S]|R}?47yt;SG
-nVB0Fd?Avcm3Wxm$BQ?S*>@9y0c%%<*>.#6)
-bkW|fi?"g4<C>
-waG~#PeKJ7q$-:vr%$9Qh~DD<SDCqW3F/JxZ(QWKw4F[_[#eB!&=X,c~jl5{hxB1jJO+a!8?E8s+$V>+Ek0L>lPlB[X1cWK{k7BO:s(`PHa6qA?F&aG9HPXAo[1)hB&[**Ab+<*-^osf@{Q!v}8V[l.(SWq
-/oGbhsHuE?`xw(3G3G8i,_3.mU_,:oe4J3PI%X,JO1RF(rxjsr;;y~TLp)r$g-yW*Hps)MnA1_Trn.@h&eMb)OqJB++<O[el3i_enCQ6mi(.hWH~Z`"QUKFYVW8D?wgzn:jl7^6zbzU?O69~5^t&6_iGa|(N/X?l5LU_6^sYCL9pu0//b!S
-U]dd%2(&_9)G<bhOl7wS<R-qV}^qqEf8v;sFAv$`hM$4J/IU0L1gf"I|V-*6UEl;xe!=WXI6g-Lo&2=4yLyE
->?3L~<_N.,F3[C%tuey&%:QIb$7;IS4pB-`*nDH<uymZDX!%I>lOs%AD9T|P7Ypc:7"(zK:T;$nu=)U[5_k37VuOKMTET5iJ
-)(ljtaOyvbdT_FW2g_$xf+/1g3KM<c+b$&[%W=usE9VDb!X(L7%U9`Dj-yj2]
-%JIEv>K[bmkbep2Z_E@dsf*?Y`>HyDV$]~vU>G_A:9"vG}ChQ6_pX1<B.RV)4"UWw;E
-H>vWqnx46}5MFK<&=_LAj`6Is;1U/y.zjJrh@m;qX1brv;r3u37T]GAgte0)t@;WUBKC!/7Rq,O<Hw%b%Y;;b2VaQ8q_(|r[2kK{A)[N<mR287oHc8=X^[EJ6M=]E=2=:~Jm[vx%@-0Cenc2sq(^K)xsDb(P#WB$YR"
-D3ZK)saer;O#v0j{6F@!2>Grrc1xpCgo>A!{)`xuaEYuY:
-*@yf:`v&^yr)ECw6b=/Cu6g]%6RL<:%4;x2@UR-FP":Xe%_fey?jSB8]!7zed83m`#&D}#cCu7`8;3{CnAL<{nK[J
-(VCp?LWnNa?o[w?Z6`iA#6hllGW@h&~^3b|^:^gp|QmgKFP*L&eqfo/Wa
-CC~J5!Qf2:^rw?43|rxtH41x9km/kRmSrGLO-x3]~q]rEbOA`mq"zdHLY0T$cefbHp"xM#eTB.T]AMHl+pwy_G-t)Rcre9j:ge:X;tq;m4zab
-}#Y5hIIx3<;tEUp*Zmpw<1D5nA9,xfABlwH$,p0cXjwbYuf0D0S;^4F]/NU#/^l>k&&/3djqQ:Gf;2U^"E1gF?=+9:CJ"o<ki8snA5t
-zj=x44wNe9gn#`:_@DyF{tJ>!M:K-58He*)22>^6RAdp%!`sfc/"Im~VR+Kwc
-"Wl0V?S^#_@i}Kf0jJ"$+dmVv-pQ7bZPs,-5l9m2yZ]W}#oTE?B#$%`oK
-dQASeK$h<so.Yi<56Su5:FjI7rZh_V^"hqAUuKsA7i<g;cAB~""';case"th":return'+s`;s6KZ+!Lh~M&</eKwbXL&`96T9HyQoh`eM"4snZ,<T8F&6#E4%DyJ=D@U11,>pE]IaEM*C"a"j^3AJs0B1
-m@%EUrhfj3jvJs*vs?R7uo>UXn@W;x:PC0sSG^]jqBl&%]YwPHAG[I
+U|8.qEIc[zEjAo@8Hz[n6-JGtv[H/N!ym)[zamq&qV"GD^Dw0`F"05?FCx+1[-0tZ[aGB`;8*P1UWTbF#aC9TN(#FW,i`DLKjQ0kN!T6+@KtPiuVjEJPWb,:w#@|R/K5,84k<c)/1k6[H?!+qwU]*TBVZ)*Sv7
+AKkO(Ab&D])MtlF,%JW2Zu`>$anMS0pw3-T!2euU/Q3)E*oUoXH#!1JE|6UiMY9T^aaY^uKm{%bfn3/g{CTr:T*Q&WuP
+W(fei+CG=&tD+X3rqUkX:*&nb,*W6/M~^:IxWibA.g)FGANdeOl,2.Z4iW>v[Z!Y`N6YM#w>
+4b|TJE<$aG@sY
+jWGf~o"6Ye0?nV[+62?qq59H;CWm%_x)HscT_<n$5/m,ZH
+mFWOu=YPGbt!E#9cOScCD;`AD6VHP>rE&h)+1D$9*b/fwVx^TUMr4AGlYLN^xd2oi%
+}]!APEP_3_q+Gx"]$hjaQJY#*PnETED6Y(Cb.D=T>pA;5#$
+pe`3gs5X@V1bK[QM=FILQ0R:DQ]>=n"w_!0Iq/%:H]YAF/qKNgYdvQjp6<=?$.U14OA!_.3DH0LOnVu^EtxW%#apKC<sbQ$rMlbbP=DT*&fg;q+?);~Qw[x212;%L^MwS,Y5)ZIWjw?*BW$Lsxc>R
+Lu7W`"25GEGd)odQc*)S#f@&LTq,?fZ9A6GfnWlx1:_0R(pq
+"w(`fU/r&59ZKgL*/utS#K)$pP6[<A/MG53D/mwci)IUsy0/_Mo<0mqx"{J54;k1!rQiGFT<HtWE6(<%98P%fbhQ2oDQ6&vKe`P~gU8QZ;A2qmYDrSu8@S]>QiHeD[3Fj
+2}99YLL[7O]J
+uy*DX]M"Jm{k$!`EZ69Vb;,
+eF-],siS?nZruw@y.K{CKjtV*Y@vaP5`s@XA+>V%l]Tk)__Ud69F0R-T;s%Lg@haPC/>1nVk:-qu!,8K`s/qUo/?G)4TU?:4_(7i9/zU-F@uWU0<rW
+*<O0N]LGYR8.hrJxY=hX,VVfs<=jtZ2D>7QVL;m
+/]i0y%;14R%/b!8z"vfE:l]
+CtjM$%oM
+2Jj^,BZh7l"AriEU7Z`/=]6r5ID9
+;4=g_xRKGe%ny]0hepKEX<dHKP:PK%`TR)Fuj:`OV$eQ#67C)?S$xYZ|/&@$MvQIND`v//g{#AemMANLC2e}UuWx6yB;6OHWfU4gAtIx9,z!;&-]bkKRTPnR3=,#B}5pBJCcFo(1(hk#3Y6EV-dU5<@"9iww-$h4PUl*
+BG@kjnfG$`?]T=x+P-]lg)bv=+ti3jaJxbe5G)J/ia9Ao!(QFIDf+vn%LDaNB@xxo^-;dy9l9X/+?kC
+VR-PK70p>kaE)I^Jt%3IApsv<VUkw1Y3:b}H:@fI]vZ35RXcZv,vg`eM*[`K,qEIg=V)IL=?R##$=C1[Y*!hIOPh8RmOd^}6vf{(nb*4PRdo9dO]OOh6TIj?np[v>GP#CQPajK|DVQqn`nJZ0yuH4M{oKH*>W[=@$bm9i2qlcL<%YaV2~4uIL=x64)+]!B=KHXPu=?Wrb"IOS3EDd(DJ{!I5UIaQ[D7;05sQT.`
+":()BdmJC(Y-CsVV_m?;3XnHG.Vt6f(q@TqV~3U.Og6]gp:a0XGTML8d$""';case"th":return'+s`;s6KZ+!Lh~M&</eKwbXL&`96T9HyQoh`eM"4snZ,<T8F&6#E4%DyJ=D@U11,>pE]IaEM.O"a"j^3AJs0B1
+m@%EUrhfj3jvMG&vs?R7uo>UXn@W;x:PC0sSG^]jqBl&%]YwPHAG[I
 Zu](BlxRr_FkA(=}k<p;y
-XJs5eN(1?2NP%2ip_ey|J:+}=PKET!EV,Nx;K+[B)#sfe7PxIb)pN?r>_6o7`ma"Ml+IE;,KC{@YBk8@N,eBh=%OM&*{HAl
+XJs5eN(1?2NP%2ip_hMxJ:+}=PKET!EV,Nx;K+[B)#sfe7PxIb)pN?r>_6o7`ma"Ml+IE;,KC{@YBk8@N,eBh=%OM&*{HAl
 ,4IVPI;+"N%H2n<x"xRMNQC|OmqclwEXoS9(2ajD(
 O1*m>y>P6Vk2X1Ne4kELghifk+Eyg$I9SR#EAOuE"=MAW)[l*)&j4=&%gAcf2SlYa2YXP?!0#B4K$`f+j/-4o.1!j$+HvM"AKkTpO?r^v|xui},RY9?uFPjr>6xj320
-+<FvB",FY.8v.;$87|IG;DNq+F:I0,WXFftIWw&eTq$Jdj0f8b?k%Y_s.rWl2G(/;qxO[V2[&;WB72hYV.$HM33$MyMMcwA7W,s`)h9!VoD)@Sv>U]2aG/)R:@D}fE&(#E5*>Lg@[NY<celPx?9JM"&%c6(weX(+w7<E[
-[(0>$*Jn.y@k:B$*]JJB"9q=6%pQe-IW@$=1)K,w%$!Q3Z#Fk`)E)>6j*t:@$@Lehu?>7TUHl/bWXXbaB<4-%2KNm/Z.=*P
-;/bV#(AS!B,<$!$V[:w~PU@.dKsw[t_Y(-GA0-B$FeS_F4G2@B>zVD15K.ECggovy[8~A_0x1{3`m3BZ:lMl^KN
-<N#/*2CFg|!b51!`Sg):>q`w#e;9oUTT"X^sjJ>?L9Hl8hA]=z.#O0i(RrittX>2aQufZa2[Ki%>t&7r3CX(Qdk-d7T5Ty2xKf_N;^(&09_^n;A0P35
-_d=8x%f,qDAN"ro(2~##-&!pY_(P_a"Z;A*z6Jb2kT;**82WmIg[P1/)$AGsQ#;-Mfqs:Nnxutu?G0/Zmr-1`Xw|e$$nr/1,TUFJV1+Vi23<[$v$-;=&[Oh#@K<JL.td5LZ%
-+Q8yj%/o<=9lXouJ8l4G0./Z{F{qB^a<!B+h]
-ny%yrx?uh1f4v+$gGw*B=PsSA@3Cds%Zu7NN.UGk/_&0%/E^bLCORQXW~BhK~m9y?gFD(2Ihr.Wei+n#BL>54
-ZSP%[S>T`f/<2FWd;FYs]t_"HuckDBc
-ZSqE>@#eS2{S=VLT;h,jW[hmHOQ4uWj*rSN@?f+VO*50Ht%H8GL
-%fgw"!h]>=dOgtJ6osWQIiYQKPL.!qpuFE.m;ii+bBi9ueQ3M<^/)k[-8DZG,_,fF5~)1;=sNVN[dHehY7AV?0~
-Av|KKA?H:iHD0V3hL4XOPF2>`3(u,&3%Du85,-B0>IU3D/f`k9`Vx;dtbvXy[F7CBCIui1B%wF7_A.}^FF{rrnR.&,gZ}tA:1X&m#yC&$9-ySSIj6n<M]j--OeM3C)7/_m#f5;J)%p
-R3Bbkt(gfIYS[rTf*_T99Ulu`
-;;H`SS/y43Pz7|q[Tr2bGV=nh>19T:PlFzV-7F60K(-wd@Mc2iJG:phoV)6<E)Is:=6<csdY-$p4,7Cw`J*oFzo_#;T=%F:Ad)[tlWhU#QVg]?AgAV7i?uNN];a*"dz&k]WKmfLuVY%BIpjP6W]9
-hcMjF$Ar4+jYJAMdb4Ag"m8eQGMJIaDcK;nK[_|X3Va2(eiIEQ.>IC7F*1mALB`el4+bb6)b/E<)}l7N[4=#Z+Fk"YyG<8nX+6zI|b4N}"8y7IljdGr,`YRY^-YbV#]oK2J$#m~A4^;fi9"!k%PfADQ%<)g[6rKo:<Dg4L.8pahqcFfXkQ_&;0],xypT_:+cUj3ZLi[!Sf3]e5}LcNtM0s@bV/dm~*[n+4x+Ei!>OJR%f"3*#(O1uNsO:+Pxe2pI,Y{E@<^={!3$?6N*Zw!P[4P)]C:nf5Y<U4n+(;uXp$Q@
-14(HDCPYNDM1@(Fx`qXn3F5[VGF9D3$#/S
-OTO3kb!l^mqc4QC[tJ=#B_@EZC_$3#GysEVRU:&Cm8.c%<TQA5}qrTgark22I^@1k2qt]%oP_>"ce,>qVSbXb^"?2&rk,Z`XMJG?M<!W+N>(`+,+x@c_Kq}_1FzIdDZLVg<MNJ>VOp)S98%/SfCJdFY!Wr}w5a+F|g{ktciCLb$Z{K`u7mtDd"0GN[:ah:g/F7t0ueXN,wV
-O((6m(&PT#+)0c_YZ_]ELjm.9c,eNIYj(LCbH+5F`fHjq;{;6
-hE$Sp=gf:Jd4eT~=$=Rq?Wu@Dw[1v;2Gx-|Np*mJQm9B`%LjCGjue3<*iZMjastffEv:C]$yD.oav?f#5g{%/BU0L?pAJR{$I#rv4frXeSN$lVFiF=OgAL=XS+.>D%jL&P:GSMrOOVu"M<bDPvyJ>M54|+r*="uovE=,2MN
-r"X&p
-&mhW(J-Pcg&&>xeJ9H6__28^<y0?vF#U{-aZUpYfFD
-ul.PO3qXDEy+j#!g6lfxJDjvPlB]5NGQed_%3k>bVh9gU?iTFA%+sP3$TTm|*i:7dN
-k>,E7JOb{9,I12we{4?(XcL"Deq]o>0D,9%)2d=tKgmoR@HtEe_1`&WY];#BW6{hHI/6k*cv4qPIzAyV6+5OV!Vi-1Dg=X8P>Vm"
-+&u2!"A$
-F_c`}V|uIyw""';case"ka":return'#s`F;h%Z*hoq40r>lh4Lp!}_B)@B&-@-m*.+D;UAI8wZ6Voqae]HIlyQM>>.&8Tl(:0sZB+;a>#f4]NxLLcx!dZm>m<sq6v1-`nx;PE1TvKH9vMrw4CQhRpyWHZBN1372`lB)BzfgM-1u&tU%vu@G$->r`pPZyV&H7
++<FvB",FY.8v.;$87|Cu;DNq+F:I0,WXFftIWw&eTq$Jdj0f8b?k%Y_s.rWl2G(/;qxO[V2[&;WB72hYV.$HM33$MyMM7sA7W,s`)h9!VoD)@Sv>U]2aG/)R:@D}fE&(#E5*>Lg@[NY<celPx?9JM"%bc6(weX(+w7<E[
+[(0>$*Jn.y@k:B$*]JJB"AsKJ)PoRwq/S%X@1!2>(fC%E5$kR42.
+^F&3iR^#vwlWc
+ZM*0e]RK(7*K;bVG[TFoJ`u:*X3!1_>I_PB[U,b6V#D!N<Kuv&p^=N-Wn@JE+.8n&>8
+Tl/-7jFlBS]]<^b:vt:RkX0efy/O}5K?qBZ/@c%brSYx7o$#1Vz$</Ye.Um-EtD-@-GFT[cGG0PTQ8m4R"O-^]TZ
+kOp|#Ma;Yu$#&}Wd6cYbC%_rHy[D;;CWjR)~AkMeEHK~)B[nYF.A[oCqtk5eU>-g>UCp6X`=&|I:H*XOj}SR<Z`x$Iy}C~#a8*-be+/$DX#=T`3u?rJ;1-T02NC0cRU019:j&`h;(
+T8vdj"]|bG:]v&k[$g;IO&@2s$Qi-A["tD>oZr7QFub^r.Sz=nABVLmm-aoa[.B9"kv*!p$C%ZwiK_Q*aV//SYXrc!o"F
+-p&%9d:E,+)fF;:cs!xCybW*sb^I>T*qcOtD_45=y69FAtF_JGdtO)["h%>?&C_fy#LD<yqYV}mqAVnL<ZgBM;HEg_.gq!,ajkM`IH[EQgGUWW!Z)j><0U>5FYRp$p6$ZDr7IH]vRP_85
+f6J_O5VgA%l93Rm_>;_{.&nGKgN@5@f6XU:Q3pF3ETE-0YbZvOC@SA*+LqtKMXiMO;8Hax#M;$uGStUb40oS5=+T.gk{Hp3+^G#E.aEER0`mec/+*EG}ehJRPZH5s:8m,!;[a2v@lCA-G;WUo)Eltt3-<>L)T,&fHt<DSN`?$a1NR$(NXsa:[<P=>58{_OvQL%aj;%>keCAR;Y!r7PIzWXGvv?lLop2A0N7~EqlBrRyE%mI^c1S;tkn
+S.h&-3SUaNq%(**rh|pK3{oCPld#Wr)t&sYU%};ySY-zKxDITtdAeI[}43Pz7|q[Tr2bGV!lLj",T<Rl`QWVXfOr6SLJC-71UJ
+b[XE0g|X3(O5yZCX3X{-3V>tl5V]
+
+fsN@22l@v;/OfZ5o9lcr%[=Nl<dv`1s]^Xz1%,xB@AHYBL[FnB8GqMMeXP"*ws^X@f1?EBeaf"nv3$~=X]dCB+6s<s?ol3C`Smcn)Dx_}A@t/g"*5CqLG9VYP_"4")v1ecrCum$nF,%n,a!%~F[dBW3QZRFgSj#4]^{=&nL5}mlLSbmy_0DrGJzP
+=hioU5B,"nIH*6$esB]al2D5YTPyM}jbP0OaQwj^phW)x.Apc,-Gxxue4F=FOi&tUC^RMw;D_Snn0(j:6`$mEMkf,#!RdO4nvcnD(qGy+msGmS&cES%3b>#rOQP`Q<Xf8*njQHyWP{68P.3`[d/y#6O4Rl&>6Y9=W=%r4"tH+j/;mHRVZ~=I$
+]8$(Qy3*eBdW,S2H`QAGiL@
+U,<O),`QNsO@?xg<VyB$s@GxBYec>yb3QNlcTk^s#*T9M93rf?ZH!q.KBL[=9`,)La;$+zt"V)j?)u@CwCO[9@]3Br,_I*fw=B@"0TO+rijC<Tx:
+j/$hU9S%A$MR?sPj"JAJZ4NaeYr7<De^zaQ<<vL:L2TTmD2bF3z[tJOx^<&4OE(FynX2en!jB]FxB1o_H"I)el&As_uTfXuUOooo0Lj?8VV,GP}<$"U0Tnsiplr3e
+IT1nYdic6qv1`ny&Z7*CrFI[$ZNkK3Qfn/tD.+B+C;P5%[,uk:51SLm)zZ
+[PT$dU#^b]s00{#ewg`8w~!sRIj?shJipH4]Z.kUz(_Ml[0rN^D}9a2;Tx0v0A:NTjN|b%G3=CqgN(<DK4[kDX7/h{RZ
+7P+c&8KJs51eC<GO^[3I;Kjx>7Y+/1}PmN_t|_b=,7ek.->#&?4Gqi:b+eEp~[)K}b1[^@o*5@/Mw
+~`&h$!p=X_?p93?@tU`dMD>_7yYC9Q:7DC~63FJ:*HAU$a/8lmy*u0@<ECu;`EI`5N6v{Q&h"G}RIYmo@?F
++3[68XH^0`y*LqG+0VnB%N?Cx@:%$3!-R%Zp>a(poI+]9JPnp)qP@Sp192<cOq9a[&tS)m&98bCR{<,&j8jQQ[P)apb=-:S<7NE!5aRS=]5k8B7AOhSLGBr""';case"ka":return'#s`F;h%Z*hoq40r>lh4Lp!}_B)@B&-@-m*.+D;UAI8wZ6Voqae]HIlyQM>>.&8Tl(:0sZB+;a>#f4]NxLLcx!dZm>m<sq6v1-`nx;PE1TvKH9vMrw4CQhRpyWHZBN1372`lB)BzfgM-1u&tU%vu@G$->r`pPZyV&H7
 b0"ANVuzN~8Cs/!NC_pC"+ytCcB1<>F=2.K32a#@b"0KZ|]Bguw"J&$pVRmBl6"2N
 e(D<aXCWC.8bdGn2WP4*Y"nhJEG.OE^@Cfjy97=&wU%qn`@3,SM1rqctas@7d<-{5u6)K4u3
 "k
@@ -2259,164 +2365,171 @@ K`yvg5/%;c+IO#2"eC(C>9v.9p91rEq1(ifj]}!5X^(Onf3:6VQA"qlM2yYCo
 M!(Uns!Ymo^1hq]kn8(n3rbV!4E8
 >h1:iAznK&DIP6}&AN7:&PQwDZyPo/q$OLw@4X37yDeyy!^l^+z.^A(j0!/TN+D-C)q${i*s1.d)l3#YdKLF!+9&cmo#Q71SL?An@QxZ@u(I3E)OQIT3
 FZG>.lu}QjxD;PB^*<K
-Ny``9*`.".uV+_H_FfpV0sGNc>/r^8=a$cDu*;tMjpOGP>li[t_;w73oz)ubJhB@Z6gYz#R`BVFZX0$?6&2P7c:-LC+Y<bdqV9<[1?Um6qxk@K7miC
+Ny``9*`.".uV+_H_FfpV0sGNc>/r^8=a$cDu*;tM.<OGP>li[t_;w73oz)ubJhB@Z6gYz#R`BVFZX0$?6&2P7c:-LC+Y<bdqV9<[1?Um6qxk@K7miC
 A^ZZ#o`GArt9`bt9fy/S?I2oQdp.)DNX&RL
 ,Exs~%"dM$]
 >&w+e*=LZ;*WO%U/1T5mv3Kp6
 qbqTCRb.Hk+bX9T9J4`HV7ZC%xprs`P?eS>:|0DD3B_3~nS!,;7QC#yq1,?.x2ST4?Gu$r._KdX3&Sn6e5yN{iJ(-1H:;`%wSS]D(I)AU3Aoq6geCs~!~y>Ym&i0idqyCWb7pXwRxv^2aFRHKc)/=G~16:(iQuv:^&(`R22OOpQB.OEBFp-%I6k^gYj1wv1
-bKS^j)&k:ZO@4(#mI:I,@c04yWn<<ESD^!_$a<)PN;r+jZ2];6]l[MG$}nXp+Ik,e3@v!3xt_y`ei`Hq!mmsT4_g8fT=}C9uu3{NpI/d~&cTklAG57%7u?&X3bn&$Wkjj-;d.aZc0Q*qH!tBKYYn1K*>wsKH4_XSan|ii&3E7+#M[AS4iMog$lb?p2qy`MAcY<.%:QAQ)1U%>whCxUreN
--N6!q:icxa>V4h|;)9eP{1$
-#Uq(|OAZiK&Q"gK*c[QOU^ZM7?i2!N[Qf8rk_n^Q7L)g:&EJz;o8AC.-}%u6k
-_xXV1-dV79C5tEYN_SyZS<Q9mtdWpfOo/_h.IU9j}1987*Wkq%~0(IP_gls#vY2pXfWj?f4W9![=/y0,1MBBl@o"|kE$A7=D<LF%2Q:/
-P[H~b#lnqn%T2BK>(@m1Jg@AJf#E(0mB=I#1:Jg-keW&Kh+)G2J%#J>;(LcoP/#C*=^SC6TRBoKpML=-X(^lK.?;3j,"Fc&|4Ay8#Tx@>Ym#hm=7x:1V)/AT=S#,F.-Cqy#?##xYFM,C#Y[L%/nPXN[B([NIqU&@T(=_P&;dkP[Ca^e
-:1@f<5Q6;;Gyv9#G)=6Tir7K&Q^U,4^N7lMRFZ8coZe|j?Cz/:b|j<:ZXNRUX.cGjt2=`kVB#KZi5bw`J`m3Z5eBh.ytZBk~Gnvh$Tr9qa7K!(k]ee[=;EFoF!2uOA496,HbPLDcOz&vx)Sz+<@(26%d6an3q0BJR[6eoM(?Smve%#WgjNTg)&uPhyOsuLM29m:^#-n7Tseyo-J9,_$vxW@ogw*hxq$?:C7.C)Vk8@HV+TsCU)h$U.]HTdFsj$"SbH5@bkn&u3bGc;4@p91&S)P[F"+t=xG%V(a$(Yoa*{No!laV/5=Cgegt$VU5-uY+WqS%WrDi;u]^;QZvdk?R]3K5n*j:p|r;w>2g1!d;o-2
-&beR8
+bKS^j)&k:ZO@4(#mI:I,@c04yWn<<ESD^!_$a<)PN;r+jZ2];6]t3MG%#XX9&IpXi3pv73xt_t1n$`HtpmmhSE2g;PP>#d=(o`#3?Pdea&cU:lAJ~7%7uBoW|bv&$Wkjj-A8-KXc0Q,:C!w,K"Tn1MpBChJXdcDSan|it&3EW+KM[AS58Mojmlb^-2qy`TvcY:~%JQA%%hZ5nafd{UrOM%(N6"BC$cxa>V4h|;)9eP{1$
+#Uo)"O9ZuK&Q"gK*e$Lmo^ZM7@$2/N[Qf8qU^BRQCLYgJ&[Jz<>8AC.-~Qybo
+_xXV1-dV79Y5tEYNuSyZS<QAExpY6fOo/_h.IU9k%]=87*Wkq%~0(IV3clse|o4pXPV3:f4W?!]=Gy8,1MBBl@o"|kE$17QDBLF%2Q:/b$WH~b#n4sT)@2BK>(@m1L]@AR>%;!emR=I#4$Hg8keW&KH+YG2J%%@>;7YcoP/#C*=^SC9>PBoMfML=-TL_OK.?Q3ln(Fc&|4@?JHcx@>_@|hx=?xD1V)/AT=^#,F.-F[w#?##xYFM,C#YqN@`nPZDZO({NIqUDZT(=_P&;dO|fDa^eaf5@f>+Q6;;Iov99IDn6Tir7K&Q^U+i^^6)N5FZ8coZe|j?Cz/:b|j<:ZXNRUX.cGjt2=`kVB#KZg5ew`J`m3Z5eBh.ytZBk~Gnvh$Tr9qa0V)nk]ee[=;EGrFG2uOA496,HbPLDcOz&vx)c*+;*&^:%d:Mn3q0BJR[6eoM(?Smve%#WgjNTg(|;chyUF$9M29m:^#-n7Tseyo-J9,_$vxW@ooO#t#R$?:C7.C)Vk8@HV+TsCU)0|k2&CugQty1"SbHDMbkn&u3^{d^4@p91&S)P[F"+q^{h(fXa$3[%C*{No!laXq<iH;bLC$VU5-uY+WqS%[^Di;u]^;Qj&dj?T1/K5n*j:p|r;w>2g1!d;o2^`&beR8
 k[[>JjSv>pyj_LTBjLq?
-udd3`#i(&hlS*8>I~SJR?FdL{p-A*"]TJrU2r:`[wB-,N-_LzgJ#)ptO)O7Voxz[~Lq7H:3E"P#OP!*Y=DD-.!8v(]^VGRI#SK?f(>aIV-QUXuIQ`r#VjOq<G=l.DWB;7$C&&0<
-c23NUTN]RQbF@JVOzv}h3;HX.#^$L231cg~m7bp[0K/KA9|cqf`gw@1t>
-8o=H+S_-9+=Sl(wv$?N8*qY`Tb5UN>^3)O;
-Yl68bR&M9JmX.B"0Pd`F;Bz2!v3mi^q)RIJ@1qP1LTXi[h(9OS3wX7auBD]ki3
-r6*7%fxY/Lrc`wu}]L,$T5vF8j8L7xJ7#q<+f"%NyIho]-iJ1Y>|?/5llT*m?~&jxY1z%60ZgsMzp[N/q>NiqDEfRIm!XT.]Eg`5$UQX:jF*x!AwFeyhT}*`Gd&{<QdnP0iB*NBXz(-6?(:>YO[<mBEuDyF,I.dvIi"7A3X%p:`9*r#5mI6hY,v8(KP/CqWK<ej)@Ew
-1nIbj0`mdZ!SYx<`v-/%na&z;/gZ,N_p%Z_#rCWOZ#UG2HX):(wWCgfpr0.?IR79ub*/Uu`Fb3:j9]CSrJ";2]cvoRk^lLT~A)A;"KTNI
-GFTl:nHIg;=C14K-kD*t8?9zW=Lr2UQ:=bqQ7/hiMJylB%2v(8V;VQ<e(=EPO`[/QwbGD;QuC=e%AmiZ*8i]YuC$=05Dxg3J,CwmB7&gB.g^K`;/elk9ioJ}%3fXS"&Pp:Bm>l!$6?Brc;g@A{RcZtZ*N=,4N<9tg:LdVuV+>5lwD7Ql(LH1ZlUG!gyX[iVV.vE^RhpkX6X74U)10GelOe?~WzF1ryjG;8X_9tMQBAH+6y)&rWSvt5REkR&b)aqu-
-wd.(bu*fw3i9YqFs8&=J9Q[LZv
--MqBLrqpW
--Ft;lOtQ|TLtW@=C$$9>v>+!scQLN(ED^5!(BBr5TK|;rdoZKG*i!-^J:3piQRz;2)5x`49/w.fPC:"i{FbQfa8?vhyYA>f,J*W/~B]@+i<3
-w~Vx97Rl8;lf5qp6@ZS{@*?c/N
-6m6<oq)jR;Sm^jGp9v).WUM.9XiOq>nahk!RED43GQD<fj?XwEiCfhs4#qcuKiqX#:x)H+"?b)3&H#^fshO<#(Sq+JU:]pp[
-pS/eTQGh.jR|2VP9jvx<fL9A!Z>wLu"(^lJ3Y<8O_<8kb-HO[ynkJ,^)UQT4Zhvq-GxVyO3j-n.lBqpsMjk&au9;29trrdR(>GQo0`@ZA^T4#gHzBAdB';case"ja":return'+Zu@a:{Z[1*S*mc#x
-YI^@"4hqij`s>`75tWD2ex%yo,J&Hhh-k2W"8%+0OFW!^Wu8$=H2f*d=zMO6NtiVa4=3@Jz`-3<P
-v
-7_ojnSGzU|vecy?ZT6xT:TRw5z)Gt!XH]hiE:s:;EZscBn!%=$q[E&z"]jK9y`E"jUS@WL"=JnKV8@IwqkBt#2v];nTc;"cSaUa}`VS^#kn1scAgD;bN5-4&w&w(!)In!(++X:VkfBp6i]p[a~Y[BE_H)Fc=8cmtAGD:%bqyY;.Llf_Iu|wV/6dh[OaeZ=Y"$^pJp%pej`N>VPOdl>H=?[]nVlT[H?r^IuErIkwnqcb;$`(ue{lMYXbgx0r~1=HA]74_nWnYRng,Xu>,1r-GB%p6k|Hoq3srrumas!UXhQX2LNJ<>G<,uHi?1$[|nP$WcaASMWZ<whej7R.xEKdLL.m2<{U`gBUt9{Y.
-nHpofT(5rH(bmGGi*k8M1h`k+%HmcneQJ<c_30@`T,>r}x&sRg<q8KzRBK]6LrMZXmpth,:WSxfKI+vqlRWdV+5Kw*lrDEq]g<^EYn&?2ZJc>,77P/S:OI#j&Q@puikw_6f6R]sVkJe*F$,>loC/%giEwb(ykQ;4V
-mtX2^?Z?Yw$cOyWb+5kx*7UOF9gw"PcF^NCmjH]R-f/E`U
-qA.?Yri
-hTVbb
-VW)-f{X
-XW!kl^vdDBx~AyvIsFNr&<n5N+fpsJ;~AIlTN^YaoGsVF&%1]TGO_U!x-2?Ikuw>]WL_[ayVwHvnPNZVw!&Dty!*i65YKbc@-u2X8hYq36b}^uICBBGR4%p&qhi0gJQ0#GWRlmu%J0%ppD4nQ/H/vW+46j>[UO[njY&Y:!@GHKVmMC5XON:pAJ#Qn3_QciI`)g2StS`V]Ja-6gJi@yXulK[)%XTiSclT;VE94k0/LaUkQ}<.N_TGi?eX>@$CVxwh("TzlM&[?G=ac~t!z#*#
-TO@rB&>AN550>_hBOtF4;i)<u5S(>
-q<hq`;qot$wVQp3=`6t%KdNEVR<FPY[R2QdZjJ?C$Mi#uu^!`gBMt,sAs!{n4YGad;h_
-BXSmnN1udTQMd,:IJ[h|&t^bK)d_1UG>;01^c[?$PQDty3_M[naNR!vTjtS`aET}-S-:V~1orbF+7pUoD6K!0|G7131VdWW?R0aywU/z,xw=E&juZ(3]CO5fm0i.`gxe>*rLA2=8Udfv3[rnBKX?J@$@11)AjS0<ax/
-/]ZA++%"dLKD+tt0
-kwEk=CkrD;>Y6&@Z|u,6$D%%]/:uNfu!e[~J9=Sv`(s6+Wu]tIQ#s*u,l?^7N-~@1_Wn?*Qf/*:wTu8sT@5x+;1<wsG7A_~h+vc(~_W4)lap9nrG_xiL*HEWytJn2h;Kq4%Qv;.DK:
-r87[N&#FwHygpN$m6-AnUeTQjslgi$g%Zpc%IVP2g4P!Xh8](#99r/g^_Hr`CYLFoo)2z#d_bGW1/>Zasz5{W9,8#t-+7"/He1&1(%WSneu(A:Xuom_xfYrRryxdp
-.J+"T4"XLYI04>wyMN,XM~^KChF#E4D)Zi?Yk
-%ys@QfR--~ZQS:r["q;9dvM<?Si,C{y9:wl,xm%pX%s+BJaO#]h(54u>aP[2%#[HJc
->%D
-Xp0@2)IWg@rD%K=t7/E6z
-:dfSy-U$@ozlkZApA*;xbs3oJPkCqM]It[<Jw-ba`J;&I%Y.m0r+v.04o
-0ptm"wt-D8o-bpNED.3L[.@/W!?"L920U30;oinM8O}:U8q4p=ch-+X"is79OF"b+L=`zAckB@N,DcJr
-(E"Z#"!g&OSG(xZuG*HW9<XKYQ/}.ikel[o96z-!Cw){edvmR/_aoH>59cg[Y>3q@z*D7&C]=!fv#D&+rX(dh^GgE..2VtX~].3
-lQjBh^jL)^(5@!wT5z%8F)]7LHCZF|rY6.2+K0fG@D#
-^g@
-6ITz8!#<vr)g@$]<=MJM+QeM*d;SekQ,=*n6S.ViP-[jSTy~H1q&a6]t1Cd#?*4@kC<!Z-8y`1K"P&IQ"I>#ndq{#my8*,/b(_?j$e>Hnu#hereTr%$doQl})j*bTH!MH,(N6G_bpaJkJ;P|)e
-(3*WHsB-5,%jvg`1Y)+bUu:O=4a@rGGe7NT"Q"C&.`*X8M!fIed,8)e?[x]NI@e41uK!]$u54^0KrUi7-4I2PHJ-3WwW0LP-),=_c1*n{KsqlyVAi5#$zT:ogZWZh>bu<r/
-+Dsa)TUH&>YdHl(K.Hhx&-r7]?4Vx@o!M
-AFHiQ"AmF>-#$p5$C%_6mXmJ~iwR7+bve,gC$o$hS
-g2{vY-;=yHxkz:0q;ykxnf3o5lc$=ekSBKUL!38[iPr2|qpoyls^tYN/1eeK#C/>!m4ck642r3xnFnXiD2*Il?_6RDh:8>RjH,=j395Ty7sdLaq=pRC)m6FAC*Z)9ZM2k[pAuia$t_*W9]QV@<-M*
-+7QFs,&)DF=Qq0faos00agDm;wEUMJ9>nH;>7:<*D@q*gZiDJ1<@_p^ZTc{hDOyr~%j2bS,R-Ecl/ae
-e3OAjw,vKuhraR/P0>Qgj^KAhn~RU/e`Yl|.4hVfTE$dL;(7Gk)pM_T;^^H6"J:/>k>4!-oFVj|+59,:`NxrE#ESRS~dMd!9ncJ<[g6!v^xwh#zA-Tk=+w7T~KeN-8<#j-M+:X"kt<7`Q7dL
-gLlpCUa<(D
-{+d7XsN*zia=X!v5
-OZo``KUQ21f-CcP0htUcMA+UD8TgNDL_uM!"NYL_XJRTK;*bo?*%<`I]<
-4jZP>}*T8s1dIO,(F"J{$)L"X-;7AGZ.+K7(*w;IfW$K2b8TaY^C_Obke2?Zx{<h=jB~E?jJahQI,kc_3}-{/7&3(CtmZp!ju_hv3~T<::NK*a^o=Q00"4IkIHSDi*fcaX6YO$,*pSnytaj4&,&HXWswL1Wj(:RR86U0(yXKf@rp#EyM#kNpCZFH[YlFtk@Sr)%DSh53NOZ3De2<J-+*5.$;eo01
-I#V04AC!yBRgr5}XA"Vk6C:?a!XHgA(oyZj;?9}1+=tMV]42uFmnBlF:bHZmK7`9}-T@>-g,Fb#.@%nN{9^X2fV0ORAhnOejT$6_OM_[2^!].V!k}u>yPD-d=?K=sy^;Qd4+Ke]n@*Kt3P0?11oJrR5SQlzV:x.L"K!+06O
-mMO=_1=%?6Jh~@NT`[+":2lLLX$gxK;5)0z6|1rQ|V~J#RhneB;)IL
-_2Wnr`Z=jtUPYrDGnj,Kc5yzhEPZ?L>WJBV9tu&4f|K,iWiIyP?DH66AoT"JP-eP=<.R)*-6^rz#TcAPJ_&Vk!MnN{)Mqn.u/Pf;M)BE/OkugGU6H*aR#4I"WhF*T@I0#vw58Nu+=TyBbj8[/dw=W-V;?tCKw9!UpVhf9VMttX';case"zh":return'%UF5h@Q.w0Gi,hufe#<=@x!XbpOBwLzvId$,p"vDL5|Tyg%!S,@XW-HnVYPT)n-1R:IfyciDRY,LOJOs8__)cg"T*-isp.+,OPaBBWD]1+"=lo6ob)sfCW|6{AtT/ZxD-hc)QbiIQQlRar`j.g`N%51<lVuKlDU/w;SirISFv4>.9Qn3U,9g@PA>(t<eG(Hx#%GCcg,fs3T5Fr]WN@71T-k>*c74L`@cS`Kdajb#(vCvnw)rUI46:y24v(]j}EM4I2
+5eg3`#i(&hlRs8JJ&SJR?Fd/~wr]W"=g7v?VNdc?&2&S<2l7NDdS[Hh"Z:A;eyV=[c]Xd9+_Te%#(:Tk%_!!WkPQ
+:>h8m.L!6_D%1$anSl<.wh8LJ2mxNy[0@HSnseY1#/f-)mU<V.d)rA>Eet`76<8|xSq.ZbFc"}3e**UqGas_BI?zb[2T+wY%G*D[1)w4k1H
+4A$tEu&>:yQPb4gkY*(i6:AxgR]g*DAj>Z].0+9a,_7j<u2$)M-A6p^2*(x.sx<=PIwb]-ukUefrE}JT-g:YLkXTF5W+s+%<vp&,R^x~_nu#mPx%?%g38Cx87L+EY"b.N|.{rm#FylEH?FK6U0?$-n+uoW&G0~PHM=NSRFpSD}6YI>i]u"NG;w_Vq:r4iC(;_w*}1&eOZJ2`M$^$4CywdkRE4uPR/9t{8FE`R=2=C$!Z0cZ5=ejip{_~+5]B5VoN6W8.Zi=Cj1BP&78
+Gd,E=Ux1%:e,2xB9.`SlZNy4Uzc:S`;uoB$i={qg*}TVHQPR.WDtS;@wOlmxJ2hk>"Qg*3=-YzKH2sDIJi>2_&X`@sR,g~;bB*pSds3,?5".VCiQe_QoeQu^1P0:xX
+95Uv`dc.H55pa[e)YawFiO:-0Z#hbaH$ie`[|ul,WEIchMe^!VP;/9Fh=PJRV3gf9hU9{B4^oe~2^Cb1tFOh3En=d2QZ8WesvVhi8v42L[E
+fpr]FZ[CuoxEw6OO]D=@"OZI62F
++/VX4^N=,EB]y:BjO>*9R!+=^-9p``^<kh$]PsPY
+f
+Q35)j`;_$sz"eG<|(L3nfiIBi0i0W=Q
+),ozdv1%i#`-p}r3Def[Z@cl0ka*XSPs`>KMvlf;t2$2%pJ]=oxtSfMK1E+F:[=x$"V?/dNk@+jE?!c92?JHu`v(_,JIY~fdn0EjU{STO10
+0&QtB`78$pTC+S%22MuG6ty9oau7_5qW!nb2*wtU:.#WS$y5%[Er(L92Z&E}2|evma
+>[WlL0D27$v(~ct
+GqiT*yEhM.~:G-,t++xI+1^:M1&](#7kp1X[LuxF6.iGnr6u/6#T@gj32iI8h0JAs
+]<x^l5h9a/DK]iP_p2rqnW&uoKeKJ<?pS%cn(QoQ]$5"pq1[:]lP{j07^ZCuM>-_<W`:vUvTJfc*<9-rHM0D7"_$l
+`]}N=@?3Bj$N;laYJn-$%k#E]b+FwfIg/>CKfiqM;Eo*xU@(G7vVQyzonm~-a(gwNDq:e0,he)A1>1n:x"s6121o5';case"ja":return'#Zu@a:{Z[1*S*mc#x
+YI^@"4hqij`s>`75tWD2ex%yo,J&Hhh-k.L$T8h$8No8ljJ%/W$,B!v3jokw`HeT+3<0>J5qp0FKL!2s#CbfApeijH5xfcy!Hc#5WE>,k>D/*m2mz<z7*j!,DX*Jrb*scV$<hq,M<c,9DX`;[M1DuyDgfp1#.d*XUMPvU@96d<]p"ocp6j_HIY)%ZaVW=aPfU?uH8F+t#sCB:q]sCJ7,m_DR]e`Y4dGI6D4aFDf0kKneJ^y`|fN(#il?C:w_>DIqr^yRM#VBGHa$W7w!>fkd[gD`k"S!vww^Ry]
+%AV.%//Xcm{qKn|p5uVnqJL!A-%Qp^u:MKHpQku*Vna@dG<c(c<+FTo7cZ6Ae8lb):/cCo`h5m^l!a(hIs0QJ6:vzrW`>V;oD,P*%>Uxx$F^s8X7kj3J,oxXlUt3eC77(1^^;gSegiCZ%8%l/5aHrg)6y_cMQahVe
+FxCW:
+,(o^Wc@*0WHIk=|1!6Zl7Ixo$T?muu6@du;Jwjm8AaJtz5p5(t
+u3*miR$CO%4H_m6Bj>tgxL+)nea?
+K8$LR.u7P:T?~I#j&Q@pujNw_6mmW]sVkJe*F$,>lyq/fUKSfLmyP3MG.?Do+C=]5ZJt?Lqxev0D+vj7"!LW"hw2@JK(-aMoL+SRTtBiZ<d@-9^o,T93^K.4J
+=N?72M)d
+^ssAfcwuaurilk&F*WW<#PSZlhU}v{^~"sD=dem%j*(A+!l|E#-q9e
+1c6sp0XDG[QyVKDvnPNZVw!&Dty!*i65YKbc@-u2X8hYq3sb}^eICBBGR4%p&qhi0gJQ0#GWRlmH~J0%ppD4nQ/H/JS656j>[UO[njY&Y:!@D]bVUN$5XON:pAJ#QnCpmF8qA1WC!n]F{B1t$Fpt5un4{_0G)!l/
+-@^~UmegGW>:K>)gQ};kc^TGi?eX>@$CVxwh("TzlM&[?G=ac~t!z#*#<y/TjZOi[IHH>cHBb}n^FUX(WiIgD]?[W2i=TA9]!p3
+f4
++KI(yNr<w*P4]#&*;)BFbr
+7oyU%l[;0*SWym7g5s3Ja
+"kL*U2:0c2N_]9BONw)TS=]mqrWq)fC=^!Q~A+lZT>A.G_
+g4Zx=x]Dq>yHc$Ss"ql-9Ha/s:J8S.FC#U;lzMb&VfJ7YBG`42R`:$FG!2MEfjN.p9]9vr)UyTT%t@|qy&M/*V:n</P6tGBO=EG_tDGKR7KXYmPJ4[9]6!_S"k5mzImFN#.B&:=c(SfLSQU2CA!*6).N}uzr<n;U8ifq{!A$2P`_:P7dl;(rn>5)*Ofe$4?-Tk571$g!$LF0#1MQYfPtZ(%E4ZX
+nq:!LT)J&,p!F6Q"eyV6veoN^c7)Nrc5Y5g>l
+up4+o<6nD`ViQ?M[L(-SL1qhLK092;#4*,H4$V,;R(tT081^ZHdB+jtpHTL`j]AgOK+9L0AqrPh8z;i3Awch|ZD/`:d>gTE>q#hlw!
+UkKk&k1E;SBXTG
+&qq0lt8)3YLI{-r&H2e:9<zL_e|G-MHVRiVB1Y*]Ri^U[!paSOy;!t<f2xcp-wmLAy5ydN2Z?adR8Tu@=@(1r_(1.iCSCSs1FFr%;]h%Dw&@$+2b;v!8cB5tx&DU"t1wao)A"2"nmf|q5*N.n<`r]R@F`6g)TOm[VUhVYB`6U;8!<>_<o<Bfw#3H|]HLTo>KJuy&
+oPG1#}n9qjRPrV8c8rsw@j#s;[Ud%<fR<[B#v;R+vdowQ#8Cd6gCR$iJ?miO%nM7PF=ep"RxNtmJ!*&dUQCVCVV23R9dN,%kSxL34+BAc.QQ`A7J&/n^p
+#;"=d
+$)S9KJ9^*$lFQzn%:?j"%P[~I.t~KU$`g61HQHoG@/EBee.,UVU@2u;FuW(+N0O1Vh%K5.=XqvJ]5cJo`!%mUqG
+HPk:F5qz9s=#EsE2X!0RA|ZgPZdin+Wu1J^mU<WJkiW^oe&B"wAgsDj/$q$wPFBD,jr64`a;L1USCF2k)9D846cm0,iTT[$Qd!RqMrM`q&w9C&ttOB@Ma/nG;$TXeb`IGDPF(QQ3Tv=#r_eSy:4jPew*4y*1A1,_1P8Gm/yRNL-7
+nFoP|=+a?0xg6<cjOj@XR7A@6#)ktr1dZUeZY,r0HJ>@-F]@4*Ml},Tb}19-h"?ea-#T:BYyY61.+u<%H;X29#QC*_Pm!dH"Heqb[kzAwkAnL8]XbU^2
+;Hssca?(=;l5J=qiy|qHovnP:N"4UL_@G;mwJ(taL*hj>;cu[Gk`FiK#;SCbU3sg:PNGy94;tmsyTEtm9#w_V*%f9i!)a_Ijz(q,qny0W5L#XSWd"4;{94?{yKi4H4^dAo,*4$Bt0hn7PL>X6m*JsU@`M33BG8Pt%=u)P$WC_yMWH=^!PtRRyx4ljm:`WnJKS2U;"OU.sEAXZ<fK.CMhNsI[-G*
+2>H)Q/gq"C42OTMkrm8x>TPx`lWUd:,cs2:Ks8BJHxa);9F-A3&MM[>d1EgXd|xy[!:s]O;z5sCNE/DzUU=`3)E:_;-NMN(6)ZGpjx=u+7f[X7M?p&rfjdI%M*mZ<3`5*5<8ZzU.MqaR7b+#=LFQb[:GW"Q[h!TBT.6c
+)g4DzU>nzDQI>R]
+[
+N$@ih/}4HP6SB#juA$m+X-vS0L^g`J%WXTB-nCjou%uv;/PWriD+iu<!_NV;O8y1j*w]aV}L(LfeGgLlpDx_6(D
+{+d7XsN5{^`=X!v5
+OZo``KUP=2f-CcP0htUcMA+UD8TgNDL_x6!"NYL_XJRTK;*bo?*%<`6D<
+4jZP>}*T8rc:IO,(EqJ{"sL#X-!{AGZ.+KB)*w;If[$G2[8TaY^C_Obke2?Zxxhl=jB~E?jJahQI,kc_3}-{/7&3(CtmZp!ju_hv3~T<::NK*a^o=Q00"4IkIHSDnYfcaX6Y"}+pP{clo
+Z=o%*o1VnJvA5M.s*zNK06/r1~hX)S$imk&{OJ91j/=,aL"(_(kKT[-IGb9":<g+BVr8`"t>&UgQ>A>H02>F4`3Ec&U]I{68.3
+B8Rbr-1YMbteLFRT
+%w@4Yic4@>D.kXb[^bXtd5`lJXQ{8:^Z9O.SHV$
+,f#/
+?6;Rr=Z+<mX%CZ~/&CQy@AjB%@32$^7pOxvfI-K
+4orvLB+N>3RGf]!3XX:k%
+@AcrC*Q!J_n2Kv3v"i!4>u~:"y_jJ>S!y?vWu3*4i1k"ZCYm<*{UiHNcc?55wAf*53usH+J]oxV=<tNeq>5]mSD@D=i;JU`M3K_yJyf35,YkZ<5k?7h1$^a"]nE"51wxIJ?aHstUC"DVU"67E_->B"pjkdN<mGvlp4;?ALj4>ZA7r.E7?3
+p}H}@n`bhPS3J#r>3k)ppBVHq..VTumC1WW5-$dcfbF~IuBvGzLu1i&
+yPFN81m7ASw`tZ';case"zh":return'-UF5h@Q.w0Gi,hufe#<=@x!XbpOBwLzvId$,p"vDL5|Tyg%!S,@XW-HnVYPT)n-1R:IfyciDRY,LOJOs8__)cg"T*-isp.+,OPaBBWD]1+"=lo6ob)sfCW|6{AtT/ZxD-hc)QbiIQQlRar`j.g`N%51<lVuKlDU/w;SirISFv4>.9Qn3U,9g@PA>(t<eG(Hx#%GCcg,fs3T5Fr]WN@71T-k>*c74L`@cS`Kdajb#(vCvnw)rUI46:y24v(]j}EM4I2
 @OIvF]jRVg9DUuUkG?P;B,ZtF%=065*6n{!eK2<}n!0_bB
 %>(`jMU(R](dbRu@5Z!k5W:`(HsmgnIhZYxl_an+2$H993CDN@jgrx{(eX
 1.lPh|o|gjEsT,L(BZ
 iKMZnRKq7PML@INPIO6m`*-P?5m^w>;lBKs0b:<l&gq/%/<]bl{U>
-^U_fXoiDw^%QMSND%UN@tkdjOQ~:.VSF#<&K2atMwR%^_!by;^0bfR&^1`mp6tjHbJ.px;AYJHXIBZVh^X"^cmj:R1FEFSd+R7I0*hc-r>YJ`>%DsE$Y_,dSBpZ9@Dm077@>V($X0FMMxVhg}
+^U_fXoiDw^%QMSND%UN@tktj7Q~:.VSF#<&K2atMwR%^_!by;^0bfR&^1`mp6tjHbJ.px;AYJHXIBZVh^X"^cnB:J1FEFSd+R7I0*hc-r>YJ`>%DsE$Y_,dSBpZ9@Dm077@>V($X0FMMxVhg}
 *5xm"Zl5HX`N!?h!Lp:uGFXfXT-Oj<ZDGK64,/(M=a9VDEH+u8VfKHEOL.A2D6a^3hOQd"TB9dYXogc-g$~fz;8f*=Uq)XnKp&C233>yOj<&t0"%9d53KG|WfhIpQ0.E=7S236po#pvfo,:v&BY).Sr7k
 ;R;XUYJx0wI/BKQrGBY.;!u-v#a(9e9%>.3%0
 ogcK`n
 XvDKY?vneqK"0^KY`H;2w{4[^1Xhd8ZbEO8Z;(l;[>wom/im9X^Fw_S]Ml+xeGP3&3S`%OmK[dt*;#FG0S5rMJgY<eh
-+8%)Z6i#cS+6Nja)o;,iNAd]biKTd!cqx!pXB!N%7
++87?WMi#cS+6Nja)o;3^KXd]biKTd!cqx!pXB!N%7
 w,T|K:e$c/yFI3;IuhJ3i|Q8*P^;OUaj/JE6
-rVt/t56x3TRii>.LE3I"gk-EGTyK>Szy|/F*=xnw/;fhTer`*vU
-Z_TkHv-qt]x70-"Afu?^~)q,elmTam(KflT
-)^4qN%b[h9gf#1i0ceXn*S@A5(m7U%iH,Au:Trx_<+8AU&SWk`dm|V5MXCgdT$Cd35Kw):oo.Dd#iskZuu2fxVy)lUZ^Kjc/#jd4On,@,]QOx<OOa-a"BAbR>6c^o9{:ek6*Ti&e"vkc6"2!}xl
-aw%1@j>LpE}kHHW[m0J"kUKuPXx/FRehs92OY5z1<l:n3[Pe4Z/qMBxWN!lHU(#Ci4m2=@Z@;pm>q4PxxI$7ta#vNPqBtmLtsbIhdGek|`;TqE#kiNc3eOA?10Dy%0Im6
-l?H,{fkAa5neRknw!y*s0I4=knnw#r+;CcxsN-~efSMXx!&Wg%{a@0oe}!!HRwkPHVv"^Bzc.R"^@b.w
-j27k6!p(pXXk%N=/k%WhvROJmj<[=|_j=S1:NJcEMOV=[`1~[8JGMc9goMAYcZHt&PeXm~RhA7N2]?hoRc_Lsw.NOCplI<`-khIb_|xn(,"TSm`JSL<*
-v9`WAd<!vDV=
-Y@bsKeB
-75V4NQ4hsI`jpL$DB+Q[Wr4W$e(i(@)e!RH{0=1}/<G1_}8^
-&3"O|y&ss;`2@5p>5N?nmSyd6u{IMLAxe"i=q>pIFKHhtUT6n;tAKLaT9H^f}_qA_bG1q(5yF_twqJ>>?lyf;]uI-wQ]m.l_UP[G^&%(!U("
-B>,/b}<9Tz`GaFE~@X?WZ%;)b^oa2a.N=c!7CQY%ZL8`.D85UR797Ad.ALF>eP_$5%Z#B]g4(u2,Om,0v#kDxYF8bvg;MZ9)"DYwq%lV
-.P/sC+~9B[M5Y>Ya+61XJ+2f.h"f9E[Y-6kG%X"=T9M>>,2P)kC7-kuRZ
-PO,"a!d+5uKbpAwPh8(!{VR4t"R%---qDBOH("|xLEF,UgHH9X>7B3sDrXq6uM1bX6LlSkg&MHt^g6yn=-fUX6pSCE`&lT^g#QeYK.32J5)S.6C(RNt-5j~pb-xP9)(!N!TYYKd6/y!:SOfHobR4P$
-JR
-w(<1Ky?ctiqQB_15pxT$-&qEx./84
-[YZAn+5CF2D;9d7?T?5="]A+bD)>`?=2_adew//bRj_Sgi{0S#2],"SF
-IW]ZB<s!^7rC:waE9EZ}!P9K-TM:Xh#F1jmoVf]rx=z)=(4EJ>5WG|3&o<EqUM+C@I$yAwI
-VvwDKV.7/`ZdP_,8Z"w]_2Ll_)ZG^o&"c<Rd6J
-^4kxr*bl]Iomo(l>cu6^"qS.~$)2G
-dlz
-=jCEv^{R%9O14p@@/8CbDJtAjo1$^tN=?o&dtfs62>[j{f<dQPj&ukh]{>te-<p`rMvtxNhE8McEA7Phw[d%mfk_nDa,Z(`_InFNI6p[};@F4O_FF0:sFbHJlIT+Fg@!y^/r>Igx/KkY>/G(!
-1?KHQOURGkc%q7YI)ko(`e</mXwuHX,^/5)11jvv{mF:T8|vkBE*e:}Y>F;Qr>c$AyA>WZu.0G$RmP/oar@s^XFay`S[~_8Yj:7i{>sKtC(_q(5;.p?krtu"$cYsc4nkUQmqlupvjm*LJKwp2yl2taJaF:i-Oy;u*Oh9ce!In.Cn4,WN/ofMey,=N,0XCWY>sU9oXljW3"]Q[Vy4ZgPe*(3f<k#n)<zJRF[,Q?BH4"S/FS"qwbx#jm-mL%S$XVIAAI;q;em`XF.SRh$Dp+s&$n7pMNwj2sm99C7TpGjxW#kK"h494-A?BCui2!6AmYZgDiuH+DtsyX(5X+Sd(a}qcwaK-E)`nk;w/M3#4p.oVD^hLsecjBbjg^$Npj;<Pubd>Q[NXe.8/KR[;m#xe49BMYq<Td7Qy5tkaA9":]X`I!SsU*pS8U[gw+]*A2pwoZI(B0p]Qt`lQ?,;{>FFF1Mry-@#"nE&>AY%ag7:FkDIj^TPM-w]Rv.G|djg>]CN$B{iXI/std@';case"zh-tw":return'#UF01lMWr1jf3)i[*EPw.sdq,tA9ev(c-(s",Sg/W0]#.%YU7<9-sUB&PU7J-%G3QwbBv&n[3DmB?rb_w(t@]"2$w,F:e+Kw6f(#V;F5eWPH3],H/Ki1(;L@^9mTDqVBMD/4R^:lzZ!wT$2,U;f*@4>?hwoHa,;i0HMICat+UGjO>Rm5},~x5S?]lhEP=hajJc*QE+r1G:=MW:u1b_@h%:ohiC0/:="u%AGCnvR2pbq0k[a*bKpJUaV^qrk21
+rVSBG"MOp1Ym:qeJ,JfXU9b%3`&1e#&!%E3"/-b;-yaX@*0Ia2<sxu_rE]]kGyZA4Ms!l^SlAy$6h%9:no?<dn,c:2D,qA>TU^CilL/J4(~2}p#L(CWF(_.CP[l9,[HOB9UKZ]ChZlWNR[Osh4~E$n{lPY1"Yo+mg7i(4K?@c!z6Kr<v+u][7d]Dws4Jt%1b}R?w*Sq1F_$i~oW"1C-)wp/!BG5e8(.JA//^Mv3B5PNh0dK4{:>B;!5u|&R,Dv@j{.&%VN8ZvLuE(%BFzuJirdL!0grK;w$C^tr;*M:w>[H9MWk#P(%&c<*ktP+xL?/hb7F6m=Os^3-YVg~[eH1Xjd^jeM]MLp~p735v7diy1C9pJKQw.<EH~bqt;vL%!i7!T:%W_SJsmvFD7ZER&DlmBiMDUH:Gxoxi^DV*?e5#ZS7fu@sx`W$ICo)u:p6[2e"
+m3qH<oH
+-/ZIi3DWf&U>`8r,zj=f
+,&][[Fez"81oTW"a3@yZhK7T1i`[NID8T%rq?QN,Qq5)I-lmCe3K3[s|4q=J$z-ds!N_)q<{1h^1iU/qiWm+D&6%n+rgV`E8O)=[?KKe-+Ei:(YWr0jEm#^a9=>Q6Ot[KK[23_9axgv!k&2]5C#}Wueb5NAU"|!qrf@T`^iUMywf<Ga[kEyGEZXLTXb[obJWPf#J,*5drK7=29"lpj8IkJ_8f7JR0p7ZoW#"U2$q$fy`tTdiT"q[qR#
+)?m_8zr$jSK`c;_~mkh~44r@o7i5GVq98~gm,4<
+H~x5GUITukoA.8.n82Vn_Hx6%+tiqO;7nDoH#%*hUO9)Us1K%
+OxM!R<#
+;O^deE*$Snl4
+n>Z
+1,%Pldy99mOA3L#!G5IOj[@SqKVS@^s="*G?|#*bE1dNv*t4MjHKe#g*bo8%Mw+V
+_b-j-x%M96nm&v:)N3.V;7]#"{eL"$IA^$V*PI<T2@R|`9buH3AB1."i:`X?kv@6y>C,sj4eY8jzRspG_2uW*cl90Ff=>1F6D[F#(::P(kPXsrO78I/t%M)`%t8jm/Ne%(io5~1akn.BNmaKy!6=#-g_:]QcJ^IQB}f|et
+#+7cuAFN&?7`LdpJ;gi]z`D3&S6!ZD_gR`+Zyf:%Qu/UQ1Q[xoyZ@AI>NC{hBF0.iO=>zlP^]"6C{0iJU=F4pX!j
+o$D!Nu3T).MFV9%+?bj=hhfAs$y~XsU2AI(~2Wf|uF4[3e${1eZR
+,*rfLM4R2V7T?jI8m^$>"7G$ybIQG7<A#k7=n:cM>>
+l]on!EsG]pt>%C-ZVcniuMdZ#%(}`KFk?Kr4`AVNm]C8yOuU;ROXA`x[/._56NHoEIEiq%j~?AEmdnsm"*tRN)s2n*
+o"Y1/5b&+M{2m0.MK>d)^Ehz&8e3khou_l)"Yac;r9x&q>?/:O
+:4J".YuSsn6HLN["o_P|IauQVpER7x4bVmExo<IP$Rf5eUAH&`MW-@tA1[B<j~*(wh26@nW8UjDD5ahq]g-/Dm]dn#_5S`bsf>g!a-wNVxea(A4NfK-|w]JaP>i9XA0_mLKPlcYm5G7?M&iZky00N:J3+Cxq9(=sL7A:D%9vO=tSxJB.c9M8D{yIF-><,sbRU2yI<C:YuCJGwDd_p#iRo.HbXgJl/fk|8c&f5zhci`t.he/~d?]8Qrp;-VW~oPL,GaEd4ta%SI^k4@!oSd$6lDnaN~oHGe]Y":R?*jc7.*H$j(0o:H#a,W&yP%>QI/Vfq~)w&i`%0l/Hc^W*2dEW,0?(XDYQ[2SRY->/r-GP4y[BJd=/*h:==ZAn#7H!LP#$?bs$>gcmodoMuA
+R[:4p=F0|@zhZe(F2]c*UhB&4C:E~,m_yl!<<Gu,p,kkA[/--hHxxp/]`888.W?lJI!1J9::z4E&0<kN&Inu.
+7SwqFFSi7J[Y^/}.U)vP%S#8jkrR[sN#to<D:1@wjw8;btb>?x<w*qOZP]u6/!MpSc1)Zt!d(';case"zh-tw":return'(UF01lMWr1jf3)i[*EPw.sdq,tA9ev(c-(s",Sg/W0]#.%YU7<9-sUB&PU7J-%G3QwbBv&n[3DmB?rb_w(t@]"2$w,F:e+Kw6f(#V;F5eWPH3],H/Ki1(;L@^9mTDqVBMD/4R^:lzZ!wT$2,U;f*@4>?hwoHa,;i0HMICat+UGjO>Rm5},~x5S?]lhEP=hajJc*QE+r1G:=MW:u1b_@h%:ohiC0/:="u%AGCnvR2pbq0k[a*bKpJUaV^qrk21
 qmEnz<pWm!vu:rDt!=2g=NU,[%t>kpUR0[0VkAv3&Z7>+<Im"[XilU8%u_f%zH<*;
 /!$^&otuUWUMWI`5gw#C[EOD?<Cf/qU2OKNG`vyFzaD`dDoTNnJB>`%7*dUcChmlq[CT;E3tIN6E]/0KXCMhhhZ#PpI8zQ-snu<FZhA1<7Dw[O|K3kfL4
-u9*@@5UctKdcZL*@"ER=/+2_SJqm.(aNUy@-7wNYW>4PWW
+u9*@@5UctKdcZL*@"ER=/+2_SJqm.(aNUy>d<wNYW>4PWW
 Zn[bM!eXsfa_dm[ejV
 kCQscKl)h3|:s6Gn1yDj>2!RD
-5I|VCw3nP&i^%G(0xfP+EvD0aU.lqe]kC:XIaYom)$I-BNABNw}Ki.VIV^EJH?t?(7l,]!Z`VFU_?v;W|fUJ57FARefEHoAV*5UcWD|uX
+5I|VCw3nP&iZ9G(0xfP+EvD0aU.lqe]kC:XIaYom)$I-BNABNw}Ki.VIV^EJH?t?(7l,]!Z`VFU_?v;W|fUJ57FARefEHoAV*5UcWD|uX
 .CXaRMPvF,%y
 en!Yb]sW2-m5Y^l&bRuHe<,Ae}A
 5/u_;>p9=4qxL;Iux"%y^S_/em1?OaIMqkV"f:;IkFy`[2&@LpL9dJObReTU)ff:`1]M(HA-C=h_UB:#&xt<fv?@I@0b4):2v;L`9QkQMdCMt<jYIaLJb@pn8jA6c.YSpi$*kJ;UkFJuc[faJV?Q)8IStT^e"i=<#"EVi]K*uA
-bo%ccUxY5.(9K>&;JhFK4o<lwBDA[w8>;g)>FQPch1ExCDSO;BZ0y+<>ufK]`UN1bRmX`HCip$
-k*`^nIO4z)fSh$2ZI<ctGH2Iu@REh1iHyEh0CBj`:3DO4B]
-*D)9y.fpVqZ8)qd>r8b?.`,}>#q[HC:Ikv[N*>q&+<B&j<coAC$EUulac87}gEg
-
-<0Hxssrm7)_1)SJ0fX.[Piluo13BN=ZNN+T+H@z"n6h*y/D)]#tl%d_N0hm1c^Clc4:PK+G+qo&y6B&a(V&8Gn3c`$7xs!hS1R4cZb9B>:R"aif2D#*"K7&1?mY].sImSIo[:skc
-OCim]"OquQI"C!1i@.j$gIvHx
-"-t=_6c1$<7+#3E<k{tv&m_eC,iWY""pAo,h@tgu.S/ZZ{Ie*wU/lU,p)bc8@ApP7/y=56uw$CGfw#P*o$JEu>RNh6TA#yrUko7hXi<]wiY$;/^EsX9$H]^xi>=C]n7Fe.t/veXR29FZT?0ZY+.pGF73u*9%G_)DRTt.qn@hgJx:_zSd+TT_x>q_(
-/eDzQ7!Rd`ujR)"8";Za(n_eL7"];ltFwMhVchgFwHpi?VNeFCTfEKp=CW!fFt*#aS
-AWI>O=DYF
-n#TR7+U#{e
-s<+RI[.n(dSSU?rqb.+Y@X2z4|3g==cp*xl&974Jr+-|L`x)Dmgje#O<1lD(tD"#k/%t+$GkBV[!:wTxqv+E"LIAf6D[rUTvSRO^
-yJfGYS3`nE)NmFusyT9"$TgIQFf88S]^IAMi
-T#CSXkPih/]Io"Eq&r8SvU7F4XvTOCaE-e$<-K+K=.0-!RENRR*rrb0BnI/?:jr0[KFg@{NWP!w:o(w#$k)<L}:Q-*&n4s"v@o&spW1!![n,yC?h95S>g<y]R14r
-5F"v,$%Tt9S*^&Yq@g2l
-gfXMrEIN"Aq)DT:gG]-?Y+8r@Dol6EA^A1Kb/4=DY]&S>663gy7LE98-hvEMJB?,u%:Q_N=)7GDEw>9J.ApT/FBgf"!{bE.wXigwX:Cw/!lZa3Vdi_X6L*9#lCR"Qr",!g#$>:QuN0jglnn[Dps~?b_zlPkq#mj&0%C`yC)7].P[Yjr&l=JE^-"@&d]Uk@AEed
-|aD6|H8M[n{?5r>xrkSu5Gw9chN#}><p])>$CR`&rsJW8.7ApL;w>SFRxta7BC]O]H)&I-8
-?/PJ*LF34+49~%vPg(Tfw<IXt99QH_n6[ocn_Opfc%tPJm~-bO!2|&!jFbptM^69l$s5hg[X[W/?Z"Vf`#n5}OU=W>T"(^RFQG}A%1=T{N%oW/Mc1Q<Y+/!?/Pp50l@./MAWSxEG<!0$8sf]Ie=d%YV_:J"m`)(<XPql0D9S0OkT75_,0H:awa$"GKFJ?ezpV2zqGM72kXY+m>FgE#U*!>8Q[uKKZJZmzk~xu
-0)be<VMCCjHfV8FWd7x`8L|I6R9`y%Krxfg5@Avs|Z{lm@fx9o=C`?LM~>Z*@fzKLda!LQNd@kmytg$1>e8yuA][gNw-O0WafmqMYCP@;Z0&v=Oka1_[bvgBAN*qXonQ/N:wHn^HY/dTWb*xN_sb4mwt;ncl;_+e;+n.R.H*U8nT4[
-<.s8#xFZ@[8-Mh@l$*(smZ:#=*eZ0lkIq^C`CoJOPH=;1]y3QlBXj3$Ic=d;x5v?pF-y,Nd{lf62NR#+8mt?BA]smmi:&7V$&guC#=T%.7j!mRwu-pgB/7=S?^=w`$r&aBgW+~^^v>)`p-rH.RV@Hx?YLKe[S3k45EmrX(P!R!e}s}nj;+N;6y!2?#CC7hwCW~g$I"0l5l9FxwQ@d=T+.qhX&$^fVPST[`Zyn#TKaT:qa9&)O:Kj[pyLtEgOs_4<^,vNIhZsV6xlB)u|.VEI$el?#dyft#q/9tqV9;)G)-Jz!$Q`
-G2`rR
-L=!5ti=n3NnE;JSoWgsXn8BH}dC@5@JZ]Y"!aFUd3%K-MV2#=Blfe]I-LX"nP_&EZN+:.g&8O;5y5KuY4xTN~lfmwTy6OAG,+FNt0LeGh8t:oHcu?%7fUM)"6.|58-`%YBin(U?<I[;s?/y*eR:Q)*y?gQi.8`BYX$Qb7[&D$$.0Dt0(l+{8T7rFZeU[KrTD(S$$eh{QSo9qPGTh:+.[29q
->ijJ*mNKAwyGzAOTrNQM&$hw66+wtg{v")".m0XPo*V`Ktv';case"ko":return'$Zu6S;zZKG.nov$0
-UP3^0vw.t3Qj4F_7;heKc58^"[lA//8|NCNjGra[GI!Yi^Dbl~rXnu2mw(J0m9iDDR<~=C0{wyLow@i%FDa,9:ar>h+r!#[P5E%0FpY]*70b>.uY?QDY8+e
-fW#_P2?(w[_(V(U@$[Bq*4]Z7/ceOFXaV}LqO<y,fJ7`j&SAH8vFMXc/Xy!2]0GfNo?I=WFeV@vA:IBFf?X^[3UY*A1Qm8_uFx%B=}gub=Geyz8?]L
-i(|Fq4UC6
-LJ(grZI;@:x[g^N%X>U]ZkZ*$"-xM4}3on5/
-o,wVD-v`KbZA$yH(KiY`_{9/t^FpKl5:gmFp4&2"V&otLXA0sa:~b!e]?sd#il%q/QB4y[DSqq>
-U.<ulh)F_7eHy1d8>O@Z$>3:Vnsj*`@8P_IPnRM<uO$eo6v4:;?Kv^UP@-85bb8kQ)q<LaW4j<d]2+c/hTP_yG3mS?`&)5qW/K<XoA#.83Z*"|B-VXpwUspl/`%-J~3C[ij%d@3vTqAm`o"$im3bxn%gc=3rNb4gqcX.4}[$r-_:W7%x.KN^2gCQh8JRqS^egXSds:/ZLPM=ZF1EtLG_c6_4YXmZ4URu[43/)U:L?]h*;l)Y_p2Tjl
-J)$&"6gb^lE$:]|?o55Q|/@8<w(EC_S*uW8`fS>;,?o#E`1R)c];9e@oxWS#1Gy:%`+pG+Wx$
-py~x><"M*sk
-.PDP|Xl`}xV6t=/13q-
-X%+QRRA<7b{s
-53R.>>jj]YirIj#-i_jF+s@f(dSad,H"$jc"uN1zjh/>#=F}q+SARdNE[QUnD*,95o
-&F1+fEu4QCC,nj#!lf.pW.DHVJA`4p,!}9+-3@~hdpma0JR&zmEcVxQr%uYI.uG%2hH0H<=jOc%V:;!cF){Z.1KD::Dd3mJ$Gq/R
-.xJ2$TWHy)MM"bMSnTKaAaJJxSW4IAj0q]>OHBK>(N*,.w1xO-2NJ$MX/D>D[VSqjG:OU%Shk2)iQ{T>1{m&tW(Qw],*xOwlo#jgslQ&e*8L58C#w*Uf@>Gs#[@(q3HufCHdyUGfyucRny`ymb!2Hk&1X[xk3.M#RqN<N%7<`cUDeP[:.oq2o?ED#m-s7tq?Y_^7$;r{Vov#VX1V]MEST#FkXh7i=f=vHUeZY<i?f`O[iec~S"E9(6b[?LP~,Tb+X?+G>y74"Qm2XM(}^/X1v3B^1}8k:(hLKVUSkHR,6BQ5YT.RlPGrUM#IDk2"g12p=V1n3U&`S~6~$ke5QSZ^3vCByyXM20pnj~$HR)YAa@5h11+=i}dksM@<Mq:9v*M;RBa`CG6t6}!|rP8S/Tlym#c]<-%HeP0>hBGH7j_/JTYg"DF42?9:.UD*G7#FMtZ7;ehBtQ;0_.:}j4nD[t^gYgiQ;cmKf8J?L|q<Z1-:#Z3R:=SVxgw6"QsrP*sh>eG:4gy_[<s&6[co1s$^]SRM`rc,uh_NnE]7Mp@Ws,]-nD9LKGtQMm+h.@gw5r3Yd7@|,/abIG/1t;5<k`Bqy/&5YF?^!8-5HUhP=>meJ<,rxsasY1^u:?Cx58KZk%AiSd297)8ze@RF[(5*w.kc:cYB*ox+uVXu60dkt^@M80.#T|48FBIq9Lp`t9n5*q&<[d546R2`YLsFc%%%8|JbwA-#UTEQU;_C/TOyR!F;RIL`QD5[/fU2a3@uSrMw_qA6W5dV_-yoUL$d&U=I7&drAMfa2d(]0w;8hp.UQ0&rTs.;c#v.)F-#C""jD]ih#n."+&6n+{V1X
-V{/SY<[XE,R}@{oOQ/6I+]Uyx+
-_090GBdtxWzq-$}N(NHs5wJ/v(5HL8}
-7LP*td$)LAPGzi@S)0GY2S*M8=qf<[8Al"3r.QD%D5hE`3VPKTKTYcy6<W>(1
-PE3i@_n2M_0qMS@g^(>P]d|x"h5@MV?-p%0;ji0+b"j7zoXvQeXAc%IdY2lN@nHm`E20]LcI}]~n-<304hQ(SaEn%;%KX"`+-kCc9>#@k2xTfYmf;8S!mV0,UYS3l*4%sM8krBJ86%E<(D)U^i_VLu|R50dm=PSh-3.Gfl4CK"?L7f40bedU<c-%NfIhqW6,{fzLOreB<f1os]x4]X/*4lKab]YJmj]i.ar"N+l;KE;t4poHXewequ;ZaV
-xowv-*O-8x?hMfkvlH6HcS2!,3d5:;y*:CwktFB@PA5(@W]5RGdOr@N;POt7h8+s8uR?R3K]#Ac
-Ft[Sn)N_wIN4Y/ADg{+Kbj/,r%D79cb@C>KKJ"[vevdI[bjpnC:*Miv(V`;`;SF{uAShaWAxgncpf4:^)_d>P.N*c9K]ma=(K%-s]fIni_uI@c_%18^Di*M<:,.0`w8wC;m*o^$?U@ujI{)u4DXq#mWUF7Z?SbVM$l*lVq]sf8rfAF7.QQ3FCo(XhXWSQ_5oi}W.=7&<hC5>ptgzGy5GGyC9U>.a,S9i3)UYU*.pK+uX:u`2l3@8w_ndX@)d0IN]`_JlaiZg+GA/Zc-{F`tuPRB*9e7T2"H.a}-ZcDrge1b56$O>
-JTPdJare+35o%xKAzQ}8Oiz[e2[8!
-Z2t9f[c/FG0"nPSCA8qj4R[A]2-CTh+w62-1U=LA_[tWP<}eo-a^y^U%VoSfzYVg|7>1Hnqq~nXPBi"xV^]-cE"Qp-+s;/~_ntqv6,m19XQyP019/O!buQ{V+i6@!T[+TDAxY>^g|GDqY];6q)O,3kCntn5XXsY@yE:g:UUK.^4jq[Vk{gx_;hzj|FWQI*7LCxx)/Sl$t6s#I(q>sZAD+/wj{brxAK{w/*5
-y5{lP/P3~[AJ(<d/56Gd+bWr
-n0XYV25$AKnpJU1dgOvM>]&;,]NRK(8rt`H1bc::CY%#tRQAMVB7LG%v")Csu0J&k}j*28?3)jspo+eM2ru9jWro"6AE5k[zL<>"fz-.3xx,Eo,:k+yO,e:
-u3%:*/X*Q#)6=9;vC)_B:H9/Q}Lzp]*M[jl0K_sf3<9@SKc)?r
-$"YRb<9-_Z>98y)=_EXmd32e5$jnAr0Y?KeVtAx`Y."=OXr/e3E@
-G=L"m0?.QnH|Yc3`C8*mOY&<#glLw6vdqx?UymI?;"U`J/=2Rapz?oJ5qvc"7Y:a=Todv3L37qo0vrrlB>s,RN(G7wrc&zmUUYE+b{B{hI]%TB[3Dii!mR@}#Rmn%
-=j@"p=<3gB<nGME
-
-qv:c#$ZhlE_F=/ecrMg
-st>$-759Yj[n&fVNEfj';}return"";}$ql=LANG.crc32(get_compressed(LANG));$pl=$_SESSION["translations"];if(!is_string($pl)||$_SESSION["translations_version"]!=$ql){$pl=decompress_string(get_compressed(LANG),(LANG!="en"?decompress_string(get_compressed("en")):""));$_SESSION["translations"]=$pl;$_SESSION["translations_version"]=$ql;}Lang::$translations=array();foreach(explode("\n",$pl)as$X)Lang::$translations[]=(strpos($X,"\t")?explode("\t",$X):$X);abstract
+bo%ccUxY5.(9K>&;JhFK4o<lwBDA[w8>;g)>FQPch1ExCDSO;BZ0y+<>ufK]pU61bRmX`HCip"VjG`^nIO4z)fSh$2ZI<ctGH2Iu@REh1iHyEh0CBj`:3DO4B]
+*D)9y.fpVqZ8)qd>r8X6yE?C^.T%W7+:/CXy8Sq;2a=2kva",8.jV~BfuAtBAs%PSoVwc57}rNg[
+<5wxs]h3I**&4Pa1)]]Z-=pxZ1s,@@CY/G%+JVl%Z6h"%/DUk.si|dgVH";Ge[fls4<PSA^#[o&X3B!a8V+p/4}c.%!xo+tR~bdaTL??W:_(1;%Ac;A"8b-r3_f5:g;`|a<<J+RM06Sof?vQ`pvsLY3SE^{O&V0rWa9!-XGLYLxGYD#PXS4
+Lo^mbD-oGwC;3.d^wV^R$Uc2<;p;?s9"][yoV7A=&EQ_dl@KZ6JMxq!sse5t=LY^m]jme+vu@53Q(eX
+ty~&wY">?7{(iB[m*euinDMMMTYmY1>RyA~xq7=yYg*[K.W;V
+TwkLE8rXCl
+A:(yB/z!_2jeu)Fa-34GqNp}ht[I:$;R(j-e"cv|)%oej+owGvD``:+RStn
+5VW&7JXntcx$
+K95#1/5t#g30h-Ok)=.EI>?[I[_,S>2=or!N2`|;|NIVd7jq7;e0.-00[k
+4(2M`t"fH>EOS2Ig_r]3
+q@7VS&CSby[?@3Wk?tDO:S*B2)]5;JCDk)|Jo*!>8eNYkJ=&P%&5`(c5D/"yE9%on5pae7[;dW4%pe^`Or2$pf{<!a`"P-SaNRmGH81f"HsBy:X`WnO]Obc#hdGx@V@m]^.CBR:+7O+$9([[RN7Ptd8e
+]sJE1:ZsNm[e+fANJVOg:RjAz)sDpHG2w7XRY=iXbB+2oK
++PZsu!}KXJkMA%u]j/UwSKxkhPMUmk%K#99j2.
+6l).3up_s7DnqTuT%JUj>++"/!V0"/>.CN[qtqxAZ)x9+Z),Q!k69Ir9!cq[+>2y2Zy(ty>U.o3R&#A9w:!4uqTt^7Svm(!W-3pff{)MWz2,vOi"V9##s>DId]5CFg6SCSGs#M#zNl%J%51A#p=ZFP[-.i8~]`*f6PbdY<LPtL9D)1y5](k},A`qZ$Z5ECVsGH#lXKDQ@WvHW~1NS/`z6+f6WzV~OS:FSw[MmTnGZgUN?}I"T!A]y8u,fL%2dT5KU!.gNJ(I26q]SdE17d@$`}F~xFC.$yVqt`F_1eJAM?69ww/hv?F>naWCXtBH0MKw<GS2vSS]U<%r1h;`l3A)a_<Hs%[T8tR<#[B:$=xq94VIMxP>O8z&2.pS]D1c#IcBUl#KRm<4Bqb5IVCRQpnfit_.UsINy;2H8L%&M%S~[d#Wt
+I(mSYy%r.I^cqF5Qp,-r%9[%^RQU0(lO`"*mk@S_=l3u/ks_8u*X=b,.dCV8ohT+N(c]D[!=,Z=+qw-vO0w7WpWo7rPbn!8AECwh#pV;fb_3wl0k?U)#6H_hxNG3wZ&=!I5
+xU7y*Tivsn(YRBGpt#MWx4?}/z;|/dS$ki0vy{HEf7x~eP^jv
+g<c}#SrN9waO)6$clN#ixVBy;,FdL7>QU8pGn@xZ3MHWSyR6Ni+E;_6rtAM`O)_f<;,`%.pw2RdjM~FVahl8S:C91KtD6B;O`Lmlqt^5]HB&kw5[o`aW(s>.-_L$?
+i/>q/0?)1/E3;JqZaddCQhp-QAq0a}:jKO1SI11jHS3y<i2vh~",eu.
+Q,).#>:-Y]%)Y)gMCb4
+RE"|.F82s-Sfn`V%%fSHZZbSJR_Vg,pU,P)>WBoSQ[,Gqn"uX=(b0qC,2zN%Ti3-)I3Y],ZKJp!d(Ey{uo^QX6>m)@$^o*LPI&1d#Df+sn7^
+VZ_k{^dI+
+Bw`Pw[kNJSanFyByf-"o&h0d0]oqWIy^XUio*jk>+4~!.896gk$5tqJ]c:vie[)0eCxrZ,N0D*pwl!!unLB!^:R%T8(0^u{KHrjw6U_0?X_gS1WtH#med)?0{0!^%5O&mFN@W/DU-NMI"En
+}8AlOOva!=
+#s!O9H,xq^[-(x`Uy+7"<{qjYyZSVri4QT!T0}P}*}7ki(A#IM[A2rrI?MakA_f35XlBK@XL2Yu(<HQcnc8q-422hmf_Fj%!oVZCP/>*es
+e2,(bSpF}#d5B;8HfL01~YH,6u"<o3nFlOKQs[R<C#$Ww^T,@';case"ko":return',Zu1$g~Wb/fR|MDOwg[QEUP6[yse8W4AnT;Lp%T/D^~U}LH;ri}k3Odlf?dft?n3bL*uuv%NCq2M^N!-K8]4+VPlT%LZIyr
+SsZm6pz/Ao00O`Ed6?+;hes<5vi]WC_cZ2S6/&?#>m#49bs+[vJ=9k"0Yp#n[vI;
+,!lawhxNL>Z:l=;~wH^LA"l[f+>5]"=z0_jepg$PUoC95S^L#r?ibyQI.x+1r&AtO9h&v7l#XTB4Q%XWH3E/7k3Oov)qP1A8/S*G&qoUH=5)&zp"xE11AT/cc+su:YCLprA6XiIs(r!}q%g`e_I;RHFUUcB]:.6l"h^}V1z&]y^y:LqwJH.ybg
+.nLPwZ&8]GbMaOq@m5}sLvA.%N8as`vHy&N?7qn&%JE(7;rD8(Mf|E.`ppeBr+aq&c^L#vL!L8/r?]Us"qp/CS7NI5SR>(
+q<IwW4gRfCt-
+8<@w2yGIG[Ua)3wxN/+&Nrj#>@D[-p*9q*f+0v*TT/bOZh.,g>:""KD1aKZ?<#eSg6Jxn66aOVtdG+$jx=(+Oe&vkl`g{"8_>dD*DY;E-L<Ij@Cenh;J
+Tpc}7V>5)j@:4ln^g/TD!.hcD8rChBOxT0UL3RTOe{^to)+[?@98YQO:a.QqZ$?J1IfmI%C<qr>RI$Q|]f;?Z|>Egeo}2vDD]}6luHC(tVC@!d%"/,t&ZAHA#[S@D?[d5-J5EdqyRc^xP[X&8b_GYS7fv(.L)-5f#WM|,jI^S,waVvQIG
+c+2pZ.(
+.0ua8RYpNfS6UB_},<tJwk@OHrVIdS7zo5pYpTvDpjQu)t
+5Vf_b@N<X=XqVog]]NFcQ&zb)E;*&Kf&|"Df4:,#-BJ,H+L)zQ,i?JTR,t(Xyv/,jF8Ly-zg)mx<.&]9H]1("%Y8}:Q&I@=L
+pgy7.@Q;X*"]/ByoXvN6,t5.Xu)wX07
+qE;64EazU1AZXE9]P(Q;<"C>&-,"XyQEv1
+JDO5N>oDjZNu`9{Z%9XWT4hxcebMJ$Rc_yQw?`7LMontoia&m@4M;Dzk]WQNKUV5l+eI,Ac7tWNMj]zK9slJyeCAde+qdyhhBBj.4CGHOqfvfo~6.`9Z_6vLuVt8N$|!Mwu/w1(94vShLm%hA)jf].-^&AXX95/WneI<w
+V>I%lYtDU0s(2Ql<A!{*me}:`,j]M14K7Qt*.L2whJf.+>C.>&!(2as@saf)O^+x$ZC%NU&6Ao0YphKUgE51|9%;?IGsw?aSjU+aB;%8P]0i26`RIF75K@R2{%/Qj:K.rEM7sB/m/@5KY?V/Wd?UsdI]Q3M9;$uF]s|2QRaSed3Sg>B?"Xp.E7i4Hsn+zZT9pU-#~*/R$5oo(f@k@1%*=r:1MlKb:sI,rpe^7!8w**M)R0e5`V!Gcm[GMMm,n1Zg9Vc@iD;0GU93t4i"2<|`frxWq1{29mfc[ovyt[PDZ/dXxH=,|m-x4?(Pm!^mKW:AZK;K(6)2qktQ<Fvc2nj8sOwx{v?O|&Z;pg2X*O3j<&)T//kDVu.SrCZw@j~eJ2>fOqS+K8=itpG#3_:twiV55QhXY[E:X667vif$>-D$O][v~Qv1XJ_iTpfllx|+Y[,:hAZwi>NDBg).6$rbG$u8]j3Q5+]?+eB@Bt3&VprjQKCS)]>dWICNfF).+UCTB$LI`qC9y`-h/Cwm;>8)X)#VQN0c`g@E3)P[YovKJ@|]?o(-qv!wGL/Y`/,_q;mi7KZ
+>1F4|vPnFOPC>sNn,7&.Mbr<{o*Yy-)<{.W=]:I(DijXbv9wi)7sY??sagDvpJR/[H
+i~C_A}9tH=0Q+PqHE2xUK=fn7A:^NQr4&0eNs@6X!/revMi^H*O(Wb>aaqII^ME!j#x_4i5I3~:SpuPmgFG(]Q&pMPP4P[itL-9[ESN?j3D5AC7nH5c!gIR5%]w:v-%cOd"^%1&zG
+lZ5>NMi>Kq7}IOZkPGXD)oWA+akLAu>|/<%&Vm>4$3I25?9{)pB+@K(u8k8Y:3rNpp`yWW(F,f?HeSG,Pu@MuXk!Fp2eG&
+w^h"d4*r,dmPh!wWn%B"
+Ie`>i3_GM^rWr0G94E=:+RL@F
+Ogib#S^dt$`l#w+{BlT/Knf^?DQ
+rzon*YI[!#5F9BgRX5m7-SfBC8KuA!hSYby2Nc/o#%IJ=bcte$m;bB?!b?$$#QfGy*fGwctFB0Qa4gKTZJGfd-q]"?a,0+JZ%;-M4XNf!A6|t%<}b=*,d)87Djs<GS:%(+eQi}w5QHvRrIHoPmmu%R-nD
+=NGl+Ubuy2"jrc/bNMF{TVOdb*A|m?7tyG>j)cig#go**n.vuv;b*$1~]>"ijDItQ0`|F{a*hw3f;PZ$[H<#dAhxp)hcE5q=[wiSrc`u!")/nY:e"#3SS]6D2yBm(/]$GKu1Q@C0&NV4F46r>wn,_-_cK]D>DCd,
+Vm.I8e.Hw#:
+)/AhN/zRV^L/ZkTEX,ten:WKJMNS&w7t8_bH@&k^]`1gn/Rk*
+Z&As:rA!-IA>{XeVpqus_Xf5Nma0bJkkDh|mOJ>>j^26oSq!|tey6D5ly`[+SgEwM3IP40$V`LsVVvSxu*16>olH%mp;hu)mDMP=N?0GGXkZj"q,mc43sSWx>RIxi2C
+ZDl279%v2JIjx!wTQy>TvDr<C"XXL&<-c5O=T?yEKoHg?%Z4|.]=rYxKy<h3@__b!uyf/]suEr$_/n^[Bey!
+EH@B?N<mhN^ApeZ1M+iP
+zQ]w4Xg=It25lC|-3P#9)I;L6z%qt"EtX(c;N#I-!n`sm"
+*o#D/%`;y4h;ue^4Rge^R46Q=UF%l"id[P]P$O6<
+7?Bm>FYFiBWq~bO`Y6<2@;o&1sk0[F~:H%8%Nd<qsClQ^7;hZX9+"]c4H6V4F6I9/tuVHr6iHF>6
+":8Jp:Mx44GQ+%_;5l3GFr4XR@$c-UY-p5wp83>yrfwHLkP<m(jbM$XhvB3S-f0A]}HhHC+5X!QcOAvmZ?aR9wa
+p"[WZ/*?H$ii(<K]rtoh9c+yAE(CKm!k#:B
+9!*Xj.mu3bx<
+"x+bf9S>bTlDB*2Fe19f_+~faL@N?VBPxqy<PkL]i08-iujQIE3
+&1#
+^xqMhIMZ>nn7=rPNmb2!2nzcKUZP^Mp=HZmfEKvoL3sGu"@iNDkpY%dUZVWfE02[y/++H&dvRDPc,"9)x&TG8Pt,IQ
+ugp3WwBkeDoX1JOafLojh2l>;d8"8(@7OR-H%h$/9GyNo)';}return"";}$zl=LANG.crc32(get_compressed(LANG));$yl=$_SESSION["translations"];if(!is_string($yl)||$_SESSION["translations_version"]!=$zl){$yl=decompress_string(get_compressed(LANG),(LANG!="en"?decompress_string(get_compressed("en")):""));$_SESSION["translations"]=$yl;$_SESSION["translations_version"]=$zl;}Lang::$translations=array();foreach(explode("\n",$yl)as$X)Lang::$translations[]=(strpos($X,"\t")?explode("\t",$X):$X);abstract
 class
 SqlDb{static$instance;static$untrusted=false;var$extension;var$flavor='';var$server_info;var$affected_rows=0;var$info='';var$errno=0;var$error='';protected$multi;abstract
 function
@@ -2426,7 +2539,7 @@ quote($Q);abstract
 function
 select_db($Zb);abstract
 function
-query($H,$Al=false);function
+query($H,$Jl=false);function
 multi_query($H){return$this->multi=$this->query($H);}function
 store_result(){return$this->multi;}function
 next_result(){return
@@ -2440,9 +2553,9 @@ class
 PdoDb
 extends
 SqlDb{protected$pdo;function
-dsn($Ic,$V,$F,array$C=array(),$ob='PDO'){$C[\PDO::ATTR_ERRMODE]=\PDO::ERRMODE_SILENT;$C[\PDO::ATTR_STATEMENT_CLASS]=array('Adminer\PdoResult');try{$this->pdo=new$ob($Ic,$V,$F,$C);}catch(\Exception$hd){return$hd->getMessage();}$this->server_info=@$this->pdo->getAttribute(\PDO::ATTR_SERVER_VERSION);return'';}function
+dsn($Jc,$V,$F,array$C=array(),$ob='PDO'){$C[\PDO::ATTR_ERRMODE]=\PDO::ERRMODE_SILENT;$C[\PDO::ATTR_STATEMENT_CLASS]=array('Adminer\PdoResult');try{$this->pdo=new$ob($Jc,$V,$F,$C);}catch(\Exception$kd){return$kd->getMessage();}$this->server_info=@$this->pdo->getAttribute(\PDO::ATTR_SERVER_VERSION);return'';}function
 quote($Q){return$this->pdo->quote($Q);}function
-query($H,$Al=false){$I=$this->pdo->query($H);$this->error="";if(!$I)return$this->store_error(false);$this->store_result($I);return$I;}private
+query($H,$Jl=false){$I=$this->pdo->query($H);$this->error="";if(!$I)return$this->store_error(false);$this->store_result($I);return$I;}private
 function
 store_error($J){if(!$J){list(,$this->errno,$this->error)=$this->pdo->errorInfo();if(!$this->error)$this->error=lang(26);}return$J;}function
 store_result($I=null){if(!$I){$I=$this->multi;if(!$I)return
@@ -2460,12 +2573,12 @@ extends
 fetch_assoc(){return$this->fetch_array(\PDO::FETCH_ASSOC);}function
 fetch_row(){return$this->fetch_array(\PDO::FETCH_NUM);}private
 function
-fetch_array($Cg){$J=$this->fetch($Cg);return($J?array_map(array($this,'normalize'),$J):$J);}private
+fetch_array($Fg){$J=$this->fetch($Fg);return($J?array_map(array($this,'normalize'),$J):$J);}private
 function
-normalize($X){if(is_bool($X))return(JUSH=='pgsql'?($X?"t":"f"):+$X);if(PHP_VERSION_ID<70100&&is_float($X)&&is_finite($X)){for($yi=15;$yi<17;$yi++){$J=sprintf("%.$yi"."G",$X);if((float)$J===$X)return$J;}return
+normalize($X){if(is_bool($X))return(JUSH=='pgsql'?($X?"t":"f"):+$X);if(PHP_VERSION_ID<70100&&is_float($X)&&is_finite($X)){for($Ci=15;$Ci<17;$Ci++){$J=sprintf("%.$Ci"."G",$X);if((float)$J===$X)return$J;}return
 sprintf("%.17G",$X);}return(is_resource($X)?stream_get_contents($X):$X);}function
 fetch_field(){return(object)$this->getColumnMeta($this->_offset++);}function
-seek($kh){for($r=0;$r<$kh;$r++)$this->fetch();}}}function
+seek($nh){for($r=0;$r<$nh;$r++)$this->fetch();}}}function
 add_driver($s,$B){SqlDriver::$drivers[$s]=$B;}function
 get_driver($s){return
 SqlDriver::$drivers[$s];}abstract
@@ -2474,14 +2587,14 @@ SqlDriver{static$instance;static$drivers=array();static$extensions=array();stati
 function
 jushModule(){return"";}static
 function
-jushAutocomplete(array$T,$ok){$Nk=array();foreach($T
-as$R=>$pk){if(!$pk["dependent"])$Nk[$R]=array();}foreach(driver()->allFields()as$R=>$l){foreach($l
-as$k)$Nk[$R][]=$k["field"];}return"jush.autocompleteSql('".idf_escape("")."', ".json_encode($Nk).", ".json_encode($ok).")";}static
+jushAutocomplete(array$T,$wk){$Wk=array();foreach($T
+as$R=>$xk){if(!$xk["dependent"])$Wk[$R]=array();}foreach(driver()->allFields()as$R=>$l){foreach($l
+as$k)$Wk[$R][]=$k["field"];}return"jush.autocompleteSql('".idf_escape("")."', ".json_encode($Wk).", ".json_encode($wk).")";}static
 function
-connect($O,$V,$F){if(static::$serverFile)$ci=server_parts(array("path"=>$O));else{$ci=parse_server($O);if(!$ci||($ci["scheme"]&&!in_array($ci["scheme"],static::$serverSchemes))||($ci["socket"]&&!static::$serverSocket)||($ci["path"]&&!static::$serverPath)||(substr($ci["host"],0,1)=="/"&&!static::$serverSocket))return
-lang(27);if($ci["port"]!=""&&($ci["port"]>65535||($ci["port"]<1024&&!in_array($ci["port"],static::$serverPorts))))return
+connect($O,$V,$F){if(static::$serverFile)$hi=server_parts(array("path"=>$O));else{$hi=parse_server($O);if(!$hi||($hi["scheme"]&&!in_array($hi["scheme"],static::$serverSchemes))||($hi["socket"]&&!static::$serverSocket)||($hi["path"]&&!static::$serverPath)||(substr($hi["host"],0,1)=="/"&&!static::$serverSocket))return
+lang(27);if($hi["port"]!=""&&($hi["port"]>65535||($hi["port"]<1024&&!in_array($hi["port"],static::$serverPorts))))return
 lang(28);}$e=new
-Db;return($e->attach($ci,$V,$F)?:$e);}static
+Db;return($e->attach($hi,$V,$F)?:$e);}static
 function
 disconnect(){}function
 __construct(Db$e){$this->conn=$e;}function
@@ -2491,35 +2604,37 @@ structuredTypes(){return
 array_map('array_keys',$this->types);}function
 enumLength(array$k){}function
 unconvertFunction(array$k){}function
-select($R,array$N,array$Z,array$q,array$D=array(),$y=1,$E=0,$Di=false){$kf=(count($q)<count($N));$H=adminer()->selectQueryBuild($N,$Z,$q,$D,$y,$E);if(!$H)$H="SELECT".limit(($_GET["page"]!="last"&&$y&&$q&&$kf&&JUSH=="sql"?"SQL_CALC_FOUND_ROWS ":"").implode(", ",$N)."\nFROM ".table($R),($Z?"\nWHERE ".implode(" AND ",$Z):"").($q&&$kf?"\nGROUP BY ".implode(", ",$q):"").($D?"\nORDER BY ".implode(", ",$D):""),$y,($E?$y*$E:0),"\n");$this->query=$H;$mk=microtime(true);$J=$this->conn->query($H,(!$y&&!$Di?1:0));if($Di)echo
-adminer()->selectQuery($H,$mk,!$J);return$J;}function
-delete($R,$Mi,$y=0){$H="FROM ".table($R);return
-queries("DELETE".($y?limit1($R,$H,$Mi):" $H$Mi"));}function
-update($R,array$P,$Mi,$y=0,$Jj="\n"){$bm=array();foreach($P
-as$w=>$X)$bm[]="$w = $X";$H=table($R)." SET$Jj".implode(",$Jj",$bm);return
-queries("UPDATE".($y?limit1($R,$H,$Mi,$Jj):" $H$Mi"));}function
+select($R,array$N,array$Z,array$q,array$D=array(),$y=1,$E=0,$Ii=false){$nf=(count($q)<count($N));$H=adminer()->selectQueryBuild($N,$Z,$q,$D,$y,$E);if(!$H)$H="SELECT".limit(($_GET["page"]!="last"&&$y&&$q&&$nf&&JUSH=="sql"?"SQL_CALC_FOUND_ROWS ":"").implode(", ",$N)."\nFROM ".table($R),($Z?"\nWHERE ".implode(" AND ",$Z):"").($q&&$nf?"\nGROUP BY ".implode(", ",$q):"").($D?"\nORDER BY ".implode(", ",$D):""),$y,($E?$y*$E:0),"\n");$this->query=$H;$tk=microtime(true);$J=$this->conn->query($H,(!$y&&!$Ii?1:0));if($Ii)echo
+adminer()->selectQuery($H,$tk,!$J);return$J;}function
+delete($R,$Si,$y=0){$H="FROM ".table($R);return
+queries("DELETE".($y?limit1($R,$H,$Si):" $H$Si"));}function
+update($R,array$P,$Si,$y=0,$Qj="\n"){$km=array();foreach($P
+as$w=>$X)$km[]="$w = $X";$H=table($R)." SET$Qj".implode(",$Qj",$km);return
+queries("UPDATE".($y?limit1($R,$H,$Si,$Qj):" $H$Si"));}function
 insert($R,array$P){return
 queries("INSERT INTO ".table($R).($P?" (".implode(", ",array_keys($P)).")\nVALUES (".implode(", ",$P).")":" DEFAULT VALUES").$this->insertReturning($R));}function
 insertReturning($R){return"";}function
-insertUpdate($R,array$L,array$Ci){foreach($L
+insertUpdate($R,array$L,array$Hi){foreach($L
 as$P){$Z=array();foreach($P
-as$w=>$X){if(isset($Ci[idf_unescape($w)]))$Z[]="$w = $X";}if(!($Z&&$this->update($R,$P," WHERE ".implode(" AND ",$Z))&&$this->conn->affected_rows)&&!$this->insert($R,$P))return
+as$w=>$X){if(isset($Hi[idf_unescape($w)]))$Z[]="$w = $X";}if(!($Z&&$this->update($R,$P," WHERE ".implode(" AND ",$Z))&&$this->conn->affected_rows)&&!$this->insert($R,$P))return
 false;}return
 true;}function
 begin(){remember_query("BEGIN");return$this->conn->begin();}function
 commit(){remember_query("COMMIT");return$this->conn->commit();}function
 rollback(){remember_query("ROLLBACK");return$this->conn->rollback();}function
-slowQuery($H,$bl){}function
-operators($Ck){return
+slowQuery($H,$kl){}function
+operators($Lk){return
 array();}function
 convertSearch($t,array$X,array$k){return$t;}function
 value($X,array$k){return(method_exists($this->conn,'value')?$this->conn->value($X,$k):$X);}function
-quoteBinary($vj){return
-q($vj);}function
+quoteBinary($Bj){return
+q($Bj);}function
 md5($c,array$k){}function
 typeName(\stdClass$k){return(isset($k->native_type)?$k->native_type:"");}function
 warnings(){}function
-tableHelp($B,$pf=false){}function
+errorLine($H){return
+0;}function
+tableHelp($B,$rf=false){}function
 inheritsFrom($R){return
 array();}function
 inheritedTables($R){return
@@ -2538,9 +2653,9 @@ array();}function
 supportsIndex(array$S){return!is_view($S);}function
 supportsAlterIndex(array$S){return
 true;}function
-supportsAlterTable(array$Ck){return
+supportsAlterTable(array$Lk){return
 true;}function
-indexAlgorithms(array$Ck){return
+indexAlgorithms(array$Lk){return
 array();}function
 indexOpclasses(){return
 array();}function
@@ -2567,7 +2682,7 @@ LEFT JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE k
 WHERE c.TABLE_SCHEMA = ".q($_GET["ns"]!=""?$_GET["ns"]:DB)."
 ORDER BY c.TABLE_NAME, c.ORDINAL_POSITION",$this->conn)as$K){$K["null"]=($K["nullable"]=="YES");$J[$K["tab"]][]=$K;}}return$J;}}class
 Adminer{static$instance;var$error='';function
-name(){return"<a href='https://www.adminer.org/'".target_blank()." id='h1'><img src='".h(preg_replace("~\\?.*~","",ME)."?file=logo.svg&version=6.1.2+9548328c")."' width='24' height='24' alt='' id='logo'>Adminer</a>";}function
+name(){return"<a href='https://www.adminer.org/'".target_blank()." id='h1'><img src='".h(preg_replace("~\\?.*~","",ME)."?file=logo.svg&version=6.2.0+df93d571")."' width='24' height='24' alt='' id='logo'>Adminer</a>";}function
 credentials(){return
 array(SERVER,$_GET["username"],get_password());}function
 connectSsl(){}function
@@ -2580,11 +2695,11 @@ serverName($O){return
 h($O);}function
 database(){return
 DB;}function
-databases($Jd=true){return
-get_databases($Jd);}function
+databases($Md=true){return
+get_databases($Md);}function
 pluginsLinks(){}function
-operators($Ck=null){return
-driver()->operators($Ck);}function
+operators($Lk=null){return
+driver()->operators($Lk);}function
 schemas(){$J=schemas();if($_GET["ns"]!=""&&!in_array($_GET["ns"],$J))array_unshift($J,$_GET["ns"]);return$J;}function
 queryTimeout(){return
 2;}function
@@ -2594,88 +2709,88 @@ csp(array$Qb){return$Qb;}function
 verifyVersion(){return
 true;}function
 serviceWorker(){service_worker();}function
-manifest(){$Be=$_SERVER["HTTP_HOST"]?:$_SERVER["SERVER_NAME"];$Hj=preg_replace('~\?.*~','',ME)?:'.';return
-array('name'=>"Adminer".($Be!=""?" - $Be":""),'short_name'=>'Adminer','description'=>lang(29),'start_url'=>$Hj,'scope'=>$Hj,'display'=>'minimal-ui','icons'=>array(array('src'=>preg_replace("~\\?.*~","",ME)."?file=logo.svg&version=6.1.2+9548328c",'sizes'=>'any','type'=>'image/svg+xml')),);}function
+manifest(){$Ee=$_SERVER["HTTP_HOST"]?:$_SERVER["SERVER_NAME"];$Oj=preg_replace('~\?.*~','',ME)?:'.';return
+array('name'=>"Adminer".($Ee!=""?" - $Ee":""),'short_name'=>'Adminer','description'=>lang(29),'start_url'=>$Oj,'scope'=>$Oj,'display'=>'minimal-ui','icons'=>array(array('src'=>preg_replace("~\\?.*~","",ME)."?file=logo.svg&version=6.2.0+df93d571",'sizes'=>'any','type'=>'image/svg+xml')),);}function
 head($Vb=null){return
 true;}function
 bodyClass(){echo" adminer";}function
-css(){$J=array();foreach(array("","-dark")as$Cg){$m="adminer$Cg.css";if(file_exists($m)){$Ad=file_get_contents($m);$J["$m?v=".crc32($Ad)]=($Cg?"dark":(preg_match('~prefers-color-scheme:\s*dark~',$Ad)?'':'light'));}}return$J;}function
+css(){$J=array();foreach(array("","-dark")as$Fg){$m="adminer$Fg.css";if(file_exists($m)){$Dd=file_get_contents($m);$J["$m?v=".crc32($Dd)]=($Fg?"dark":(preg_match('~prefers-color-scheme:\s*dark~',$Dd)?'':'light'));}}return$J;}function
 loginForm(){echo"<table class='layout'>\n",adminer()->loginFormField('driver','<tr><th>'.lang(30).'<td>',input_hidden("auth[driver]","server")."MySQL / MariaDB"),adminer()->loginFormField('server','<tr><th>'.lang(31).'<td>',"<input name='auth[server]' value='".h(SERVER)."' title='".lang(32)."' placeholder='localhost' autocapitalize='off'>"),adminer()->loginFormField('username','<tr><th>'.lang(33).'<td>','<input name="auth[username]" id="username" autofocus value="'.h($_GET["username"]).'" autocomplete="username" autocapitalize="off">'),adminer()->loginFormField('password','<tr><th>'.lang(34).'<td>','<input type="password" name="auth[password]" autocomplete="current-password">'),adminer()->loginFormField('db','<tr><th>'.lang(35).'<td>','<input name="auth[db]" value="'.h($_GET["db"]).'" autocapitalize="off">'),"</table>\n","<p><input type='submit' value='".lang(36)."'>\n",checkbox("auth[permanent]",1,$_COOKIE["adminer_permanent"],lang(37))."\n";}function
-loginFormField($B,$te,$Y){return$te.$Y."\n";}function
-login($Vf,$F){if($F=="")return
+loginFormField($B,$we,$Y){return$we.$Y."\n";}function
+login($Xf,$F){if($F=="")return
 lang(38).require_password_link(null);if(!Driver::$passwords)return
 lang(39).require_password_link($F);if(!password_required())return
 lang(40).require_password_link($F);return
 true;}function
-tableName(array$Ck){return
-h($Ck["Name"]);}function
+tableName(array$Lk){return
+h($Lk["Name"]);}function
 fieldName(array$k,$D=0){$U=$k["full_type"].($k["null"]?" NULL":"");$xb=$k["comment"];return'<span title="'.h($U.($xb!=""?($U?": ":"").$xb:'')).'">'.h($k["field"]).'</span>';}function
 commentValue($U,$xb){if($xb==""||$U=='SCHEMA'||$U=='TABLE'||$U=='COLUMN')return
-h($xb);$xi=function($vj,$ab='td'){return
-preg_replace('~^~m','<tr>',preg_replace('~\|~',"<$ab>",preg_replace('~\|$~m',"",rtrim($vj))));};$R='(\+--[-+]+\+\n)';$K='(\| .* \|\n)';return"<pre>\n".preg_replace_callback("~^$R?$K$R?($K*)$R?~m",function($A)use($xi){return"<table>\n".($A[1]?"<thead>".$xi($A[2],'th')."<tbody>\n":$xi($A[2])).$xi($A[4])."\n</table>";},preg_replace('~(\n(    -|mysql)&gt; )(.+)~',"\\1<code class='jush-sql'>\\3</code>",preg_replace('~(.+)\n---+\n~',"<b>\\1</b>\n",h($xb))))."</pre>\n";}function
+h($xb);$Bi=function($Bj,$ab='td'){return
+preg_replace('~^~m','<tr>',preg_replace('~\|~',"<$ab>",preg_replace('~\|$~m',"",rtrim($Bj))));};$R='(\+--[-+]+\+\n)';$K='(\| .* \|\n)';return"<pre>\n".preg_replace_callback("~^$R?$K$R?($K*)$R?~m",function($A)use($Bi){return"<table>\n".($A[1]?"<thead>".$Bi($A[2],'th')."<tbody>\n":$Bi($A[2])).$Bi($A[4])."\n</table>";},preg_replace('~(\n(    -|mysql)&gt; )(.+)~',"\\1<code class='jush-sql'>\\3</code>",preg_replace('~(.+)\n---+\n~',"<b>\\1</b>\n",h($xb))))."</pre>\n";}function
 commentInput($U,$b,$xb){$Y=h($xb);return(preg_match('~\n~',$Y)?"<textarea$b rows='2' cols='".($U=='TABLE'?20:30)."' style='vertical-align: bottom;'>\n$Y</textarea>":"<input$b value='$Y'>");}function
-selectLinks(array$Ck,$P=""){$B=$Ck["Name"];echo'<p class="links">';$Rf=array();if($B!="")$Rf["select"]=lang(41);if(support("table")||support("indexes"))$Rf["table"]=lang(42);if(support("table")){if(is_view($Ck)){if(support("view"))$Rf["view"]=lang(43);}elseif(function_exists('Adminer\alter_table')&&$B!="")$Rf["create"]=lang(44);}if($P!==null)$Rf["edit"]=lang(45);foreach($Rf
+selectLinks(array$Lk,$P=""){$B=$Lk["Name"];echo'<p class="links">';$Tf=array();if($B!="")$Tf["select"]=lang(41);if(support("table")||support("indexes"))$Tf["table"]=lang(42);if(support("table")){if(is_view($Lk)){if(support("view"))$Tf["view"]=lang(43);}elseif(function_exists('Adminer\alter_table')&&$B!="")$Tf["create"]=lang(44);}if($P!==null)$Tf["edit"]=lang(45);foreach($Tf
 as$w=>$X)echo" <a href='".h(ME)."$w=".url_escape($B).($w=="edit"?$P:"")."'".bold(isset($_GET[$w])).">$X</a>";echo"\n";}function
 foreignKeys($R){return
 foreign_keys($R);}function
-backwardKeys($R,$Bk){return
+backwardKeys($R,$Kk){return
 array();}function
 backwardKeysPrint(array$La,array$K){}function
-selectQuery($H,$mk,$ud=false){$J="\n";if(!$ud&&($jm=driver()->warnings())){$s="warnings";$J=", <a href='#$s' class='toggle'>".lang(46)."</a>"."$J<div id='$s' class='hidden'>\n$jm</div>\n";}return"<p><code class='jush-".JUSH."'>".h(str_replace("\n"," ",$H))."</code> <span class='time'>(".format_time($mk).")</span>".(support("sql")?" <a href='".h(ME)."sql=".url_escape($H)."' class='hover'>".lang(14)."</a>":"").$J;}function
+selectQuery($H,$tk,$xd=false){$J="\n";if(!$xd&&($sm=driver()->warnings())){$s="warnings";$J=", <a href='#$s' class='toggle'>".lang(46)."</a>"."$J<div id='$s' class='hidden'>\n$sm</div>\n";}return"<p><code class='sql jush-".JUSH."'>".h(str_replace("\n"," ",$H))."</code> <span class='time'>(".format_time($tk).")</span>".(support("sql")?" <a href='".h(ME)."sql=".url_escape($H)."' class='hover'>".lang(14)."</a>":"").$J;}function
 sqlCommandQuery($H){return
 shorten_utf8(trim($H),1000);}function
 sqlPrintAfter(){}function
 sqlUrlLength(){return
 2000;}function
-explain(Db$e,$H,array$Eh){$I=explain($e,$H);if(!$I)return"";ob_start();print_select_result($I,$e,$Eh);return
+explain(Db$e,$H,array$Ih){$I=explain($e,$H);if(!$I)return"";ob_start();print_select_result($I,$e,$Ih);return
 ob_get_clean();}function
 rowDescription($R){return"";}function
-rowDescriptions(array$L,array$Md){return$L;}function
+rowDescriptions(array$L,array$Pd){return$L;}function
 selectLink($X,array$k){}function
-selectVal($X,$z,array$k,$Kh){$J=($X===null?"<i>NULL</i>":(preg_match("~char|binary|boolean~",$k["type"])&&!preg_match("~var~",$k["type"])?"<code>$X</code>":(preg_match('~^jsonb?$~',$k["full_type"])?"<code class='jush-json'>$X</code>":$X)));if(is_blob($k)&&!is_utf8($X))$J="<i>".lang(47,strlen($Kh))."</i>";return($z?"<a href='".h($z)."'".(is_url($z)?target_blank():"").">$J</a>":$J);}function
+selectVal($X,$z,array$k,$Oh){$J=($X===null?"<i>NULL</i>":(preg_match("~char|binary|boolean~",$k["type"])&&!preg_match("~var~",$k["type"])?"<code>$X</code>":(preg_match('~^jsonb?$~',$k["full_type"])?"<code class='jush-json'>$X</code>":$X)));if(is_blob($k)&&!is_utf8($X))$J="<i>".lang(47,strlen($Oh))."</i>";return($z?"<a href='".h($z)."'".(is_url($z)?target_blank():"").">$J</a>":$J);}function
 editVal($X,array$k){return$X;}function
 config(){return
 array();}function
-tableStructurePrint(array$l,$Ck=null){echo"<div class='scrollable'>\n","<table class='nowrap odds'>\n","<thead><tr><th>".lang(48)."<th>".lang(49).(support("comment")?"<th>".lang(50):"")."<tbody>\n";$Vl=(support("type")?types():array());foreach($l
-as$k){echo"<tr><th>".h($k["field"]);$U=h($k["full_type"]);$sb=h($k["collation"]);echo"<td><span title='$sb'>".(in_array($U,$Vl)?"<a href='".h(ME.'type='.url_escape($U))."'>$U</a>":$U.($sb&&isset($Ck["Collation"])&&$sb!=$Ck["Collation"]?" $sb":""))."</span>",($k["null"]?" <i>NULL</i>":""),($k["auto_increment"]?" <i>".lang(51)."</i>":""),(isset($k["default"])?" <span title='".lang(52)."'>[<b>".($k["generated"]?"<code class='jush-".JUSH."'>".shorten_utf8(preg_replace('~\s+~',' ',ltrim($k["default"])),80,"</code>"):h($k["default"]))."</b>]</span>":""),(support("comment")?"<td>".adminer()->commentValue('COLUMN',$k["comment"]):""),"\n";}echo"</table>\n","</div>\n";}function
-tableIndexesPrint(array$v,array$Ck){$Uh=false;foreach($v
-as$B=>$u)$Uh|=!!$u["partial"];echo"<table>\n";$fc=first(driver()->indexAlgorithms($Ck));foreach($v
-as$B=>$u){ksort($u["columns"]);$Di=array();foreach($u["columns"]as$w=>$X)$Di[]="<i>".h($X)."</i>".($u["lengths"][$w]?"(".h($u["lengths"][$w]).")":"").($u["descs"][$w]?" DESC":"");echo"<tr title='".h($B)."'>","<th>".h($u["type"]).($fc&&$u['algorithm']!=$fc?" (".h($u['algorithm']).")":""),"<td>".implode(", ",$Di);if($Uh)echo"<td>".($u['partial']?"<code class='jush-".JUSH."'>WHERE ".h($u['partial']):"");echo"\n";}echo"</table>\n";}function
+tableStructurePrint(array$l,$Lk=null){echo"<div class='scrollable'>\n","<table class='nowrap odds'>\n","<thead><tr><th>".lang(48)."<th>".lang(49).(support("comment")?"<th>".lang(50):"")."<tbody>\n";$em=(support("type")?types():array());foreach($l
+as$k){echo"<tr><th>".h($k["field"]).doc_link(array(JUSH=>$k["doc"]));$U=h($k["full_type"]);$sb=h($k["collation"]);echo"<td><span title='$sb'>".(in_array($U,$em)?"<a href='".h(ME.'type='.url_escape($U))."'>$U</a>":$U.($sb&&isset($Lk["Collation"])&&$sb!=$Lk["Collation"]?" $sb":""))."</span>",($k["null"]?" <i>NULL</i>":""),($k["auto_increment"]?" <i>".lang(51)."</i>":""),(isset($k["default"])?" <span title='".lang(52)."'>[<b>".($k["generated"]||$k["default_sql"]?"<code class='sql jush-".JUSH."'>".shorten_utf8(preg_replace('~\s+~',' ',ltrim($k["default"])),80,"</code>"):h($k["default"]))."</b>]</span>":""),(support("comment")?"<td>".adminer()->commentValue('COLUMN',$k["comment"]):""),"\n";}echo"</table>\n","</div>\n";}function
+tableIndexesPrint(array$v,array$Lk){$Zh=false;foreach($v
+as$B=>$u)$Zh|=!!$u["partial"];echo"<table>\n";$fc=first(driver()->indexAlgorithms($Lk));foreach($v
+as$B=>$u){ksort($u["columns"]);$Ii=array();foreach($u["columns"]as$w=>$X)$Ii[]="<i>".h($X)."</i>".($u["lengths"][$w]?"(".h($u["lengths"][$w]).")":"").($u["descs"][$w]?" DESC":"");echo"<tr title='".h($B)."'>","<th>".h($u["type"]).($fc&&$u['algorithm']!=$fc?" (".h($u['algorithm']).")":""),"<td>".implode(", ",$Ii).($u["invalid"]?" <span class='error'>INVALID</span>":"");if($Zh)echo"<td>".($u['partial']?"<code class='sql jush-".JUSH."'>WHERE ".h($u['partial']):"");echo"\n";}echo"</table>\n";}function
 namePattern($U){if($U=="FOREIGN"||$U=="CHECK")return"";if($U=="TRIGGER")return"{table}_{timing}{event}";return(JUSH=="sql"?"":"{table}_")."{columns}";}function
-selectColumnInput($b,array$d,$Y="",$mi=""){return
-select_input($b,$d,$Y,$mi);}function
+selectColumnInput($b,array$d,$Y="",$ri=""){return
+select_input($b,$d,$Y,$ri);}function
 selectColumnsPrint(array$N,array$d){print_fieldset("select",lang(53),$N);$r=0;$N[""]=array();foreach($N
 as$w=>$X){$X=idx($_GET["columns"],$w,array());$c=adminer()->selectColumnInput(" name='columns[$r][col]' data-default=''".on('change',($w!==""?'selectFieldChange':'selectAddRow')),$d,$X["col"]);echo"<div>".(driver()->functions||driver()->grouping?html_select("columns[$r][fun]",array(-1=>"")+array_filter(array(lang(54)=>driver()->functions,lang(55)=>driver()->grouping)),$X["fun"]," data-default=''".on('change',($w!==""?'helpClose':'selectFunAddRow')).on_help_value(' (.*)|$','($1)'))."($c)":$c)."</div>\n";$r++;}echo"</div></fieldset>\n";}function
-selectSearchPrint(array$Z,array$d,array$v,$Ck=null){print_fieldset("search",lang(56),$Z);foreach($v
-as$r=>$u){if($u["type"]=="FULLTEXT")echo"<div>(<i>".implode("</i>, <i>",array_map('Adminer\h',$u["columns"]))."</i>) ".h(driver()->fulltextOperator)," <input type='search' name='fulltext[$r]' value='".h(idx($_GET["fulltext"],$r))."' data-default=''".on('input','selectFieldChange').">",(JUSH=='sql'?checkbox("boolean[$r]",1,isset($_GET["boolean"][$r]),"BOOL"):''),"</div>\n";}$xh=adminer()->operators($Ck);foreach(array_merge((array)$_GET["where"],array(array()))as$r=>$X){if(!$X||(("$X[col]$X[val]"!=""||preg_match('~NULL$~',$X["op"]))&&in_array($X["op"],$xh)))echo"<div>".adminer()->selectColumnInput(" name='where[$r][col]' data-default=''".on('change',($X?'selectFieldChange':'selectAddRow')),$d,$X["col"],"(".lang(57).")"),html_select("where[$r][op]",$xh,$X["op"]," data-default='".h(first($xh))."'".on('change','selectFirstChange')),"<input type='search' name='where[$r][val]' value='".h($X["val"])."' data-default=''".on('input','selectFirstChange').on('keydown','selectSearchKeydown').on('search','selectSearchSearch').">","</div>\n";}echo"</div></fieldset>\n";}function
+selectSearchPrint(array$Z,array$d,array$v,$Lk=null){print_fieldset("search",lang(56),$Z);foreach($v
+as$r=>$u){if($u["type"]=="FULLTEXT")echo"<div>(<i>".implode("</i>, <i>",array_map('Adminer\h',$u["columns"]))."</i>) ".h(driver()->fulltextOperator)," <input type='search' name='fulltext[$r]' value='".h(idx($_GET["fulltext"],$r))."' data-default=''".on('input','selectFieldChange').">",(JUSH=='sql'?checkbox("boolean[$r]",1,isset($_GET["boolean"][$r]),"BOOL"):''),"</div>\n";}$_h=adminer()->operators($Lk);foreach(array_merge((array)$_GET["where"],array(array()))as$r=>$X){if(!$X||(("$X[col]$X[val]"!=""||preg_match('~NULL$~',$X["op"]))&&in_array($X["op"],$_h)))echo"<div>".adminer()->selectColumnInput(" name='where[$r][col]' data-default=''".on('change',($X?'selectFieldChange':'selectAddRow')),$d,$X["col"],"(".lang(57).")"),html_select("where[$r][op]",$_h,$X["op"]," data-default='".h(first($_h))."'".on('change','selectFirstChange')),"<input type='search' name='where[$r][val]' value='".h($X["val"])."' data-default=''".on('input','selectFirstChange').on('keydown','selectSearchKeydown').on('search','selectSearchSearch').">","</div>\n";}echo"</div></fieldset>\n";}function
 selectOrderPrint(array$D,array$d,array$v){print_fieldset("sort",lang(58),$D);$r=0;foreach((array)$_GET["order"]as$w=>$X){if($X!=""){echo"<div>".adminer()->selectColumnInput(" name='order[$r]' data-default=''".on('change','selectFieldChange'),$d,$X),checkbox("desc[$r]",1,isset($_GET["desc"][$w]),lang(59))."</div>\n";$r++;}}echo"<div>".adminer()->selectColumnInput(" name='order[$r]' data-default=''".on('change','selectAddRow'),$d),checkbox("desc[$r]",1,false,lang(59))."</div>\n","</div></fieldset>\n";}function
 selectLimitPrint($y){echo"<fieldset><legend>".lang(60)."</legend><div>","<input type='number' name='limit' class='size' value='".h($y?:"")."' data-default='50'".on('input','selectFieldChange').">","</div></fieldset>\n";}function
-selectLengthPrint($Yk){echo"<fieldset><legend>".lang(61)."</legend><div>","<input type='number' name='text_length' class='size' value='".h($Yk)."' data-default='100'>","</div></fieldset>\n";}function
+selectLengthPrint($hl){echo"<fieldset><legend>".lang(61)."</legend><div>","<input type='number' name='text_length' class='size' value='".h($hl)."' data-default='100'>","</div></fieldset>\n";}function
 selectActionPrint(array$v){echo"<fieldset><legend>".lang(62)."</legend><div>","<input type='submit' value='".lang(53)."'>"," <span id='noindex' title='".lang(63)."'></span>","<script".nonce().">\n","const indexColumns = ";$d=array();foreach($v
 as$u){$Ub=reset($u["columns"]);if($u["type"]!="FULLTEXT"&&$Ub)$d[$Ub]=1;}$d[""]=1;foreach($d
 as$w=>$X)json_row($w);echo";\n","selectFieldChange.call(qs('#form')['select']);\n","</script>\n","</div></fieldset>\n";}function
 selectCommandPrint(){return!information_schema(DB);}function
 selectImportPrint(){return!information_schema(DB);}function
-selectEmailPrint(array$Rc,array$d){}function
+selectEmailPrint(array$Sc,array$d){}function
 selectColumnsProcess(array$d,array$v){$N=array();$q=array();foreach((array)$_GET["columns"]as$w=>$X){if($X["fun"]=="count"||($X["col"]!=""&&(!$X["fun"]||in_array($X["fun"],driver()->functions)||in_array($X["fun"],driver()->grouping)))){$N[$w]=apply_sql_function($X["fun"],($X["col"]!=""?idf_escape($X["col"]):"*"));if(!in_array($X["fun"],driver()->grouping))$q[]=$N[$w];}}return
 array($N,$q);}function
-selectSearchProcess(array$l,array$v,$Ck=null){$J=array();foreach($v
-as$r=>$u){if($u["type"]=="FULLTEXT"&&idx($_GET["fulltext"],$r)!="")$J[]=driver()->fulltextSql($r,$u,$_GET["fulltext"][$r],isset($_GET["boolean"][$r]));}$xh=adminer()->operators($Ck);foreach((array)$_GET["where"]as$w=>$X){$X+=array("col"=>"","op"=>first($xh),"val"=>"");$_GET["where"][$w]=$X;$qb=$X["col"];if(("$qb$X[val]"!=""||preg_match('~NULL$~',$X["op"]))&&in_array($X["op"],$xh)){if($X["op"]=="SQL"&&(!$_POST||!verify_token()))SqlDb::$untrusted=true;$Ab=array();foreach(($qb!=""?array($qb=>idx($l,$qb,array())):$l)as$B=>$k){if($qb!=""||is_searchable($k,$X))$Ab[]=adminer()->selectSearchCondition(driver()->convertSearch(idf_escape($B),$X,$k),$X["op"],$X["val"]);}$J[]=(count($Ab)==1?$Ab[0]:($Ab?"(".implode(" OR ",$Ab).")":"1 = 0"));}}return$J;}function
-selectSearchCondition($c,$th,$X){if(preg_match('~IN$~',$th))return"$c $th ".($X!=""?process_in($X):"(NULL)");if($th=="BETWEEN")return"$c $th ".process_between($X);if($th=="SQL")return"$c $X";if(preg_match('~^(I?LIKE) %%$~',$th,$A))return"$c $A[1] ".q("%$X%");if($th=="FIND_IN_SET")return"$th(".q($X).", $c)";return"$c $th".(!preg_match('~NULL$~',$th)?" ".q($X):"");}function
+selectSearchProcess(array$l,array$v,$Lk=null){$J=array();foreach($v
+as$r=>$u){if($u["type"]=="FULLTEXT"&&idx($_GET["fulltext"],$r)!="")$J[]=driver()->fulltextSql($r,$u,$_GET["fulltext"][$r],isset($_GET["boolean"][$r]));}$_h=adminer()->operators($Lk);foreach((array)$_GET["where"]as$w=>$X){$X+=array("col"=>"","op"=>first($_h),"val"=>"");$_GET["where"][$w]=$X;$qb=$X["col"];if(("$qb$X[val]"!=""||preg_match('~NULL$~',$X["op"]))&&in_array($X["op"],$_h)){if($X["op"]=="SQL"&&(!$_POST||!verify_token()))SqlDb::$untrusted=true;$Ab=array();foreach(($qb!=""?array($qb=>idx($l,$qb,array())):$l)as$B=>$k){if($qb!=""||is_searchable($k,$X))$Ab[]=adminer()->selectSearchCondition(driver()->convertSearch(idf_escape($B),$X,$k),$X["op"],$X["val"]);}$J[]=(count($Ab)==1?$Ab[0]:($Ab?"(".implode(" OR ",$Ab).")":"1 = 0"));}}return$J;}function
+selectSearchCondition($c,$wh,$X){if(preg_match('~IN$~',$wh))return"$c $wh ".($X!=""?process_in($X):"(NULL)");if($wh=="BETWEEN")return"$c $wh ".process_between($X);if($wh=="SQL")return"$c $X";if(preg_match('~^(I?LIKE) %%$~',$wh,$A))return"$c $A[1] ".q("%$X%");if($wh=="FIND_IN_SET")return"$wh(".q($X).", $c)";return"$c $wh".(!preg_match('~NULL$~',$wh)?" ".q($X):"");}function
 selectOrderProcess(array$l,array$v){$J=array();foreach((array)$_GET["order"]as$w=>$X){if($X!="")$J[]=(preg_match('~^((COUNT\(DISTINCT |[A-Z0-9_]+\()(`(?:[^`]|``)+`|"(?:[^"]|"")+")\)|COUNT\(\*\))$~',$X)?$X:idf_escape($X)).(isset($_GET["desc"][$w])?" DESC".(JUSH=='pgsql'&&idx($l[$X],"null")?" NULLS LAST":""):"");}return$J;}function
 selectLimitProcess(){return(isset($_GET["limit"])?intval($_GET["limit"]):50);}function
 selectLengthProcess(){return(isset($_GET["text_length"])?"$_GET[text_length]":"100");}function
-selectEmailProcess(array$Z,array$Md){return
+selectEmailProcess(array$Z,array$Pd){return
 false;}function
 selectQueryBuild(array$N,array$Z,array$q,array$D,$y,$E){return"";}function
-messageQuery($H,$al,$ud=false){restart_session();$ze=&get_session("queries");if(!idx($ze,$_GET["db"]))$ze[$_GET["db"]]=array();if(strlen($H)>1e6)$H=preg_replace('~[\x80-\xFF]+$~','',substr($H,0,1e6))."\n…";$ze[$_GET["db"]][]=array($H,time(),$al);$ik="sql-".count($ze[$_GET["db"]]);$J="<a href='#$ik' class='toggle'>".lang(64)."</a> ".copy_icon()."\n";if(!$ud&&($jm=driver()->warnings())){$s="warnings-".count($ze[$_GET["db"]]);$J="<a href='#$s' class='toggle'>".lang(46)."</a>, $J<div id='$s' class='hidden'>\n$jm</div>\n";}return" <span class='time'>".@date("H:i:s")."</span>"." $J<div id='$ik' class='hidden'><pre><code class='jush-".JUSH."'>".shorten_utf8($H,1e4)."</code></pre>".($al?" <span class='time'>($al)</span>":'').(support("sql")?'<p><a href="'.h(str_replace("db=".url_escape(DB),"db=".url_escape($_GET["db"]),ME).'sql=&history='.(count($ze[$_GET["db"]])-1)).'">'.lang(14).'</a>':'').'</div>';}function
+messageQuery($H,$jl,$xd=false){restart_session();$Be=&get_session("queries");if(!idx($Be,$_GET["db"]))$Be[$_GET["db"]]=array();if(strlen($H)>1e6)$H=preg_replace('~[\x80-\xFF]+$~','',substr($H,0,1e6))."\n…";$Be[$_GET["db"]][]=array($H,time(),$jl);$pk="sql-".count($Be[$_GET["db"]]);$J="<a href='#$pk' class='toggle'>".lang(64)."</a> ".copy_icon()."\n";if(!$xd&&($sm=driver()->warnings())){$s="warnings-".count($Be[$_GET["db"]]);$J="<a href='#$s' class='toggle'>".lang(46)."</a>, $J<div id='$s' class='hidden'>\n$sm</div>\n";}return" <span class='time'>".@date("H:i:s")."</span>"." $J<div id='$pk' class='hidden'><pre><code class='jush-".JUSH."'>".shorten_utf8($H,1e4)."</code></pre>".($jl?" <span class='time'>($jl)</span>":'').(support("sql")?'<p><a href="'.h(str_replace("db=".url_escape(DB),"db=".url_escape($_GET["db"]),ME).'sql=&history='.(count($Be[$_GET["db"]])-1)).'">'.lang(14).'</a>':'').'</div>';}function
 error(){return
 error();}function
-editRowPrint($R,array$l,$K,$Jl,$H='',$al=''){echo($H!=""?"<p><code class='jush-".JUSH."'>".h(str_replace("\n"," ",$H))."</code> <span class='time'>($al)</span>\n":"");}function
-editFunctions(array$k){$J=($k["null"]?"NULL/":"");$pe=isset($_GET["select"])||where($_GET);foreach(array(driver()->insertFunctions,driver()->editFunctions)as$w=>$Xd){if(!$w||(!isset($_GET["call"])&&$pe)){foreach($Xd
-as$ii=>$X){if(!$ii||preg_match("~$ii~",$k["type"]))$J
-.="/$X";}}if($w&&$Xd&&!preg_match('~set|bool~',$k["type"])&&!is_blob($k))$J
-.="/SQL";}if($k["auto_increment"]&&!$pe)$J=lang(51);return
+editRowPrint($R,array$l,$K,$Sl,$H='',$jl=''){echo($H!=""?"<p><code class='sql jush-".JUSH."'>".h(str_replace("\n"," ",$H))."</code> <span class='time'>($jl)</span>\n":"");}function
+editFunctions(array$k){$J=($k["null"]?"NULL/":"");$se=isset($_GET["select"])||where($_GET);foreach(array(driver()->insertFunctions,driver()->editFunctions)as$w=>$ae){if(!$w||(!isset($_GET["call"])&&$se)){foreach($ae
+as$ni=>$X){if(!$ni||preg_match("~$ni~",$k["type"]))$J
+.="/$X";}}if($w&&$ae&&!preg_match('~set|bool~',$k["type"])&&!is_blob($k))$J
+.="/SQL";}if($k["auto_increment"]&&!$se)$J=lang(51);return
 explode("/",$J);}function
 editInput($R,array$k,$b,$Y){if($k["type"]=="enum")return(isset($_GET["select"])?"<label><input type='radio'$b value='orig' checked><i>".lang(12)."</i></label> ":"").enum_input("radio",$b,$k,$Y,"NULL");return"";}function
 editHint($R,array$k,$Y){return"";}function
@@ -2685,19 +2800,19 @@ dumpOutput(){$J=array('text'=>lang(65),'file'=>lang(66));if(function_exists('gze
 dumpFormat(){return(support("dump")?array('sql'=>'SQL'):array())+array('csv'=>'CSV,','csv;'=>'CSV;','tsv'=>'TSV');}function
 dumpPrint(){}function
 dumpDatabase($h){}function
-dumpTable($R,$uk,$pf=0){if($_POST["format"]!="sql"){echo"\xef\xbb\xbf";if($uk)dump_csv(array_keys(fields($R)));}else{if($pf==2){$l=array();foreach(fields($R)as$B=>$k)$l[]=idf_escape($B)." ".full_type_sql($k);$Mb="CREATE TABLE ".table($R)." (".implode(", ",$l).")";}else$Mb=create_sql($R,$_POST["auto_increment"],$uk);set_utf8mb4($Mb);if($uk&&$Mb){if(($uk=="DROP+CREATE"&&!function_exists('Adminer\drop_sql'))||$pf==1)echo"DROP ".($pf==2?"VIEW":"TABLE")." IF EXISTS ".table($R).";\n";if($pf==1)$Mb=remove_definer($Mb);echo"$Mb;\n\n";}}}function
-dumpData($R,$uk,$H,array$N=array(),array$Z=array(),array$q=array(),array$D=array()){if($uk){$fg=(JUSH=="sqlite"?0:1048576);$l=array();$Ge=false;if($_POST["format"]=="sql"){if($uk=="TRUNCATE+INSERT"&&!function_exists('Adminer\truncate_all_sql'))echo
+dumpTable($R,$Bk,$rf=0){if($_POST["format"]!="sql"){echo"\xef\xbb\xbf";if($Bk)dump_csv(array_keys(fields($R)));}else{if($rf==2){$l=array();foreach(fields($R)as$B=>$k)$l[]=idf_escape($B)." ".full_type_sql($k);$Mb="CREATE TABLE ".table($R)." (".implode(", ",$l).")";}else$Mb=create_sql($R,$_POST["auto_increment"],$Bk);set_utf8mb4($Mb);if($Bk&&$Mb){if(($Bk=="DROP+CREATE"&&!function_exists('Adminer\drop_sql'))||$rf==1)echo"DROP ".($rf==2?"VIEW":"TABLE")." IF EXISTS ".table($R).";\n";if($rf==1)$Mb=remove_definer($Mb);echo"$Mb;\n\n";}}}function
+dumpData($R,$Bk,$H,array$N=array(),array$Z=array(),array$q=array(),array$D=array()){if($Bk){$hg=(JUSH=="sqlite"?0:1048576);$l=array();$Je=false;if($_POST["format"]=="sql"){if($Bk=="TRUNCATE+INSERT"&&!function_exists('Adminer\truncate_all_sql'))echo
 truncate_sql($R).";\n";$l=fields($R);if(JUSH=="mssql"){foreach($l
-as$k){if($k["auto_increment"]){echo"SET IDENTITY_INSERT ".table($R)." ON;\n";$Ge=true;break;}}}}$I=($H!=""?connection()->query($H,1):driver()->select($R,($N?:array("*")),$Z,$q,$D,0));if($I){$Ze="";$Wa="";$wf=array();$Yd=array();$wk="";$xd=($R!=''?'fetch_assoc':'fetch_row');$Lb=0;while($K=$I->$xd()){if(!$wf){$bm=array();foreach($K
-as$X){$k=$I->fetch_field();if(idx($l[$k->name],'generated')){$Yd[$k->name]=true;continue;}$wf[]=$k->name;$w=idf_escape($k->name);$bm[]="$w = VALUES($w)";}$wk=($uk=="INSERT+UPDATE"?"\nON DUPLICATE KEY UPDATE ".implode(", ",$bm):"").";\n";}foreach($K
-as$w=>$X){if(is_array($X))$K[$w]=json_encode($X,256|64);}if($_POST["format"]!="sql"){if($uk=="table"){dump_csv($wf);$uk="INSERT";}dump_csv($K);}else{if(!$Ze)$Ze="INSERT INTO ".table($R)." (".implode(", ",array_map('Adminer\idf_escape',$wf)).") VALUES";foreach($K
-as$w=>$X){if($Yd[$w]){unset($K[$w]);continue;}$k=$l[$w];$K[$w]=($X===null?"NULL":($X===false?0:unconvert_field($k,preg_match(number_type(),$k["type"])&&!preg_match('~\[~',$k["full_type"])&&is_numeric($X)?$X:(!is_blob($k)||is_utf8($X)?q($X):driver()->quoteBinary($X)))));}$vj=($fg?"\n":" ")."(".implode(",\t",$K).")";if(!$Wa)$Wa=$Ze.$vj;elseif(JUSH=='mssql'?$Lb%1000!=0:strlen($Wa)+4+strlen($vj)+strlen($wk)<$fg)$Wa
-.=",$vj";else{echo$Wa.$wk;$Wa=$Ze.$vj;}}$Lb++;}if($Wa)echo$Wa.$wk;}elseif($_POST["format"]=="sql")echo"-- ".str_replace("\n"," ",connection()->error)."\n";else
-dump_csv(array(connection()->error));if($Ge)echo"SET IDENTITY_INSERT ".table($R)." OFF;\n";}}function
-dumpFilename($Fe){return
-friendly_url($Fe!=""?$Fe:(SERVER?:"localhost"));}function
-dumpHeaders($Fe,$Ig=false){$Nh=$_POST["output"];$pd=(preg_match('~sql~',$_POST["format"])?"sql":($Ig?"tar":"csv"));header("Content-Type: ".($Nh=="gz"?"application/x-gzip":($pd=="tar"?"application/x-tar":($pd=="sql"||$Nh!="file"?"text/plain":"text/csv")."; charset=utf-8")));if($Nh=="gz"){ob_start(function($Q){return
-gzencode($Q);},1e6);}return$pd;}function
+as$k){if($k["auto_increment"]){echo"SET IDENTITY_INSERT ".table($R)." ON;\n";$Je=true;break;}}}}$I=($H!=""?connection()->query($H,1):driver()->select($R,($N?:array("*")),$Z,$q,$D,0));if($I){$cf="";$Wa="";$yf=array();$be=array();$Dk="";$_d=($R!=''?'fetch_assoc':'fetch_row');$Lb=0;while($K=$I->$_d()){if(!$yf){$km=array();foreach($K
+as$X){$k=$I->fetch_field();if(idx($l[$k->name],'generated')){$be[$k->name]=true;continue;}$yf[]=$k->name;$w=idf_escape($k->name);$km[]="$w = VALUES($w)";}$Dk=($Bk=="INSERT+UPDATE"?"\nON DUPLICATE KEY UPDATE ".implode(", ",$km):"").";\n";}foreach($K
+as$w=>$X){if(is_array($X))$K[$w]=json_encode($X,256|64);}if($_POST["format"]!="sql"){if($Bk=="table"){dump_csv($yf);$Bk="INSERT";}dump_csv($K);}else{if(!$cf)$cf="INSERT INTO ".table($R)." (".implode(", ",array_map('Adminer\idf_escape',$yf)).") VALUES";foreach($K
+as$w=>$X){if($be[$w]){unset($K[$w]);continue;}$k=$l[$w];$K[$w]=($X===null?"NULL":($X===false?0:unconvert_field($k,preg_match(number_type(),$k["type"])&&!preg_match('~\[~',$k["full_type"])&&is_numeric($X)?$X:(!is_blob($k)||is_utf8($X)?q($X):driver()->quoteBinary($X)))));}$Bj=($hg?"\n":" ")."(".implode(",\t",$K).")";if(!$Wa)$Wa=$cf.$Bj;elseif(JUSH=='mssql'?$Lb%1000!=0:strlen($Wa)+4+strlen($Bj)+strlen($Dk)<$hg)$Wa
+.=",$Bj";else{echo$Wa.$Dk;$Wa=$cf.$Bj;}}$Lb++;}if($Wa)echo$Wa.$Dk;}elseif($_POST["format"]=="sql")echo"-- ".str_replace("\n"," ",connection()->error)."\n";else
+dump_csv(array(connection()->error));if($Je)echo"SET IDENTITY_INSERT ".table($R)." OFF;\n";}}function
+dumpFilename($Ie){return
+friendly_url($Ie!=""?$Ie:(SERVER?:"localhost"));}function
+dumpHeaders($Ie,$Lg=false){$Rh=$_POST["output"];$sd=(preg_match('~sql~',$_POST["format"])?"sql":($Lg?"tar":"csv"));header("Content-Type: ".($Rh=="gz"?"application/x-gzip":($sd=="tar"?"application/x-tar":($sd=="sql"||$Rh!="file"?"text/plain":"text/csv")."; charset=utf-8")));if($Rh=="gz"){ob_start(function($Q){return
+gzencode($Q);},1e6);}return$sd;}function
 dumpFooter(){if($_POST["format"]=="sql")echo"-- ".gmdate("Y-m-d H:i:s e")."\n";}function
 importServerPath(){return"adminer.sql";}function
 importPrint(){}function
@@ -2705,20 +2820,20 @@ importProcess(){return
 false;}function
 homepage(){echo'<p class="links">'.($_GET["ns"]==""&&support("database")?'<a href="'.h(ME).'database=">'.lang(67)."</a>\n":""),(support("scheme")?"<a href='".h(ME)."scheme='>".($_GET["ns"]!=""?lang(68):lang(69))."</a>\n":""),($_GET["ns"]!==""?'<a href="'.h(ME).'schema=">'.lang(70)."</a>\n":""),(support("privileges")?"<a href='".h(ME)."privileges='>".lang(71)."</a>\n":"");if($_GET["ns"]!=="")echo(support("routine")?"<a href='#routines'>".lang(72)."</a>\n":""),(support("sequence")?"<a href='#sequences'>".lang(73)."</a>\n":""),(support("type")?"<a href='#user-types'>".lang(0)."</a>\n":""),(support("event")?"<a href='#events'>".lang(74)."</a>\n":"");return
 true;}function
-navigation($Bg){echo"<h1>".adminer()->name()." <span class='version'>".VERSION;$Xg=$_COOKIE["adminer_version"];echo" <a href='https://www.adminer.org/#download'".target_blank()." id='version'>".(version_compare(VERSION,$Xg)<0?h($Xg):"").version_iframe()."</a>","</span></h1>\n";switch_lang();if($Bg=="auth"){$Nh="";foreach((array)$_SESSION["pwds"]as$dm=>$Qj){foreach($Qj
-as$O=>$Wl){$B=h(get_setting("vendor-$dm-$O")?:get_driver($dm));foreach($Wl
-as$V=>$F){if($B&&$F!==null){$dc=$_SESSION["db"][$dm][$O][$V];foreach(($dc?array_keys($dc):array(""))as$h)$Nh
-.="<li><a href='".h(auth_url($dm,$O,$V,$h))."'>($B) ".h("$V@").($O!=""?adminer()->serverName($O):"").h($h!=""?" - $h":"")."</a>\n";}}}}if($Nh)echo"<ul id='logins'".on('mouseover','menuOver').on('mouseout','menuOut').">\n$Nh</ul>\n";}else{$T=array();if($_GET["ns"]!==""&&!$Bg&&DB!=""){connection()->select_db(DB);$T=table_status('',true);}adminer()->syntaxHighlighting($T);adminer()->databasesPrint($Bg);$ia=array();if(DB==""||!$Bg){if(support("sql")){$ia['sql']="<a href='".h(ME)."sql='".bold(isset($_GET["sql"])&&!isset($_GET["import"])).">".lang(64)."</a>";$ia['import']="<a href='".h(ME)."import='".bold(isset($_GET["import"])).">".lang(75)."</a>";}$ia['dump']="<a href='".h(ME)."dump=".url_escape(isset($_GET["table"])?$_GET["table"]:$_GET["select"])."' id='dump'".bold(isset($_GET["dump"])).">".lang(76)."</a>";}$Me=$_GET["ns"]!==""&&!$Bg&&DB!="";if($Me&&function_exists('Adminer\alter_table'))$ia['create']='<a href="'.h(ME).'create="'.bold($_GET["create"]==="").">".lang(77)."</a>";$ia=adminer()->menuActions($ia,$Bg);echo($ia?"<p class='links'>\n".implode("\n",$ia)."\n":"");if($Me){if($T)adminer()->tablesPrint($T);else
+navigation($Eg){echo"<h1>".adminer()->name()." <span class='version'>".VERSION;$ah=$_COOKIE["adminer_version"];echo" <a href='https://www.adminer.org/#download'".target_blank()." id='version'>".(version_compare(VERSION,$ah)<0?h($ah):"").version_iframe()."</a>","</span></h1>\n";switch_lang();if($Eg=="auth"){$Rh="";foreach((array)$_SESSION["pwds"]as$mm=>$Xj){foreach($Xj
+as$O=>$fm){$B=h(get_setting("vendor-$mm-$O")?:get_driver($mm));foreach($fm
+as$V=>$F){if($B&&$F!==null){$dc=$_SESSION["db"][$mm][$O][$V];foreach(($dc?array_keys($dc):array(""))as$h)$Rh
+.="<li><a href='".h(auth_url($mm,$O,$V,$h))."'>($B) ".h("$V@").($O!=""?adminer()->serverName($O):"").h($h!=""?" - $h":"")."</a>\n";}}}}if($Rh)echo"<ul id='logins'".on('mouseover','menuOver').on('mouseout','menuOut').">\n$Rh</ul>\n";}else{$T=array();if($_GET["ns"]!==""&&!$Eg&&DB!=""){connection()->select_db(DB);$T=table_status('',true);}adminer()->syntaxHighlighting($T);adminer()->databasesPrint($Eg);$ia=array();if(DB==""||!$Eg){if(support("sql")){$ia['sql']="<a href='".h(ME)."sql='".bold(isset($_GET["sql"])&&!isset($_GET["import"])).">".lang(64)."</a>";$ia['import']="<a href='".h(ME)."import='".bold(isset($_GET["import"])).">".lang(75)."</a>";}$ia['dump']="<a href='".h(ME)."dump=".url_escape(isset($_GET["table"])?$_GET["table"]:$_GET["select"])."' id='dump'".bold(isset($_GET["dump"])).">".lang(76)."</a>";}$Pe=$_GET["ns"]!==""&&!$Eg&&DB!="";if($Pe&&function_exists('Adminer\alter_table'))$ia['create']='<a href="'.h(ME).'create="'.bold($_GET["create"]==="").">".lang(77)."</a>";$ia=adminer()->menuActions($ia,$Eg);echo($ia?"<p class='links'>\n".implode("\n",$ia)."\n":"");if($Pe){if($T)adminer()->tablesPrint($T);else
 echo"<p class='message'>".lang(13)."</p>\n";}}}function
 syntaxHighlighting(array$T){echo
-script_src(preg_replace("~\\?.*~","",ME)."?file=jush.js&version=6.1.2+9548328c",true);$Eg=preg_replace('~<(?=/script)~i','<\\',Driver::jushModule());echo($Eg?script("addEventListener('DOMContentLoaded', () => {\n$Eg\n});"):"");if(support("sql")){echo"<script".nonce().">\n";if($T){$Rf=array();foreach($T
-as$R=>$U)$Rf[]=js_escape_re($R);echo"var jushLinks = { ".JUSH.":";json_row(js_escape(ME).(support("table")?"table":"select").'=$&','/\b(?<!\$)('.implode('|',$Rf).')(?!\$)\b/g',false);$kk=array("sql","check","event","procedure","trigger","view","type","table","processlist");if(support("routine")&&array_intersect_key($_GET,array_flip($kk))){foreach(routines()as$K)json_row(js_escape(ME).'function='.url_escape($K["SPECIFIC_NAME"]).'&name=$&','/\b'.js_escape_re($K["ROUTINE_NAME"]).'(?=["`\]]?\()/g',false);}json_row('');echo"};\n";foreach(array("bac","bra","sqlite_quo","mssql_bra")as$X)echo"jushLinks.$X = jushLinks.".JUSH.";\n";if(array_intersect_key($_GET,array_flip(array("sql","check","event","procedure","trigger","view")))){$ok=(isset($_GET["trigger"])?array('INSERT INTO','UPDATE','DELETE FROM'):(isset($_GET["check"])?array():(isset($_GET["view"])?array('SELECT'):null)));$Ha=Driver::jushAutocomplete($T,$ok);echo($Ha?"addEventListener('DOMContentLoaded', () => { autocompleter = $Ha; });\n":"");}}echo"</script>\n";}echo
+script_src(preg_replace("~\\?.*~","",ME)."?file=jush.js&version=6.2.0+df93d571",true);$Hg=preg_replace('~<(?=/script)~i','<\\',Driver::jushModule());echo($Hg?script("addEventListener('DOMContentLoaded', () => {\n$Hg\n});"):"");if(support("sql")){echo"<script".nonce().">\n";if($T){$Tf=array();foreach($T
+as$R=>$U)$Tf[]=js_escape_re($R);echo"var jushLinks = { ".JUSH.":";json_row(js_escape(ME).(support("table")?"table":"select").'=$&','/\b(?<!\$)('.implode('|',$Tf).')(?!\$)\b/g',false);$rk=array("sql","check","event","procedure","trigger","view","type","table","processlist");if(support("routine")&&array_intersect_key($_GET,array_flip($rk))){foreach(routines()as$K)json_row(js_escape(ME).'function='.url_escape($K["SPECIFIC_NAME"]).'&name=$&','/\b'.js_escape_re($K["ROUTINE_NAME"]).'(?=["`\]]?\()/g',false);}json_row('');echo"};\n";foreach(array("bac","bra","sqlite_quo","mssql_bra")as$X)echo"jushLinks.$X = jushLinks.".JUSH.";\n";if(array_intersect_key($_GET,array_flip(array("sql","check","event","procedure","trigger","view")))){$wk=(isset($_GET["trigger"])?array('INSERT INTO','UPDATE','DELETE FROM'):(isset($_GET["check"])?array():(isset($_GET["view"])?array('SELECT'):null)));$Ha=Driver::jushAutocomplete($T,$wk);echo($Ha?"addEventListener('DOMContentLoaded', () => { autocompleter = $Ha; });\n":"");}}echo"</script>\n";}echo
 script("syntaxHighlighting('".doc_version()."', '".connection()->flavor."');");}function
-databasesPrint($Bg){if(support("single_db"))return;$g=adminer()->databases();if(DB&&$g&&!in_array(DB,$g))array_unshift($g,DB);echo"<form action=''>\n<p id='dbs'>\n";hidden_fields_get();$ac=on('mousedown','dbMouseDown').on('change','dbChange');echo"<label title='".lang(35)."'>".lang(78).": ".($g?html_select("db",array(""=>"")+group_system($g),DB,$ac):"<input name='db' value='".h(DB)."' autocapitalize='off' size='19'>\n")."</label>","<input type='submit' value='".lang(25)."'".($g?" class='hidden'":"").">\n";foreach(array("import","sql","schema","dump","privileges")as$X){if(isset($_GET[$X])){echo
+databasesPrint($Eg){if(support("single_db"))return;$g=adminer()->databases();if(DB&&$g&&!in_array(DB,$g))array_unshift($g,DB);echo"<form action=''>\n<p id='dbs'>\n";hidden_fields_get();$ac=on('mousedown','dbMouseDown').on('change','dbChange');echo"<label title='".lang(35)."'>".lang(78).": ".($g?html_select("db",array(""=>"")+group_system($g),DB,$ac):"<input name='db' value='".h(DB)."' autocapitalize='off' size='19'>\n")."</label>","<input type='submit' value='".lang(25)."'".($g?" class='hidden'":"").">\n";foreach(array("import","sql","schema","dump","privileges")as$X){if(isset($_GET[$X])){echo
 input_hidden($X);break;}}echo"</p></form>\n";}function
-menuActions(array$ia,$Bg){return$ia;}function
+menuActions(array$ia,$Eg){return$ia;}function
 tablesPrint(array$T){echo"<ul id='tables'".on('mouseover','menuOver').on('mouseout','menuOut').">";foreach($T
-as$R=>$pk){$R="$R";$B=adminer()->tableName($pk);if($B!=""&&!$pk["dependent"])echo'<li><a href="'.h(ME).'select='.url_escape($R).'"'.bold($_GET["select"]==$R||$_GET["edit"]==$R,"select hover")." title='".lang(41)."'>".lang(79)."</a> ",(support("table")||support("indexes")?'<a href="'.h(ME).'table='.url_escape($R).'"'.bold(in_array($R,array($_GET["table"],$_GET["create"],$_GET["indexes"],$_GET["foreign"],$_GET["trigger"],$_GET["check"],$_GET["view"])),(is_view($pk)?"view":"structure"))." title='".lang(42)."'>$B</a>":"<span>$B</span>")."\n";}echo"</ul>\n";}function
+as$R=>$xk){$R="$R";$B=adminer()->tableName($xk);if($B!=""&&!$xk["dependent"])echo'<li><a href="'.h(ME).'select='.url_escape($R).'"'.bold($_GET["select"]==$R||$_GET["edit"]==$R,"select hover")." title='".lang(41)."'>".lang(79)."</a> ",(support("table")||support("indexes")?'<a href="'.h(ME).'table='.url_escape($R).'"'.bold(in_array($R,array($_GET["table"],$_GET["create"],$_GET["indexes"],$_GET["foreign"],$_GET["trigger"],$_GET["check"],$_GET["view"])),(is_view($xk)?"view":"structure"))." title='".lang(42)."'>$B</a>":"<span>$B</span>")."\n";}echo"</ul>\n";}function
 showVariables(){return
 show_variables();}function
 showStatus(){return
@@ -2730,44 +2845,52 @@ kill_process($s);}function
 formatSizeValue($X){return
 format_number($X);}}class
 Plugins{private
-static$append=array('dumpFormat'=>true,'dumpOutput'=>true,'editRowPrint'=>true,'editFunctions'=>true,'config'=>true);var$plugins;var$drivers=array();var$driverFiles=array();var$error='';private$hooks=array();function
-__construct($qi){$Ec=SqlDriver::$drivers;$ve=" href='https://www.adminer.org/plugins/#use'".target_blank();if($qi===null){$qi=array();$Pa="adminer-plugins";if(is_dir($Pa)){foreach(glob("$Pa/*.php")as$m){$Bd=SqlDriver::$drivers;$this->includeOnce($m);foreach(array_diff_key(SqlDriver::$drivers,$Bd)as$s=>$B)$this->driverFiles[$s]=$m;}}if(file_exists("$Pa.php")){$Oe=$this->includeOnce("$Pa.php");if(is_array($Oe)){foreach($Oe
-as$w=>$ni)$qi[is_object($ni)?get_class($ni):$w]=$ni;}else$this->error
-.=lang(80,"<b>$Pa.php</b>",$ve)."<br>";}foreach(get_declared_classes()as$ob){if(!$qi[$ob]&&(preg_match('~^Adminer\w~i',$ob)||is_subclass_of($ob,'Adminer\Plugin'))){$Xi=new
-\ReflectionClass($ob);$Db=$Xi->getConstructor();if($Db&&$Db->getNumberOfRequiredParameters())$this->error
-.=lang(81,$ve,"<b>$ob</b>","<b>$Pa.php</b>")."<br>";else$qi[$ob]=new$ob;}}}$ef=array_filter($qi,function($ni){return!is_object($ni);});if($ef){$this->error
-.=lang(82,$ve)."<br>";$qi=array_diff_key($qi,$ef);}$this->drivers=array_diff_key(SqlDriver::$drivers,$Ec);$this->plugins=$qi;$la=new
-Adminer;$qi[]=$la;$Xi=new
-\ReflectionObject($la);foreach($Xi->getMethods()as$zg){foreach($qi
-as$ni){$B=$zg->getName();if(method_exists($ni,$B))$this->hooks[$B][]=$ni;}}}function
+static$append=array('dumpFormat'=>true,'dumpOutput'=>true,'editRowPrint'=>true,'editFunctions'=>true,'config'=>true);var$plugins;var$disabled=array();var$drivers=array();var$driverFiles=array();var$error='';private$hooks=array();function
+__construct($vi){$Fc=SqlDriver::$drivers;$ye=" href='https://www.adminer.org/plugins/#use'".target_blank();if($vi===null){$vi=array();$Pa="adminer-plugins";if(is_dir($Pa)){foreach(glob("$Pa/*.php")as$m){$Ed=SqlDriver::$drivers;$this->includeOnce($m);foreach(array_diff_key(SqlDriver::$drivers,$Ed)as$s=>$B)$this->driverFiles[$s]=$m;}}if(file_exists("$Pa.php")){$Re=$this->includeOnce("$Pa.php");if(is_array($Re)){foreach($Re
+as$w=>$si)$vi[is_object($si)?get_class($si):$w]=$si;}else$this->error
+.=lang(80,"<b>$Pa.php</b>",$ye)."<br>";}foreach(get_declared_classes()as$ob){if(!$vi[$ob]&&(preg_match('~^Adminer\w~i',$ob)||is_subclass_of($ob,'Adminer\Plugin'))){$ej=new
+\ReflectionClass($ob);$Db=$ej->getConstructor();if($Db&&$Db->getNumberOfRequiredParameters())$this->error
+.=lang(81,$ye,"<b>$ob</b>","<b>$Pa.php</b>")."<br>";else$vi[$ob]=new$ob;}}}$hf=array_filter($vi,function($si){return!is_object($si);});if($hf){$this->error
+.=lang(82,$ye)."<br>";$vi=array_diff_key($vi,$hf);}$Hk=get_setting("plugins","adminer_config");foreach($vi
+as$w=>$si){if($si
+instanceof
+Plugin&&$si::$optional){$uk=idx($Hk,get_class($si));if($uk!==null?!$uk:!$si->enabled){$this->disabled[]=$si;unset($vi[$w]);}}}$this->drivers=array_diff_key(SqlDriver::$drivers,$Fc);$this->plugins=$vi;$la=new
+Adminer;$vi[]=$la;$ej=new
+\ReflectionObject($la);foreach($ej->getMethods()as$Bg){foreach($vi
+as$si){$B=$Bg->getName();if(method_exists($si,$B))$this->hooks[$B][]=$si;}}}function
 includeOnce($m){return
 include_once"./$m";}static
 function
-checksum($m){$Ad=str_replace("\r","",file_get_contents($m));$Ad=preg_replace('~\n\tprotected \$translations = array\(.*?\n\t\);~s','',$Ad);return
-dechex(crc32($Ad));}function
-checksums(){$Cd=array_values($this->driverFiles);foreach($this->plugins
-as$ni){$Xi=new
-\ReflectionObject($ni);$Cd[]=$Xi->getFileName();}$J=array();foreach($Cd
+describe($si){$oc=(method_exists($si,'description')?$si->description():"");if(!$oc){$ej=new
+\ReflectionObject($si);if(preg_match('~^/[\s*]+(.+?)(?:\s*\*/)?$~m',$ej->getDocComment(),$A))$oc=$A[1];}$Gj=(method_exists($si,'screenshot')?$si->screenshot():"");return
+h($oc).($Gj?($oc?" ":"")."(<a href='".h($Gj)."'".target_blank().">".lang(83)."</a>)":"");}static
+function
+checksum($m){$Dd=str_replace("\r","",file_get_contents($m));$Dd=preg_replace('~\n\tprotected \$translations = array\(.*?\n\t\);~s','',$Dd);return
+dechex(crc32($Dd));}function
+checksums(){$Fd=array_values($this->driverFiles);foreach($this->plugins
+as$si){$ej=new
+\ReflectionObject($si);$Fd[]=$ej->getFileName();}$J=array();foreach($Fd
 as$m)$J[basename($m,'.php')]=self::checksum($m);return$J;}static
 function
 officialChecksums(){return
-array('adminer.js'=>'a0599090','backward-keys'=>'5fb34a8b','before-unload'=>'2a613523','config'=>'722eb4af','dark-switcher'=>'3d490dea','database-hide'=>'e304a899','designs'=>'ed7e44e3','dump-alter'=>'896b579e','dump-bz2'=>'f0d0e336','dump-date'=>'adc7f1c7','dump-json'=>'767dd321','dump-xml'=>'4fc3cd60','dump-zip'=>'93817d96','edit-foreign'=>'eb823bb0','edit-textarea'=>'a24c3cc','editor-setup'=>'a7dc3a37','editor-views'=>'5c12b185','enum-option'=>'1e24970e','file-upload'=>'10add0e8','foreign-system'=>'ebb4c654','frames'=>'b0e1d11a','highlight-codemirror'=>'c5716555','highlight-monaco'=>'edd1b0af','highlight-prism'=>'267948e5','import-csv'=>'d429c77','login-ip'=>'4d174fea','login-otp'=>'5b5a68af','login-passkey'=>'f69f2f06','login-password-less'=>'e150daac','login-reverse-proxy'=>'24558ea2','login-servers'=>'19c42e45','login-ssl'=>'2b06a5b7','login-table'=>'811f8cef','menu-links'=>'c78461b3','name-patterns'=>'84c10d09','remote-color'=>'ddeecc48','row-numbers'=>'eec8698c','select-email'=>'f84fbd2c','select-expression'=>'4b61d59c','select-foreign'=>'38ac915c','select-image'=>'f55c0231','slugify'=>'dec64713','sql-gemini'=>'c60ab309','sql-log'=>'8e435000','sql-url-length'=>'cd70f1a0','table-indexes-structure'=>'a90cc0c9','table-structure'=>'a8458e02','tables-filter'=>'ec2bcd6e','timeout'=>'97321caf','version-github'=>'627cadf9','version-noverify'=>'966937e9','clickhouse'=>'92ca960d','elastic'=>'1582a04d','firebird'=>'1c4309b2','igdb'=>'a6a1750a','imap'=>'3da1022b','mongo'=>'63486492','redis'=>'6a653462','simpledb'=>'b8e2cc7d',);}function
-__call($B,array$Sh){$_a=array();foreach($Sh
-as$w=>$X)$_a[]=&$Sh[$w];$J=null;foreach($this->hooks[$B]as$ni){$Y=call_user_func_array(array($ni,$B),$_a);if($Y!==null){if(!self::$append[$B])return$Y;$J=$Y+(array)$J;}}return$J;}}abstract
+array('adminer.js'=>'a0599090','backward-keys'=>'1c017d59','before-unload'=>'9674d220','config'=>'bdac2201','dark-switcher'=>'8c201319','database-hide'=>'e304a899','designs'=>'5903cccc','dump-alter'=>'896b579e','dump-bz2'=>'c9229da6','dump-date'=>'512aad63','dump-json'=>'f8aa6b99','dump-xml'=>'aedd2d3a','dump-zip'=>'735d7e2','edit-foreign'=>'d04a0ac8','edit-textarea'=>'a178d7d9','editor-setup'=>'a7dc3a37','editor-views'=>'5c12b185','enum-option'=>'e9005cb0','file-upload'=>'10add0e8','foreign-system'=>'634ce119','frames'=>'b0e1d11a','highlight-codemirror'=>'ada4b569','highlight-monaco'=>'ec1da606','highlight-prism'=>'19933b19','import-csv'=>'bcecfad2','login-ip'=>'4d174fea','login-otp'=>'66bd013d','login-passkey'=>'89783b50','login-password-less'=>'e150daac','login-reverse-proxy'=>'24558ea2','login-servers'=>'19c42e45','login-ssl'=>'2b06a5b7','login-table'=>'811f8cef','menu-links'=>'55b9b15c','name-patterns'=>'84c10d09','remote-color'=>'267580a3','row-numbers'=>'1ad1b6cf','select-email'=>'c33a2661','select-expression'=>'b6a4b3f1','select-foreign'=>'577c07b2','select-image'=>'39ed1607','slugify'=>'7b422f0e','sql-gemini'=>'c60ab309','sql-log'=>'8e435000','sql-url-length'=>'cd70f1a0','table-indexes-structure'=>'e0b1433','table-structure'=>'f71ec61b','tables-filter'=>'2729bf7','timeout'=>'97321caf','version-github'=>'627cadf9','version-noverify'=>'966937e9','clickhouse'=>'51a3d7d5','elastic'=>'9b83a12a','firebird'=>'5f3d9493','igdb'=>'3b00190b','imap'=>'3ba195cd','mongo'=>'235e3ba','redis'=>'41709f61','simpledb'=>'b8e2cc7d',);}function
+__call($B,array$Wh){$_a=array();foreach($Wh
+as$w=>$X)$_a[]=&$Wh[$w];$J=null;foreach($this->hooks[$B]as$si){$Y=call_user_func_array(array($si,$B),$_a);if($Y!==null){if(!self::$append[$B])return$Y;$J=$Y+(array)$J;}}return$J;}}abstract
 class
-Plugin{protected$translations=array();function
+Plugin{static$optional=false;var$enabled=true;protected$translations=array();function
+disable(){$this->enabled=false;return$this;}function
 description(){return$this->lang('');}function
 screenshot(){return"";}protected
 function
-lang($t,$dh=null){$_a=func_get_args();$_a[0]=idx($this->translations[LANG],$t)?:$t;return
+lang($t,$gh=null){$_a=func_get_args();$_a[0]=idx($this->translations[LANG],$t)?:$t;return
 call_user_func_array('Adminer\lang_format',$_a);}}class
 Password{private$password_hash;private$password_matches=null;function
-__construct($ei){$this->password_hash=$ei;}function
+__construct($ji){$this->password_hash=$ji;}function
 description(){return
-lang(83);}function
+lang(84);}function
 credentials(){$F=get_password();return
 array(SERVER,$_GET["username"],($this->passwordMatches($F)&&!password_required()?"":$F));}function
-login($Vf,$F){if($this->passwordMatches($F))return
+login($Xf,$F){if($this->passwordMatches($F))return
 true;if(!Driver::$passwords||!password_required())return
 false;}protected
 function
@@ -2778,7 +2901,7 @@ Db
 extends
 \mysqli{static$instance;var$extension="MySQLi",$flavor='';function
 __construct(){parent::init();}function
-attach(array$O,$V,$F){mysqli_report(MYSQLI_REPORT_OFF);$ri=$O["port"];$Tc=("$O[host]$ri$O[socket]"=="");$lk=adminer()->connectSsl();$Tl=($lk&&($lk['key']||$lk['cert']||$lk['ca']||isset($lk['verify'])));if($Tl)$this->ssl_set($lk['key'],$lk['cert'],$lk['ca'],'','');$J=@$this->real_connect((!$Tc?$O["host"]:ini_get("mysqli.default_host")),(!$Tc||$V!=""?$V:ini_get("mysqli.default_user")),(!$Tc||$V.$F!=""?$F:ini_get("mysqli.default_pw")),null,($ri!=""?intval($ri):ini_get("mysqli.default_port")),($ri!=""?null:$O["socket"]),($Tl?($lk['verify']!==false?MYSQLI_CLIENT_SSL:64):0));$this->options(MYSQLI_OPT_LOCAL_INFILE,0);return($J?'':$this->error);}function
+attach(array$O,$V,$F){mysqli_report(MYSQLI_REPORT_OFF);$wi=$O["port"];$Uc=("$O[host]$wi$O[socket]"=="");$sk=adminer()->connectSsl();$cm=($sk&&($sk['key']||$sk['cert']||$sk['ca']||isset($sk['verify'])));if($cm)$this->ssl_set($sk['key'],$sk['cert'],$sk['ca'],'','');$J=@$this->real_connect((!$Uc?$O["host"]:ini_get("mysqli.default_host")),(!$Uc||$V!=""?$V:ini_get("mysqli.default_user")),(!$Uc||$V.$F!=""?$F:ini_get("mysqli.default_pw")),null,($wi!=""?intval($wi):ini_get("mysqli.default_port")),($wi!=""?null:$O["socket"]),($cm?($sk['verify']!==false?MYSQLI_CLIENT_SSL:64):0));$this->options(MYSQLI_OPT_LOCAL_INFILE,0);return($J?'':$this->error);}function
 set_charset($eb){if(parent::set_charset($eb))return
 true;parent::set_charset('utf8');return$this->query("SET NAMES $eb");}function
 next_result(){return
@@ -2791,14 +2914,14 @@ Db
 extends
 SqlDb{private$link;function
 attach(array$O,$V,$F){if(ini_bool("mysql.allow_local_infile"))return
-lang(84,"'mysql.allow_local_infile'","MySQLi","PDO_MySQL");$ri="$O[port]$O[socket]";$B=$O["host"].($ri!=""?":$ri":"");$this->link=@mysql_connect(($B!=""?$B:ini_get("mysql.default_host")),($B.$V!=""?$V:ini_get("mysql.default_user")),($B.$V.$F!=""?$F:ini_get("mysql.default_password")),true,131072);if(!$this->link)return
+lang(85,"'mysql.allow_local_infile'","MySQLi","PDO_MySQL");$wi="$O[port]$O[socket]";$B=$O["host"].($wi!=""?":$wi":"");$this->link=@mysql_connect(($B!=""?$B:ini_get("mysql.default_host")),($B.$V!=""?$V:ini_get("mysql.default_user")),($B.$V.$F!=""?$F:ini_get("mysql.default_password")),true,131072);if(!$this->link)return
 mysql_error();$this->server_info=mysql_get_server_info($this->link);return'';}function
 set_charset($eb){return
 mysql_set_charset($eb,$this->link)||mysql_set_charset('utf8',$this->link);}function
 quote($Q){return"'".mysql_real_escape_string($Q,$this->link)."'";}function
 select_db($Zb){return
 mysql_select_db($Zb,$this->link);}function
-query($H,$Al=false){$I=@($Al?mysql_unbuffered_query($H,$this->link):mysql_query($H,$this->link));$this->error="";if(!$I){$this->errno=mysql_errno($this->link);$this->error=mysql_error($this->link);return
+query($H,$Jl=false){$I=@($Jl?mysql_unbuffered_query($H,$this->link):mysql_query($H,$this->link));$this->error="";if(!$I){$this->errno=mysql_errno($this->link);$this->error=mysql_error($this->link);return
 false;}if($I===true){$this->affected_rows=mysql_affected_rows($this->link);$this->info=mysql_info($this->link);return
 true;}return
 new
@@ -2813,55 +2936,56 @@ fetch_field(){$J=mysql_fetch_field($this->result,$this->offset++);$J->orgtable=$
 Db
 extends
 PdoDb{var$extension="PDO_MySQL";function
-attach(array$O,$V,$F){$C=array(\PDO::MYSQL_ATTR_LOCAL_INFILE=>false);if(isset($_GET["select"]))$C[\PDO::MYSQL_ATTR_MULTI_STATEMENTS]=false;$lk=adminer()->connectSsl();if($lk){if($lk['key'])$C[\PDO::MYSQL_ATTR_SSL_KEY]=$lk['key'];if($lk['cert'])$C[\PDO::MYSQL_ATTR_SSL_CERT]=$lk['cert'];if($lk['ca'])$C[\PDO::MYSQL_ATTR_SSL_CA]=$lk['ca'];if(isset($lk['verify']))$C[\PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT]=$lk['verify'];}$Be=$O["host"];$ri=$O["port"];$Zj=$O["socket"];return$this->dsn("mysql:charset=utf8".($Be!=""?";host=$Be":'').($ri!=""?";port=$ri":($Zj!=""?";unix_socket=$Zj":"")),$V,$F,$C);}function
+attach(array$O,$V,$F){$C=array(\PDO::MYSQL_ATTR_LOCAL_INFILE=>false);if(isset($_GET["select"]))$C[\PDO::MYSQL_ATTR_MULTI_STATEMENTS]=false;$sk=adminer()->connectSsl();if($sk){if($sk['key'])$C[\PDO::MYSQL_ATTR_SSL_KEY]=$sk['key'];if($sk['cert'])$C[\PDO::MYSQL_ATTR_SSL_CERT]=$sk['cert'];if($sk['ca'])$C[\PDO::MYSQL_ATTR_SSL_CA]=$sk['ca'];if(isset($sk['verify']))$C[\PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT]=$sk['verify'];}$Ee=$O["host"];$wi=$O["port"];$gk=$O["socket"];return$this->dsn("mysql:charset=utf8".($Ee!=""?";host=$Ee":'').($wi!=""?";port=$wi":($gk!=""?";unix_socket=$gk":"")),$V,$F,$C);}function
 set_charset($eb){return$this->query("SET NAMES $eb");}function
 select_db($Zb){return$this->query("USE ".idf_escape($Zb));}function
-query($H,$Al=false){$this->pdo->setAttribute(\PDO::MYSQL_ATTR_USE_BUFFERED_QUERY,!$Al);return
-parent::query($H,$Al);}}}class
+query($H,$Jl=false){$this->pdo->setAttribute(\PDO::MYSQL_ATTR_USE_BUFFERED_QUERY,!$Jl);return
+parent::query($H,$Jl);}}}class
 Driver
 extends
 SqlDriver{static$extensions=array("MySQLi","MySQL","PDO_MySQL");static$jush="sql";static$serverSocket=true;var$unsigned=array("unsigned","zerofill","unsigned zerofill");var$functions=array("char_length","date","from_unixtime","lower","round","floor","ceil","sec_to_time","time_to_sec","upper");var$grouping=array("avg","count","count distinct","group_concat","max","min","sum");var$partitionBy=array("HASH","LINEAR HASH","KEY","LINEAR KEY","RANGE","LIST");function
-operators($Ck){return
+operators($Lk){return
 array("=","<",">","<=",">=","!=","&","LIKE","LIKE %%","REGEXP","IN","BETWEEN","FIND_IN_SET","IS NULL","NOT LIKE","NOT REGEXP","NOT IN","IS NOT NULL","SQL");}static
 function
-connect($O,$V,$F){$e=parent::connect($O,$V,$F);if(is_string($e)){if(function_exists('iconv')&&!is_utf8($e)&&strlen($vj=iconv("windows-1252","utf-8//IGNORE",$e))>strlen($e))$e=$vj;return$e;}$e->set_charset(charset($e));$e->query("SET sql_quote_show_create = 1, autocommit = 1");$e->flavor=(preg_match('~MariaDB~',$e->server_info)?'maria':'mysql');add_driver(DRIVER,($e->flavor=='maria'?"MariaDB":"MySQL"));return$e;}function
-__construct(Db$e){parent::__construct($e);$this->types=array(lang(85)=>array("tinyint"=>3,"smallint"=>5,"mediumint"=>8,"int"=>10,"bigint"=>20,"decimal"=>66,"float"=>12,"double"=>21),lang(86)=>array("date"=>10,"datetime"=>19,"timestamp"=>19,"time"=>10,"year"=>4),lang(87)=>array("char"=>255,"varchar"=>65535,"tinytext"=>255,"text"=>65535,"mediumtext"=>16777215,"longtext"=>4294967295),lang(88)=>array("enum"=>65535,"set"=>64),lang(89)=>array("bit"=>20,"binary"=>255,"varbinary"=>65535,"tinyblob"=>255,"blob"=>65535,"mediumblob"=>16777215,"longblob"=>4294967295),lang(90)=>array("geometry"=>0,"point"=>0,"linestring"=>0,"polygon"=>0,"multipoint"=>0,"multilinestring"=>0,"multipolygon"=>0,"geometrycollection"=>0),);$this->insertFunctions=array("char"=>"md5/sha1/password/encrypt/uuid","binary"=>"md5/sha1","date|time"=>"now",);$this->editFunctions=array(number_type()=>"+/-","date"=>"+ interval/- interval","time"=>"addtime/subtime","char|text"=>"concat",);if(min_version('5.7.8',10.2,$e))$this->types[lang(87)]["json"]=4294967295;if(min_version('',10.7,$e)){$this->types[lang(87)]["uuid"]=128;$this->insertFunctions['uuid']='uuid';}if(min_version('',10.5,$e)){$this->types[lang(91)]["inet6"]=39;if(min_version('','10.10',$e))$this->types[lang(91)]["inet4"]=15;}if(min_version(9,11.7,$e))$this->types[lang(85)]["vector"]=16383;if(min_version(5.7,10.2,$e))$this->generated=array("STORED","VIRTUAL");}function
+connect($O,$V,$F){$e=parent::connect($O,$V,$F);if(is_string($e)){if(function_exists('iconv')&&!is_utf8($e)&&strlen($Bj=iconv("windows-1252","utf-8//IGNORE",$e))>strlen($e))$e=$Bj;return$e;}$e->set_charset(charset($e));$e->query("SET sql_quote_show_create = 1, autocommit = 1");$e->flavor=(preg_match('~MariaDB~',$e->server_info)?'maria':'mysql');add_driver(DRIVER,($e->flavor=='maria'?"MariaDB":"MySQL"));return$e;}function
+__construct(Db$e){parent::__construct($e);$this->types=array(lang(86)=>array("tinyint"=>3,"smallint"=>5,"mediumint"=>8,"int"=>10,"bigint"=>20,"decimal"=>66,"float"=>12,"double"=>21),lang(87)=>array("date"=>10,"datetime"=>19,"timestamp"=>19,"time"=>10,"year"=>4),lang(88)=>array("char"=>255,"varchar"=>65535,"tinytext"=>255,"text"=>65535,"mediumtext"=>16777215,"longtext"=>4294967295),lang(89)=>array("enum"=>65535,"set"=>64),lang(90)=>array("bit"=>20,"binary"=>255,"varbinary"=>65535,"tinyblob"=>255,"blob"=>65535,"mediumblob"=>16777215,"longblob"=>4294967295),lang(91)=>array("geometry"=>0,"point"=>0,"linestring"=>0,"polygon"=>0,"multipoint"=>0,"multilinestring"=>0,"multipolygon"=>0,"geometrycollection"=>0),);$this->insertFunctions=array("char"=>"md5/sha1/password/encrypt/uuid","binary"=>"md5/sha1","date|time"=>"now",);$this->editFunctions=array(number_type()=>"+/-","date"=>"+ interval/- interval","time"=>"addtime/subtime","char|text"=>"concat",);if(min_version('5.7.8',10.2,$e))$this->types[lang(88)]["json"]=4294967295;if(min_version('',10.7,$e)){$this->types[lang(88)]["uuid"]=128;$this->insertFunctions['uuid']='uuid';}if(min_version('',10.5,$e)){$this->types[lang(92)]["inet6"]=39;if(min_version('','10.10',$e))$this->types[lang(92)]["inet4"]=15;}if(min_version(9,11.7,$e))$this->types[lang(86)]["vector"]=16383;if(min_version(5.7,10.2,$e))$this->generated=array("STORED","VIRTUAL");}function
 unconvertFunction(array$k){return(preg_match("~binary~",$k["type"])?"<code class='jush-sql'>UNHEX</code>":($k["type"]=="bit"?doc_link(array('sql'=>'bit-value-literals.html'),"<code>b''</code>"):($k["type"]=="vector"?"<code class='jush-sql'>".($this->conn->flavor=='maria'?"VEC_FromText":"STRING_TO_VECTOR")."</code>":(preg_match("~geom|point|linestring|polygon~",$k["type"])?"<code class='jush-sql'>GeomFromText</code>":""))));}function
 insert($R,array$P){return($P?parent::insert($R,$P):queries("INSERT INTO ".table($R)." ()\nVALUES ()"));}function
-insertUpdate($R,array$L,array$Ci){$d=array_keys(reset($L));$zi="INSERT INTO ".table($R)." (".implode(", ",$d).") VALUES\n";$bm=array();foreach($d
-as$w)$bm[$w]="$w = VALUES($w)";$wk="\nON DUPLICATE KEY UPDATE ".implode(", ",$bm);$bm=array();$x=0;foreach($L
-as$P){$Y="(".implode(", ",$P).")";if($bm&&(strlen($zi)+$x+strlen($Y)+strlen($wk)>1e6)){if(!queries($zi.implode(",\n",$bm).$wk))return
-false;$bm=array();$x=0;}$bm[]=$Y;$x+=strlen($Y)+2;}return
-queries($zi.implode(",\n",$bm).$wk);}function
-slowQuery($H,$bl){if(min_version('5.7.8','10.1.2')){if($this->conn->flavor=='maria')return"SET STATEMENT max_statement_time=$bl FOR $H";elseif(preg_match('~^(SELECT\b)(.+)~is',$H,$A))return"$A[1] /*+ MAX_EXECUTION_TIME(".($bl*1000).") */ $A[2]";}}function
+insertUpdate($R,array$L,array$Hi){$d=array_keys(reset($L));$Di="INSERT INTO ".table($R)." (".implode(", ",$d).") VALUES\n";$km=array();foreach($d
+as$w)$km[$w]="$w = VALUES($w)";$Dk="\nON DUPLICATE KEY UPDATE ".implode(", ",$km);$km=array();$x=0;foreach($L
+as$P){$Y="(".implode(", ",$P).")";if($km&&(strlen($Di)+$x+strlen($Y)+strlen($Dk)>1e6)){if(!queries($Di.implode(",\n",$km).$Dk))return
+false;$km=array();$x=0;}$km[]=$Y;$x+=strlen($Y)+2;}return
+queries($Di.implode(",\n",$km).$Dk);}function
+slowQuery($H,$kl){if(min_version('5.7.8','10.1.2')){if($this->conn->flavor=='maria')return"SET STATEMENT max_statement_time=$kl FOR $H";elseif(preg_match('~^(SELECT\b)(.+)~is',$H,$A))return"$A[1] /*+ MAX_EXECUTION_TIME(".($kl*1000).") */ $A[2]";}}function
 convertColumn($t,array$k){if(preg_match("~binary~",$k["type"]))return"HEX($t)";if($k["type"]=="bit")return"BIN($t + 0)";if($k["type"]=="vector")return($this->conn->flavor=='maria'?"VEC_ToText":"VECTOR_TO_STRING")."($t)";if(preg_match("~geom|point|linestring|polygon~",$k["type"]))return(min_version(8)?"ST_":"")."AsWKT($t)";return"";}function
 convertSearch($t,array$X,array$k){return($this->convertColumn($t,$k)?:(preg_match('~'.text_type().'~',$k["type"])&&!preg_match("~^utf8~",$k["collation"])&&preg_match('~[\x80-\xFF]~',$X['val'])?"CONVERT($t USING ".charset($this->conn).")":$t));}function
-typeName(\stdClass$k){$B=parent::typeName($k);if($B!=""){$_l=array("TINY"=>"tinyint","SHORT"=>"smallint","LONG"=>"int","INT24"=>"mediumint","LONGLONG"=>"bigint","NEWDECIMAL"=>"decimal","VAR_STRING"=>"varchar","STRING"=>"char",);return
-idx($_l,$B,strtolower($B));}$_l=array("decimal","tinyint","smallint","int","float","double",7=>"timestamp","bigint","mediumint","date","time","datetime","year",15=>"varchar","bit",242=>"vector",245=>"json","decimal","enum","set","tinytext","mediumtext","longtext","text","varchar","char","geometry",);$J=idx($_l,$k->type,"");return($k->charsetnr==63?str_replace(array("text","varchar","char"),array("blob","varbinary","binary"),$J):$J);}function
-quoteBinary($vj){return"X".q(bin2hex($vj));}function
+typeName(\stdClass$k){$B=parent::typeName($k);if($B!=""){$Il=array("TINY"=>"tinyint","SHORT"=>"smallint","LONG"=>"int","INT24"=>"mediumint","LONGLONG"=>"bigint","NEWDECIMAL"=>"decimal","VAR_STRING"=>"varchar","STRING"=>"char",);return
+idx($Il,$B,strtolower($B));}$Il=array("decimal","tinyint","smallint","int","float","double",7=>"timestamp","bigint","mediumint","date","time","datetime","year",15=>"varchar","bit",242=>"vector",245=>"json","decimal","enum","set","tinytext","mediumtext","longtext","text","varchar","char","geometry",);$J=idx($Il,$k->type,"");return($k->charsetnr==63?str_replace(array("text","varchar","char"),array("blob","varbinary","binary"),$J):$J);}function
+quoteBinary($Bj){return"X".q(bin2hex($Bj));}function
 md5($c,array$k){if(is_blob($k)||preg_match('~'.text_type().'~',$k["type"]))return"MD5(".(is_blob($k)||preg_match("~^utf8~",$k["collation"])?$c:"CONVERT($c USING ".charset($this->conn).")").")";}function
 warnings(){$I=$this->conn->query("SHOW WARNINGS");if($I&&$I->num_rows){ob_start();print_select_result($I);return
 ob_get_clean();}}function
-tableHelp($B,$pf=false){$Xf=($this->conn->flavor=='maria');if(information_schema(DB))return
-strtolower(str_replace("_","-",DB)."-".($Xf?"$B-table/":str_replace("_","-",$B)."-table.html"));if(DB=="sys")return($Xf?"sys-schema/":strtolower("sys-".str_replace("_","-",preg_replace('~^x\$~','',$B)).".html"));if(DB=="mysql")return($Xf?"mysql$B-table/":"system-schema.html");}function
-partitionsInfo($R){$Sd="FROM information_schema.PARTITIONS WHERE TABLE_SCHEMA = ".q(DB)." AND TABLE_NAME = ".q($R);$I=$this->conn->query("SELECT PARTITION_METHOD, PARTITION_EXPRESSION, PARTITION_ORDINAL_POSITION $Sd ORDER BY PARTITION_ORDINAL_POSITION DESC LIMIT 1");$K=($I?$I->fetch_row():null);if(!$K)return
-array();$J=array();list($J["partition_by"],$J["partition"],$J["partitions"])=$K;$ai=get_key_vals("SELECT PARTITION_NAME, PARTITION_DESCRIPTION $Sd AND PARTITION_NAME != '' ORDER BY PARTITION_ORDINAL_POSITION");$J["partition_names"]=array_keys($ai);$J["partition_values"]=array_values($ai);return$J;}function
+errorLine($H){return(preg_match('~ at line (\d+)$~',$this->conn->error,$A)?(int)$A[1]:0);}function
+tableHelp($B,$rf=false){$Zf=($this->conn->flavor=='maria');if(information_schema(DB))return
+strtolower(str_replace("_","-",DB)."-".($Zf?"$B-table/":str_replace("_","-",$B)."-table.html"));if(DB=="sys")return($Zf?"sys-schema/":strtolower("sys-".str_replace("_","-",preg_replace('~^x\$~','',$B)).".html"));if(DB=="mysql")return($Zf?"mysql$B-table/":"system-schema.html");}function
+partitionsInfo($R){$Vd="FROM information_schema.PARTITIONS WHERE TABLE_SCHEMA = ".q(DB)." AND TABLE_NAME = ".q($R);$I=$this->conn->query("SELECT PARTITION_METHOD, PARTITION_EXPRESSION, PARTITION_ORDINAL_POSITION $Vd ORDER BY PARTITION_ORDINAL_POSITION DESC LIMIT 1");$K=($I?$I->fetch_row():null);if(!$K)return
+array();$J=array();list($J["partition_by"],$J["partition"],$J["partitions"])=$K;$fi=get_key_vals("SELECT PARTITION_NAME, PARTITION_DESCRIPTION $Vd AND PARTITION_NAME != '' ORDER BY PARTITION_ORDINAL_POSITION");$J["partition_names"]=array_keys($fi);$J["partition_values"]=array_values($fi);return$J;}function
 checkConstraints($R){$J=parent::checkConstraints($R);return($this->conn->flavor=='maria'?$J:array_map('stripslashes',$J));}function
-hasCStyleEscapes(){static$Xa;if($Xa===null){$jk=get_val("SHOW VARIABLES LIKE 'sql_mode'",1,$this->conn);$Xa=(strpos($jk,'NO_BACKSLASH_ESCAPES')===false);}return$Xa;}function
+hasCStyleEscapes(){static$Xa;if($Xa===null){$qk=get_val("SHOW VARIABLES LIKE 'sql_mode'",1,$this->conn);$Xa=(strpos($qk,'NO_BACKSLASH_ESCAPES')===false);}return$Xa;}function
 hasEstimatedRows(){return
 true;}function
 isSystem($h,$M=""){return
 information_schema($h,$M)||in_array($h,array("mysql","sys"));}function
 lineComment(){return"#|-- ";}function
 engines(){$J=array();foreach(get_rows("SHOW ENGINES")as$K){if(preg_match("~YES|DEFAULT~",$K["Support"]))$J[]=$K["Engine"];}return$J;}function
-indexAlgorithms(array$Ck){return(preg_match('~^(MEMORY|NDB)$~',$Ck["Engine"])?array("HASH","BTREE"):array());}}function
+indexAlgorithms(array$Lk){return(preg_match('~^(MEMORY|NDB)$~',$Lk["Engine"])?array("HASH","BTREE"):array());}}function
 idf_escape($t){return"`".str_replace("`","``",$t)."`";}function
 table($t){return
 idf_escape($t);}function
-get_databases($Jd){$J=get_session("dbs");if($J===null){$H="SELECT SCHEMA_NAME FROM information_schema.SCHEMATA ORDER BY SCHEMA_NAME";$mk=microtime(true);$J=($Jd?slow_query($H):get_vals($H));if(microtime(true)-$mk>0.1){restart_session();set_session("dbs",$J);stop_session();}}return$J;}function
-limit($H,$Z,$y,$kh=0,$Jj=" "){return" $H$Z".($y?$Jj."LIMIT $y".($kh?" OFFSET $kh":""):"");}function
-limit1($R,$H,$Z,$Jj="\n"){return
-limit($H,$Z,1,0,$Jj);}function
+get_databases($Md){$J=get_session("dbs");if($J===null){$H="SELECT SCHEMA_NAME FROM information_schema.SCHEMATA ORDER BY SCHEMA_NAME";$tk=microtime(true);$J=($Md?slow_query($H):get_vals($H));if(microtime(true)-$tk>0.1){restart_session();set_session("dbs",$J);stop_session();}}return$J;}function
+limit($H,$Z,$y,$nh=0,$Qj=" "){return" $H$Z".($y?$Qj."LIMIT $y".($nh?" OFFSET $nh":""):"");}function
+limit1($R,$H,$Z,$Qj="\n"){return
+limit($H,$Z,1,0,$Qj);}function
 db_collation($h,array$tb){$J=null;$Mb=get_val("SHOW CREATE DATABASE ".idf_escape($h),1);if(preg_match('~ COLLATE ([^ ]+)~',$Mb,$A))$J=$A[1];elseif(preg_match('~ CHARACTER SET ([^ ]+)~',$Mb,$A))$J=$tb[$A[1]][-1];return$J;}function
 logged_user(){return
 get_val("SELECT CURRENT_USER()");}function
@@ -2869,17 +2993,16 @@ tables_list(){return
 get_key_vals("SELECT TABLE_NAME, TABLE_TYPE FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() ORDER BY TABLE_NAME");}function
 count_tables(array$g){$J=array();foreach($g
 as$h)$J[$h]=count(get_vals("SHOW TABLES IN ".idf_escape($h)));return$J;}function
-table_status($B="",$vd=false){$J=array();$H="SELECT ENGINE AS Engine, TABLE_NAME AS Name, TABLE_COMMENT AS Comment FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() ".($B!=""?"AND TABLE_NAME = ".q($B):"ORDER BY Name");$M=array();foreach(($vd?array():get_rows($H))as$K)$M[$K["Name"]]=$K;$Bi=null;foreach(get_rows($vd?$H:"SHOW TABLE STATUS".($B!=""?" LIKE ".q(addcslashes($B,"%_\\")):""))as$K){$Kh=idx($M,$K["Name"]);if($Kh){if($K["Comment"]!==$Kh["Comment"]&&$K["Comment"]!==$Bi)$K["Error"]=$K["Comment"];$Bi=$K["Comment"];$K["Comment"]=$Kh["Comment"];$K["Engine"]=$Kh["Engine"];}if($K["Engine"]=="InnoDB")$K["Comment"]=preg_replace('~(?:(.+); )?InnoDB free: .*~','\1',$K["Comment"]);if(!isset($K["Engine"]))$K["Comment"]="";if($B!="")$K["Name"]=$B;$J[$K["Name"]]=$K;}return$J;}function
+table_status($B="",$yd=false){$J=array();$H="SELECT ENGINE AS Engine, TABLE_NAME AS Name, TABLE_COMMENT AS Comment FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() ".($B!=""?"AND TABLE_NAME = ".q($B):"ORDER BY Name");$M=array();foreach(($yd?array():get_rows($H))as$K)$M[$K["Name"]]=$K;$Gi=null;foreach(get_rows($yd?$H:"SHOW TABLE STATUS".($B!=""?" LIKE ".q(addcslashes($B,"%_\\")):""))as$K){$Oh=idx($M,$K["Name"]);if($Oh){if($K["Comment"]!==$Oh["Comment"]&&$K["Comment"]!==$Gi)$K["Error"]=$K["Comment"];$Gi=$K["Comment"];$K["Comment"]=$Oh["Comment"];$K["Engine"]=$Oh["Engine"];}if($K["Engine"]=="InnoDB")$K["Comment"]=preg_replace('~(?:(.+); )?InnoDB free: .*~','\1',$K["Comment"]);if(!isset($K["Engine"]))$K["Comment"]="";if($B!="")$K["Name"]=$B;$J[$K["Name"]]=$K;}return$J;}function
 is_view(array$S){return$S["Engine"]===null;}function
 fk_support(array$S){return
 preg_match('~InnoDB|IBMDB2I'.(min_version(5.6)?'|NDB':'').'~i',$S["Engine"]);}function
-parse_type($Ud){preg_match('~^([^( ]+)(?:\((.+)\))?( unsigned)?( zerofill)?$~',$Ud,$A);return
+parse_type($Xd){preg_match('~^([^( ]+)(?:\((.+)\))?( unsigned)?( zerofill)?$~',$Xd,$A);return
 array($A[1],$A[2],ltrim($A[3].$A[4]));}function
-fields($R){$Xf=(connection()->flavor=='maria');$J=array();foreach(get_rows("SELECT * FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ".q($R)." ORDER BY ORDINAL_POSITION")as$K){$k=$K["COLUMN_NAME"];$U=$K["COLUMN_TYPE"];$Zd=$K["GENERATION_EXPRESSION"];$sd=$K["EXTRA"];preg_match('~^(VIRTUAL|PERSISTENT|STORED)~',$sd,$Yd);list($zl,$x,$Hl)=parse_type($U);$i=$K["COLUMN_DEFAULT"];if($i!=""){$nf=preg_match('~text|json~',$zl);if(!$Xf&&$nf)$i=preg_replace("~^(_\w+)?('.*')$~",'\2',stripslashes($i));if($Xf||$nf){$i=($i=="NULL"?null:preg_replace_callback("~^'(.*)'$~",function($A){return
-stripslashes(str_replace("''","'",$A[1]));},$i));}if(!$Xf&&preg_match('~binary~',$zl)&&preg_match('~^0x(\w*)$~',$i,$A))$i=pack("H*",$A[1]);}$J[$k]=array("field"=>$k,"full_type"=>$U,"type"=>$zl,"length"=>$x,"unsigned"=>$Hl,"default"=>($Yd?($Xf?$Zd:stripslashes($Zd)):$i),"null"=>($K["IS_NULLABLE"]=="YES"),"auto_increment"=>($sd=="auto_increment"),"on_update"=>(preg_match('~\bon update (\w+)~i',$sd,$A)?$A[1]:""),"collation"=>$K["COLLATION_NAME"],"privileges"=>array_flip(explode(",","$K[PRIVILEGES],where,order")),"comment"=>$K["COLUMN_COMMENT"],"primary"=>($K["COLUMN_KEY"]=="PRI"),"generated"=>($Yd[1]=="PERSISTENT"?"STORED":$Yd[1]),);}return$J;}function
+fields($R){$Zf=(connection()->flavor=='maria');$J=array();foreach(get_rows("SELECT * FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ".q($R)." ORDER BY ORDINAL_POSITION")as$K){$k=$K["COLUMN_NAME"];$U=$K["COLUMN_TYPE"];$ce=$K["GENERATION_EXPRESSION"];$vd=$K["EXTRA"];preg_match('~^(VIRTUAL|PERSISTENT|STORED)~',$vd,$be);list($Hl,$x,$Ql)=parse_type($U);$i=$K["COLUMN_DEFAULT"];$hc=false;if($i!=""){$Vi=$Zf;if($Zf)$hc=!preg_match("~^('(?:[^'\\\\]|\\\\.|'')*'|NULL|[-+]?[\\d.]+)$~s",$i);elseif(preg_match('~text|json~',$Hl)||preg_match('~\bDEFAULT_GENERATED\b~',$vd)){$i=stripslashes($i);$Vi=preg_match("~^(_\\w+)?('(?:[^'\\\\]|\\\\.|'')*')$~s",$i,$A);if($Vi)$i=$A[2];else$hc=true;}elseif(preg_match("~^[bx]'[\\da-f]*'$~i",$i))$hc=true;if($Vi)$i=($i=="NULL"?null:(preg_match("~^'.*'$~s",$i)?stripslashes(idf_unescape($i)):$i));if(preg_match('~binary~',$Hl)&&preg_match("~^(?:0x(\\w*)|x'(\\w*)')$~",$i,$A)){$i=pack("H*",$A[1].idx($A,2));$hc=false;}}$J[$k]=array("field"=>$k,"full_type"=>$U,"type"=>$Hl,"length"=>$x,"unsigned"=>$Ql,"default"=>($be?($Zf?$ce:stripslashes($ce)):$i),"default_sql"=>(!$be&&$hc),"null"=>($K["IS_NULLABLE"]=="YES"),"auto_increment"=>($vd=="auto_increment"),"on_update"=>(preg_match('~\bon update current_timestamp\b~i',$vd)?"CURRENT_TIMESTAMP":""),"collation"=>$K["COLLATION_NAME"],"privileges"=>array_flip(explode(",","$K[PRIVILEGES],where,order")),"comment"=>$K["COLUMN_COMMENT"],"primary"=>($K["COLUMN_KEY"]=="PRI"),"generated"=>($be[1]=="PERSISTENT"?"STORED":$be[1]),);}return$J;}function
 indexes($R,$f=null){$J=array();foreach(get_rows("SHOW INDEX FROM ".table($R),$f)as$K){$B=$K["Key_name"];$J[$B]["type"]=($B=="PRIMARY"?"PRIMARY":($K["Index_type"]=="FULLTEXT"?"FULLTEXT":($K["Non_unique"]?(preg_match('~^(SPATIAL|VECTOR)$~',$K["Index_type"])?$K["Index_type"]:"INDEX"):"UNIQUE")));$J[$B]["columns"][]=$K["Column_name"];$J[$B]["lengths"][]=($K["Index_type"]=="SPATIAL"?null:$K["Sub_part"]);$J[$B]["descs"][]=null;$J[$B]["algorithm"]=$K["Index_type"];}return$J;}function
-foreign_keys($R){static$ii='(?:`(?:[^`]|``)+`|"(?:[^"]|"")+")';$J=array();$Nb=get_val("SHOW CREATE TABLE ".table($R),1);if($Nb){preg_match_all("~CONSTRAINT ($ii) FOREIGN KEY ?\\(((?:$ii,? ?)+)\\) REFERENCES ($ii)(?:\\.($ii))? \\(((?:$ii,? ?)+)\\)(?: ON DELETE (".driver()->onActions."))?(?: ON UPDATE (".driver()->onActions."))?~",$Nb,$Zf,PREG_SET_ORDER);foreach($Zf
-as$A){preg_match_all("~$ii~",$A[2],$dk);preg_match_all("~$ii~",$A[5],$Rk);$J[idf_unescape($A[1])]=array("db"=>idf_unescape($A[4]!=""?$A[3]:$A[4]),"table"=>idf_unescape($A[4]!=""?$A[4]:$A[3]),"source"=>array_map('Adminer\idf_unescape',$dk[0]),"target"=>array_map('Adminer\idf_unescape',$Rk[0]),"on_delete"=>($A[6]?:"RESTRICT"),"on_update"=>($A[7]?:"RESTRICT"),);}}return$J;}function
+foreign_keys($R){static$ni='(?:`(?:[^`]|``)+`|"(?:[^"]|"")+")';$J=array();$Nb=get_val("SHOW CREATE TABLE ".table($R),1);if($Nb){preg_match_all("~CONSTRAINT ($ni) FOREIGN KEY ?\\(((?:$ni,? ?)+)\\) REFERENCES ($ni)(?:\\.($ni))? \\(((?:$ni,? ?)+)\\)(?: ON DELETE (".driver()->onActions."))?(?: ON UPDATE (".driver()->onActions."))?~",$Nb,$bg,PREG_SET_ORDER);foreach($bg
+as$A){preg_match_all("~$ni~",$A[2],$kk);preg_match_all("~$ni~",$A[5],$al);$J[idf_unescape($A[1])]=array("db"=>idf_unescape($A[4]!=""?$A[3]:$A[4]),"table"=>idf_unescape($A[4]!=""?$A[4]:$A[3]),"source"=>array_map('Adminer\idf_unescape',$kk[0]),"target"=>array_map('Adminer\idf_unescape',$al[0]),"on_delete"=>($A[6]?:"RESTRICT"),"on_update"=>($A[7]?:"RESTRICT"),);}}return$J;}function
 view($B){return
 array("select"=>preg_replace('~^(?:[^`]|`[^`]*`)*\s+AS\s+~isU','',get_val("SHOW CREATE VIEW ".table($B),1)));}function
 collations(){$J=array();foreach(get_rows("SHOW COLLATION")as$K){if($K["Default"])$J[$K["Charset"]][-1]=$K["Collation"];else$J[$K["Charset"]][]=$K["Collation"];}ksort($J);foreach($J
@@ -2890,51 +3013,51 @@ h(preg_replace('~^You have an error.*syntax to use~U',"Syntax error",connection(
 create_database($h,$sb){return
 queries("CREATE DATABASE ".idf_escape($h).($sb?" COLLATE ".q($sb):""));}function
 drop_databases(array$g){$J=apply_queries("DROP DATABASE",$g,'Adminer\idf_escape');restart_session();set_session("dbs",null);return$J;}function
-rename_database($B,$sb){$J=false;if(create_database($B,$sb)){$T=array();$gm=array();foreach(tables_list()as$R=>$U){if($U=='VIEW')$gm[]=$R;else$T[]=$R;}$J=(!$T&&!$gm)||move_tables($T,$gm,$B);drop_databases($J?array(DB):array());}return$J;}function
+rename_database($B,$sb){$J=false;if(create_database($B,$sb)){$T=array();$pm=array();foreach(tables_list()as$R=>$U){if($U=='VIEW')$pm[]=$R;else$T[]=$R;}$J=(!$T&&!$pm)||move_tables($T,$pm,$B);drop_databases($J?array(DB):array());}return$J;}function
 auto_increment(){$Ga=" PRIMARY KEY";if($_GET["create"]!=""&&$_POST["auto_increment_col"]){foreach(indexes($_GET["create"])as$u){if(in_array($_POST["fields"][$_POST["auto_increment_col"]]["orig"],$u["columns"],true)){$Ga="";break;}if($u["type"]=="PRIMARY")$Ga=" UNIQUE";}}return" AUTO_INCREMENT$Ga";}function
-alter_table($R,$B,array$l,array$Ld,$xb,$Vc,$sb,$Fa,$Zh){$va=array();foreach($l
-as$k){if($k[1]){$i=$k[1][3];if(preg_match('~ GENERATED~',$i)){$k[1][3]=(connection()->flavor=='maria'?"":$k[1][2]);$k[1][2]=$i;}$va[]=($R!=""?($k[0]!=""?"CHANGE ".idf_escape($k[0]):"ADD"):" ")." ".implode($k[1]).($R!=""?$k[2]:"");}else$va[]="DROP ".idf_escape($k[0]);}$va=array_merge($va,$Ld);$pk=($xb!==null?" COMMENT=".q($xb):"").($Vc?" ENGINE=".q($Vc):"").($sb?" COLLATE ".q($sb):"").($Fa!=""?" AUTO_INCREMENT=$Fa":"");if($Zh){$ai=array();if($Zh["partition_by"]=='RANGE'||$Zh["partition_by"]=='LIST'){foreach($Zh["partition_names"]as$w=>$X){$Y=$Zh["partition_values"][$w];$ai[]="\n  PARTITION ".idf_escape($X)." VALUES ".($Zh["partition_by"]=='RANGE'?"LESS THAN":"IN").($Y!=""?" ($Y)":" MAXVALUE");}}$pk
-.="\nPARTITION BY $Zh[partition_by]($Zh[partition])";if($ai)$pk
-.=" (".implode(",",$ai)."\n)";elseif($Zh["partitions"])$pk
-.=" PARTITIONS ".(+$Zh["partitions"]);}elseif($Zh===null)$pk
+alter_table($R,$B,array$l,array$Od,$xb,$Xc,$sb,$Fa,$ei){$va=array();foreach($l
+as$k){if($k[1]){$i=$k[1][3];if(preg_match('~ GENERATED~',$i)){$k[1][3]=(connection()->flavor=='maria'?"":$k[1][2]);$k[1][2]=$i;}$va[]=($R!=""?($k[0]!=""?"CHANGE ".idf_escape($k[0]):"ADD"):" ")." ".implode($k[1]).($R!=""?$k[2]:"");}else$va[]="DROP ".idf_escape($k[0]);}$va=array_merge($va,$Od);$xk=($xb!==null?" COMMENT=".q($xb):"").($Xc?" ENGINE=".q($Xc):"").($sb?" COLLATE ".q($sb):"").($Fa!=""?" AUTO_INCREMENT=$Fa":"");if($ei){$fi=array();if($ei["partition_by"]=='RANGE'||$ei["partition_by"]=='LIST'){foreach($ei["partition_names"]as$w=>$X){$Y=$ei["partition_values"][$w];$fi[]="\n  PARTITION ".idf_escape($X)." VALUES ".($ei["partition_by"]=='RANGE'?"LESS THAN":"IN").($Y!=""?" ($Y)":" MAXVALUE");}}$xk
+.="\nPARTITION BY $ei[partition_by]($ei[partition])";if($fi)$xk
+.=" (".implode(",",$fi)."\n)";elseif($ei["partitions"])$xk
+.=" PARTITIONS ".(+$ei["partitions"]);}elseif($ei===null)$xk
 .="\nREMOVE PARTITIONING";if($R=="")return
-queries("CREATE TABLE ".table($B)." (\n".implode(",\n",$va)."\n)$pk");if($R!=$B)$va[]="RENAME TO ".table($B);if($pk)$va[]=ltrim($pk);return($va?queries("ALTER TABLE ".table($R)."\n".implode(",\n",$va)):true);}function
+queries("CREATE TABLE ".table($B)." (\n".implode(",\n",$va)."\n)$xk");if($R!=$B)$va[]="RENAME TO ".table($B);if($xk)$va[]=ltrim($xk);return($va?queries("ALTER TABLE ".table($R)."\n".implode(",\n",$va)):true);}function
 alter_indexes($R,$va){$cb=array();foreach($va
 as$X)$cb[]=($X[2]=="DROP"?"\nDROP INDEX ".idf_escape($X[1]):"\nADD $X[0] ".($X[0]=="PRIMARY"?"KEY ":"").($X[1]!=""?idf_escape($X[1])." ":"")."(".implode(", ",$X[2]).")");return
 queries("ALTER TABLE ".table($R).implode(",",$cb));}function
 truncate_tables(array$T){return
 apply_queries("TRUNCATE TABLE",$T);}function
-drop_views(array$gm){return
-queries("DROP VIEW ".implode(", ",array_map('Adminer\table',$gm)));}function
+drop_views(array$pm){return
+queries("DROP VIEW ".implode(", ",array_map('Adminer\table',$pm)));}function
 drop_tables(array$T){return
 queries("DROP TABLE ".implode(", ",array_map('Adminer\table',$T)));}function
-move_tables(array$T,array$gm,$Rk){$cj=array();foreach($T
-as$R)$cj[]=table($R)." TO ".idf_escape($Rk).".".table($R);if(!$cj||queries("RENAME TABLE ".implode(", ",$cj))){$kc=array();foreach($gm
-as$R)$kc[table($R)]=view($R);connection()->select_db($Rk);$h=idf_escape(DB);foreach($kc
-as$B=>$fm){if(!queries("CREATE VIEW $B AS ".str_replace(" $h."," ",$fm["select"]))||!queries("DROP VIEW $h.$B"))return
+move_tables(array$T,array$pm,$al){$jj=array();foreach($T
+as$R)$jj[]=table($R)." TO ".idf_escape($al).".".table($R);if(!$jj||queries("RENAME TABLE ".implode(", ",$jj))){$lc=array();foreach($pm
+as$R)$lc[table($R)]=view($R);connection()->select_db($al);$h=idf_escape(DB);foreach($lc
+as$B=>$om){if(!queries("CREATE VIEW $B AS ".str_replace(" $h."," ",$om["select"]))||!queries("DROP VIEW $h.$B"))return
 false;}return
 true;}return
 false;}function
-copy_tables(array$T,array$gm,$Rk){queries("SET sql_mode = 'NO_AUTO_VALUE_ON_ZERO'");foreach($T
-as$R){$B=($Rk==DB?table("copy_$R"):idf_escape($Rk).".".table($R));if(($_POST["overwrite"]&&!queries("\nDROP TABLE IF EXISTS $B"))||!queries("CREATE TABLE $B LIKE ".table($R))||!queries("INSERT INTO $B SELECT * FROM ".table($R)))return
-false;foreach(get_rows("SHOW TRIGGERS LIKE ".q(addcslashes($R,"%_\\")))as$K){$rl=$K["Trigger"];list($ed,$fh)=trigger_event($K);if(!queries("CREATE TRIGGER ".($Rk==DB?idf_escape("copy_$rl"):idf_escape($Rk).".".idf_escape($rl))." $K[Timing] $ed".($fh!=""?" $fh":"")." ON $B FOR EACH ROW\n$K[Statement];"))return
-false;}}foreach($gm
-as$R){$B=($Rk==DB?table("copy_$R"):idf_escape($Rk).".".table($R));$fm=view($R);if(($_POST["overwrite"]&&!queries("DROP VIEW IF EXISTS $B"))||!queries("CREATE VIEW $B AS $fm[select]"))return
+copy_tables(array$T,array$pm,$al){queries("SET sql_mode = 'NO_AUTO_VALUE_ON_ZERO'");foreach($T
+as$R){$B=($al==DB?table("copy_$R"):idf_escape($al).".".table($R));if(($_POST["overwrite"]&&!queries("\nDROP TABLE IF EXISTS $B"))||!queries("CREATE TABLE $B LIKE ".table($R))||!queries("INSERT INTO $B SELECT * FROM ".table($R)))return
+false;foreach(get_rows("SHOW TRIGGERS LIKE ".q(addcslashes($R,"%_\\")))as$K){$_l=$K["Trigger"];list($hd,$ih)=trigger_event($K);if(!queries("CREATE TRIGGER ".($al==DB?idf_escape("copy_$_l"):idf_escape($al).".".idf_escape($_l))." $K[Timing] $hd".($ih!=""?" $ih":"")." ON $B FOR EACH ROW\n$K[Statement];"))return
+false;}}foreach($pm
+as$R){$B=($al==DB?table("copy_$R"):idf_escape($al).".".table($R));$om=view($R);if(($_POST["overwrite"]&&!queries("DROP VIEW IF EXISTS $B"))||!queries("CREATE VIEW $B AS $om[select]"))return
 false;}return
 true;}function
-trigger_event(array$K){$gd=explode(",",$K["Event"]);$J=array();foreach(array("DELETE","INSERT","UPDATE")as$ed){if(in_array($ed,$gd))$J[]=$ed;}$J=implode(" OR ",$J);if(in_array("UPDATE",$gd)&&min_version('','12.0.1')&&preg_match('~\s(?:BEFORE|AFTER)\s+(.+?)\s+ON\s~is',get_val("SHOW CREATE TRIGGER ".idf_escape($K["Trigger"]),2),$A)&&preg_match('~\bOF\s+(.+)~is',$A[1],$fh))return
-array("$J OF",$fh[1]);return
+trigger_event(array$K){$jd=explode(",",$K["Event"]);$J=array();foreach(array("DELETE","INSERT","UPDATE")as$hd){if(in_array($hd,$jd))$J[]=$hd;}$J=implode(" OR ",$J);if(in_array("UPDATE",$jd)&&min_version('','12.0.1')&&preg_match('~\s(?:BEFORE|AFTER)\s+(.+?)\s+ON\s~is',get_val("SHOW CREATE TRIGGER ".idf_escape($K["Trigger"]),2),$A)&&preg_match('~\bOF\s+(.+)~is',$A[1],$ih))return
+array("$J OF",$ih[1]);return
 array($J,"");}function
 trigger($B,$R){if($B=="")return
 array();$L=get_rows("SHOW TRIGGERS WHERE `Trigger` = ".q($B));$J=reset($L);if($J)list($J["Event"],$J["Of"])=trigger_event($J);return($J?:array());}function
-triggers($R){$J=array();foreach(get_rows("SHOW TRIGGERS LIKE ".q(addcslashes($R,"%_\\")))as$K){list($ed)=trigger_event($K);$J[$K["Trigger"]]=array($K["Timing"],$ed);}return$J;}function
+triggers($R){$J=array();foreach(get_rows("SHOW TRIGGERS LIKE ".q(addcslashes($R,"%_\\")))as$K){list($hd)=trigger_event($K);$J[$K["Trigger"]]=array($K["Timing"],$hd);}return$J;}function
 trigger_options(){return
 array("Timing"=>array("BEFORE","AFTER"),"Event"=>(min_version('','12.0.1')?array("INSERT","UPDATE","UPDATE OF","DELETE","INSERT OR UPDATE","INSERT OR UPDATE OF","DELETE OR INSERT","DELETE OR UPDATE","DELETE OR UPDATE OF","DELETE OR INSERT OR UPDATE","DELETE OR INSERT OR UPDATE OF",):array("INSERT","UPDATE","DELETE")),"Type"=>array("FOR EACH ROW"),);}function
 routine($B,$U){$L=get_rows("SELECT PARAMETER_NAME, DTD_IDENTIFIER, PARAMETER_MODE, COLLATION_NAME
 FROM information_schema.PARAMETERS
 WHERE SPECIFIC_SCHEMA = DATABASE() AND ROUTINE_TYPE = '$U' AND SPECIFIC_NAME = ".q($B)."
 ORDER BY ORDINAL_POSITION");$l=array();foreach($L
-as$K){$Ud=$K["DTD_IDENTIFIER"];list($zl,$x,$Hl)=parse_type($Ud);$l[]=array("field"=>$K["PARAMETER_NAME"],"type"=>$zl,"length"=>$x,"unsigned"=>$Hl,"null"=>true,"full_type"=>$Ud,"inout"=>($U=="FUNCTION"?"":$K["PARAMETER_MODE"]),"collation"=>$K["COLLATION_NAME"],);}$J=connection()->query("SELECT
+as$K){$Xd=$K["DTD_IDENTIFIER"];list($Hl,$x,$Ql)=parse_type($Xd);$l[]=array("field"=>$K["PARAMETER_NAME"],"type"=>$Hl,"length"=>$x,"unsigned"=>$Ql,"null"=>true,"full_type"=>$Xd,"inout"=>($U=="FUNCTION"?"":$K["PARAMETER_MODE"]),"collation"=>$K["COLLATION_NAME"],);}$J=connection()->query("SELECT
 	ROUTINE_COMMENT comment,
 	ROUTINE_DEFINITION definition,
 	LOWER(EXTERNAL_LANGUAGE) language,
@@ -2948,7 +3071,7 @@ array();$J['options']=array("DEFINER"=>$J['definer'],"DETERMINISTIC"=>$J['is_det
 routines(){return
 get_rows("SELECT SPECIFIC_NAME, ROUTINE_NAME, ROUTINE_TYPE, DTD_IDENTIFIER FROM information_schema.ROUTINES WHERE ROUTINE_SCHEMA = DATABASE()");}function
 routine_languages(){return(min_version(9,99)?array("sql"=>"sql","javascript"=>"js"):array());}function
-routine_options($nj){return
+routine_options($uj){return
 array("DEFINER"=>array(),"DETERMINISTIC"=>array("NOT DETERMINISTIC","DETERMINISTIC"),"SQL_DATA_ACCESS"=>array("CONTAINS SQL","NO SQL","READS SQL DATA","MODIFIES SQL DATA"),"SQL_SECURITY"=>array("SQL SECURITY DEFINER","SQL SECURITY INVOKER"),"COMMENT"=>array(),);}function
 routine_id($B,array$K){return
 idf_escape($B);}function
@@ -2956,9 +3079,9 @@ last_id($I){return
 get_val("SELECT LAST_INSERT_ID()");}function
 explain(Db$e,$H){return$e->query("EXPLAIN ".(min_version(5.7)?"":"PARTITIONS ").$H);}function
 found_rows(array$S,array$Z){return($Z||$S["Engine"]!="InnoDB"?null:$S["Rows"]);}function
-create_sql($R,$Fa,$uk){$J=get_val("SHOW CREATE TABLE ".table($R),1);if(!$Fa)$J=preg_replace('~(\n\)[^\n]*?) AUTO_INCREMENT=\d+~','\1',$J);return$J;}function
+create_sql($R,$Fa,$Bk){$J=get_val("SHOW CREATE TABLE ".table($R),1);if(!$Fa)$J=preg_replace('~(\n\)[^\n]*?) AUTO_INCREMENT=\d+~','\1',$J);return$J;}function
 truncate_sql($R){return"TRUNCATE ".table($R);}function
-use_sql($Zb,$uk=""){$B=idf_escape($Zb);$J="";if(preg_match('~CREATE~',$uk)&&($Mb=get_val("SHOW CREATE DATABASE $B",1))){set_utf8mb4($Mb);if($uk=="DROP+CREATE")$J="DROP DATABASE IF EXISTS $B;\n";$J
+use_sql($Zb,$Bk=""){$B=idf_escape($Zb);$J="";if(preg_match('~CREATE~',$Bk)&&($Mb=get_val("SHOW CREATE DATABASE $B",1))){set_utf8mb4($Mb);if($Bk=="DROP+CREATE")$J="DROP DATABASE IF EXISTS $B;\n";$J
 .="$Mb;\n";}return$J."USE $B";}function
 trigger_sql($R){$J="";foreach(get_rows("SHOW TRIGGERS LIKE ".q(addcslashes($R,"%_\\")),null,"-- ")as$K){list($K["Event"],$K["Of"])=trigger_event($K);$J
 .="\n".create_trigger(" ON ".table($K["Table"]),$K+array("Type"=>"FOR EACH ROW")).";\n";}return$J;}function
@@ -2970,15 +3093,15 @@ process_list(){return
 get_rows("SHOW FULL PROCESSLIST");}function
 convert_field(array$k){return
 driver()->convertColumn(idf_escape($k["field"]),$k);}function
-unconvert_field(array$k,$J){if(preg_match("~binary~",$k["type"]))$J="UNHEX($J)";if($k["type"]=="bit")$J="CONVERT(b$J, UNSIGNED)";if($k["type"]=="vector")$J=(connection()->flavor=='maria'?"VEC_FromText":"STRING_TO_VECTOR")."($J)";if(preg_match("~geom|point|linestring|polygon~",$k["type"])){$zi=(min_version(8)?"ST_":"");$J=$zi."GeomFromText($J, $zi"."SRID($k[field]))";}return$J;}function
-support($wd){return
-preg_match('~^(comment|columns|copy|database|drop_col|dump|event|indexes|kill|privileges|move_col|procedure|processlist|routine|sql|status|table|trigger|variables|view'.(min_version(8)?'|descidx':'').(min_version('8.0.16','10.2.1')?'|check':'').(min_version(8,99)?'|fast_status':'').')$~',$wd);}function
+unconvert_field(array$k,$J){if(preg_match("~binary~",$k["type"]))$J="UNHEX($J)";if($k["type"]=="bit")$J="CONVERT(b$J, UNSIGNED)";if($k["type"]=="vector")$J=(connection()->flavor=='maria'?"VEC_FromText":"STRING_TO_VECTOR")."($J)";if(preg_match("~geom|point|linestring|polygon~",$k["type"])){$Di=(min_version(8)?"ST_":"");$J=$Di."GeomFromText($J, $Di"."SRID($k[field]))";}return$J;}function
+support($zd){return
+preg_match('~^(comment|columns|copy|database|drop_col|dump|event|indexes|kill|privileges|move_col|procedure|processlist|routine|sql|status|table|trigger|variables|view'.(min_version(8)?'|descidx':'').(min_version('8.0.16','10.2.1')?'|check':'').(min_version(8,99)?'|fast_status':'').')$~',$zd);}function
 kill_process($s){return
 queries("KILL ".number($s));}function
 connection_id(){return"SELECT CONNECTION_ID()";}function
 max_connections(){return
 get_val("SELECT @@max_connections");}function
-types($rd=false){return
+types($ud=false){return
 array();}function
 type_values($s){return"";}function
 type_definition($s){return
@@ -2992,443 +3115,448 @@ schema_comment($M){return"";}function
 set_schema_comment($M,$xb){return
 true;}}define('Adminer\JUSH',Driver::$jush);define('Adminer\SERVER',"".$_GET[DRIVER]);define('Adminer\DB',"$_GET[db]");define('Adminer\ME',preg_replace('~\?.*~','',relative_uri()).'?'.(sid()?SID.'&':'').($_GET["ext"]?"ext=".url_escape($_GET["ext"]).'&':'').(isset($_GET[DRIVER])?DRIVER."=".url_escape(SERVER).'&':'').(isset($_GET["username"])?"username=".url_escape($_GET["username"]).'&':'').(isset($_GET["db"])?'db='.url_escape(DB).'&'.(isset($_GET["ns"])?"ns=".url_escape($_GET["ns"])."&":""):''));if(isset($_GET["manifest"])){header("Content-Type: application/manifest+json; charset=utf-8");header("Cache-Control: no-cache");echo
 json_encode(adminer()->manifest(),64|256);exit;}function
-page_header($dl,$j="",$Va=array(),$el="",$ah=false,$Ac=""){if($ah){header("HTTP/1.1 404 Not Found");$j=($j?:lang(92));}page_headers();if(is_ajax()&&$j){page_messages($j);exit;}if(!ob_get_level())ob_start('ob_gzhandler',4096);$fl=$dl.($el!=""?": $el":"");$gl=strip_tags($fl.(SERVER!=""&&SERVER!="localhost"?h(" - ".SERVER):"")." - ".adminer()->name());echo'<!DOCTYPE html>
-<html lang=\'',LANG,'\' dir=\'',lang(93),'\' class=\'',lang(93),' nojs\'>
+page_header($ml,$j="",$Va=array(),$nl="",$dh=false,$Bc=""){if($dh){header("HTTP/1.1 404 Not Found");$j=($j?:lang(93));}page_headers();if(is_ajax()&&$j){page_messages($j);exit;}if(!ob_get_level())ob_start('ob_gzhandler',4096);$ol=$ml.($nl!=""?": $nl":"");$pl=strip_tags($ol.(SERVER!=""&&SERVER!="localhost"?h(" - ".SERVER):"")." - ".adminer()->name());echo'<!DOCTYPE html>
+<html lang=\'',LANG,'\' dir=\'',lang(94),'\' class=\'',lang(94),' nojs\'>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta name="robots" content="noindex">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>',$gl,'</title>
-<link rel="stylesheet" href="',h(preg_replace("~\\?.*~","",ME)."?file=default.css&version=6.1.2+9548328c"),'">
-';$Rb=adminer()->css();if(is_int(key($Rb)))$Rb=array_fill_keys($Rb,'light');$ne=in_array('light',$Rb)||in_array('',$Rb);$le=in_array('dark',$Rb)||in_array('',$Rb);$Vb=($ne?($le?null:false):($le?:null));$og=" media='(prefers-color-scheme: dark)'";if($Vb!==false)echo"<link rel='stylesheet'".($Vb?"":$og)." href='".h(preg_replace("~\\?.*~","",ME)."?file=dark.css&version=6.1.2+9548328c")."'>\n";echo"<meta name='color-scheme' content='".($Vb===null?"light dark":($Vb?"dark":"light"))."'>\n",script_src(preg_replace("~\\?.*~","",ME)."?file=functions.js&version=6.1.2+9548328c");if(adminer()->head($Vb))echo"<link rel='icon' href='data:image/gif;base64,"."R0lGODlhEAAQAJEAAAQCBPz+/PwCBAROZCH5BAEAAAAALAAAAAAQABAAAAI2hI+pGO1rmghihiUdvUBnZ3XBQA7f05mOak1RWXrNq5nQWHMKvuoJ37BhVEEfYxQzHjWQ5qIAADs='>\n","<link rel='apple-touch-icon' href='".h(preg_replace("~\\?.*~","",ME)."?file=logo.svg&version=6.1.2+9548328c")."'>\n";if(adminer()->manifest())echo"<link rel='manifest' href='".h(preg_replace('~\?.*~','',ME)."?manifest=")."' crossorigin='use-credentials'>\n";foreach($Rb
-as$Ol=>$Cg){$b=($Cg=='dark'&&!$Vb?$og:($Cg=='light'&&$le?" media='(prefers-color-scheme: light)'":""));echo"<link rel='stylesheet'$b href='".h($Ol)."'>\n";}echo"\n<body class='";adminer()->bodyClass();echo"'>\n",script((isset($_COOKIE["adminer_version"])||!adminer()->verifyVersion()?"":"onload = partial(verifyVersion, '".VERSION."');\n")."
-const offlineMessage = '".js_escape(lang(94))."';
+<title>',$pl,'</title>
+<link rel="stylesheet" href="',h(preg_replace("~\\?.*~","",ME)."?file=default.css&version=6.2.0+df93d571"),'">
+';$Rb=adminer()->css();if(is_int(key($Rb)))$Rb=array_fill_keys($Rb,'light');$qe=in_array('light',$Rb)||in_array('',$Rb);$oe=in_array('dark',$Rb)||in_array('',$Rb);$Vb=($qe?($oe?null:false):($oe?:null));$qg=" media='(prefers-color-scheme: dark)'";if($Vb!==false)echo"<link rel='stylesheet'".($Vb?"":$qg)." href='".h(preg_replace("~\\?.*~","",ME)."?file=dark.css&version=6.2.0+df93d571")."'>\n";echo"<meta name='color-scheme' content='".($Vb===null?"light dark":($Vb?"dark":"light"))."'>\n",script_src(preg_replace("~\\?.*~","",ME)."?file=functions.js&version=6.2.0+df93d571");if(adminer()->head($Vb))echo"<link rel='icon' href='data:image/gif;base64,"."R0lGODlhEAAQAJEAAAQCBPz+/PwCBAROZCH5BAEAAAAALAAAAAAQABAAAAI2hI+pGO1rmghihiUdvUBnZ3XBQA7f05mOak1RWXrNq5nQWHMKvuoJ37BhVEEfYxQzHjWQ5qIAADs='>\n","<link rel='apple-touch-icon' href='".h(preg_replace("~\\?.*~","",ME)."?file=logo.svg&version=6.2.0+df93d571")."'>\n";if(adminer()->manifest())echo"<link rel='manifest' href='".h(preg_replace('~\?.*~','',ME)."?manifest=")."' crossorigin='use-credentials'>\n";foreach($Rb
+as$Xl=>$Fg){$b=($Fg=='dark'&&!$Vb?$qg:($Fg=='light'&&$oe?" media='(prefers-color-scheme: light)'":""));echo"<link rel='stylesheet'$b href='".h($Xl)."'>\n";}echo"\n<body class='";adminer()->bodyClass();echo"'>\n",script((isset($_COOKIE["adminer_version"])||!adminer()->verifyVersion()?"":"onload = partial(verifyVersion, '".VERSION."');\n")."
+const offlineMessage = '".js_escape(lang(95))."';
 const numberFormat = '".js_escape(lang(6))."';
 const numberDigits = '".js_escape(lang(7))."';
-const urlSeparators = '".js_escape(ini_get("arg_separator.input"))."';"),"<div id='help' class='jush-".JUSH." jsonly hidden'".on('mouseover','helpKeep').on('mouseout','helpMouseout')."></div>\n","<div id='content'>\n","<span id='menuopen' class='jsonly'".on('click','menuToggle')."><button title='".lang(95)."' class='icon icon-move' aria-expanded='false'></button></span>\n";if($Va!==null){$z=substr(preg_replace('~\b(username|db|ns)=[^&]*&~','',ME),0,-1);echo'<p id="breadcrumb"><a href="'.h($z?:".").'">'.get_driver(DRIVER).'</a> » ';$z=substr(preg_replace('~\b(db|ns)=[^&]*&~','',ME),0,-1);$O=adminer()->serverName(SERVER);$O=($O!=""?$O:lang(31));if($Va===false)echo"$O\n";else{echo"<a href='".h($z.(DB!=""&&support("single_db")?"&db=":""))."' accesskey='1' title='Alt+Shift+1'>$O</a> » ";$Cj="";if(is_string($Va)){$Cj=$Va;$Va=array();}if($_GET["ns"]!=""||(DB!=""&&is_array($Va))){$bc="$z&db=".url_escape(DB).(support("scheme")?"&ns=":"").(support("single_table")?"&select=":"");echo'<a href="'.h($bc.($_GET["ns"]==""?$Cj:"")).'">'.h(DB).'</a> » ';}if(is_array($Va)){if($_GET["ns"]!="")echo'<a href="'.h(substr(ME,0,-1).$Cj).'">'.h($_GET["ns"]).'</a> » ';foreach($Va
-as$w=>$X){$mc=(is_array($X)?$X[1]:h($X));if($mc!="")echo"<a href='".h(ME."$w=").url_escape(is_array($X)?$X[0]:$X)."'>$mc</a> » ";}}echo"$dl\n";}}echo"<h2>$fl$Ac</h2>\n","<div id='ajaxstatus' role='status' class='jsonly'></div>\n";restart_session();page_messages($j);adminer()->serviceWorker();$g=&get_session("dbs");if(DB!=""&&$g&&!in_array(DB,$g,true))$g=null;stop_session();define('Adminer\PAGE_HEADER',1);ob_flush();flush();if($ah){page_footer($ah===true?"":$ah);exit;}}function
-service_worker(){$aj=has_passwords();$pb=($aj?"navigator.serviceWorker.register('".js_escape(preg_replace('~\?.*~','',ME)."?file=worker.js&version=6.1.2+9548328c")."', {scope: location.pathname}).catch(() => {});":"navigator.serviceWorker.getRegistration().then(registration => registration && registration.unregister());
+const urlSeparators = '".js_escape(ini_get("arg_separator.input"))."';"),"<div id='help' class='jush-".JUSH." jsonly hidden'".on('mouseover','helpKeep').on('mouseout','helpMouseout')."></div>\n","<div id='content'>\n","<span id='menuopen' class='jsonly'".on('click','menuToggle')."><button title='".lang(96)."' class='icon icon-move' aria-expanded='false'></button></span>\n";if($Va!==null){$z=substr(preg_replace('~\b(username|db|ns)=[^&]*&~','',ME),0,-1);echo'<p id="breadcrumb"><a href="'.h($z?:".").'">'.get_driver(DRIVER).'</a> » ';$z=substr(preg_replace('~\b(db|ns)=[^&]*&~','',ME),0,-1);$O=adminer()->serverName(SERVER);$O=($O!=""?$O:lang(31));if($Va===false)echo"$O\n";else{echo"<a href='".h($z.(DB!=""&&support("single_db")?"&db=":""))."' accesskey='1' title='Alt+Shift+1'>$O</a> » ";$Jj="";if(is_string($Va)){$Jj=$Va;$Va=array();}if($_GET["ns"]!=""||(DB!=""&&is_array($Va))){$bc="$z&db=".url_escape(DB).(support("scheme")?"&ns=":"").(support("single_table")?"&select=":"");echo'<a href="'.h($bc.($_GET["ns"]==""?$Jj:"")).'">'.h(DB).'</a> » ';}if(is_array($Va)){if($_GET["ns"]!="")echo'<a href="'.h(substr(ME,0,-1).$Jj).'">'.h($_GET["ns"]).'</a> » ';foreach($Va
+as$w=>$X){$nc=(is_array($X)?$X[1]:h($X));if($nc!="")echo"<a href='".h(ME."$w=").url_escape(is_array($X)?$X[0]:$X)."'>$nc</a> » ";}}echo"$ml\n";}}echo"<h2>$ol$Bc</h2>\n","<div id='ajaxstatus' role='status' class='jsonly'></div>\n";restart_session();page_messages($j);adminer()->serviceWorker();$g=&get_session("dbs");if(DB!=""&&$g&&!in_array(DB,$g,true))$g=null;stop_session();define('Adminer\PAGE_HEADER',1);ob_flush();flush();if($dh){page_footer($dh===true?"":$dh);exit;}}function
+service_worker(){$hj=has_passwords();$pb=($hj?"navigator.serviceWorker.register('".js_escape(preg_replace('~\?.*~','',ME)."?file=worker.js&version=6.2.0+df93d571")."', {scope: location.pathname}).catch(() => {});":"navigator.serviceWorker.getRegistration().then(registration => registration && registration.unregister());
 	caches.keys().then(keys => keys.forEach(key => key.startsWith('adminer-') && caches.delete(key)));");echo
 script("if (navigator.serviceWorker) {\n\t$pb\n}");}function
-has_passwords(){foreach((array)$_SESSION["pwds"]as$Qj){foreach($Qj
-as$Wl){foreach($Wl
+has_passwords(){foreach((array)$_SESSION["pwds"]as$Xj){foreach($Xj
+as$fm){foreach($fm
 as$F){if($F!==null)return
 true;}}}return
 false;}function
-page_headers(){header("Content-Type: text/html; charset=utf-8");header("Cache-Control: no-cache");header("X-Frame-Options: deny");header("X-XSS-Protection: 0");header("X-Content-Type-Options: nosniff");header("Referrer-Policy: origin-when-cross-origin");foreach(adminer()->csp(csp())as$Qb){$re=array();foreach($Qb
-as$w=>$X)$re[]="$w $X";header("Content-Security-Policy: ".implode("; ",$re));}adminer()->headers();}function
+page_headers(){header("Content-Type: text/html; charset=utf-8");header("Cache-Control: no-cache");header("X-Frame-Options: deny");header("X-XSS-Protection: 0");header("X-Content-Type-Options: nosniff");header("Referrer-Policy: origin-when-cross-origin");foreach(adminer()->csp(csp())as$Qb){$ue=array();foreach($Qb
+as$w=>$X)$ue[]="$w $X";header("Content-Security-Policy: ".implode("; ",$ue));}adminer()->headers();}function
 csp(){return
 array(array("script-src"=>"'self' 'unsafe-inline' 'nonce-".get_nonce()."' 'strict-dynamic'","connect-src"=>"'self' https://www.adminer.org","frame-src"=>"https://www.adminer.org","object-src"=>"'none'","base-uri"=>"'none'","form-action"=>"'self'",),);}function
-design_checksums(){$Ul=array();foreach(array_keys(adminer()->css())as$Ol)$Ul[preg_replace('~\?.*~','',$Ol)]=true;$J=array();foreach(array("adminer.css","adminer-dark.css")as$m){if($Ul[$m]&&file_exists($m)){preg_match('~^/\* Adminer design ([-\w]+) \*/~',file_get_contents($m),$A);$J[$m]=array((string)$A[1],Plugins::checksum($m));}}return$J;}function
+design_checksums(){$dm=array();foreach(array_keys(adminer()->css())as$Xl)$dm[preg_replace('~\?.*~','',$Xl)]=true;$J=array();foreach(array("adminer.css","adminer-dark.css")as$m){if($dm[$m]&&file_exists($m)){preg_match('~^/\* Adminer design ([-\w]+) \*/~',file_get_contents($m),$A);$J[$m]=array((string)$A[1],Plugins::checksum($m));}}return$J;}function
 official_design_checksums(){return
-array('adminer-border/adminer.css'=>'ec757f3e','adminer-dark/adminer-dark.css'=>'a26bcd7b','brade/adminer.css'=>'be4161f0','bueltge/adminer.css'=>'1a8f00b4','cpanel/adminer.css'=>'59ce604e','dracula/adminer-dark.css'=>'cfaf61dd','esterka/adminer.css'=>'1f805f36','flat/adminer.css'=>'49a61af9','galkaev/adminer-dark.css'=>'16c46f94','haeckel/adminer.css'=>'147a3565','hever/adminer.css'=>'ef0e1948','konya/adminer.css'=>'2b409696','lavender-light/adminer.css'=>'bf03f5d7','lucas-sandery/adminer.css'=>'6596353','mancave/adminer-dark.css'=>'d9169f12','mvt/adminer.css'=>'ebd3afdc','nette/adminer.css'=>'1b8ac749','ng9/adminer.css'=>'488583cf','nicu/adminer.css'=>'a38b3b6a','pappu687/adminer.css'=>'b58d128c','paranoiq/adminer.css'=>'64d27e5','pepa-linha/adminer.css'=>'baf25f0','pokorny/adminer.css'=>'ee9eea6d','price/adminer.css'=>'81be9a85','rmsoft/adminer.css'=>'6cd4a237','rmsoft_blue-dark/adminer.css'=>'32102a8','rmsoft_blue/adminer.css'=>'7d8d5b18','win98/adminer.css'=>'e82d63c3',);}function
+array('adminer-dark/adminer-dark.css'=>'a26bcd7b','brade/adminer.css'=>'be4161f0','bueltge/adminer.css'=>'1a8f00b4','cpanel/adminer.css'=>'59ce604e','dracula/adminer-dark.css'=>'cfaf61dd','esterka/adminer.css'=>'1f805f36','flat/adminer.css'=>'49a61af9','galkaev/adminer-dark.css'=>'16c46f94','haeckel/adminer.css'=>'147a3565','hever/adminer.css'=>'c9d1d11c','konya/adminer.css'=>'2b409696','lavender-light/adminer.css'=>'bf03f5d7','lucas-sandery/adminer.css'=>'6596353','mancave/adminer-dark.css'=>'d9169f12','mvt/adminer.css'=>'ebd3afdc','nette/adminer.css'=>'1b8ac749','ng9/adminer.css'=>'488583cf','nicu/adminer.css'=>'a38b3b6a','pappu687/adminer.css'=>'b58d128c','paranoiq/adminer.css'=>'64d27e5','pepa-linha/adminer.css'=>'baf25f0','pokorny/adminer.css'=>'ee9eea6d','price/adminer.css'=>'81be9a85','rmsoft/adminer.css'=>'6cd4a237','rmsoft_blue-dark/adminer.css'=>'32102a8','rmsoft_blue/adminer.css'=>'7d8d5b18','win98/adminer.css'=>'e82d63c3',);}function
 version_iframe(){return(isset($_COOKIE["adminer_version"])||!adminer()->verifyVersion()?"":"<noscript><iframe sandbox src='https://www.adminer.org/version/?current=".VERSION."&amp;noscript=1'></iframe></noscript>");}function
-get_nonce(){static$Zg;if(!$Zg)$Zg=base64_encode(rand_string());return$Zg;}function
-page_messages($j){$Nl=preg_replace('~^[^?]*~','',$_SERVER["REQUEST_URI"]);$vg=idx($_SESSION["messages"],$Nl);if($vg){echo"<div class='message'>".implode("</div>\n<div class='message'>",$vg)."</div>".script("messagesPrint();");unset($_SESSION["messages"][$Nl]);}if($j)echo"<div class='error'>$j</div>\n";if(adminer()->error)echo"<div class='error'>".adminer()->error."</div>\n";}function
-page_footer($Bg=""){echo"</div>\n\n<div id='foot' class='foot'>\n<div id='menu'>\n";adminer()->navigation($Bg);echo"</div>\n";if($Bg!="auth")echo'<form action="" method="post">
+get_nonce(){static$ch;if(!$ch)$ch=base64_encode(rand_string());return$ch;}function
+page_messages($j){$Wl=preg_replace('~^[^?]*~','',$_SERVER["REQUEST_URI"]);$xg=idx($_SESSION["messages"],$Wl);if($xg){echo"<div class='message'>".implode("</div>\n<div class='message'>",$xg)."</div>".script("messagesPrint();");unset($_SESSION["messages"][$Wl]);}if($j)echo"<div class='error'>$j</div>\n";if(adminer()->error)echo"<div class='error'>".adminer()->error."</div>\n";}function
+page_footer($Eg=""){echo"</div>\n\n<div id='foot' class='foot'>\n<div id='menu'>\n";adminer()->navigation($Eg);echo"</div>\n";if($Eg!="auth")echo'<form action="" method="post">
 <p class="logout">
 <span title="',lang(33),'">',h($_GET["username"])."\n",'</span>
-<input type=\'submit\' name=\'logout\' value=\'',lang(96),'\' id=\'logout\'>
+<input type=\'submit\' name=\'logout\' value=\'',lang(97),'\' id=\'logout\'>
 ',input_token(),'</form>
 ';echo"</div>\n\n",script("setupSubmitHighlight(document);");}function
-int32($Kg){while($Kg>=2147483648)$Kg-=4294967296;while($Kg<=-2147483649)$Kg+=4294967296;return(int)$Kg;}function
-long2str(array$W,$im){$vj='';foreach($W
-as$X)$vj
-.=pack('V',$X);if($im)return
-substr($vj,0,end($W));return$vj;}function
-str2long($vj,$im){$W=array_values(unpack('V*',str_pad($vj,4*ceil(strlen($vj)/4),"\0")));if($im)$W[]=strlen($vj);return$W;}function
-xxtea_mx($sm,$rm,$xk,$uf){return
-int32((($sm>>5&0x7FFFFFF)^$rm<<2)+(($rm>>3&0x1FFFFFFF)^$sm<<4))^int32(($xk^$rm)+($uf^$sm));}function
-encrypt_string($rk,$w){if($rk=="")return"";$w=array_values(unpack("V*",pack("H*",md5($w))));$W=str2long($rk,true);$Kg=count($W)-1;$sm=$W[$Kg];$rm=$W[0];$Ki=floor(6+52/($Kg+1));$xk=0;while($Ki-->0){$xk=int32($xk+0x9E3779B9);$Jc=$xk>>2&3;for($Oh=0;$Oh<$Kg;$Oh++){$rm=$W[$Oh+1];$Jg=xxtea_mx($sm,$rm,$xk,$w[$Oh&3^$Jc]);$sm=int32($W[$Oh]+$Jg);$W[$Oh]=$sm;}$rm=$W[0];$Jg=xxtea_mx($sm,$rm,$xk,$w[$Oh&3^$Jc]);$sm=int32($W[$Kg]+$Jg);$W[$Kg]=$sm;}return
+int32($Ng){while($Ng>=2147483648)$Ng-=4294967296;while($Ng<=-2147483649)$Ng+=4294967296;return(int)$Ng;}function
+long2str(array$W,$rm){$Bj='';foreach($W
+as$X)$Bj
+.=pack('V',$X);if($rm)return
+substr($Bj,0,end($W));return$Bj;}function
+str2long($Bj,$rm){$W=array_values(unpack('V*',str_pad($Bj,4*ceil(strlen($Bj)/4),"\0")));if($rm)$W[]=strlen($Bj);return$W;}function
+xxtea_mx($Am,$_m,$Ek,$wf){return
+int32((($Am>>5&0x7FFFFFF)^$_m<<2)+(($_m>>3&0x1FFFFFFF)^$Am<<4))^int32(($Ek^$_m)+($wf^$Am));}function
+encrypt_string($zk,$w){if($zk=="")return"";$w=array_values(unpack("V*",pack("H*",md5($w))));$W=str2long($zk,true);$Ng=count($W)-1;$Am=$W[$Ng];$_m=$W[0];$Pi=floor(6+52/($Ng+1));$Ek=0;while($Pi-->0){$Ek=int32($Ek+0x9E3779B9);$Kc=$Ek>>2&3;for($Sh=0;$Sh<$Ng;$Sh++){$_m=$W[$Sh+1];$Mg=xxtea_mx($Am,$_m,$Ek,$w[$Sh&3^$Kc]);$Am=int32($W[$Sh]+$Mg);$W[$Sh]=$Am;}$_m=$W[0];$Mg=xxtea_mx($Am,$_m,$Ek,$w[$Sh&3^$Kc]);$Am=int32($W[$Ng]+$Mg);$W[$Ng]=$Am;}return
 long2str($W,false);}function
-decrypt_string($rk,$w){if($rk=="")return"";if(!$w)return
-false;$w=array_values(unpack("V*",pack("H*",md5($w))));$W=str2long($rk,false);$Kg=count($W)-1;$sm=$W[$Kg];$rm=$W[0];$Ki=floor(6+52/($Kg+1));$xk=int32($Ki*0x9E3779B9);while($xk){$Jc=$xk>>2&3;for($Oh=$Kg;$Oh>0;$Oh--){$sm=$W[$Oh-1];$Jg=xxtea_mx($sm,$rm,$xk,$w[$Oh&3^$Jc]);$rm=int32($W[$Oh]-$Jg);$W[$Oh]=$rm;}$sm=$W[$Kg];$Jg=xxtea_mx($sm,$rm,$xk,$w[$Oh&3^$Jc]);$rm=int32($W[0]-$Jg);$W[0]=$rm;$xk=int32($xk-0x9E3779B9);}return
-long2str($W,true);}$li=array();if($_COOKIE["adminer_permanent"]){foreach(explode(" ",$_COOKIE["adminer_permanent"])as$X){list($w)=explode(":",$X);$li[$w]=$X;}}function
-add_invalid_login(){$Na=get_temp_dir()."/adminer-invalid";foreach(glob("$Na*")?:array($Na)as$m){$o=file_open_lock($m);if($o)break;}if(!$o)$o=file_open_lock("$Na-".rand_string());if(!$o)return;$gf=json_decode(stream_get_contents($o),true);$al=time();if($gf){foreach($gf
-as$hf=>$X){if($X[0]<$al)unset($gf[$hf]);}}$ef=&$gf[adminer()->bruteForceKey()];if(!$ef)$ef=array($al+30*60,0);$ef[1]++;file_write_unlock($o,json_encode($gf));}function
-check_invalid_login(array&$li){$gf=array();foreach(glob(get_temp_dir()."/adminer-invalid*")as$m){$o=file_open_lock($m);if($o){$gf=json_decode(stream_get_contents($o),true);file_unlock($o);break;}}$w=adminer()->bruteForceKey();$ef=idx($gf,$w,array());$Yg=($ef[1]>29?$ef[0]-time():0);if($Yg>0){$j=lang(97,ceil($Yg/60));if($_SERVER["HTTP_X_FORWARDED_FOR"]!=""&&$w==$_SERVER["REMOTE_ADDR"])$j
-.='<br>'.lang(98,'<b>login-reverse-proxy</b>'," href='https://www.adminer.org/plugins/?version=".VERSION."'".target_blank());auth_error($j,$li,false);}}function
+decrypt_string($zk,$w){if($zk=="")return"";if(!$w)return
+false;$w=array_values(unpack("V*",pack("H*",md5($w))));$W=str2long($zk,false);$Ng=count($W)-1;$Am=$W[$Ng];$_m=$W[0];$Pi=floor(6+52/($Ng+1));$Ek=int32($Pi*0x9E3779B9);while($Ek){$Kc=$Ek>>2&3;for($Sh=$Ng;$Sh>0;$Sh--){$Am=$W[$Sh-1];$Mg=xxtea_mx($Am,$_m,$Ek,$w[$Sh&3^$Kc]);$_m=int32($W[$Sh]-$Mg);$W[$Sh]=$_m;}$Am=$W[$Ng];$Mg=xxtea_mx($Am,$_m,$Ek,$w[$Sh&3^$Kc]);$_m=int32($W[0]-$Mg);$W[0]=$_m;$Ek=int32($Ek-0x9E3779B9);}return
+long2str($W,true);}$qi=array();if($_COOKIE["adminer_permanent"]){foreach(explode(" ",$_COOKIE["adminer_permanent"])as$X){list($w)=explode(":",$X);$qi[$w]=$X;}}function
+add_invalid_login(){$Na=get_temp_dir()."/adminer-invalid";foreach(glob("$Na*")?:array($Na)as$m){$o=file_open_lock($m);if($o)break;}if(!$o)$o=file_open_lock("$Na-".rand_string());if(!$o)return;$jf=json_decode(stream_get_contents($o),true);$jl=time();if($jf){foreach($jf
+as$kf=>$X){if($X[0]<$jl)unset($jf[$kf]);}}$hf=&$jf[adminer()->bruteForceKey()];if(!$hf)$hf=array($jl+30*60,0);$hf[1]++;file_write_unlock($o,json_encode($jf));}function
+check_invalid_login(array&$qi){$jf=array();foreach(glob(get_temp_dir()."/adminer-invalid*")as$m){$o=file_open_lock($m);if($o){$jf=json_decode(stream_get_contents($o),true);file_unlock($o);break;}}$w=adminer()->bruteForceKey();$hf=idx($jf,$w,array());$bh=($hf[1]>29?$hf[0]-time():0);if($bh>0){$j=lang(98,ceil($bh/60));if($_SERVER["HTTP_X_FORWARDED_FOR"]!=""&&$w==$_SERVER["REMOTE_ADDR"])$j
+.='<br>'.lang(99,'<b>login-reverse-proxy</b>'," href='https://www.adminer.org/plugins/?version=".VERSION."'".target_blank());auth_error($j,$qi,false);}}function
 password_required(){static$J;if($J===null){$J=(bool)get_session("password_required");if(!$J){$Pb=adminer()->credentials();$J=!is_object(Driver::connect($Pb[0],$Pb[1],""));if($J)set_session("password_required",true);}}return$J;}function
-require_password_link($F){$Gg="<a href='https://www.adminer.org/password/'".target_blank().">".lang(99)."</a>";if(!function_exists('password_hash'))return" $Gg";$oi=($F!==null?$F:base64_encode(substr(pack("H*",rand_string()),0,12)));$qe=password_hash($oi,PASSWORD_DEFAULT);$m="adminer-plugins.php";$ld=file_exists("adminer-plugins.php");if($ld)$cf=($F!==null?lang(100,"<b>$m</b>"):lang(101,"<b>$m</b>","<b>$oi</b>"));else{$m="<button name='password_less' value='".h($qe)."' class='link'>$m</button>";$cf=($F!==null?lang(102,$m):lang(103,$m,"<b>$oi</b>"));}$Pf="\t<a>new</a> Adminer\\Password(<span class='jush-apo'>'".h($qe)."'</span>),";$J="<p>$cf
-<pre><code class='jush'>".($ld?$Pf:"&lt;?php\n<a>return</a> <a>array</a>(\n$Pf\n);")."</code></pre>
-<p>$Gg
-";return" <a href='#password-less' class='toggle'>".lang(104)."</a>
-<div id='password-less' class='hidden'>".($ld?$J:"<form action='' method='post'>\n".$J.input_token()."</form>")."</div>";}if(preg_match('~^[-\w$./]+$~',$_POST["password_less"])&&verify_token()){header("Content-Type: application/octet-stream");header("Content-Disposition: attachment; filename=adminer-plugins.php");echo"<?php\nreturn array(\n\tnew Adminer\\Password('$_POST[password_less]'),\n);\n";exit;}$Ea=$_POST["auth"];if($Ea&&(!adminer()->verifyLoginToken()||verify_token())){session_regenerate_id();$dm=$Ea["driver"];$O=$Ea["server"];$V=$Ea["username"];$F=(string)$Ea["password"];$h=$Ea["db"];set_password($dm,$O,$V,$F);$_SESSION["db"][$dm][$O][$V][$h]=true;if($Ea["permanent"]){$w=implode("-",array_map('base64_encode',array($dm,$O,$V,$h)));$Ei=adminer()->permanentLogin(true);$li[$w]="$w:".base64_encode($Ei?encrypt_string($F,$Ei):"");cookie("adminer_permanent",implode(" ",$li));}if(!array_diff(array_keys($_POST),array("auth","token"))||$dm!=DRIVER||$O!=SERVER||$V!==$_GET["username"]||$h!=DB)redirect(auth_url($dm,$O,$V,$h));}elseif($_POST["logout"]&&(!$_SESSION["token"]||verify_token())){Driver::disconnect();foreach(array("pwds","db","dbs","queries")as$w)set_session($w,null);unset_permanent($li);redirect(substr(preg_replace('~\b(username|db|ns)=[^&]*&~','',ME),0,-1),lang(105).' '.lang(106));}elseif($li&&!$_SESSION["pwds"]){session_regenerate_id();$Ei=adminer()->permanentLogin();foreach($li
-as$w=>$X){list(,$nb)=explode(":",$X);list($dm,$O,$V,$h)=array_map('base64_decode',explode("-",$w));set_password($dm,$O,$V,decrypt_string(base64_decode($nb),$Ei));$_SESSION["db"][$dm][$O][$V][$h]=true;}}function
-unset_permanent(array&$li){foreach($li
-as$w=>$X){list($dm,$O,$V,$h)=array_map('base64_decode',explode("-",$w));if($dm==DRIVER&&$O==SERVER&&$V==$_GET["username"]&&$h==DB)unset($li[$w]);}cookie("adminer_permanent",implode(" ",$li));}function
-auth_error($j,array&$li,$ff=true){$Rj=session_name();if(isset($_GET["username"])){header("HTTP/1.1 403 Forbidden");if(($_COOKIE[$Rj]||$_GET[$Rj])&&!$_SESSION["token"])$j=lang(107);elseif($ff&&($F=get_password())!==null){restart_session();add_invalid_login();if($F===false)$j
-.=($j?'<br>':'').lang(108,target_blank(),'<code>permanentLogin()</code>');set_password(DRIVER,SERVER,$_GET["username"],null);unset_permanent($li);}}if(!$_COOKIE[$Rj]&&$_GET[$Rj]&&ini_bool("session.use_only_cookies"))$j=lang(109);$Sh=session_get_cookie_params();cookie("adminer_key",($_COOKIE["adminer_key"]?:rand_string()),$Sh["lifetime"]);if(!$_SESSION["token"])$_SESSION["token"]=rand(1,1e6);page_header(lang(36),$j,null);echo"<form action='' method='post'>\n","<div>";if(hidden_fields($_POST,array("auth","token")))echo"<p class='message'>".lang(110)."\n";echo
-input_token(),"</div>\n";adminer()->loginForm();echo"</form>\n";page_footer("auth");exit;}if(isset($_GET["username"])&&!class_exists('Adminer\Db')){unset($_SESSION["pwds"][DRIVER]);unset_permanent($li);page_header(lang(111),lang(112,implode(", ",Driver::$extensions)),false);page_footer("auth");exit;}$e='';if(isset($_GET["username"])&&is_string(get_password())){check_invalid_login($li);$Pb=adminer()->credentials();$e=Driver::connect($Pb[0],$Pb[1],$Pb[2]);if(is_object($e)){Db::$instance=$e;Driver::$instance=new
-Driver($e);if($e->flavor)save_settings(array("vendor-".DRIVER."-".SERVER=>get_driver(DRIVER)));}}$Vf=null;if(!is_object($e)||($Vf=adminer()->login($_GET["username"],get_password()))!==true){$j=(is_string($e)?nl_br(h($e)):(is_string($Vf)?$Vf:lang(113))).(preg_match('~^ | $~',get_password())?'<br>'.lang(114):'');auth_error($j,$li);}if($_POST["logout"]&&$_SESSION["token"]&&!verify_token()){page_header(lang(96),lang(115));page_footer("db");exit;}if(!$_SESSION["token"])$_SESSION["token"]=rand(1,1e6);stop_session(true);if($Ea&&$_POST["token"])$_POST["token"]=get_token();$j='';if($_POST){if(!verify_token()){header("HTTP/1.1 403 Forbidden");$j=lang(115).' '.lang(116);}}elseif($_SERVER["REQUEST_METHOD"]=="POST"){header("HTTP/1.1 413 Content Too Large");$j=lang(117,"<b>post_max_size</b>");if(isset($_GET["sql"]))$j
-.=' '.lang(118);}function
-print_select_result($I,$f=null,array$Eh=array(),&$y=0,&$Kc=false){$Rf=array();$v=array();$d=array();$T=array();$Ci=array();$Oc=array();$_l=array();$J=array();$Dg=$Kc;$Kc=false;for($r=0;(!$y||$r<$y)&&($K=$I->fetch_row());$r++){if(!$r){echo"<div class='scrollable'>\n","<table class='nowrap odds'".($Dg?on('click','tableClick').on('dblclick','tableClick').on('keydown','editingKeydown'):"").">\n","<thead><tr>";for($rf=0;$rf<count($K);$rf++){$k=$I->fetch_field();$B=$k->name;$R=(isset($k->table)?$k->table:"");$Dh=(isset($k->orgtable)?$k->orgtable:"");$Ch=(isset($k->orgname)?$k->orgname:$B);$zl=driver()->typeName($k);if($Eh&&JUSH=="sql")$Rf[$rf]=($B=="table"?"table=":($B=="possible_keys"?"indexes=":null));elseif($Dh!=""){$ra=($R!=""?$R:$Dh);if($R!="")$J[$R]=$Dh;if(!isset($v[$ra])){if(!isset($Ci[$Dh])){$Ci[$Dh]=array();foreach(indexes($Dh,$f)as$u){if($u["type"]=="PRIMARY"){$Ci[$Dh]=array_flip($u["columns"]);break;}}}$T[$ra]=$Dh;$v[$ra]=$Ci[$Dh];$d[$ra]=$Ci[$Dh];}if(isset($d[$ra][$Ch])){unset($d[$ra][$Ch]);$v[$ra][$Ch]=$rf;$Rf[$rf]=$ra;}elseif($Dg&&isset($k->orgname)&&$k->db==DB&&!is_blob(array("type"=>$zl)))$Oc[$rf]=array($ra,$Ch,preg_match('~text|json|lob~',$zl));}$_l[$rf]=$zl;echo"<th title='".h(trim(($Dh!=""?"$Dh.$Ch":($k->name!=$Ch?$Ch:""))." ".$zl))."'>".h($B).($Eh?doc_link(array('sql'=>"explain-output.html#explain_".strtolower($B),'mariadb'=>"explain/#the-columns-in-explain-select",)):"");}foreach($Oc
-as$rf=>$ab){if($d[$ab[0]])unset($Oc[$rf]);}echo"<tbody>\n";}$He=array();foreach($v
+require_password_link($F){$Jg="<a href='https://www.adminer.org/password/'".target_blank().">".lang(100)."</a>";if(!function_exists('password_hash'))return" $Jg";$ti=($F!==null?$F:base64_encode(substr(pack("H*",rand_string()),0,12)));$te=password_hash($ti,PASSWORD_DEFAULT);$m="adminer-plugins.php";$od=file_exists("adminer-plugins.php");if($od)$ff=($F!==null?lang(101,"<b>$m</b>"):lang(102,"<b>$m</b>","<b>$ti</b>"));else{$m="<button name='password_less' value='".h($te)."' class='link'>$m</button>";$ff=($F!==null?lang(103,$m):lang(104,$m,"<b>$ti</b>"));}$Rf="\t<a>new</a> Adminer\\Password(<span class='jush-apo'>'".h($te)."'</span>),";$J="<p>$ff
+<pre><code class='jush'>".($od?$Rf:"&lt;?php\n<a>return</a> <a>array</a>(\n$Rf\n);")."</code></pre>
+<p>$Jg
+";return" <a href='#password-less' class='toggle'>".lang(105)."</a>
+<div id='password-less' class='hidden'>".($od?$J:"<form action='' method='post'>\n".$J.input_token()."</form>")."</div>";}if(preg_match('~^[-\w$./]+$~',$_POST["password_less"])&&verify_token()){header("Content-Type: application/octet-stream");header("Content-Disposition: attachment; filename=adminer-plugins.php");echo"<?php\nreturn array(\n\tnew Adminer\\Password('$_POST[password_less]'),\n);\n";exit;}$Ea=$_POST["auth"];if($Ea&&(!adminer()->verifyLoginToken()||verify_token())){session_regenerate_id();$mm=$Ea["driver"];$O=$Ea["server"];$V=$Ea["username"];$F=(string)$Ea["password"];$h=$Ea["db"];set_password($mm,$O,$V,$F);$_SESSION["db"][$mm][$O][$V][$h]=true;if($Ea["permanent"]){$w=implode("-",array_map('base64_encode',array($mm,$O,$V,$h)));$Ji=adminer()->permanentLogin(true);$qi[$w]="$w:".base64_encode($Ji?encrypt_string($F,$Ji):"");cookie("adminer_permanent",implode(" ",$qi));}if(!array_diff(array_keys($_POST),array("auth","token"))||$mm!=DRIVER||$O!=SERVER||$V!==$_GET["username"]||$h!=DB)redirect(auth_url($mm,$O,$V,$h));}elseif($_POST["logout"]&&(!$_SESSION["token"]||verify_token())){Driver::disconnect();foreach(array("pwds","db","dbs","queries")as$w)set_session($w,null);unset_permanent($qi);redirect(substr(preg_replace('~\b(username|db|ns)=[^&]*&~','',ME),0,-1),lang(106).' '.str_replace('<a ','<a'.target_blank().' ',lang(107)));}elseif($qi&&!$_SESSION["pwds"]){session_regenerate_id();$Ji=adminer()->permanentLogin();foreach($qi
+as$w=>$X){list(,$nb)=explode(":",$X);list($mm,$O,$V,$h)=array_map('base64_decode',explode("-",$w));set_password($mm,$O,$V,decrypt_string(base64_decode($nb),$Ji));$_SESSION["db"][$mm][$O][$V][$h]=true;}}function
+unset_permanent(array&$qi){foreach($qi
+as$w=>$X){list($mm,$O,$V,$h)=array_map('base64_decode',explode("-",$w));if($mm==DRIVER&&$O==SERVER&&$V==$_GET["username"]&&$h==DB)unset($qi[$w]);}cookie("adminer_permanent",implode(" ",$qi));}function
+auth_error($j,array&$qi,$if=true){$Yj=session_name();if(isset($_GET["username"])){header("HTTP/1.1 403 Forbidden");if(($_COOKIE[$Yj]||$_GET[$Yj])&&!$_SESSION["token"])$j=lang(108);elseif($if&&($F=get_password())!==null){restart_session();add_invalid_login();if($F===false)$j
+.=($j?'<br>':'').lang(109,target_blank(),'<code>permanentLogin()</code>');set_password(DRIVER,SERVER,$_GET["username"],null);unset_permanent($qi);}}if(!$_COOKIE[$Yj]&&$_GET[$Yj]&&ini_bool("session.use_only_cookies"))$j=lang(110);$Wh=session_get_cookie_params();cookie("adminer_key",($_COOKIE["adminer_key"]?:rand_string()),$Wh["lifetime"]);if(!$_SESSION["token"])$_SESSION["token"]=rand(1,1e6);page_header(lang(36),$j,null);echo"<form action='' method='post'>\n","<div>";if(hidden_fields($_POST,array("auth","token")))echo"<p class='message'>".lang(111)."\n";echo
+input_token(),"</div>\n";adminer()->loginForm();echo"</form>\n";page_footer("auth");exit;}if(isset($_GET["username"])&&!class_exists('Adminer\Db')){unset($_SESSION["pwds"][DRIVER]);unset_permanent($qi);page_header(lang(112),lang(113,implode(", ",Driver::$extensions)),false);page_footer("auth");exit;}$e='';if(isset($_GET["username"])&&is_string(get_password())){check_invalid_login($qi);$Pb=adminer()->credentials();$e=Driver::connect($Pb[0],$Pb[1],$Pb[2]);if(is_object($e)){Db::$instance=$e;Driver::$instance=new
+Driver($e);if($e->flavor)save_settings(array("vendor-".DRIVER."-".SERVER=>get_driver(DRIVER)));}}$Xf=null;if(!is_object($e)||($Xf=adminer()->login($_GET["username"],get_password()))!==true){$j=(is_string($e)?nl_br(h($e)):(is_string($Xf)?$Xf:lang(114))).(preg_match('~^ | $~',get_password())?'<br>'.lang(115):'');auth_error($j,$qi);}if($_POST["logout"]&&$_SESSION["token"]&&!verify_token()){page_header(lang(97),lang(116));page_footer("db");exit;}if(!$_SESSION["token"])$_SESSION["token"]=rand(1,1e6);stop_session(true);if($Ea&&$_POST["token"])$_POST["token"]=get_token();$j='';if($_POST){if(!verify_token()){header("HTTP/1.1 403 Forbidden");$j=lang(116).' '.lang(117);}}elseif($_SERVER["REQUEST_METHOD"]=="POST"){header("HTTP/1.1 413 Content Too Large");$j=lang(118,"<b>post_max_size</b>");if(isset($_GET["sql"]))$j
+.=' '.lang(119);}function
+print_select_result($I,$f=null,array$Ih=array(),&$y=0,&$Lc=false){$Tf=array();$v=array();$d=array();$T=array();$Hi=array();$Pc=array();$Il=array();$J=array();$Gg=$Lc;$Lc=false;for($r=0;(!$y||$r<$y)&&is_array($K=$I->fetch_row());$r++){if(!$r){echo"<div class='scrollable'>\n","<table class='nowrap odds'".($Gg?on('click','tableClick').on('dblclick','tableClick').on('keydown','editingKeydown'):"").">\n","<thead><tr>";for($tf=0;$tf<count($K);$tf++){$k=$I->fetch_field();$B=$k->name;$R=(isset($k->table)?$k->table:"");$Hh=(isset($k->orgtable)?$k->orgtable:"");$Gh=(isset($k->orgname)?$k->orgname:$B);$Hl=driver()->typeName($k);if($Ih&&JUSH=="sql")$Tf[$tf]=($B=="table"?"table=":($B=="possible_keys"?"indexes=":null));elseif($Hh!=""){$ra=($R!=""?$R:$Hh);if($R!="")$J[$R]=$Hh;if(!isset($v[$ra])){if(!isset($Hi[$Hh])){$Hi[$Hh]=array();foreach(indexes($Hh,$f)as$u){if($u["type"]=="PRIMARY"){$Hi[$Hh]=array_flip($u["columns"]);break;}}}$T[$ra]=$Hh;$v[$ra]=$Hi[$Hh];$d[$ra]=$Hi[$Hh];}if(isset($d[$ra][$Gh])){unset($d[$ra][$Gh]);$v[$ra][$Gh]=$tf;$Tf[$tf]=$ra;}elseif($Gg&&isset($k->orgname)&&$k->db==DB&&!is_blob(array("type"=>$Hl)))$Pc[$tf]=array($ra,$Gh,preg_match('~text|json|lob~',$Hl));}$Il[$tf]=$Hl;echo"<th title='".h(trim(($Hh!=""?"$Hh.$Gh":($k->name!=$Gh?$Gh:""))." ".$Hl))."'>".h($B).($Ih?doc_link(array('sql'=>"explain-output.html#explain_".strtolower($B),'mariadb'=>"explain/#the-columns-in-explain-select",)):"");}foreach($Pc
+as$tf=>$ab){if($d[$ab[0]])unset($Pc[$tf]);}echo"<tbody>\n";}$Ke=array();foreach($v
 as$ra=>$u){if($u&&!$d[$ra]){$t="";foreach($u
-as$qb=>$rf){if($K[$rf]===null){$t=null;break;}$t
-.="&where[".url_escape(bracket_escape($qb))."]=".url_escape($K[$rf]);}$He[$ra]=$t;}}echo"<tr>";foreach($K
-as$w=>$X){$z="";if(isset($Rf[$w])){if($Eh&&JUSH=="sql"){$R=$K[array_search("table=",$Rf)];$z=ME.$Rf[$w].url_escape($Eh[$R]!=""?$Eh[$R]:$R);}elseif(idx($He,$Rf[$w])!==null)$z=ME."edit=".url_escape($T[$Rf[$w]]).$He[$Rf[$w]];}$De=select_value($X,$z,array('type'=>(preg_match('~binary~',$_l[$w])?'blob':$_l[$w])),null);$b="";$ab=idx($Oc,$w);if($ab&&idx($He,$ab[0])!==null&&is_utf8($X)){$Kc=true;$b=" data-name='".h("val[".bracket_escape($T[$ab[0]])."][".bracket_escape(substr($He[$ab[0]],1))."][".bracket_escape($ab[1])."]")."' data-text='".($ab[2]?1:0)."'".(html_entity_decode(strip_tags($De),ENT_QUOTES,"UTF-8")!==$X?" data-value='".h($X)."'":"");}echo"<td".(preg_match(number_type(),$_l[$w])?" class='number'":"")."$b>$De";}}$y=$r;echo($r?"</table>\n</div>":"<p class='message'>".lang(16))."\n";return$J;}function
-textarea($B,$Y,$L=10,$ub=80,$tf=JUSH){echo"<textarea name='".h($B)."' rows='$L' cols='$ub' class='sqlarea jush-".h($tf)."' spellcheck='false' wrap='off'>";if(is_array($Y)){foreach($Y
+as$qb=>$tf){if($K[$tf]===null){$t=null;break;}$t
+.="&where[".url_escape(bracket_escape($qb))."]=".url_escape($K[$tf]);}$Ke[$ra]=$t;}}echo"<tr>";foreach($K
+as$w=>$X){$z="";if(isset($Tf[$w])){if($Ih&&JUSH=="sql"){$R=$K[array_search("table=",$Tf)];$z=ME.$Tf[$w].url_escape($Ih[$R]!=""?$Ih[$R]:$R);}elseif(idx($Ke,$Tf[$w])!==null)$z=ME."edit=".url_escape($T[$Tf[$w]]).$Ke[$Tf[$w]];}$Ge=select_value($X,$z,array('type'=>(preg_match('~binary~',$Il[$w])?'blob':$Il[$w])),null);$b="";$ab=idx($Pc,$w);if($ab&&idx($Ke,$ab[0])!==null&&is_utf8($X)){$Lc=true;$b=" data-name='".h("val[".bracket_escape($T[$ab[0]])."][".bracket_escape(substr($Ke[$ab[0]],1))."][".bracket_escape($ab[1])."]")."' data-text='".($ab[2]?1:0)."'".(html_entity_decode(strip_tags($Ge),ENT_QUOTES,"UTF-8")!==$X?" data-value='".h($X)."'":"");}echo"<td".(preg_match(number_type(),$Il[$w])?" class='number'":"")."$b>$Ge";}}$y=$r;echo($r?"</table>\n</div>":"<p class='message'>".lang(16))."\n";return$J;}function
+textarea($B,$Y,$L=10,$ub=80,$vf=JUSH,$dd=0){echo"<textarea name='".h($B)."' rows='$L' cols='$ub' class='sqlarea jush-".h($vf)."' spellcheck='false' wrap='off'".($dd?" data-error-line='$dd'":"").">\n";if(is_array($Y)){foreach($Y
 as$X)echo
 h($X[0])."\n\n\n";}else
 echo
 h($Y);echo"</textarea>";}function
-select_input($b,array$C,$Y="",$mi=""){if($C&&$Y!=""&&!isset($C[$Y]))$C=array($Y=>$Y)+$C;$Qk=($C?"select":"input");return"<$Qk$b".($C?"><option value=''>$mi".optionlist($C,$Y,true)."</select>":" size='10' value='".h($Y)."' placeholder='$mi'>");}function
-json_row($w,$X=null,$dd=true){static$Gd=true;if($Gd)echo"{";if($w!=""){echo($Gd?"":",")."\n\t\"".addcslashes($w,"\r\n\t\"\\/").'": '.($X!==null?($dd?'"'.addcslashes($X,"\r\n\"\\/").'"':$X):'null');$Gd=false;}else{echo"\n}\n";$Gd=true;}}function
+select_input($b,array$C,$Y="",$ri=""){if($C&&$Y!=""&&!isset($C[$Y]))$C=array($Y=>$Y)+$C;$Zk=($C?"select":"input");return"<$Zk$b".($C?"><option value=''>$ri".optionlist($C,$Y,true)."</select>":" size='10' value='".h($Y)."' placeholder='$ri'>");}function
+json_row($w,$X=null,$gd=true){static$Jd=true;if($Jd)echo"{";if($w!=""){echo($Jd?"":",")."\n\t\"".addcslashes($w,"\r\n\t\"\\/").'": '.($X!==null?($gd?'"'.addcslashes($X,"\r\n\"\\/").'"':$X):'null');$Jd=false;}else{echo"\n}\n";$Jd=true;}}function
 flat_collations(){$tb=collations();return(is_array(reset($tb))?call_user_func_array('array_merge',array_values($tb)):$tb);}function
-edit_type($w,array$k,array$tb,array$Nd=array(),array$td=array()){$U=(string)$k["type"];echo"<td><select name='".h($w)."[type]' class='type' aria-labelledby='label-type'".on_help_value().">";if($U&&!array_key_exists($U,driver()->types())&&!isset($Nd[$U])&&!in_array($U,$td))$td[]=$U;$sk=driver()->structuredTypes();if($Nd)$sk[lang(119)]=$Nd;echo
-optionlist(array_merge($td,$sk),$U),"</select><td>","<input name='".h($w)."[length]' value='".h($k["length"])."' size='3'".(!$k["length"]&&preg_match('~var(char|binary)$~',$U)?" class='required'":"")." aria-labelledby='label-length'>","<td class='options'>",($tb?"<input list='collations' name='".h($w)."[collation]'".option_types($U,'('.text_type().')$')." value='".h($k["collation"])."' placeholder='(".lang(120).")'>":''),(driver()->unsigned?"<select name='".h($w)."[unsigned]'".option_types($U,'^$|'.number_type()).'><option>'.optionlist(driver()->unsigned,$k["unsigned"]).'</select>':''),(isset($k['on_update'])?"<select name='".h($w)."[on_update]'".option_types($U,'timestamp|datetime').'>'.optionlist(array(""=>"(".lang(121).")","CURRENT_TIMESTAMP"),(preg_match('~^CURRENT_TIMESTAMP~i',$k["on_update"])?"CURRENT_TIMESTAMP":$k["on_update"])).'</select>':''),($Nd?"<select name='".h($w)."[on_delete]'".option_types($U,'`')."><option value=''>(".lang(122).")".optionlist(explode("|",driver()->onActions),$k["on_delete"])."</select> ":" ");}function
-option_types($U,$_l){return" data-types='".h($_l)."'".(preg_match("~$_l~",$U)?"":" class='hidden'");}function
-process_length($x){if(JUSH=="mssql"&&preg_match('~^\s*\(?\s*max\s*\)?\s*$~i',$x))return"(max)";$Yc=driver()->enumLength;return(preg_match("~^\\s*\\(?\\s*$Yc(?:\\s*,\\s*$Yc)*+\\s*\\)?\\s*\$~",$x)&&preg_match_all("~$Yc~",$x,$Zf)?"(".implode(",",$Zf[0]).")":preg_replace('~^[0-9].*~','(\0)',preg_replace('~[^-0-9,+()[\]]~','',$x)));}function
-process_in($X){$X=preg_replace('~^\s*\(\s*(.*?)\s*\)\s*$~s','\1',$X);$Oi="'((?:[^']|'')*+)'";$qf=(preg_match("~^\\s*$Oi(?:\\s*,\\s*$Oi)*+\\s*\$~",$X)&&preg_match_all("~$Oi~",$X,$Zf)?str_replace("''","'",$Zf[1]):array_map('trim',explode(",",$X)));return"(".implode(", ",array_map('Adminer\q',$qf)).")";}function
-process_between($X){$Oi="'((?:[^']|'')*+)'";$Qi=(preg_match("~^\\s*$Oi\\s+AND\\s+$Oi\\s*\$~i",$X,$A)?array(str_replace("''","'",$A[1]),str_replace("''","'",$A[2])):preg_split('~\s+AND\s+~i',trim($X)));return(count($Qi)==2?q($Qi[0])." AND ".q($Qi[1]):"NULL AND NULL");}function
+edit_type($w,array$k,array$tb,array$Qd=array(),array$wd=array()){$U=(string)$k["type"];echo"<td><select name='".h($w)."[type]' class='type' aria-labelledby='label-type'".on_help_value().">";if($U&&!array_key_exists($U,driver()->types())&&!isset($Qd[$U])&&!in_array($U,$wd))$wd[]=$U;$_k=driver()->structuredTypes();if($Qd)$_k[lang(120)]=$Qd;echo
+optionlist(array_merge($wd,$_k),$U),"</select><td>","<input name='".h($w)."[length]' value='".h($k["length"])."' size='3'".(!$k["length"]&&preg_match('~var(char|binary)$~',$U)?" class='required'":"")." aria-labelledby='label-length'>","<td class='options'>",($tb?"<input list='collations' name='".h($w)."[collation]'".option_types($U,'('.text_type().')$')." value='".h($k["collation"])."' placeholder='(".lang(121).")'>":''),(driver()->unsigned?"<select name='".h($w)."[unsigned]'".option_types($U,'^$|'.number_type()).'><option>'.optionlist(driver()->unsigned,$k["unsigned"]).'</select>':''),(isset($k['on_update'])?"<select name='".h($w)."[on_update]'".option_types($U,'timestamp|datetime').'>'.optionlist(array(""=>"(".lang(122).")","CURRENT_TIMESTAMP"),(preg_match('~^CURRENT_TIMESTAMP~i',$k["on_update"])?"CURRENT_TIMESTAMP":$k["on_update"])).'</select>':''),($Qd?"<select name='".h($w)."[on_delete]'".option_types($U,'`')."><option value=''>(".lang(123).")".optionlist(explode("|",driver()->onActions),$k["on_delete"])."</select> ":" ");}function
+option_types($U,$Il){return" data-types='".h($Il)."'".(preg_match("~$Il~",$U)?"":" class='hidden'");}function
+process_length($x){if(JUSH=="mssql"&&preg_match('~^\s*\(?\s*max\s*\)?\s*$~i',$x))return"(max)";if(JUSH=="oracle"&&preg_match('~^\s*\(?\s*(\d+)\s+(CHAR|BYTE)\s*\)?\s*$~i',$x,$A))return"($A[1] ".strtoupper($A[2]).")";$ad=driver()->enumLength;return(preg_match("~^\\s*\\(?\\s*$ad(?:\\s*,\\s*$ad)*+\\s*\\)?\\s*\$~",$x)&&preg_match_all("~$ad~",$x,$bg)?"(".implode(",",$bg[0]).")":preg_replace('~^[0-9].*~','(\0)',preg_replace('~[^-0-9,+()[\]]~','',$x)));}function
+process_in($X){$X=preg_replace('~^\s*\(\s*(.*?)\s*\)\s*$~s','\1',$X);$Vi="'(?:[^']|'')*+'";$sf=(preg_match("~^\\s*$Vi(?:\\s*,\\s*$Vi)*+\\s*\$~",$X)&&preg_match_all("~$Vi~",$X,$bg)?array_map('Adminer\idf_unescape',$bg[0]):array_map('trim',explode(",",$X)));return"(".implode(", ",array_map('Adminer\q',$sf)).")";}function
+process_between($X){$Vi="('(?:[^']|'')*+')";$Xi=(preg_match("~^\\s*$Vi\\s+AND\\s+$Vi\\s*\$~i",$X,$A)?array(idf_unescape($A[1]),idf_unescape($A[2])):preg_split('~\s+AND\s+~i',trim($X)));return(count($Xi)==2?q($Xi[0])." AND ".q($Xi[1]):"NULL AND NULL");}function
 process_type(array$k,$rb="COLLATE"){return" ".(is_user_type($k["type"])?idf_escape($k["type"]):$k["type"]).process_length($k["length"]).(preg_match(number_type(),$k["type"])&&in_array($k["unsigned"],driver()->unsigned)?" $k[unsigned]":"").(preg_match('~'.text_type().'~',$k["type"])&&$k["collation"]?" $rb ".(JUSH=="mssql"&&preg_match('~^\w+$~',$k["collation"])?$k["collation"]:q($k["collation"])):"");}function
-process_field(array$k,array$xl){if($k["on_update"])$k["on_update"]=str_ireplace("current_timestamp()","CURRENT_TIMESTAMP",$k["on_update"]);return
-array(idf_escape(trim($k["field"])),process_type($xl),($k["null"]?" NULL":" NOT NULL"),default_value($k),(preg_match('~timestamp|datetime~',$k["type"])&&$k["on_update"]?" ON UPDATE $k[on_update]":""),(support("comment")&&$k["comment"]!=""?" COMMENT ".q($k["comment"]):""),($k["auto_increment"]?auto_increment():null),);}function
-default_value(array$k){if($k["default"]===null)return"";$i=str_replace("\r","",$k["default"]);$Yd=$k["generated"];$Q=!preg_match('~]$~',$k["length"])&&(preg_match('~char|binary|text|json|enum|set|String~',$k["type"])||driver()->enumLength($k));return(in_array($Yd,driver()->generated)?(JUSH=="mssql"?" AS ($i)".($Yd=="VIRTUAL"?"":" $Yd"):" GENERATED ALWAYS AS ($i) $Yd"):(preg_match('~^GENERATED ~i',$i)?" $i":" DEFAULT ".($Q||preg_match('~^(?![a-z])~i',$i)?(JUSH=="sql"&&preg_match('~text|json~',$k["type"])?"(".q($i).")":q($i)):str_ireplace("current_timestamp()","CURRENT_TIMESTAMP",(JUSH=="sqlite"?"($i)":$i)))));}function
-edit_fields(array$l,array$tb,$U="TABLE",array$Nd=array()){$l=array_values($l);$gc=(($_POST?$_POST["defaults"]:get_setting("defaults"))?"":" class='hidden'");$yb=(($_POST?$_POST["comments"]:get_setting("comments"))?"":" class='hidden'");echo"<thead><tr>\n",($U=="PROCEDURE"?"<td>":""),"<th id='label-name'>".($U=="TABLE"?lang(123):lang(124)),"<th id='label-type'>".lang(49)."<textarea id='enum-edit' rows='4' cols='12' wrap='off' hidden></textarea>".script("qs('#enum-edit').onblur = editingLengthBlur;"),"<th id='label-length'>".lang(125),"<th>".lang(126);if($U=="TABLE")echo"<th id='label-null'>NULL\n","<th><input type='radio' name='auto_increment_col' value=''><abbr id='label-ai' title='".lang(51)."'>AI</abbr>",doc_link(array('sql'=>"example-auto-increment.html",'mariadb'=>"auto_increment/",)),"<th id='label-default'$gc>".lang(52),(support("comment")?"<th id='label-comment'$yb>".lang(50):"");$Ef=!support("move_col");echo"<td>".icon("plus","add[".($Ef?count($l):0)."]","+",lang(127),($Ef?on('click','editingAddLastRow'):"")),"<tbody".on('click','editingClick').on('input','editingInput').on('keydown','editingKeydown').">\n";foreach($l
-as$r=>$k){$r++;$Fh=$k[($_POST?"orig":"field")];$tc=(isset($_POST["add"][$r-1])||(isset($k["field"])&&!idx($_POST["drop_col"],$r)))&&(support("drop_col")||$Fh=="");echo"<tr".($tc?"":" hidden").">\n",($U=="PROCEDURE"?"<td>".html_select("fields[$r][inout]",explode("|",driver()->inout),$k["inout"]):"")."<th>",(support("move_col")?icon("move","","↕",lang(128))." ":"");if($tc)echo"<input name='fields[$r][field]' value='".h($k["field"])."' data-maxlength='64' autocapitalize='off' aria-labelledby='label-name'".(isset($_POST["add"][$r-1])?" autofocus":"").">";echo
-input_hidden("fields[$r][orig]",$Fh);edit_type("fields[$r]",$k,$tb,$Nd);if($U=="TABLE"){echo"<td><label class='block'>".checkbox("fields[$r][null]",1,$k["null"],"","","","label-null")."</label>","<td><label class='block'><input type='radio' name='auto_increment_col' value='$r'".($k["auto_increment"]?" checked":"")." aria-labelledby='label-ai'></label>","<td$gc>".(driver()->generated?html_select("fields[$r][generated]",array_merge(array("","DEFAULT"),driver()->generated),$k["generated"])." ":checkbox("fields[$r][generated]",1,$k["generated"],"","","","label-default"));$b=" name='fields[$r][default]' aria-labelledby='label-default'";$Y=h($k["default"]);echo(preg_match('~\n~',$k["default"])?"<textarea$b rows='2' cols='30' style='vertical-align: bottom;'>\n$Y</textarea>":"<input$b value='$Y'>");if(support("comment")){$b=" name='fields[$r][comment]' data-maxlength='".(min_version(5.5)?1024:255)."' aria-labelledby='label-comment'";echo"<td$yb>".adminer()->commentInput('COLUMN',$b,$k["comment"]);}}echo"<td>",(support("move_col")?icon("plus","add[$r]","+",lang(127))." ":""),($Fh==""||support("drop_col")?icon("cross","drop_col[$r]","x",lang(129)):"");}}function
+process_field(array$k,array$Fl){return
+array(idf_escape(trim($k["field"])),process_type($Fl),($k["null"]?" NULL":" NOT NULL"),default_value($k),(preg_match('~timestamp|datetime~',$k["type"])&&$k["on_update"]?" ON UPDATE $k[on_update]".process_length($k["length"]):""),(support("comment")&&$k["comment"]!=""?" COMMENT ".q($k["comment"]):""),($k["auto_increment"]?auto_increment():null),);}function
+default_value(array$k){if($k["default"]===null)return"";$i=str_replace("\r","",$k["default"]);$be=$k["generated"];$Q=!preg_match('~]$~',$k["length"])&&(preg_match('~char|binary|text|clob|json|enum|set|String~',$k["type"])||driver()->enumLength($k));$Xh=(JUSH=="sqlite"||(JUSH=="sql"&&$k["default_sql"]&&!preg_match("~^(current_timestamp(\\(\\d*\\))?|[bx]'[\\da-f]*')$~i",$i)));return(in_array($be,driver()->generated)?(JUSH=="mssql"?" AS ($i)".($be=="VIRTUAL"?"":" $be"):" GENERATED ALWAYS AS ($i) $be"):(preg_match('~^GENERATED ~i',$i)?" $i":" DEFAULT ".(!$k["default_sql"]&&($Q||preg_match('~^(?![a-z])~i',$i))?(JUSH=="sql"&&preg_match('~text|json~',$k["type"])?"(".q($i).")":q($i)):($Xh?"($i)":$i))));}function
+edit_fields(array$l,array$tb,$U="TABLE",array$Qd=array()){$l=array_values($l);$gc=(($_POST?$_POST["defaults"]:get_setting("defaults"))?"":" class='hidden'");$yb=(($_POST?$_POST["comments"]:get_setting("comments"))?"":" class='hidden'");echo"<thead><tr>\n",($U=="PROCEDURE"?"<td>":""),"<th id='label-name'>".($U=="TABLE"?lang(124):lang(125)),"<th id='label-type'>".lang(49)."<textarea id='enum-edit' rows='4' cols='12' wrap='off' hidden></textarea>".script("qs('#enum-edit').onblur = editingLengthBlur;"),"<th id='label-length'>".lang(126),"<th>".lang(127);if($U=="TABLE")echo"<th id='label-null'>NULL\n","<th><input type='radio' name='auto_increment_col' value=''><abbr id='label-ai' title='".lang(51)."'>A_I</abbr>",doc_link(array('sql'=>"example-auto-increment.html",'mariadb'=>"auto_increment/",)),"<th id='label-default'$gc>".lang(52),(support("comment")?"<th id='label-comment'$yb>".lang(50):"");$Gf=!support("move_col");echo"<td>".icon("plus","add[".($Gf?count($l):0)."]","+",lang(128),($Gf?on('click','editingAddLastRow'):"")),"<tbody".on('click','editingClick').on('input','editingInput').on('keydown','editingKeydown').">\n";foreach($l
+as$r=>$k){$r++;$Jh=$k[($_POST?"orig":"field")];$uc=(isset($_POST["add"][$r-1])||(isset($k["field"])&&!idx($_POST["drop_col"],$r)))&&(support("drop_col")||$Jh=="");echo"<tr".($uc?"":" hidden").">\n",($U=="PROCEDURE"?"<td>".html_select("fields[$r][inout]",explode("|",driver()->inout),$k["inout"]):"")."<th>",(support("move_col")?icon("move","","↕",lang(129))." ":"");if($uc)echo"<input name='fields[$r][field]' value='".h($k["field"])."' data-maxlength='64' autocapitalize='off' aria-labelledby='label-name'".(isset($_POST["add"][$r-1])?" autofocus":"").">";echo
+input_hidden("fields[$r][orig]",$Jh);edit_type("fields[$r]",$k,$tb,$Qd);if($U=="TABLE"){echo"<td><label class='block'>".checkbox("fields[$r][null]",1,$k["null"],"","","","label-null")."</label>","<td><label class='block'><input type='radio' name='auto_increment_col' value='$r'".($k["auto_increment"]?" checked":"")." aria-labelledby='label-ai'></label>","<td$gc>".html_select("fields[$r][generated]",array_merge(array("","DEFAULT","DEFAULT SQL"),driver()->generated),$k["generated"],"","label-default")." ";$b=" name='fields[$r][default]' aria-labelledby='label-default'";$Y=h($k["default"]);echo(preg_match('~\n~',$k["default"])?"<textarea$b rows='2' cols='30' style='vertical-align: bottom;'>\n$Y</textarea>":"<input$b value='$Y'>");if(support("comment")){$b=" name='fields[$r][comment]' data-maxlength='".(min_version(5.5)?1024:255)."' aria-labelledby='label-comment'";echo"<td$yb>".adminer()->commentInput('COLUMN',$b,$k["comment"]);}}echo"<td>",(support("move_col")?icon("plus","add[$r]","+",lang(128))." ":""),($Jh==""||support("drop_col")?icon("cross","drop_col[$r]","x",lang(130)):"");}}function
 process_fields(array&$l){if($_POST["add"]){$l=array_values($l);array_splice($l,key($_POST["add"]),0,array(array()));}return$_POST["add"]||$_POST["drop_col"];}function
-drop_create($Fc,$Mb,$Gc,$Wk,$Hc,$_,$ug,$sg,$tg,$oh,$Ug){if($_POST["drop"])query_redirect($Fc,$_,$ug);elseif($oh=="")query_redirect($Mb,$_,$tg);elseif(support("transaction_ddl")){driver()->begin();queries_redirect($_,$sg,queries($Fc)&&queries($Mb)&&driver()->commit());driver()->rollback();}elseif($oh!=$Ug){$Ob=queries($Mb);queries_redirect($_,$sg,$Ob&&queries($Fc));if($Ob&&$Gc)queries($Gc);}else
-queries_redirect($_,$sg,queries($Wk)&&queries($Hc)&&queries($Fc)&&queries($Mb));}function
-create_trigger($rh,array$K){$cl=" $K[Timing] $K[Event]".(preg_match('~ OF~',$K["Event"])?" $K[Of]":"");return"CREATE TRIGGER ".idf_escape($K["Trigger"]).(JUSH=="mssql"?$rh.$cl:$cl.$rh).preg_replace('~[\s;]+$~',''," $K[Type]\n$K[Statement]").";";}function
-q_dollar($Q){$lc='$$';while(strpos($Q.$lc,$lc)!=strlen($Q))$lc='$_'.substr($lc,1);return$lc.$Q.$lc;}function
-routine_collate($sb){static$fb=array();if($sb&&!$fb){foreach(collations()as$eb=>$am){foreach((array)$am
+drop_create($Gc,$Mb,$Hc,$fl,$Ic,$_,$wg,$ug,$vg,$rh,$Xg){if($_POST["drop"])query_redirect($Gc,$_,$wg);elseif($rh=="")query_redirect($Mb,$_,$vg);elseif(support("transaction_ddl")){driver()->begin();queries_redirect($_,$ug,queries($Gc)&&queries($Mb)&&driver()->commit());driver()->rollback();}elseif($rh!=$Xg){$Ob=queries($Mb);queries_redirect($_,$ug,$Ob&&queries($Gc));if($Ob&&$Hc)queries($Hc);}else
+queries_redirect($_,$ug,queries($fl)&&queries($Ic)&&queries($Gc)&&queries($Mb));}function
+create_trigger($uh,array$K){$ll=" $K[Timing] $K[Event]".(preg_match('~ OF~',$K["Event"])?" $K[Of]":"");return"CREATE TRIGGER ".idf_escape($K["Trigger"]).(JUSH=="mssql"?$uh.$ll:$ll.$uh).preg_replace('~[\s;]+$~',''," $K[Type]\n$K[Statement]").";";}function
+q_dollar($Q){$mc='$$';while(strpos($Q.$mc,$mc)!=strlen($Q))$mc='$_'.substr($mc,1);return$mc.$Q.$mc;}function
+routine_collate($sb){static$fb=array();if($sb&&!$fb){foreach(collations()as$eb=>$jm){foreach((array)$jm
 as$X)$fb[$X]=$eb;}}return($fb[$sb]?"CHARACTER SET ".q($fb[$sb])." ":"")."COLLATE";}function
-create_routine($nj,array$K){$P=array();$l=$K["fields"];ksort($l);foreach($l
-as$k){if($k["field"]!=""){$Xe=(preg_match("~^(".driver()->inout.")\$~",$k["inout"])?$k["inout"]:"");$P[]="\n  ".(JUSH=="mssql"?"@$k[field]".process_type($k).($Xe?" $Xe":""):($Xe?"$Xe ":"").idf_escape($k["field"]).process_type($k,routine_collate($k["collation"])));}}$ic="";$C=array();foreach(routine_options($nj)as$w=>$bm){$Y=idx($K["options"],$w,"");if($w=="DEFINER")$ic=($Y?" $w=".implode("@",array_map('Adminer\q',explode("@",$Y,2))):"");elseif(!$bm){if($Y!="")$C[]="$w ".q($Y);}elseif($Y!=reset($bm)&&in_array($Y,$bm))$C[]=$Y;}$Cf=$K["language"];$jc=preg_replace('~[\s;]+$~','',$K["definition"]);$Bc=(JUSH=="pgsql"||($Cf&&$Cf!="sql"));$Rh=($P?implode(",",$P)."\n":"");return"CREATE$ic $nj ".table(trim($K["name"])).(JUSH=="mssql"&&$nj=="PROCEDURE"?rtrim($Rh):" ($Rh)").($nj=="FUNCTION"?"\nRETURNS".process_type($K["returns"],routine_collate($K["returns"]["collation"])):"").($Cf?" LANGUAGE $Cf":"").($C?"\n".implode(" ",$C):"").($Bc?" AS ".q_dollar("\n".trim($jc)."\n"):(JUSH=="mssql"?"\nAS":"")."\n$jc;");}function
-remove_definer($H){$ic=implode("@",array_map('Adminer\idf_escape',explode("@",logged_user(),2)));return
-preg_replace('(^([A-Z =]+) DEFINER='.preg_quote($ic).')','\1',$H);}function
+create_routine($uj,array$K){$P=array();$l=$K["fields"];ksort($l);foreach($l
+as$k){if($k["field"]!=""){$af=(preg_match("~^(".driver()->inout.")\$~",$k["inout"])?$k["inout"]:"");$P[]="\n  ".(JUSH=="mssql"?"@$k[field]".process_type($k).($af?" $af":""):($af?"$af ":"").idf_escape($k["field"]).process_type($k,routine_collate($k["collation"])));}}$jc="";$C=array();foreach(routine_options($uj)as$w=>$km){$Y=idx($K["options"],$w,"");if($w=="DEFINER")$jc=($Y?" $w=".implode("@",array_map('Adminer\q',explode("@",$Y,2))):"");elseif(!$km){if($Y!="")$C[]="$w ".q($Y);}elseif($Y!=reset($km)&&in_array($Y,$km))$C[]=$Y;}$Ef=$K["language"];$kc=preg_replace('~[\s;]+$~','',$K["definition"]);$Cc=(JUSH=="pgsql"||($Ef&&$Ef!="sql"));$Vh=($P?implode(",",$P)."\n":"");return"CREATE$jc $uj ".table(trim($K["name"])).(JUSH=="mssql"&&$uj=="PROCEDURE"?rtrim($Vh):" ($Vh)").($uj=="FUNCTION"?"\nRETURNS".process_type($K["returns"],routine_collate($K["returns"]["collation"])):"").($Ef?" LANGUAGE $Ef":"").($C?"\n".implode(" ",$C):"").($Cc?" AS ".q_dollar("\n".trim($kc)."\n"):(JUSH=="mssql"?"\nAS":"")."\n$kc;");}function
+remove_definer($H){$jc=implode("@",array_map('Adminer\idf_escape',explode("@",logged_user(),2)));return
+preg_replace('(^([A-Z =]+) DEFINER='.preg_quote($jc).')','\1',$H);}function
 object_name($U,$R,array$d){return
 str_replace(array("{table}","{columns}"),array($R,implode("_",$d)),adminer()->namePattern($U));}function
-format_foreign_key(array$n,$B=""){$h=$n["db"];$bh=$n["ns"];return($B!=""?" CONSTRAINT ".idf_escape($B):"")." FOREIGN KEY (".implode(", ",array_map('Adminer\idf_escape',$n["source"])).") REFERENCES ".($h!=""&&$h!=$_GET["db"]?idf_escape($h).".":"").($bh!=""&&$bh!=$_GET["ns"]?idf_escape($bh).".":"").idf_escape($n["table"])." (".implode(", ",array_map('Adminer\idf_escape',$n["target"])).")".(preg_match("~^(".driver()->onActions.")\$~",$n["on_delete"])?" ON DELETE $n[on_delete]":"").(preg_match("~^(".driver()->onActions.")\$~",$n["on_update"])?" ON UPDATE $n[on_update]":"").($n["deferrable"]?" $n[deferrable]":"");}function
-tar_file($m,$hl){$J=pack("a100a8a8a8a12a12",$m,644,0,0,decoct($hl->size),decoct(time()));$kb=8*32;for($r=0;$r<strlen($J);$r++)$kb+=ord($J[$r]);$J
-.=sprintf("%06o",$kb)."\0 ";echo$J,str_repeat("\0",512-strlen($J));$hl->send();echo
-str_repeat("\0",511-($hl->size+511)%512);}function
-doc_version(){$Pj=connection()->server_info;if(JUSH=='oracle'){preg_match('~(?:.* |^)(\d+)\.\d+\.\d+\.\d+\.\d+~s',$Pj,$A);return($A[1]>=18?$A[1]:"19");}$Zi=(JUSH=='sql'||connection()->flavor=='cockroach'?'~^\d+\.\d+~':'~^\d\.?\d~');$em=(preg_match($Zi,$Pj,$A)?$A[0]:"");if(JUSH=='mssql')return($em>=15?"sql-server-ver$em":($em==12?"azuresqldb-current":"sql-server-2017"));return$em;}function
-doc_link(array$hi,$Xk="📖"){$em=doc_version();$Pl=array('sql'=>"https://dev.mysql.com/doc/refman/$em/en/",'sqlite'=>"https://www.sqlite.org/",'pgsql'=>"https://www.postgresql.org/docs/".(connection()->flavor=='cockroach'?"current":$em)."/",'mssql'=>"https://learn.microsoft.com/en-us/sql/",'oracle'=>"https://docs.oracle.com/en/database/oracle/oracle-database/$em/",);if(connection()->flavor=='maria'){$Pl['sql']="https://mariadb.com/kb/en/";$hi['sql']=($hi['mariadb']?:str_replace(".html","/",$hi['sql']));}if(connection()->flavor=='cockroach'&&$hi['cockroach']){$Pl['pgsql']="https://docs.cockroachlabs.com/docs/v$em/";$hi['pgsql']=$hi['cockroach'];}return($hi[JUSH]?" <a href='".h($Pl[JUSH].$hi[JUSH].(JUSH=='mssql'?"?view=$em":""))."'".target_blank()." class='doc' title='".lang(130)."'>$Xk</a>":"");}function
+format_foreign_key(array$n,$B=""){$h=$n["db"];$eh=$n["ns"];return($B!=""?" CONSTRAINT ".idf_escape($B):"")." FOREIGN KEY (".implode(", ",array_map('Adminer\idf_escape',$n["source"])).") REFERENCES ".($h!=""&&$h!=$_GET["db"]?idf_escape($h).".":"").($eh!=""&&$eh!=$_GET["ns"]?idf_escape($eh).".":"").idf_escape($n["table"])." (".implode(", ",array_map('Adminer\idf_escape',$n["target"])).")".(preg_match("~^(".driver()->onActions.")\$~",$n["on_delete"])?" ON DELETE $n[on_delete]":"").(preg_match("~^(".driver()->onActions.")\$~",$n["on_update"])?" ON UPDATE $n[on_update]":"").($n["deferrable"]?" $n[deferrable]":"");}function
+tar_file($m,$ql){$J=pack("a100a8a8a8a12a12",$m,644,0,0,decoct($ql->size),decoct(time()));$kb=8*32;for($r=0;$r<strlen($J);$r++)$kb+=ord($J[$r]);$J
+.=sprintf("%06o",$kb)."\0 ";echo$J,str_repeat("\0",512-strlen($J));$ql->send();echo
+str_repeat("\0",511-($ql->size+511)%512);}function
+doc_version(){$Wj=connection()->server_info;if(JUSH=='oracle'){preg_match('~(?:.* |^)(\d+)\.\d+\.\d+\.\d+\.\d+~s',$Wj,$A);return($A[1]>=18?$A[1]:"19");}$gj=(JUSH=='sql'||connection()->flavor=='cockroach'?'~^\d+\.\d+~':'~^\d\.?\d~');$nm=(preg_match($gj,$Wj,$A)?$A[0]:"");if(JUSH=='mssql')return($nm>=15?"sql-server-ver$nm":($nm==12?"azuresqldb-current":"sql-server-2017"));return$nm;}function
+doc_link(array$mi,$gl="📖"){$nm=doc_version();$Yl=array('sql'=>"https://dev.mysql.com/doc/refman/$nm/en/",'sqlite'=>"https://www.sqlite.org/",'pgsql'=>"https://www.postgresql.org/docs/".(connection()->flavor=='cockroach'?"current":$nm)."/",'mssql'=>"https://learn.microsoft.com/en-us/sql/",'oracle'=>"https://docs.oracle.com/en/database/oracle/oracle-database/$nm/",);if(connection()->flavor=='maria'){$Yl['sql']="https://mariadb.com/kb/en/";$mi['sql']=($mi['mariadb']?:str_replace(".html","/",$mi['sql']));}if(connection()->flavor=='cockroach'&&$mi['cockroach']){$Yl['pgsql']="https://docs.cockroachlabs.com/docs/v$nm/";$mi['pgsql']=$mi['cockroach'];}return($mi[JUSH]?" <a href='".h($Yl[JUSH].$mi[JUSH].(JUSH=='mssql'?"?view=$nm":""))."'".target_blank()." class='doc' title='".lang(131)."'>$gl</a>":"");}function
 db_size($h){if(!connection()->select_db($h))return"?";$J=0;foreach(table_status()as$S)$J+=$S["Data_length"]+$S["Index_length"];return
 adminer()->formatSizeValue($J);}function
-set_utf8mb4($Mb){static$P=false;if(!$P&&preg_match('~\butf8mb4~i',$Mb)){$P=true;echo"SET NAMES ".charset(connection()).";\n\n";}}if(DB==""&&isset($_GET["ns"]))redirect(remove_from_uri('ns'));if(!(DB!=""?connection()->select_db(DB):isset($_GET["sql"])||isset($_GET["dump"])||isset($_GET["database"])||isset($_GET["processlist"])||isset($_GET["privileges"])||isset($_GET["user"])||isset($_GET["variables"])||$_GET["script"]=="connect"||$_GET["script"]=="kill")){if(DB!=""||$_GET["refresh"]){restart_session();set_session("dbs",null);}if(DB!="")page_header(lang(35).": ".h(DB),adminer()->error(),true,"","db");else{if(!isset($_GET["db"])&&support("single_db")){$g=adminer()->databases();if($g)redirect(ME."db=".url_escape($g[0]));}if($_POST["db"]&&!$j)queries_redirect(substr(ME,0,-1),lang(131),drop_databases($_POST["db"]));page_header(lang(132),$j,false);echo"<p class='links'>\n";foreach(array('database'=>lang(133),'privileges'=>lang(71),'processlist'=>lang(134),'variables'=>lang(135),'status'=>lang(136),)as$w=>$X){if(support($w))echo"<a href='".h(ME)."$w='>$X</a>\n";}echo"<p>".lang(137,get_driver(DRIVER),"<b>".h(connection()->server_info)."</b>","<b>".connection()->extension."</b>")."\n","<p>".lang(138,"<b>".h(logged_user())."</b>")."\n";$g=adminer()->databases();if($g){$zj=support("scheme");$tb=collations();echo"<form action='' method='post'>\n","<table class='checkable odds'".on('click','tableClick').on('dblclick','tableClick').">\n","<thead><tr>".(support("database")?"<td class='hover'>":"")."<th".(JUSH!='mssql'?" aria-sort='ascending'":"").">".lang(35).(get_session("dbs")!==null?" - <a href='".h(ME)."refresh=1'>".lang(139)."</a>":"")."<th>".lang(140)."<th>".lang(141)."<th>".lang(142)." - <a href='".h(ME)."dbsize=1'".on('click','ajaxSetHtml',ME."script=connect").">".lang(143)."</a>"."<tbody>\n";$g=($_GET["dbsize"]?count_tables($g):array_flip($g));foreach($g
-as$h=>$T){$mj=h(preg_replace('~&db=[^&]*~','',ME))."db=".url_escape($h);$s=h("Db-".$h);echo"<tr>".(support("database")?"<td class='hover'>".checkbox("db[]",$h,in_array($h,(array)$_POST["db"]),"","","",$s):""),"<th><a href='$mj' id='$s'>".h($h)."</a>";$sb=h(db_collation($h,$tb));echo"<td>".(support("database")?"<a href='$mj".($zj?"&amp;ns=":"")."&amp;database=' title='".lang(67)."'>$sb</a>":$sb),"<td align='right'><a href='$mj&amp;schema=' id='tables-".h($h)."' title='".lang(70)."'>".($_GET["dbsize"]?format_number($T):"?")."</a>","<td align='right' id='size-".h($h)."'>".($_GET["dbsize"]?db_size($h):"?"),"\n";}echo"</table>\n",(support("database")?"<div class='footer'><div>\n"."<fieldset><legend>".lang(144)." <span id='selected'></span></legend><div>\n"."<input type='hidden' name='all' value=''".on('click','countDbs').">\n"."<input type='submit' name='drop' value='".lang(145)."'".confirm().">\n"."</div></fieldset>\n"."</div></div>\n":""),input_token(),"</form>\n",script("tableCheck();");}$la=adminer();$qi=($la
+set_utf8mb4($Mb){static$P=false;if(!$P&&preg_match('~\butf8mb4~i',$Mb)){$P=true;echo"SET NAMES ".charset(connection()).";\n\n";}}if(DB==""&&isset($_GET["ns"]))redirect(remove_from_uri('ns'));if(!(DB!=""?connection()->select_db(DB):isset($_GET["sql"])||isset($_GET["dump"])||isset($_GET["database"])||isset($_GET["processlist"])||isset($_GET["privileges"])||isset($_GET["user"])||isset($_GET["variables"])||$_GET["script"]=="connect"||$_GET["script"]=="kill")){if(DB!=""||$_GET["refresh"]){restart_session();set_session("dbs",null);}if(DB!="")page_header(lang(35).": ".h(DB),adminer()->error(),true,"","db");else{if(!isset($_GET["db"])&&support("single_db")){$g=adminer()->databases();if($g)redirect(ME."db=".url_escape($g[0]));}if($_POST["db"]&&!$j)queries_redirect(substr(ME,0,-1),lang(132),drop_databases($_POST["db"]));page_header(lang(133),$j,false);echo"<p class='links'>\n";foreach(array('database'=>lang(134),'privileges'=>lang(71),'processlist'=>lang(135),'variables'=>lang(136),'status'=>lang(137),)as$w=>$X){if(support($w))echo"<a href='".h(ME)."$w='>$X</a>\n";}echo"<p>".lang(138,get_driver(DRIVER),"<b>".h(connection()->server_info)."</b>","<b>".connection()->extension."</b>")."\n","<p>".lang(139,"<b>".h(logged_user())."</b>")."\n";$g=adminer()->databases();if($g){$Fj=support("scheme");$tb=collations();echo"<form action='' method='post'>\n","<table class='checkable odds'".on('click','tableClick').on('dblclick','tableClick').">\n","<thead><tr>".(support("database")?"<td class='hover'>":"")."<th".(JUSH!='mssql'?" aria-sort='ascending'":"").">".lang(35).(get_session("dbs")!==null?" - <a href='".h(ME)."refresh=1'>".lang(140)."</a>":"")."<th>".lang(141)."<th>".lang(142)."<th>".lang(143)." - <a href='".h(ME)."dbsize=1'".on('click','ajaxSetHtml',ME."script=connect").">".lang(144)."</a>"."<tbody>\n";$g=($_GET["dbsize"]?count_tables($g):array_flip($g));foreach($g
+as$h=>$T){$tj=h(preg_replace('~&db=[^&]*~','',ME))."db=".url_escape($h);$s=h("Db-".$h);echo"<tr>".(support("database")?"<td class='hover'>".checkbox("db[]",$h,in_array($h,(array)$_POST["db"]),"","","",$s):""),"<th><a href='$tj' id='$s'>".h($h)."</a>";$sb=h(db_collation($h,$tb));echo"<td>".(support("database")?"<a href='$tj".($Fj?"&amp;ns=":"")."&amp;database=' title='".lang(67)."'>$sb</a>":$sb),"<td align='right'><a href='$tj&amp;schema=' id='tables-".h($h)."' title='".lang(70)."'>".($_GET["dbsize"]?format_number($T):"?")."</a>","<td align='right' id='size-".h($h)."'>".($_GET["dbsize"]?db_size($h):"?"),"\n";}echo"</table>\n",(support("database")?"<div class='footer'><div>\n"."<fieldset><legend>".lang(145)." <span id='selected'></span></legend><div>\n"."<input type='hidden' name='all' value=''".on('click','countDbs').">\n"."<input type='submit' name='drop' value='".lang(146)."'".confirm().">\n"."</div></fieldset>\n"."</div></div>\n":""),input_token(),"</form>\n",script("tableCheck();");}$la=adminer();$vi=($la
 instanceof
-Plugins?$la->plugins:array());$Ec=($la
+Plugins?$la->plugins:array());$Fc=($la
 instanceof
-Plugins?$la->drivers:array());$qc=design_checksums();if($qi||$Ec||$qc){$lb=($la
+Plugins?$la->drivers:array());$rc=design_checksums();if($vi||$Fc||$rc){$lb=($la
 instanceof
-Plugins?$la->checksums():array());$hh=Plugins::officialChecksums();$Kl=function($Ol){return" (<a href='$Ol'".target_blank()." class='update'>".VERSION."</a>)";};$pi=function($Ad)use($lb,$hh,$Kl){return($lb[$Ad]&&$hh[$Ad]&&$lb[$Ad]!==$hh[$Ad]?$Kl("https://www.adminer.org/plugins/?version=".VERSION):"");};echo"<div class='plugins'>\n","<h3>".lang(146)."</h3>\n<ul>\n";foreach($qi
-as$ni){$Xi=new
-\ReflectionObject($ni);$nc=(method_exists($ni,'description')?$ni->description():"");if(!$nc){if(preg_match('~^/[\s*]+(.+)~',$Xi->getDocComment(),$A))$nc=$A[1];}$_j=(method_exists($ni,'screenshot')?$ni->screenshot():"");echo"<li><b>".get_class($ni)."</b>".h($nc?": $nc":"").($_j?" (<a href='".h($_j)."'".target_blank().">".lang(147)."</a>)":"").$pi(basename((string)$Xi->getFileName(),'.php'))."\n";}foreach($Ec
-as$s=>$B)echo"<li><b>".h($s)."</b>: ".h($B).$pi(basename((string)$la->driverFiles[$s],'.php'))."\n";if($qc){$jh=official_design_checksums();foreach($qc
-as$m=>$pc){list($B,$kb)=$pc;$ih=$jh["$B/$m"];echo"<li><b>".h($m)."</b>".h($B?": $B":"").($ih&&$ih!==$kb?$Kl("https://www.adminer.org/?version=".VERSION."#extras"):"")."\n";}}echo"</ul>\n";adminer()->pluginsLinks();echo"</div>\n";}}page_footer("db");exit;}adminer()->afterConnect();class
+Plugins?$la->checksums():array());$kh=Plugins::officialChecksums();$Tl=function($Xl){return" (<a href='$Xl'".target_blank()." class='update'>".VERSION."</a>)";};$ui=function($Dd)use($lb,$kh,$Tl){return($lb[$Dd]&&$kh[$Dd]&&$lb[$Dd]!==$kh[$Dd]?$Tl("https://www.adminer.org/plugins/?version=".VERSION):"");};echo"<div class='plugins'>\n","<h3>".lang(147)."</h3>\n<ul>\n";foreach($vi
+as$si){$ej=new
+\ReflectionObject($si);$oc=Plugins::describe($si);echo"<li><b>".get_class($si)."</b>".($oc!=""?": $oc":"").$ui(basename((string)$ej->getFileName(),'.php'))."\n";}foreach($Fc
+as$s=>$B)echo"<li><b>".h($s)."</b>: ".h($B).$ui(basename((string)$la->driverFiles[$s],'.php'))."\n";if($rc){$mh=official_design_checksums();foreach($rc
+as$m=>$qc){list($B,$kb)=$qc;$lh=$mh["$B/$m"];echo"<li><b>".h($m)."</b>".h($B?": $B":"").($lh&&$lh!==$kb?$Tl("https://www.adminer.org/?version=".VERSION."#extras"):"")."\n";}}echo"</ul>\n";adminer()->pluginsLinks();echo"</div>\n";}}page_footer("db");exit;}adminer()->afterConnect();class
 TmpFile{private$handler;var$size=0;function
 __construct(){$this->handler=tmpfile();}function
 write($Fb){$this->size+=strlen($Fb);fwrite($this->handler,$Fb);}function
-send(){fseek($this->handler,0);fpassthru($this->handler);fclose($this->handler);}}if($_GET["select"]!=""&&($_POST["edit"]||$_POST["clone"])&&!$_POST["save"])$_GET["edit"]=$_GET["select"];if(isset($_GET["callf"]))$_GET["call"]=$_GET["callf"];if(isset($_GET["function"]))$_GET["procedure"]=$_GET["function"];if(isset($_GET["download"])){$a=$_GET["download"];$l=fields($a);header("Content-Type: application/octet-stream");$bm=array_merge((array)$_GET["where"],(array)$_GET["val"]);header("Content-Disposition: attachment; filename=".friendly_url("$a-".implode("_",$bm)).".".friendly_url($_GET["field"]));$N=array(idf_escape($_GET["field"]));$I=driver()->select($a,$N,array(where($_GET,$l)),$N);$K=($I?$I->fetch_row():array());echo
-driver()->value($K[0],$l[$_GET["field"]]);exit;}elseif(isset($_GET["table"])){$a=$_GET["table"];$l=fields($a);if(!$l)$j=adminer()->error();$S=table_status1($a);$B=adminer()->tableName($S);$j=$j?:h($S["Error"]);page_header(($l&&is_view($S)?$S['Engine']=='materialized view'?lang(148):lang(149):lang(150)).": ".($B!=""?$B:h($a)),$j,array(),"",!$l,($l?doc_link(array(JUSH=>driver()->tableHelp($a,is_view($S)))):""));$lj=array();foreach($l
-as$w=>$k)$lj+=$k["privileges"];adminer()->selectLinks($S,(isset($lj["insert"])||!support("table")?"":null));$xb=$S["Comment"];if($xb!="")echo"<p class='nowrap'>".lang(50).": ".adminer()->commentValue('TABLE',$xb)."\n";if($l)adminer()->tableStructurePrint($l,$S);function
+send(){fseek($this->handler,0);fpassthru($this->handler);fclose($this->handler);}}if($_GET["select"]!=""&&($_POST["edit"]||$_POST["clone"])&&!$_POST["save"])$_GET["edit"]=$_GET["select"];if(isset($_GET["callf"]))$_GET["call"]=$_GET["callf"];if(isset($_GET["function"]))$_GET["procedure"]=$_GET["function"];if(isset($_GET["download"])){$a=$_GET["download"];$l=fields($a);header("Content-Type: application/octet-stream");$km=array_merge((array)$_GET["where"],(array)$_GET["val"]);header("Content-Disposition: attachment; filename=".friendly_url("$a-".implode("_",$km)).".".friendly_url($_GET["field"]));$N=array(idf_escape($_GET["field"]));$I=driver()->select($a,$N,array(where($_GET,$l)),$N);$K=($I?$I->fetch_row():array());echo
+driver()->value($K[0],$l[$_GET["field"]]);exit;}elseif(isset($_GET["table"])){$a=$_GET["table"];$l=fields($a);if(!$l)$j=adminer()->error();$S=table_status1($a);$B=adminer()->tableName($S);$j=$j?:h($S["Error"]);page_header(($l&&is_view($S)?$S['Engine']=='materialized view'?lang(148):lang(149):lang(150)).": ".($B!=""?$B:h($a)),$j,array(),"",!$l,($l?doc_link(array(JUSH=>driver()->tableHelp($a,is_view($S)))):""));$sj=array();foreach($l
+as$w=>$k)$sj+=$k["privileges"];adminer()->selectLinks($S,(isset($sj["insert"])||!support("table")?"":null));$xb=$S["Comment"];if($xb!="")echo"<p class='nowrap'>".lang(50).": ".adminer()->commentValue('TABLE',$xb)."\n";if($l)adminer()->tableStructurePrint($l,$S);function
 tables_links(array$T){echo"<ul>\n";foreach($T
-as$K){$z=preg_replace('~&ns=[^&]*~',"&ns=".url_escape($K["ns"]),ME);echo"<li><a href='".h($z."table=".url_escape($K["table"]))."'>".($K["ns"]!=$_GET["ns"]?"<b>".h($K["ns"])."</b>.":"").h($K["table"])."</a>";}echo"</ul>\n";}$Ve=driver()->inheritsFrom($a);if($Ve){echo"<h3>".lang(151)."</h3>\n";tables_links($Ve);}if(support("indexes")&&driver()->supportsIndex($S)){echo"<div>\n","<h3 id='indexes'>".lang(152)."</h3>\n";$v=indexes($a);if($v)adminer()->tableIndexesPrint($v,$S);if(driver()->supportsAlterIndex($S))echo'<p class="links hover"><a href="'.h(ME).'indexes='.url_escape($a).'">'.lang(153)."</a>\n";echo"</div>\n";}if(!is_view($S)&&driver()->supportsAlterTable($S)){if(fk_support($S)){echo"<div>\n","<h3 id='foreign-keys'>".lang(119)."</h3>\n";$Nd=foreign_keys($a);if($Nd){echo"<table>\n","<thead><tr><th>".lang(154)."<th>".lang(155)."<th>".lang(122)."<th>".lang(121)."<td class='hover'><tbody>\n";foreach($Nd
-as$B=>$n){echo"<tr title='".h($B)."'>","<th><i>".implode("</i>, <i>",array_map('Adminer\h',$n["source"]))."</i>";$z=($n["db"]!=""?preg_replace('~&db=[^&]*~',"&db=".url_escape($n["db"]),ME):($n["ns"]!=""?preg_replace('~&ns=[^&]*~',"&ns=".url_escape($n["ns"]),ME):ME));echo"<td><a href='".h($z."table=".url_escape($n["table"]))."'>".($n["db"]!=""&&$n["db"]!=DB?"<b>".h($n["db"])."</b>.":"").($n["ns"]!=""&&$n["ns"]!=$_GET["ns"]?"<b>".h($n["ns"])."</b>.":"").h($n["table"])."</a>","(<i>".implode("</i>, <i>",array_map('Adminer\h',$n["target"]))."</i>)","<td>".h($n["on_delete"]),"<td>".h($n["on_update"]),'<td class="hover"><a href="'.h(ME.'foreign='.url_escape($a).'&name='.url_escape($B)).'">'.lang(156).'</a>',"\n";}echo"</table>\n";}echo'<p class="links hover"><a href="'.h(ME).'foreign='.url_escape($a).'">'.lang(157)."</a>\n","</div>\n";}if(support("check")){echo"<div>\n","<h3 id='checks'>".lang(158)."</h3>\n";$hb=driver()->checkConstraints($a);if($hb){echo"<table>\n";foreach($hb
-as$w=>$X)echo"<tr title='".h($w)."'>","<td><code class='jush-".JUSH."'>".shorten_utf8(preg_replace('~\s+~',' ',ltrim($X)),80,"</code>"),"<td class='hover'><a href='".h(ME.'check='.url_escape($a).'&name='.url_escape($w))."'>".lang(156)."</a>","\n";echo"</table>\n";}echo'<p class="links hover"><a href="'.h(ME).'check='.url_escape($a).'">'.lang(159)."</a>\n","</div>\n";}}if(support(is_view($S)?"view_trigger":"trigger")&&driver()->supportsAlterTable($S)){echo"<div>\n","<h3 id='triggers'>".lang(160)."</h3>\n";$ul=triggers($a);if($ul){echo"<table>\n";foreach($ul
-as$w=>$X){echo"<tr valign='top'><td>".h($X[0])."<td>".h($X[1])."<th>".h($w)."<td class='hover'><a href='".h(ME.'trigger='.url_escape($a).'&name='.url_escape($w))."'>".lang(156)."</a>";$nj=$X[2];if($nj){$pj=preg_replace('~&ns=[^&]*~',"&ns=".url_escape($nj["ns"]),ME).'function='.url_escape($nj["function"]).'&name='.url_escape($nj["name"]);echo", <a href='".h($pj)."' title='".h($nj["name"])."'>".lang(161)."</a>";}echo"\n";}echo"</table>\n";}echo'<p class="links hover"><a href="'.h(ME).'trigger='.url_escape($a).'">'.lang(162)."</a>\n","</div>\n";}$Uj=driver()->shadowTables($a);if($Uj){echo"<h3 id='shadow-tables'>".lang(163)."</h3>\n";tables_links($Uj);}$Ue=driver()->inheritedTables($a);if($Ue){echo"<h3 id='partitions'>".lang(164)."</h3>\n";$Vh=driver()->partitionsInfo($a);if($Vh)echo"<p><code class='jush-".JUSH."'>BY ".h("$Vh[partition_by]($Vh[partition])")."</code>\n";tables_links($Ue);}}elseif(isset($_GET["schema"])){page_header(lang(70),"",array(),h(DB.($_GET["ns"]?".$_GET[ns]":"")));function
-schema_column($R,array$Wi,array&$d){if(!isset($d[$R])){$d[$R]=0;foreach((array)idx($Wi,$R)as$B=>$Yi){if($B!=$R)$d[$R]=max($d[$R],schema_column($B,$Wi,$d)+1);}}return$d[$R];}function
-type_class($U){foreach(array('char'=>'text','date'=>'time|year','binary'=>'blob','enum'=>'set',)as$w=>$X){if(preg_match("~$w|$X~",$U))return" class='$w'";}}$Hk=array();$Jk=array();$Ik=array();$yd=array();$da=($_GET["schema"]?:$_COOKIE["adminer_schema-".str_replace(".","_",DB)]);preg_match_all('~([^:]+):([-0-9.]+)x([-0-9.]+)(_|$)~',$da,$Zf,PREG_SET_ORDER);foreach($Zf
-as$r=>$A){$Hk[$A[1]]=array((float)$A[2],(float)$A[3]);$Jk[]="\n\t'".js_escape($A[1])."': [ $A[2], $A[3] ]";}$M=array();$Wi=array();$Nd=array();$ta=driver()->allFields();$we=array();$Kk=array();foreach(table_status('',true)as$R=>$S){if(!is_view($S)){if(adminer()->tableName($S)!=""&&!$S["dependent"])$Kk[$R]=$S;else$we[$R]=true;}}foreach($Kk
-as$R=>$S){$G=0;$M[$R]["fields"]=array();foreach($ta[$R]as$k){$G+=1.25;$yd[$R][$k["field"]]=$G;$M[$R]["fields"][$k["field"]]=$k;}foreach(adminer()->foreignKeys($R)as$X){if($X["db"]==""&&$X["ns"]==""&&!$we[$X["table"]]){$Nd[$R][]=$X;$Wi[$X["table"]][$R]=array();}}}$d=array();$ce=array();$qm=array();$he=array();foreach(array_keys($M)as$B)schema_column($B,$Wi,$d);arsort($d);foreach($d
-as$B=>$c){$_g=null;foreach((array)idx($Nd,$B)as$X){if($X["table"]!=$B&&$M[$X["table"]])$_g=($_g===null?$d[$X["table"]]:min($_g,$d[$X["table"]]));}$d[$B]=max($c,(int)$_g-1);}foreach($M
-as$B=>$R){$c=$d[$B];$ce[$c][]=$B;$Zk=.75*strlen($B);foreach($R["fields"]as$k)$Zk=max($Zk,.65*strlen($k["field"]));$qm[$c]=max(idx($qm,$c,0),ceil($Zk)+1);}foreach($Nd
-as$B=>$am){foreach($am
-as$X){$ge=$d[$B]+(idx($d,$X["table"],$d[$B])>$d[$B]?1:0);$he[$ge]=idx($he,$ge,0)+1;}}ksort($ce);$ue=0;$pm=0;$vb=0;$Ai=null;$Fk=array();$Mk=array();foreach($ce
-as$c=>$T){if($Ai!==null){$vb=round($vb+$qm[$Ai]+1.7+idx($he,$c,0)*.1,1);$D=array();foreach($T
-as$B){$xk=0;$Lb=0;$Rg=array_keys((array)idx($Wi,$B));foreach((array)idx($Nd,$B)as$X)$Rg[]=$X["table"];foreach($Rg
-as$Lg){if($M[$Lg]&&$d[$Lg]<$c){$xk+=$M[$Lg]["pos"][0];$Lb++;}}$D[$B]=($Lb?$xk/$Lb:$ue);}asort($D);$T=array_keys($D);}$kl=0;foreach($T
-as$B){$G=1.25*count($M[$B]["fields"]);$M[$B]["pos"]=($Hk[$B]?:array($kl,$vb));$Fk[$B]=$M[$B]["pos"][1];$Mk[$B]=$qm[$c];$kl+=2.5+$G;$ue=max($ue,$M[$B]["pos"][0]+2.5+$G);$pm=max($pm,round($M[$B]["pos"][1]+$qm[$c],1));if(!$Hk[$B])$Ik[]="\n\t'".js_escape($B)."': [ ".$M[$B]["pos"][0].", ".$M[$B]["pos"][1]." ]";}$Ai=$c;}$If=array();$Oa=array();foreach($Nd
-as$B=>$am){foreach($am
-as$X){$Sk=idx($Fk,$X["table"],$Fk[$B]);$ek=$Fk[$B]+$Mk[$B];$kj=($Sk-1>$ek);$Gf=($kj?$ek+1:min($Fk[$B],$Sk)-1);$Na=idx($Oa,(string)$Gf,0);$Oa[(string)$Gf]=$Na+1;$Gf=round($kj?min($Gf+$Na*.1,$Sk-1):$Gf-$Na*.1,1);while($If[(string)$Gf])$Gf-=.0001;$M[$B]["references"][$X["table"]][(string)$Gf]=array($X["source"],$X["target"]);$Wi[$X["table"]][$B][(string)$Gf]=$X["target"];$If[(string)$Gf]=true;}}echo'<div id="schema" style="height: ',$ue,'em; width: ',$pm,'em;">
+as$K){$z=preg_replace('~&ns=[^&]*~',"&ns=".url_escape($K["ns"]),ME);echo"<li><a href='".h($z."table=".url_escape($K["table"]))."'>".($K["ns"]!=$_GET["ns"]?"<b>".h($K["ns"])."</b>.":"").h($K["table"])."</a>";}echo"</ul>\n";}$Ye=driver()->inheritsFrom($a);if($Ye){echo"<h3>".lang(151)."</h3>\n";tables_links($Ye);}if(support("indexes")&&driver()->supportsIndex($S)){echo"<div>\n","<h3 id='indexes'>".lang(152)."</h3>\n";$v=indexes($a);if($v)adminer()->tableIndexesPrint($v,$S);if(driver()->supportsAlterIndex($S))echo'<p class="links hover"><a href="'.h(ME).'indexes='.url_escape($a).'">'.lang(153)."</a>\n";echo"</div>\n";}if(!is_view($S)&&driver()->supportsAlterTable($S)){if(fk_support($S)){echo"<div>\n","<h3 id='foreign-keys'>".lang(120)."</h3>\n";$Qd=foreign_keys($a);$wa=function_exists('Adminer\alter_table');if($Qd){echo"<table>\n","<thead><tr><th>".lang(154)."<th>".lang(155)."<th>".lang(123)."<th>".lang(122).($wa?"<td class='hover'>":"")."<tbody>\n";foreach($Qd
+as$B=>$n){echo"<tr".(!is_int($B)?" title='".h($B)."'":"").">","<th><i>".implode("</i>, <i>",array_map('Adminer\h',$n["source"]))."</i>";$z=($n["db"]!=""?preg_replace('~&db=[^&]*~',"&db=".url_escape($n["db"]),ME):($n["ns"]!=""?preg_replace('~&ns=[^&]*~',"&ns=".url_escape($n["ns"]),ME):ME));echo"<td><a href='".h($z."table=".url_escape($n["table"]))."'>".($n["db"]!=""&&$n["db"]!=DB?"<b>".h($n["db"])."</b>.":"").($n["ns"]!=""&&$n["ns"]!=$_GET["ns"]?"<b>".h($n["ns"])."</b>.":"").h($n["table"])."</a>","(<i>".implode("</i>, <i>",array_map('Adminer\h',$n["target"]))."</i>)","<td>".h($n["on_delete"]),"<td>".h($n["on_update"]),($wa?'<td class="hover"><a href="'.h(ME.'foreign='.url_escape($a).'&name='.url_escape($B)).'">'.lang(156).'</a>':''),"\n";}echo"</table>\n";}echo($wa?'<p class="links hover"><a href="'.h(ME).'foreign='.url_escape($a).'">'.lang(157)."</a>\n":''),"</div>\n";}if(support("check")){echo"<div>\n","<h3 id='checks'>".lang(158)."</h3>\n";$hb=driver()->checkConstraints($a);if($hb){echo"<table>\n";foreach($hb
+as$w=>$X)echo"<tr".($w!=$X?" title='".h($w)."'":"").">","<td><code class='sql jush-".JUSH."'>".shorten_utf8(preg_replace('~\s+~',' ',ltrim($X)),80,"</code>"),"<td class='hover'><a href='".h(ME.'check='.url_escape($a).'&name='.url_escape($w))."'>".lang(156)."</a>","\n";echo"</table>\n";}echo'<p class="links hover"><a href="'.h(ME).'check='.url_escape($a).'">'.lang(159)."</a>\n","</div>\n";}}if(support(is_view($S)?"view_trigger":"trigger")&&driver()->supportsAlterTable($S)){echo"<div>\n","<h3 id='triggers'>".lang(160)."</h3>\n";$Cl=triggers($a);if($Cl){echo"<table>\n";foreach($Cl
+as$w=>$X){echo"<tr valign='top'><td>".h($X[0])."<td>".h($X[1])."<th>".h($w)."<td class='hover'><a href='".h(ME.'trigger='.url_escape($a).'&name='.url_escape($w))."'>".lang(156)."</a>";$uj=$X[2];if($uj){$wj=preg_replace('~&ns=[^&]*~',"&ns=".url_escape($uj["ns"]),ME).'function='.url_escape($uj["function"]).'&name='.url_escape($uj["name"]);echo", <a href='".h($wj)."' title='".h($uj["name"])."'>".lang(161)."</a>";}echo"\n";}echo"</table>\n";}echo'<p class="links hover"><a href="'.h(ME).'trigger='.url_escape($a).'">'.lang(162)."</a>\n","</div>\n";}$bk=driver()->shadowTables($a);if($bk){echo"<h3 id='shadow-tables'>".lang(163)."</h3>\n";tables_links($bk);}$Xe=driver()->inheritedTables($a);if($Xe){echo"<h3 id='partitions'>".lang(164)."</h3>\n";$ai=driver()->partitionsInfo($a);if($ai)echo"<p><code class='sql jush-".JUSH."'>BY ".h("$ai[partition_by]($ai[partition])")."</code>\n";tables_links($Xe);}}elseif(isset($_GET["schema"])){page_header(lang(70),"",array(),h(DB.($_GET["ns"]?".$_GET[ns]":"")));function
+schema_column($R,array$dj,array&$d){if(!isset($d[$R])){$d[$R]=0;foreach((array)idx($dj,$R)as$B=>$fj){if($B!=$R)$d[$R]=max($d[$R],schema_column($B,$dj,$d)+1);}}return$d[$R];}function
+type_class($U){foreach(array('char'=>'text','date'=>'time|year','binary'=>'blob','enum'=>'set',)as$w=>$X){if(preg_match("~$w|$X~",$U))return" class='$w'";}}$Qk=array();$Sk=array();$Rk=array();$Ad=array();$da=($_GET["schema"]?:$_COOKIE["adminer_schema-".str_replace(".","_",DB)]);preg_match_all('~([^:]+):([-0-9.]+)x([-0-9.]+)(_|$)~',$da,$bg,PREG_SET_ORDER);foreach($bg
+as$r=>$A){$Qk[$A[1]]=array((float)$A[2],(float)$A[3]);$Sk[]="\n\t'".js_escape($A[1])."': [ $A[2], $A[3] ]";}$M=array();$dj=array();$Qd=array();$ta=driver()->allFields();$ze=array();$Tk=array();foreach(table_status('',true)as$R=>$S){if(!is_view($S)){if(adminer()->tableName($S)!=""&&!$S["dependent"])$Tk[$R]=$S;else$ze[$R]=true;}}foreach($Tk
+as$R=>$S){$G=0;$M[$R]["fields"]=array();foreach($ta[$R]as$k){$G+=1.25;$Ad[$R][$k["field"]]=$G;$M[$R]["fields"][$k["field"]]=$k;}foreach(adminer()->foreignKeys($R)as$X){if($X["db"]==""&&$X["ns"]==""&&!$ze[$X["table"]]){$Qd[$R][]=$X;$dj[$X["table"]][$R]=array();}}}$d=array();$fe=array();$zm=array();$ke=array();foreach(array_keys($M)as$B)schema_column($B,$dj,$d);arsort($d);foreach($d
+as$B=>$c){$Cg=null;foreach((array)idx($Qd,$B)as$X){if($X["table"]!=$B&&$M[$X["table"]])$Cg=($Cg===null?$d[$X["table"]]:min($Cg,$d[$X["table"]]));}$d[$B]=max($c,(int)$Cg-1);}$Vk=array();foreach($M
+as$B=>$R){$c=$d[$B];$fe[$c][]=$B;$il=.75*strlen($B);foreach($R["fields"]as$k)$il=max($il,.65*strlen($k["field"]));$Vk[$B]=ceil($il)+1;$zm[$c]=max(idx($zm,$c,0),$Vk[$B]);}foreach($Qd
+as$B=>$jm){foreach($jm
+as$X){$je=$d[$B]+(idx($d,$X["table"],$d[$B])>$d[$B]?1:0);$ke[$je]=idx($ke,$je,0)+1;}}ksort($fe);$xe=0;$ym=0;$vb=0;$Fi=null;$Ok=array();foreach($fe
+as$c=>$T){if($Fi!==null){$vb=round($vb+$zm[$Fi]+1.7+idx($ke,$c,0)*.1,1);$D=array();foreach($T
+as$B){$Ek=0;$Lb=0;$Ug=array_keys((array)idx($dj,$B));foreach((array)idx($Qd,$B)as$X)$Ug[]=$X["table"];foreach($Ug
+as$Og){if($M[$Og]&&$d[$Og]<$c){$Ek+=$M[$Og]["pos"][0];$Lb++;}}$D[$B]=($Lb?$Ek/$Lb:$xe);}asort($D);$T=array_keys($D);}$tl=0;foreach($T
+as$B){$G=1.25*count($M[$B]["fields"]);$M[$B]["pos"]=($Qk[$B]?:array($tl,$vb));$Ok[$B]=$M[$B]["pos"][1];$tl+=2.5+$G;$xe=max($xe,$M[$B]["pos"][0]+2.5+$G);$ym=max($ym,round($M[$B]["pos"][1]+$zm[$c],1));if(!$Qk[$B])$Rk[]="\n\t'".js_escape($B)."': [ ".$M[$B]["pos"][0].", ".$M[$B]["pos"][1]." ]";}$Fi=$c;}$Kf=array();$Oa=array();foreach($Qd
+as$B=>$jm){foreach($jm
+as$X){$bl=idx($Ok,$X["table"],$Ok[$B]);$lk=$Ok[$B]+$zm[$d[$B]];$rj=($bl-1>$lk);$If=($rj?$lk+1:min($Ok[$B],$bl)-1);$Na=idx($Oa,(string)$If,0);$Oa[(string)$If]=$Na+1;$If=round($rj?min($If+$Na*.1,$bl-1):$If-$Na*.1,1);while($Kf[(string)$If])$If-=.0001;$M[$B]["references"][$X["table"]][(string)$If]=array($X["source"],$X["target"]);$dj[$X["table"]][$B][(string)$If]=$X["target"];$Kf[(string)$If]=true;}}echo'<div id="schema" style="height: ',$xe,'em; width: ',$ym,'em;">
 <script',nonce(),'>
-const tablePos = {',implode(",",$Jk)."\n",'};
-const tablePosDefault = {',implode(",",$Ik)."\n",'};
-const em = qs(\'#schema\').offsetHeight / ',$ue,';
+const tablePos = {',implode(",",$Sk)."\n",'};
+const tablePosDefault = {',implode(",",$Rk)."\n",'};
+const em = qs(\'#schema\').offsetHeight / ',$xe,';
 document.onmousemove = schemaMousemove;
 document.onmouseup = event => schemaMouseup(event, \'',js_escape(DB),'\');
 </script>
 ';foreach($M
-as$B=>$R){echo"<div class='table'".on('mousedown','schemaMousedown')." style='top: ".$R["pos"][0]."em; left: ".$R["pos"][1]."em; width: ".$Mk[$B]."em;'>",'<a href="'.h(ME).'table='.url_escape($B).'"><b>'.h($B)."</b></a>";foreach($R["fields"]as$k){$X='<span'.type_class($k["type"]).' title="'.h($k["type"].($k["length"]?"($k[length])":"").($k["null"]?" NULL":'')).'">'.h($k["field"]).'</span>';echo"<br>".($k["primary"]?"<i>$X</i>":$X);}foreach((array)$R["references"]as$Tk=>$Yi){foreach($Yi
-as$Gf=>$Ti){$Hf=$Gf-$R["pos"][1];$uk=($Hf>0?"left: 100%; width: calc($Hf"."em - 100%)":"left: $Hf"."em");$pm=($Hf>0?"100%":(-$Hf)."em");$r=0;foreach($Ti[0]as$dk)echo"\n<div class='references' title='".h($Tk)."' id='refs$Gf-".($r++)."' style='$uk"."; top: ".$yd[$B][$dk]."em; padding-top: .5em;'>"."<div style='border-top: 1px solid gray; width: $pm;'></div></div>";}}foreach((array)$Wi[$B]as$Tk=>$Yi){foreach($Yi
-as$Gf=>$Uk){$Hf=$Gf-$R["pos"][1];$r=0;foreach($Uk
-as$Rk)echo"\n<div class='references arrow' title='".h($Tk)."' id='refd$Gf-".($r++)."' style='left: $Hf"."em; top: ".$yd[$B][$Rk]."em;'>"."<div style='height: .5em; border-bottom: 1px solid gray; width: ".(-$Hf)."em;'></div>"."</div>";}}echo"\n</div>\n";}foreach($M
-as$B=>$R){foreach((array)$R["references"]as$Tk=>$Yi){if($M[$Tk]){foreach($Yi
-as$Gf=>$Ti){$Ag=$ue;$hg=-10;foreach($Ti[0]as$w=>$dk){$si=$R["pos"][0]+$yd[$B][$dk];$ti=$M[$Tk]["pos"][0]+$yd[$Tk][$Ti[1][$w]];$Ag=min($Ag,$si,$ti);$hg=max($hg,$si,$ti);}echo"<div class='references' id='refl$Gf' style='left: $Gf"."em; top: $Ag"."em; padding: .5em 0;'><div style='border-right: 1px solid gray; margin-top: 1px; height: ".($hg-$Ag)."em;'></div></div>\n";}}}}echo'</div>
+as$B=>$R){echo"<div class='table'".on('mousedown','schemaMousedown')." style='top: ".$R["pos"][0]."em; left: ".$R["pos"][1]."em; width: ".$Vk[$B]."em;'>",'<a href="'.h(ME).'table='.url_escape($B).'"><b>'.h($B)."</b></a>";foreach($R["fields"]as$k){$X='<span'.type_class($k["type"]).' title="'.h($k["type"].($k["length"]?"($k[length])":"").($k["null"]?" NULL":'')).'">'.h($k["field"]).'</span>';echo"<br>".($k["primary"]?"<i>$X</i>":$X);}foreach((array)$R["references"]as$cl=>$fj){foreach($fj
+as$If=>$aj){$Jf=$If-$R["pos"][1];$Bk=($Jf>0?"left: 100%; width: calc($Jf"."em - 100%)":"left: $Jf"."em");$ym=($Jf>0?"100%":(-$Jf)."em");$r=0;foreach($aj[0]as$kk)echo"\n<div class='references' title='".h($cl)."' id='refs$If-".($r++)."' style='$Bk"."; top: ".$Ad[$B][$kk]."em; padding-top: .5em;'>"."<div style='border-top: 1px solid gray; width: $ym;'></div></div>";}}foreach((array)$dj[$B]as$cl=>$fj){foreach($fj
+as$If=>$dl){$Jf=$If-$R["pos"][1];$r=0;foreach($dl
+as$al)echo"\n<div class='references arrow' title='".h($cl)."' id='refd$If-".($r++)."' style='left: $Jf"."em; top: ".$Ad[$B][$al]."em;'>"."<div style='height: .5em; border-bottom: 1px solid gray; width: ".(-$Jf)."em;'></div>"."</div>";}}echo"\n</div>\n";}foreach($M
+as$B=>$R){foreach((array)$R["references"]as$cl=>$fj){if($M[$cl]){foreach($fj
+as$If=>$aj){$Dg=$xe;$jg=-10;foreach($aj[0]as$w=>$kk){$xi=$R["pos"][0]+$Ad[$B][$kk];$yi=$M[$cl]["pos"][0]+$Ad[$cl][$aj[1][$w]];$Dg=min($Dg,$xi,$yi);$jg=max($jg,$xi,$yi);}echo"<div class='references' id='refl$If' style='left: $If"."em; top: $Dg"."em; padding: .5em 0;'><div style='border-right: 1px solid gray; margin-top: 1px; height: ".($jg-$Dg)."em;'></div></div>\n";}}}}echo'</div>
 <p class="links"><a href="',h(ME."schema=".url_escape($da)),'" id="schema-link">',lang(165),'</a>
-';}elseif(isset($_GET["dump"])){$a=$_GET["dump"];if($_POST&&!$j){$i=array("auto_increment"=>'');foreach(array("type","routine","event","trigger")as$zk){if(support($zk))$i[$zk."s"]='';}save_settings(array_intersect_key($_POST+$i,array_flip(array("output","format","db_style","schema_style","table_style","data_style"))+$i),"adminer_export");$sa=(DB==""||$_GET["ns"]==="");$T=array_flip((array)$_POST["tables"])+array_flip((array)$_POST["data"]);$pd=dump_headers((count($T)==1?key($T):DB),($sa||count($T)>1));$mf=preg_match('~sql~',$_POST["format"]);if($mf){echo"-- Adminer ".VERSION." ".get_driver(DRIVER)." ".str_replace("\n"," ",connection()->server_info)." dump\n\n";if(JUSH=="sql"){echo"SET NAMES utf8;
+';}elseif(isset($_GET["dump"])){$a=$_GET["dump"];if($_POST&&!$j){$i=array("auto_increment"=>'');foreach(array("type","routine","event","trigger")as$Gk){if(support($Gk))$i[$Gk."s"]='';}save_settings(array_intersect_key($_POST+$i,array_flip(array("output","format","db_style","schema_style","table_style","data_style"))+$i),"adminer_export");$sa=(DB==""||$_GET["ns"]==="");$T=array_flip((array)$_POST["tables"])+array_flip((array)$_POST["data"]);$sd=dump_headers((count($T)==1?key($T):DB),($sa||count($T)>1));$pf=preg_match('~sql~',$_POST["format"]);if($pf){echo"-- Adminer ".VERSION." ".get_driver(DRIVER)." ".str_replace("\n"," ",connection()->server_info)." dump\n\n";if(JUSH=="sql"){echo"SET NAMES utf8;
 SET time_zone = '+00:00';
 SET foreign_key_checks = 0;
 ".($_POST["data_style"]?"SET sql_mode = 'NO_AUTO_VALUE_ON_ZERO';
 ":"")."
-";connection()->query("SET time_zone = '+00:00'");connection()->query("SET sql_mode = ''");}}$uk=$_POST["db_style"];$g=array(DB);if(DB==""){$g=$_POST["databases"];if(is_string($g))$g=explode("\n",rtrim(str_replace("\r","",$g),"\n"));}foreach((array)$g
-as$h){adminer()->dumpDatabase($h);if(connection()->select_db($h)){if($mf&&$uk)echo
-use_sql($h,$uk).";\n\n";foreach(($_GET["ns"]===""?(array)$_POST["schemas"]:(DB!=""||!support("scheme")?array(""):adminer()->schemas()))as$M){if($M!=""){if(DB==""&&information_schema(DB,$M))continue;set_schema($M);}if($mf&&$_POST["schema_style"]&&function_exists('Adminer\use_schema_sql'))echo
-use_schema_sql($_GET["ns"],$_POST["schema_style"]).";\n\n";$qk=($_POST["table_style"]||$_POST["data_style"]?table_status('',true):array());$od=array();$Yb=array();foreach($qk
-as$B=>$S){if($sa||in_array($B,(array)$_POST["tables"]))$od[$B]=$S;if($sa||in_array($B,(array)$_POST["data"]))$Yb[$B]=$S;}if($mf){if($_POST["table_style"]=="DROP+CREATE"&&function_exists('Adminer\drop_sql'))echo
-drop_sql($od);if($_POST["data_style"]=="TRUNCATE+INSERT"&&function_exists('Adminer\truncate_all_sql')){$vl=array();foreach($Yb
-as$B=>$S){if(!is_view($S)&&!($_POST["table_style"]=="DROP+CREATE"&&isset($od[$B])))$vl[]=$B;}echo
-truncate_all_sql($vl);}$Mh="";if($_POST["types"]){foreach(types()as$s=>$U){$jc=type_definition($s);$eh=($jc["kind"]=='d'?"DOMAIN":"TYPE");if($jc["definition"])$Mh
-.=($uk!='DROP+CREATE'?"DROP $eh IF EXISTS ".table($U).";;\n":"")."CREATE $eh ".table($U)." $jc[definition];\n\n";else$Mh
-.="-- Could not export type ".preg_replace('~[\r\n]+~',' ',$U)."\n\n";}}if($_POST["routines"]){foreach(routines()as$K){$B=$K["ROUTINE_NAME"];$nj=$K["ROUTINE_TYPE"];$Te=routine($K["SPECIFIC_NAME"],$nj);if($Te["definition"]!=""){$Mb=create_routine($nj,array("name"=>$B)+$Te);set_utf8mb4($Mb);$Mh
-.=($uk!='DROP+CREATE'?"DROP $nj IF EXISTS ".table($B).";;\n":"")."$Mb;\n\n";}else$Mh
-.="-- Could not export ".strtolower($nj)." ".preg_replace('~[\r\n]+~',' ',$B)."\n\n";}}if($_POST["events"]){foreach(get_rows("SHOW EVENTS",null,"-- ")as$K){$Mb=remove_definer(get_val("SHOW CREATE EVENT ".idf_escape($K["Name"]),3));set_utf8mb4($Mb);$Mh
-.=($uk!='DROP+CREATE'?"DROP EVENT IF EXISTS ".idf_escape($K["Name"]).";;\n":"")."$Mb;;\n\n";}}echo($Mh&&JUSH=='sql'?"DELIMITER ;;\n\n$Mh"."DELIMITER ;\n\n":$Mh);}if($_POST["table_style"]||$_POST["data_style"]){$gm=array();foreach($qk
-as$B=>$S){$R=array_key_exists($B,$od);$Wb=array_key_exists($B,$Yb);if($R||$Wb){$hl=null;if($pd=="tar"){$hl=new
-TmpFile;ob_start(array($hl,'write'),1e5);}adminer()->dumpTable($B,($R?$_POST["table_style"]:""),(is_view($S)?2:0));if(is_view($S))$gm[]=$B;elseif($Wb){$l=fields($B);$N=array("*");$Ib=convert_fields($l,$l);if($Ib)$N[]=substr($Ib,2);adminer()->dumpData($B,$_POST["data_style"],"",$N);}if($mf&&$_POST["triggers"]&&$R&&($ul=trigger_sql($B)))echo"\nDELIMITER ;;\n$ul\nDELIMITER ;\n";if($pd=="tar"){ob_end_flush();tar_file((DB!=""?"":"$h/")."$B.csv",$hl);}elseif($mf)echo"\n";}}if($mf&&$_POST["table_style"]&&function_exists('Adminer\foreign_keys_sql')){foreach($od
+";connection()->query("SET time_zone = '+00:00'");connection()->query("SET sql_mode = ''");}}$Bk=$_POST["db_style"];$g=array(DB);if(DB==""){$g=$_POST["databases"];if(is_string($g))$g=explode("\n",rtrim(str_replace("\r","",$g),"\n"));}foreach((array)$g
+as$h){adminer()->dumpDatabase($h);if(connection()->select_db($h)){if($pf&&$Bk)echo
+use_sql($h,$Bk).";\n\n";foreach(($_GET["ns"]===""?(array)$_POST["schemas"]:(DB!=""||!support("scheme")?array(""):adminer()->schemas()))as$M){if($M!=""){if(DB==""&&information_schema(DB,$M))continue;set_schema($M);}if($pf&&$_POST["schema_style"]&&function_exists('Adminer\use_schema_sql'))echo
+use_schema_sql($_GET["ns"],$_POST["schema_style"]).";\n\n";$yk=($_POST["table_style"]||$_POST["data_style"]?table_status('',true):array());$rd=array();$Yb=array();foreach($yk
+as$B=>$S){if($sa||in_array($B,(array)$_POST["tables"]))$rd[$B]=$S;if($sa||in_array($B,(array)$_POST["data"]))$Yb[$B]=$S;}if($pf){if($_POST["table_style"]=="DROP+CREATE"&&function_exists('Adminer\drop_sql'))echo
+drop_sql($rd);if($_POST["data_style"]=="TRUNCATE+INSERT"&&function_exists('Adminer\truncate_all_sql')){$Dl=array();foreach($Yb
+as$B=>$S){if(!is_view($S)&&!($_POST["table_style"]=="DROP+CREATE"&&isset($rd[$B])))$Dl[]=$B;}echo
+truncate_all_sql($Dl);}$Qh="";if($_POST["types"]){foreach(types()as$s=>$U){$kc=type_definition($s);$hh=($kc["kind"]=='d'?"DOMAIN":"TYPE");if($kc["definition"])$Qh
+.=($Bk!='DROP+CREATE'?"DROP $hh IF EXISTS ".table($U).";;\n":"")."CREATE $hh ".table($U)." $kc[definition];\n\n";else$Qh
+.="-- Could not export type ".preg_replace('~[\r\n]+~',' ',$U)."\n\n";}}if($_POST["routines"]){foreach(routines()as$K){$B=$K["ROUTINE_NAME"];$uj=$K["ROUTINE_TYPE"];$We=routine($K["SPECIFIC_NAME"],$uj);if($We["definition"]!=""){$Mb=create_routine($uj,array("name"=>$B)+$We);set_utf8mb4($Mb);$Qh
+.=($Bk!='DROP+CREATE'?"DROP $uj IF EXISTS ".table($B).";;\n":"")."$Mb;\n\n";}else$Qh
+.="-- Could not export ".strtolower($uj)." ".preg_replace('~[\r\n]+~',' ',$B)."\n\n";}}if($_POST["events"]){foreach(get_rows("SHOW EVENTS",null,"-- ")as$K){$Mb=remove_definer(get_val("SHOW CREATE EVENT ".idf_escape($K["Name"]),3));set_utf8mb4($Mb);$Qh
+.=($Bk!='DROP+CREATE'?"DROP EVENT IF EXISTS ".idf_escape($K["Name"]).";;\n":"")."$Mb;;\n\n";}}echo($Qh&&JUSH=='sql'?"DELIMITER ;;\n\n$Qh"."DELIMITER ;\n\n":$Qh);}if($_POST["table_style"]||$_POST["data_style"]){$pm=array();foreach($yk
+as$B=>$S){$R=array_key_exists($B,$rd);$Wb=array_key_exists($B,$Yb);if($R||$Wb){$ql=null;if($sd=="tar"){$ql=new
+TmpFile;ob_start(array($ql,'write'),1e5);}adminer()->dumpTable($B,($R?$_POST["table_style"]:""),(is_view($S)?2:0));if(is_view($S))$pm[]=$B;elseif($Wb){$l=fields($B);$N=array("*");$Ib=convert_fields($l,$l);if($Ib)$N[]=substr($Ib,2);adminer()->dumpData($B,$_POST["data_style"],"",$N);}if($pf&&$_POST["triggers"]&&$R&&($Cl=trigger_sql($B)))echo"\nDELIMITER ;;\n$Cl\nDELIMITER ;\n";if($sd=="tar"){ob_end_flush();tar_file((DB!=""?"":"$h/")."$B.csv",$ql);}elseif($pf)echo"\n";}}if($pf&&$_POST["table_style"]&&function_exists('Adminer\foreign_keys_sql')){foreach($rd
 as$B=>$S){if(!is_view($S))echo
-foreign_keys_sql($B);}}if($mf){foreach($gm
-as$fm)adminer()->dumpTable($fm,$_POST["table_style"],1);}if($pd=="tar")echo
+foreign_keys_sql($B);}}if($pf){foreach($pm
+as$om)adminer()->dumpTable($om,$_POST["table_style"],1);}if($sd=="tar")echo
 pack("x1024");}}}}adminer()->dumpFooter();exit;}page_header(lang(76),$j,($_GET["export"]!=""?array("table"=>$_GET["export"]):array()),h(DB));echo'
 <form action="" method="post">
 <table class="layout">
-';$cc=array('','USE','DROP+CREATE','CREATE');$xj=(JUSH=="mssql"?array('','DROP+CREATE','CREATE'):$cc);$Lk=array('','DROP+CREATE','CREATE');$Xb=array('','TRUNCATE+INSERT','INSERT');if(JUSH=="sql")$Xb[]='INSERT+UPDATE';$K=get_settings("adminer_export");if(!$K)$K=array("output"=>"text","format"=>"sql","db_style"=>(DB!=""?"":"CREATE"),"schema_style"=>"","table_style"=>"DROP+CREATE","data_style"=>"INSERT");echo"<tr><th>".lang(166)."<td>".html_radios("output",adminer()->dumpOutput(),$K["output"])."\n","<tr><th>".lang(167)."<td>".html_radios("format",adminer()->dumpFormat(),$K["format"])."\n",(JUSH=="sqlite"?"":"<tr><th>".lang(35)."<td>".html_select('db_style',$cc,$K["db_style"]).(support("type")?checkbox("types",1,$K["types"],lang(0)):"").(support("routine")?checkbox("routines",1,$K["routines"],lang(72)):"").(support("event")?checkbox("events",1,$K["events"],lang(74)):"")),(function_exists('Adminer\use_schema_sql')?"<tr><th>".lang(168)."<td>".html_select('schema_style',$xj,$K["schema_style"]):""),"<tr><th>".lang(141)."<td>".html_select('table_style',$Lk,$K["table_style"]).checkbox("auto_increment",1,$K["auto_increment"],lang(51)).(support("trigger")?checkbox("triggers",1,$K["triggers"],lang(160)):""),"<tr><th>".lang(169)."<td>".html_select('data_style',$Xb,$K["data_style"]),'</table>
+';$cc=array('','USE','DROP+CREATE','CREATE');$Dj=(JUSH=="mssql"?array('','DROP+CREATE','CREATE'):$cc);$Uk=array('','DROP+CREATE','CREATE');$Xb=array('','TRUNCATE+INSERT','INSERT');if(JUSH=="sql")$Xb[]='INSERT+UPDATE';$K=get_settings("adminer_export");if(!$K)$K=array("output"=>"text","format"=>"sql","db_style"=>(DB!=""?"":"CREATE"),"schema_style"=>"","table_style"=>"DROP+CREATE","data_style"=>"INSERT");echo"<tr><th>".lang(166)."<td>".html_radios("output",adminer()->dumpOutput(),$K["output"])."\n","<tr><th>".lang(167)."<td>".html_radios("format",adminer()->dumpFormat(),$K["format"])."\n",(JUSH=="sqlite"?"":"<tr><th>".lang(35)."<td>".html_select('db_style',$cc,$K["db_style"]).(support("type")?checkbox("types",1,$K["types"],lang(0)):"").(support("routine")?checkbox("routines",1,$K["routines"],lang(72)):"").(support("event")?checkbox("events",1,$K["events"],lang(74)):"")),(function_exists('Adminer\use_schema_sql')?"<tr><th>".lang(168)."<td>".html_select('schema_style',$Dj,$K["schema_style"]):""),"<tr><th>".lang(142)."<td>".html_select('table_style',$Uk,$K["table_style"]).checkbox("auto_increment",1,$K["auto_increment"],lang(51)).(support("trigger")?checkbox("triggers",1,$K["triggers"],lang(160)):""),"<tr><th>".lang(169)."<td>".html_select('data_style',$Xb,$K["data_style"]),'</table>
 ';adminer()->dumpPrint();echo'<p><input type=\'submit\' value=\'',lang(76),'\'>
 ',input_token(),'
 <table',on('click','dumpClick'),'>
-';$_i=array();if($_GET["ns"]===""&&support("scheme")){echo"<thead><tr><th style='text-align: left;'>","<label class='block'><input type='checkbox' id='check-schemas' checked class='jsonly' title='".lang(170)."'".on('click','formCheck','^schemas\[').">".lang(168)."</label>","<tbody>\n";foreach(adminer()->schemas()as$M){if(!information_schema(DB,$M))echo"<tr><td>".checkbox("schemas[]",$M,true,$M,"","block")."\n";}}elseif(DB!=""){$ib=($a!=""?"":" checked");echo"<thead><tr>","<th style='text-align: left;'><label class='block'><input type='checkbox' id='check-tables'$ib class='jsonly' title='".lang(170)."'".on('click','formCheck','^tables\[').">".lang(150)."</label>","<th style='text-align: right;'><label class='block'>".lang(169)."<input type='checkbox' id='check-data'$ib class='jsonly' title='".lang(170)."'".on('click','formCheck','^data\[')."></label>","<tbody>\n";$gm="";$Ok=tables_list();foreach($Ok
-as$B=>$U){$zi=preg_replace('~_.*~','',$B);$ib=($a==""||$a==(substr($a,-1)=="%"?"$zi%":$B));$Di="<tr><td>".checkbox("tables[]",$B,$ib,$B,"","block");if($U!==null&&!preg_match('~table~i',$U))$gm
-.="$Di\n";else
-echo"$Di<td align='right'><label class='block'><span id='Rows-".h($B)."'></span>".checkbox("data[]",$B,$ib)."</label>\n";$_i[$zi]++;}echo$gm;if($Ok)echo
+';$Ei=array();if($_GET["ns"]===""&&support("scheme")){echo"<thead><tr><th style='text-align: left;'>","<label class='block'><input type='checkbox' id='check-schemas' checked class='jsonly' title='".lang(170)."'".on('click','formCheck','^schemas\[').">".lang(168)."</label>","<tbody>\n";foreach(adminer()->schemas()as$M){if(!information_schema(DB,$M))echo"<tr><td>".checkbox("schemas[]",$M,true,$M,"","block")."\n";}}elseif(DB!=""){$ib=($a!=""?"":" checked");echo"<thead><tr>","<th style='text-align: left;'><label class='block'><input type='checkbox' id='check-tables'$ib class='jsonly' title='".lang(170)."'".on('click','formCheck','^tables\[').">".lang(150)."</label>","<th style='text-align: right;'><label class='block'>".lang(169)."<input type='checkbox' id='check-data'$ib class='jsonly' title='".lang(170)."'".on('click','formCheck','^data\[')."></label>","<tbody>\n";$pm="";$Xk=tables_list();foreach($Xk
+as$B=>$U){$Di=preg_replace('~_.*~','',$B);$ib=($a==""||$a==(substr($a,-1)=="%"?"$Di%":$B));$Ii="<tr><td>".checkbox("tables[]",$B,$ib,$B,"","block");if($U!==null&&!preg_match('~table~i',$U))$pm
+.="$Ii\n";else
+echo"$Ii<td align='right'><label class='block'><span id='Rows-".h($B)."'></span>".checkbox("data[]",$B,$ib)."</label>\n";$Ei[$Di]++;}echo$pm;if($Xk)echo
 script("ajaxSetHtml('".js_escape(ME)."script=db');");}else{$g=adminer()->databases();echo"<thead><tr><th style='text-align: left;'>","<label class='block'>".($g?"<input type='checkbox' id='check-databases'".($a==""?" checked":"")." class='jsonly' title='".lang(170)."'".on('click','formCheck','^databases\[').">":"").lang(35)."</label>","<tbody>\n";if($g){foreach($g
-as$h){if(!information_schema($h)){$zi=preg_replace('~_.*~','',$h);echo"<tr><td>".checkbox("databases[]",$h,$a==""||$a=="$zi%",$h,"","block")."\n";$_i[$zi]++;}}}else
+as$h){if(!information_schema($h)){$Di=preg_replace('~_.*~','',$h);echo"<tr><td>".checkbox("databases[]",$h,$a==""||$a=="$Di%",$h,"","block")."\n";$Ei[$Di]++;}}}else
 echo"<tr><td><textarea name='databases' rows='10' cols='20'></textarea>";}echo'</table>
 </form>
-';$Gd=true;foreach($_i
-as$w=>$X){if($w!=""&&$X>1){echo($Gd?"<p>":" ")."<a href='".h(ME)."dump=".url_escape("$w%")."'>".h($w)."</a>";$Gd=false;}}}elseif(isset($_GET["privileges"])){page_header(lang(71));echo'<p class="links"><a href="'.h(ME).'user=">'.lang(171)."</a>";$I=connection()->query("SELECT User, Host FROM mysql.".(DB==""?"user":"db WHERE ".q(DB)." LIKE Db")." ORDER BY Host, User");$ae=$I;if(!$I)$I=connection()->query("SELECT SUBSTRING_INDEX(CURRENT_USER, '@', 1) AS User, SUBSTRING_INDEX(CURRENT_USER, '@', -1) AS Host");echo"<form action=''><p>\n";hidden_fields_get();echo
-input_hidden("db",DB),($ae?"":input_hidden("grant")),"<table class='odds'>\n","<thead><tr><th>".lang(33)."<th>".lang(31)."<td class='hover'><tbody>\n";while($K=$I->fetch_assoc())echo'<tr><td>'.h($K["User"]),"<td>".h($K["Host"]),'<td class="hover"><a href="'.h(ME.'user='.url_escape($K["User"]).'&host='.url_escape($K["Host"])).'">'.lang(14)."</a>\n";if(!$ae||DB!="")echo"<tr><td><input name='user' autocapitalize='off'>","<td><input name='host' value='localhost' autocapitalize='off'>","<td class='hover'><input type='submit' value='".lang(14)."'>\n";echo"</table>\n","</form>\n";}elseif(isset($_GET["sql"])){if(!$j&&$_POST["export"]){save_settings(array("output"=>$_POST["output"],"format"=>$_POST["format"]),"adminer_import");dump_headers("sql");if($_POST["format"]=="sql")echo"$_POST[query]\n";else{adminer()->dumpTable("","");adminer()->dumpData("","table",$_POST["query"]);adminer()->dumpFooter();}exit;}if(!$j&&$_POST["val"]){$oa=0;$vk=true;$bb=array();$uj=0;foreach($_POST["val"]as$L)$uj+=count($L);$Qa=$uj>1&&driver()->begin();foreach($_POST["val"]as$Dk=>$L){$R=bracket_escape($Dk,true);$l=fields($R);$Ek=indexes($R);foreach($L
-as$t=>$K){parse_str(bracket_escape($t,true),$Z);$Cl=array();foreach($Z["where"]as$w=>$X)$Cl[bracket_escape($w,true)]=$X;if(!$l||$Z["null"]||array_diff_key($Cl,$l)||!unique_array($Cl,$Ek)){$vk=false;break
+';$Jd=true;foreach($Ei
+as$w=>$X){if($w!=""&&$X>1){echo($Jd?"<p>":" ")."<a href='".h(ME)."dump=".url_escape("$w%")."'>".h($w)."</a>";$Jd=false;}}}elseif(isset($_GET["privileges"])){page_header(lang(71));echo'<p class="links"><a href="'.h(ME).'user=">'.lang(171)."</a>";$I=connection()->query("SELECT User, Host FROM mysql.".(DB==""?"user":"db WHERE ".q(DB)." LIKE Db")." ORDER BY Host, User");$de=$I;if(!$I)$I=connection()->query("SELECT SUBSTRING_INDEX(CURRENT_USER, '@', 1) AS User, SUBSTRING_INDEX(CURRENT_USER, '@', -1) AS Host");echo"<form action=''><p>\n";hidden_fields_get();echo
+input_hidden("db",DB),($de?"":input_hidden("grant")),"<table class='odds'>\n","<thead><tr><th>".lang(33)."<th>".lang(31)."<td class='hover'><tbody>\n";while($K=$I->fetch_assoc())echo'<tr><td>'.h($K["User"]),"<td>".h($K["Host"]),'<td class="hover"><a href="'.h(ME.'user='.url_escape($K["User"]).'&host='.url_escape($K["Host"])).'">'.lang(14)."</a>\n";if(!$de||DB!="")echo"<tr><td><input name='user' autocapitalize='off'>","<td><input name='host' value='localhost' autocapitalize='off'>","<td class='hover'><input type='submit' value='".lang(14)."'>\n";echo"</table>\n","</form>\n";}elseif(isset($_GET["sql"])){if(!$j&&$_POST["export"]){save_settings(array("output"=>$_POST["output"],"format"=>$_POST["format"]),"adminer_import");dump_headers("sql");if($_POST["format"]=="sql")echo"$_POST[query]\n";else{adminer()->dumpTable("","");adminer()->dumpData("","table",$_POST["query"]);adminer()->dumpFooter();}exit;}if(!$j&&$_POST["val"]){$oa=0;$Ck=true;$bb=array();$Aj=0;foreach($_POST["val"]as$L)$Aj+=count($L);$Qa=$Aj>1&&driver()->begin();foreach($_POST["val"]as$Mk=>$L){$R=bracket_escape($Mk,true);$l=fields($R);$Nk=indexes($R);foreach($L
+as$t=>$K){parse_str(bracket_escape($t,true),$Z);$Ll=array();foreach($Z["where"]as$w=>$X)$Ll[bracket_escape($w,true)]=$X;if(!$l||$Z["null"]||array_diff_key($Ll,$l)||!unique_array($Ll,$Nk)){$Ck=false;break
 2;}$P=array();$N=array();foreach($K
-as$vf=>$X){$w=bracket_escape($vf,true);$k=idx($l,$w);if(!$k){$vk=false;break
-3;}$P[idf_escape($w)]=(preg_match('~char|text~',$k["type"])||$X!=""?adminer()->processInput($k,$X):"NULL");$N[$vf]=$w;}$Ni=where($Z,$l);if(!driver()->update($R,$P," WHERE $Ni",0," ")){$vk=false;break
+as$xf=>$X){$w=bracket_escape($xf,true);$k=idx($l,$w);if(!$k){$Ck=false;break
+3;}$P[idf_escape($w)]=(preg_match('~char|text~',$k["type"])||$X!=""?adminer()->processInput($k,$X):"NULL");$N[$xf]=$w;}$Ui=where($Z,$l);if(!driver()->update($R,$P," WHERE $Ui",0," ")){$Ck=false;break
 2;}$oa+=connection()->affected_rows;$d=array();foreach($N
-as$w)$d[]=idf_escape($w);$Ll=driver()->select($R,$d,array($Ni),$d);$Vg=($Ll?$Ll->fetch_row():array());$rf=0;foreach($N
-as$vf=>$w){$k=$l[$w];$tk=array('type'=>(preg_match('~binary~',$k["type"])?'blob':$k["type"]));$bb["val[$Dk][$t][$vf]"]=select_value(idx($Vg,$rf++),"",$tk,null);}}}if($Qa&&$vk)$vk=driver()->commit();queries_redirect(null,lang(172,$oa),$vk);if($Qa&&!$vk)driver()->rollback();page_headers();page_messages($j);foreach($bb
-as$B=>$X)echo"<div data-name='".h($B)."' hidden>$X</div>\n";exit;}restart_session();$_e=&get_session("queries");$ze=&$_e[DB];if(!$j&&$_POST["clear"]){$ze=array();redirect(remove_from_uri("history"));}stop_session();$ma=get_settings("adminer_import");if($_POST&&$ma)save_settings($ma,"adminer_import");page_header((isset($_GET["import"])?lang(75):lang(64)),$j);$Qf=driver()->lineComment();if(!$j&&$_POST&&!(isset($_GET["import"])&&adminer()->importProcess())){$lc=driver()->delimiter;$o=false;if(!isset($_GET["import"]))$H=$_POST["query"];elseif($_POST["webfile"]){$hk=adminer()->importServerPath();$o=@fopen((file_exists($hk)?$hk:"compress.zlib://$hk.gz"),"rb");$H=($o?fread($o,1e6):false);}else$H=get_file("sql_file",true,$lc);if(is_string($H)){if(($pg=ini_bytes("memory_limit"))!="-1")ini_set("memory_limit",max($pg,strval(2*strlen($H)+memory_get_usage()+8e6)));if($H!=""&&strlen($H)<1e6){$Ki=$H.(preg_match("~$lc\\s*\$~",$H)?"":$lc);if(!$ze||first(end($ze))!=$Ki){restart_session();$ze[]=array($Ki,time());set_session("queries",$_e);stop_session();}}$fk="(?:\\s|\xEF\xBB\xBF|/\\*[\s\S]*?\\*/|(?:$Qf)[^\n]*\n?|--\r?\n)";$kh=0;$Tc=true;$Kb=false;$f=connect();if($f&&DB!=""){$f->select_db(DB);if($_GET["ns"]!="")set_schema($_GET["ns"],$f);}$wb=0;$bd=array();$Th='[\'"'.(JUSH=="sql"?'`':(JUSH=="sqlite"?'`[':(JUSH=="mssql"?'[':''))).']|/\*|'.$Qf.'|$'.(JUSH=="pgsql"?'|\$([a-zA-Z]\w*)?\$':'');$ll=microtime(true);while($H!=""){if(!$kh&&preg_match("~^$fk*+DELIMITER\\s+(\\S+)~i",$H,$A)){$lc=preg_quote($A[1]);$H=substr($H,strlen($A[0]));}elseif(!$kh&&JUSH=='pgsql'&&preg_match("~^($fk*+COPY\\s+)[^;]+\\s+FROM\\s+stdin;~i",$H,$A)){$lc="\n\\\\\\.\r?\n";$Kb=true;$kh=strlen($A[0]);}else{preg_match("($lc\\s*|$Th)",$H,$A,PREG_OFFSET_CAPTURE,$kh);list($Pd,$G)=$A[0];if(!$Pd&&$o&&!feof($o))$H
-.=fread($o,1e5);else{if(!$Pd&&rtrim($H)=="")break;$kh=$G+strlen($Pd);if($Pd&&!preg_match("(^$lc)",$Pd)){$Ya=driver()->hasCStyleEscapes()||(JUSH=="pgsql"&&($G>0&&strtolower($H[$G-1])=="e"));$ii=($Pd=='/*'?'\*/':($Pd=='['?']':(preg_match("~^(?:$Qf)~",$Pd)?"\n":preg_quote($Pd).($Ya?'|\\\\.':''))));while(preg_match("($ii|\$)s",$H,$A,PREG_OFFSET_CAPTURE,$kh)){$vj=$A[0][0];if(!$vj&&$o&&!feof($o))$H
-.=fread($o,1e5);else{$kh=$A[0][1]+strlen($vj);if(!$vj||$vj[0]!="\\")break;}}}else{$Ki=substr($H,0,$G+($Kb?3:0));$H=substr($H,$kh);$kh=0;if($Kb){$lc=driver()->delimiter;$Kb=false;}$pb="<code class='jush-".JUSH."'>".adminer()->sqlCommandQuery($Ki)."</code>";if(preg_match("~^$fk*+\$~",$Ki)&&!preg_match('~/\*M?!~',$Ki)){echo($_POST["only_errors"]?"":"<pre>$pb</pre>\n");continue;}$Tc=false;$wb++;$Di="<pre id='sql-$wb'>$pb</pre>\n";if(JUSH=="sqlite"&&preg_match("~^$fk*+(ATTACH|VACUUM\\b.*\\bINTO)\\b~is",$Ki,$A)!==0){echo$Di,"<p class='error'>".lang(173,preg_match('~ATTACH~i',$A[1])?'ATTACH':'VACUUM INTO')."\n";$bd[]=" <a href='#sql-$wb'>$wb</a>";if($_POST["error_stops"])break;}else{if(!$_POST["only_errors"]){echo$Di;ob_flush();flush();}$mk=microtime(true);if(connection()->multi_query($Ki)&&$f&&preg_match("~^$fk*+USE\\b~i",$Ki))$f->query($Ki);do{$I=connection()->store_result();if(connection()->error){echo($_POST["only_errors"]?$Di:""),"<p class='error'>".lang(174).(connection()->errno?" (".connection()->errno.")":"").": ".adminer()->error()."\n";$bd[]=" <a href='#sql-$wb'>$wb</a>";if($_POST["error_stops"])break
-2;}else{$z=ME."sql=".url_escape(trim($Ki));$al=" <span class='time'>(".format_time($mk).")</span>".(strlen($z)<adminer()->sqlUrlLength()-100?" <a href='".h($z)."'>".lang(14)."</a>":"");$oa=connection()->affected_rows;$jm=($_POST["only_errors"]?"":driver()->warnings());$km="warnings-$wb";if($jm)$al
-.=", <a href='#$km' class='toggle'>".lang(46)."</a>";$md="";$nd="explain-$wb";if(is_object($I)){$y=$_POST["limit"];$ch=$y;$Kc=!$_POST["only_errors"];if($Kc)echo"<form action='' method='post'>\n";$Eh=print_select_result($I,$f,array(),$ch,$Kc);if(!$_POST["only_errors"]){$ch=max($I->num_rows,$ch);echo"<p class='sql-footer'>".($ch?($y&&$ch>$y?lang(175,$y):"").lang(176,$ch):""),$al;if($f&&preg_match("~^($fk|\\()*+SELECT\\b~i",$Ki)&&($md=adminer()->explain($f,$Ki,$Eh))!="")echo", <a href='#$nd' class='toggle'>Explain</a>";if($Kc)echo", <input type='submit' name='save' value='".lang(18)."' class='jsonly' disabled"." title='".lang(177)."'".on('click','sqlSave',lang(21)).">";$s="export-$wb";echo", <a href='#$s' class='toggle'>".lang(76)."</a><span id='$s' class='hidden'>: ".html_select("output",adminer()->dumpOutput(),$ma["output"])." ".html_select("format",adminer()->dumpFormat(),$ma["format"]).input_hidden("query",$Ki)."<input type='submit' name='export' value='".lang(76)."'".($y?"":on('click','sqlExport')).">".input_token()."</span>\n"."</form>\n";}}else{if(preg_match("~^$fk*+(CREATE|DROP|ALTER)$fk++(DATABASE|SCHEMA)\\b~i",$Ki)){restart_session();set_session("dbs",null);stop_session();}if(!$_POST["only_errors"])echo"<p class='message' title='".h(connection()->info)."'>".lang(178,$oa)."$al\n";}echo($jm?"<div id='$km' class='hidden'>\n$jm</div>\n":""),($md!=""?"<div id='$nd' class='hidden explain'>\n$md</div>\n":"");}$mk=microtime(true);}while(connection()->next_result());}}}}}if($Tc)echo"<p class='message'>".lang(179)."\n";else{$Ne=connection()->inTransaction();driver()->rollback();if($Ne)echo"<pre><code class='jush-".JUSH."'>ROLLBACK".(JUSH=="mssql"?" TRANSACTION":"")." -- Adminer</code></pre>\n";if($_POST["only_errors"])echo"<p class='message'>".lang(180,$wb-count($bd))," <span class='time'>(".format_time($ll).")</span>\n";elseif($bd&&$wb>1)echo"<p class='error'>".lang(174).": ".implode("",$bd)."\n";}}else
+as$w)$d[]=idf_escape($w);$Ul=driver()->select($R,$d,array($Ui),$d);$Yg=($Ul?$Ul->fetch_row():array());$tf=0;foreach($N
+as$xf=>$w){$k=$l[$w];$Ak=array('type'=>(preg_match('~binary~',$k["type"])?'blob':$k["type"]));$bb["val[$Mk][$t][$xf]"]=select_value(idx($Yg,$tf++),"",$Ak,null);}}}if($Qa&&$Ck)$Ck=driver()->commit();queries_redirect(null,lang(172,$oa),$Ck);if($Qa&&!$Ck)driver()->rollback();page_headers();page_messages($j);foreach($bb
+as$B=>$X)echo"<div data-name='".h($B)."' hidden>$X</div>\n";exit;}restart_session();$Ce=&get_session("queries");$Be=&$Ce[DB];if(!$j&&$_POST["clear"]){$Be=array();redirect(remove_from_uri("history"));}stop_session();$ma=get_settings("adminer_import");if($_POST&&$ma)save_settings($ma,"adminer_import");page_header((isset($_GET["import"])?lang(75):lang(64)),$j);$Sf=driver()->lineComment();$dd=0;function
+query_error_line($gl,$nh,$H,$Rf){return
+substr_count(substr($gl,0,$nh),"\n")+($Rf?:substr_count(substr($H,0,strspn($H," \t\r\n")),"\n")+1);}if(!$j&&$_POST&&!(isset($_GET["import"])&&adminer()->importProcess())){$mc=driver()->delimiter;$o=false;if(!isset($_GET["import"]))$H=$_POST["query"];elseif($_POST["webfile"]){$ok=adminer()->importServerPath();$o=@fopen((file_exists($ok)?$ok:"compress.zlib://$ok.gz"),"rb");$H=($o?fread($o,1e6):false);}else$H=get_file("sql_file",true,$mc);if(is_string($H)){if(($rg=ini_bytes("memory_limit"))!="-1")ini_set("memory_limit",max($rg,strval(2*strlen($H)+memory_get_usage()+8e6)));if($H!=""&&strlen($H)<1e6){$Pi=$H.(preg_match("~$mc\\s*\$~",$H)?"":$mc);if(!$Be||first(end($Be))!=$Pi){restart_session();$Be[]=array($Pi,time());set_session("queries",$Ce);stop_session();}}$mk="(?:\\s|\xEF\xBB\xBF|/\\*[\s\S]*?\\*/|(?:$Sf)[^\n]*\n?|--\r?\n)";$nh=0;$Ti=0;$Uc=true;$Kb=false;$yg=false;$f=connect();if($f&&DB!=""){$f->select_db(DB);if($_GET["ns"]!="")set_schema($_GET["ns"],$f);}$wb=0;$ed=array();$Yh='[\'"'.(JUSH=="sql"?'`':(JUSH=="sqlite"?'`[':(JUSH=="mssql"?'[':''))).']|/\*|'.$Sf.'|$'.(JUSH=="pgsql"?'|\$([a-zA-Z]\w*)?\$':'');$ul=microtime(true);while($H!=""){if(!$nh&&preg_match("~^$mk*+DELIMITER\\s+(\\S+)~i",$H,$A)){$mc=preg_quote($A[1]);$H=substr($H,strlen($A[0]));$Ti+=strlen($A[0]);}elseif(!$nh&&JUSH=='pgsql'&&preg_match("~^($mk*+COPY\\s+)[^;]+\\s+FROM\\s+stdin;~i",$H,$A)){$mc="\n\\\\\\.\r?\n";$Kb=true;$nh=strlen($A[0]);}elseif(!$nh&&JUSH=='pgsql'&&preg_match("~^$mk*+\\\\connect[ \t][^\n]*~",$H,$A)){$mc="\n";$yg=true;$nh=strlen($A[0]);}else{preg_match("($mc\\s*|$Yh)",$H,$A,PREG_OFFSET_CAPTURE,$nh);list($Sd,$G)=$A[0];if(!$Sd&&$o&&!feof($o))$H
+.=fread($o,1e5);else{if(!$Sd&&rtrim($H)=="")break;$nh=$G+strlen($Sd);if($Sd&&!preg_match("(^$mc)",$Sd)){$Ya=driver()->hasCStyleEscapes()||(JUSH=="pgsql"&&($G>0&&strtolower($H[$G-1])=="e"));$ni=($Sd=='/*'?'\*/':($Sd=='['?']':(preg_match("~^(?:$Sf)~",$Sd)?"\n":preg_quote($Sd).($Ya?'|\\\\.':''))));while(preg_match("($ni|\$)s",$H,$A,PREG_OFFSET_CAPTURE,$nh)){$Bj=$A[0][0];if(!$Bj&&$o&&!feof($o))$H
+.=fread($o,1e5);else{$nh=$A[0][1]+strlen($Bj);if(!$Bj||$Bj[0]!="\\")break;}}}else{$Pi=substr($H,0,$G+($Kb?3:0));$H=substr($H,$nh);$Qi=$Ti;$Ti+=$nh;$nh=0;if($Kb||$yg){$mc=driver()->delimiter;$Kb=false;$yg=false;}$pb="<code class='jush-".JUSH."'>".adminer()->sqlCommandQuery($Pi)."</code>";if(preg_match("~^$mk*+\$~",$Pi)&&!preg_match('~/\*M?!~',$Pi)){echo($_POST["only_errors"]?"":"<pre>$pb</pre>\n");continue;}$Uc=false;$wb++;$Ii="<pre id='sql-$wb'>$pb</pre>\n";if(JUSH=="sqlite"&&preg_match("~^$mk*+(ATTACH|VACUUM\\b.*\\bINTO)\\b~is",$Pi,$A)!==0){echo$Ii,"<p class='error'>".lang(173,preg_match('~ATTACH~i',$A[1])?'ATTACH':'VACUUM INTO')."\n";$ed[]=" <a href='#sql-$wb'>$wb</a>";if(!$dd&&!isset($_GET["import"]))$dd=query_error_line($_POST["query"],$Qi,$Pi,0);if($_POST["error_stops"])break;}else{if(!$_POST["only_errors"]){echo$Ii;ob_flush();flush();}$tk=microtime(true);if(JUSH=="pgsql"&&preg_match("~^$mk*+\\\\connect\\s+(\"(?:[^\"]|\"\")+\"|[^\\s\";]+)\\s*;*\\s*\$~",$Pi,$A)){$h=idf_unescape($A[1]);if(connection()->select_db($h)){if($f)$f->select_db($h);echo($_POST["only_errors"]?"":"<p class='message'>".lang(35).": ".h($h)." <span class='time'>(".format_time($tk).")</span>\n");continue;}}elseif(connection()->multi_query($Pi)&&$f&&preg_match("~^$mk*+USE\\b~i",$Pi))$f->query($Pi);do{$I=connection()->store_result();if(connection()->error){echo($_POST["only_errors"]?$Ii:""),"<p class='error'>".lang(174).(connection()->errno?" (".connection()->errno.")":"").": ".adminer()->error()."\n";$ed[]=" <a href='#sql-$wb'>$wb</a>";if(!$dd&&!isset($_GET["import"]))$dd=query_error_line($_POST["query"],$Qi,$Pi,driver()->errorLine($Pi));if($_POST["error_stops"])break
+2;}else{$z=ME."sql=".url_escape(trim($Pi));$jl=" <span class='time'>(".format_time($tk).")</span>".(strlen($z)<adminer()->sqlUrlLength()-100?" <a href='".h($z)."'>".lang(14)."</a>":"");$oa=connection()->affected_rows;$sm=($_POST["only_errors"]?"":driver()->warnings());$tm="warnings-$wb";if($sm)$jl
+.=", <a href='#$tm' class='toggle'>".lang(46)."</a>";$pd="";$qd="explain-$wb";if(is_object($I)){$y=$_POST["limit"];$fh=$y;$Lc=!$_POST["only_errors"];if($Lc)echo"<form action='' method='post'>\n";$Ih=print_select_result($I,$f,array(),$fh,$Lc);if(!$_POST["only_errors"]){$fh=max($I->num_rows,$fh);echo"<p class='sql-footer'>".($fh?($y&&$fh>$y?lang(175,$y):"").lang(176,$fh):""),$jl;if($f&&preg_match("~^($mk|\\()*+SELECT\\b~i",$Pi)&&($pd=adminer()->explain($f,$Pi,$Ih))!="")echo", <a href='#$qd' class='toggle'>Explain</a>";if($Lc)echo", <input type='submit' name='save' value='".lang(18)."' class='jsonly' disabled"." title='".lang(177)."'".on('click','sqlSave',lang(21)).">";$s="export-$wb";echo", <a href='#$s' class='toggle'>".lang(76)."</a><span id='$s' class='hidden'>: ".html_select("output",adminer()->dumpOutput(),$ma["output"])." ".html_select("format",adminer()->dumpFormat(),$ma["format"]).input_hidden("query",$Pi)."<input type='submit' name='export' value='".lang(76)."'".($y?"":on('click','sqlExport')).">".input_token()."</span>\n"."</form>\n";}}else{if(preg_match("~^$mk*+(CREATE|DROP|ALTER)$mk++(DATABASE|SCHEMA)\\b~i",$Pi)){restart_session();set_session("dbs",null);stop_session();}if(!$_POST["only_errors"])echo"<p class='message' title='".h(connection()->info)."'>".lang(178,$oa)."$jl\n";}echo($sm?"<div id='$tm' class='hidden'>\n$sm</div>\n":""),($pd!=""?"<div id='$qd' class='hidden explain'>\n$pd</div>\n":"");}$tk=microtime(true);}while(connection()->next_result());}}}}}if($Uc)echo"<p class='message'>".lang(179)."\n";else{$Qe=connection()->inTransaction();driver()->rollback();if($Qe)echo"<pre><code class='jush-".JUSH."'>ROLLBACK".(JUSH=="mssql"?" TRANSACTION":"")." -- Adminer</code></pre>\n";if($_POST["only_errors"])echo"<p class='message'>".lang(180,$wb-count($ed))," <span class='time'>(".format_time($ul).")</span>\n";elseif($ed&&$wb>1)echo"<p class='error'>".lang(174).": ".implode("",$ed)."\n";}}else
 echo"<p class='error'>".upload_error($H)."\n";}echo'
-<form action="" method="post" enctype="multipart/form-data" id="form"';$Ml="";if(!isset($_GET["import"]))echo
+<form action="" method="post" enctype="multipart/form-data" id="form"';$Vl="";if(!isset($_GET["import"]))echo
 on('submit','sqlSubmit',remove_from_uri("sql|limit|error_stops|only_errors|history"),adminer()->sqlUrlLength());else
 echo
-on_upload_progress($Ml);echo'>
-';$jd="<input type='submit' value='".lang(181)."' title='Ctrl+Enter'>";if(!isset($_GET["import"])){$Ki=$_GET["sql"];if($_POST)$Ki=$_POST["query"];elseif($_GET["history"]=="all")$Ki=$ze;elseif($_GET["history"]!="")$Ki=idx($ze[$_GET["history"]],0);echo"<p>";textarea("query",$Ki,20);echo($_POST?"":script("qs('textarea').focus();")),"<p>";adminer()->sqlPrintAfter();echo"$jd\n",lang(182).": <input type='number' name='limit' class='size' value='".h($_POST?$_POST["limit"]:$_GET["limit"])."'>\n";}else{$ie=(extension_loaded("zlib")?"[.gz]":"");echo"<fieldset><legend>".lang(183)."</legend><div>",($Ml?input_hidden(ini_get("session.upload_progress.name"),$Ml):""),"SQL$ie: ".file_input(" name='sql_file[]' multiple","\n$jd"),($Ml?" <progress class='jsonly hidden' max='1' value='0'></progress>":""),"</div></fieldset>\n";$Ke=adminer()->importServerPath();if($Ke)echo"<fieldset><legend>".lang(184)."</legend><div>",lang(185,"<code>".h($Ke)."$ie</code>")," <input type='submit' name='webfile' value='".lang(186)."'>","</div></fieldset>\n";adminer()->importPrint();echo"<p>";}echo
-checkbox("error_stops",1,($_POST?$_POST["error_stops"]:isset($_GET["import"])||$_GET["error_stops"]),lang(187))."\n",checkbox("only_errors",1,($_POST?$_POST["only_errors"]:isset($_GET["import"])||$_GET["only_errors"]),lang(188))."\n",input_token();if(!isset($_GET["import"])&&$ze){print_fieldset("history",lang(189),$_GET["history"]!="");for($X=end($ze);$X;$X=prev($ze)){$w=key($ze);list($Ki,$al,$Pc)=$X;echo'<div><a href="'.h(ME."sql=&history=$w").'" class="hover">'.lang(14)."</a>"." <span class='time' title='".@date('Y-m-d',$al)."'>".@date("H:i:s",$al)."</span>"." <code class='jush-".JUSH."'>".shorten_utf8(preg_replace('~\s+~',' ',ltrim(preg_replace("~^(?:$Qf).*~m",'',$Ki))),80,"</code>").($Pc?" <span class='time'>($Pc)</span>":"")."</div>\n";}echo"<input type='submit' name='clear' value='".lang(190)."'>\n","<a href='".h(ME."sql=&history=all")."'>".lang(191)."</a>\n","</div></fieldset>\n";}echo'</form>
-';}elseif(isset($_GET["edit"])){$a=$_GET["edit"];$l=fields($a);$Z=(isset($_GET["select"])?($_POST["check"]&&count($_POST["check"])==1?where_check($_POST["check"][0],$l):""):where($_GET,$l));$Jl=(isset($_GET["select"])?$_POST["edit"]:$Z);foreach($l
-as$B=>$k){if((!$Jl&&!isset($k["privileges"]["insert"]))||adminer()->fieldName($k)=="")unset($l[$B]);}if($_POST&&!$j&&!isset($_GET["select"])){$_=relative_uri((string)$_POST["referer"]);if($_POST["insert"])$_=($Jl?null:relative_uri());elseif(!preg_match('~^.+&select=.+$~',$_))$_=ME."select=".url_escape($a);$v=indexes($a);$Dl=unique_array($_GET["where"],$v);$Ni="\nWHERE $Z";if(isset($_POST["delete"]))queries_redirect($_,lang(192),driver()->delete($a,$Ni,$Dl?0:1));else{$P=array();foreach($l
-as$B=>$k){$X=process_input($k);if($X!==false&&$X!==null)$P[idf_escape($B)]=$X;}if($Jl){if(!$P)redirect($_);queries_redirect($_,lang(193),driver()->update($a,$P,$Ni,$Dl?0:1));if(is_ajax()){page_headers();page_messages($j);exit;}}else{$I=driver()->insert($a,$P);$Ff=($I?last_id($I):0);queries_redirect($_,lang(194,($Ff?" $Ff":"")),$I);}}}$K=null;$H="";$al="";if($Z){$N=array();$Fj=array("*");foreach($l
-as$B=>$k){if(isset($k["privileges"]["select"])){$Ba=($_POST["clone"]&&$k["auto_increment"]?"''":convert_field($k));$c=($Ba?"$Ba AS ":"").idf_escape($B);$N[]=$c;if($Ba)$Fj[]=$c;}}$K=array();if(!support("table")){$N=array("*");$Fj=$N;}if($N){$mk=microtime(true);$I=driver()->select($a,$N,array($Z),$N,array(),(isset($_GET["select"])?2:1));$H=str_replace("SELECT ".implode(", ",$N),"SELECT ".implode(", ",$Fj),driver()->query);$al=format_time($mk);if(!$I)$j=adminer()->error();else{$K=$I->fetch_assoc();if(!$K)$K=false;}if(isset($_GET["select"])&&(!$K||$I->fetch_assoc()))$K=null;}}if(!$l&&driver()->primary!=""){if(!$Z){$I=driver()->select($a,array("*"),array(),array("*"));$K=($I?$I->fetch_assoc():false);if(!$K)$K=array(driver()->primary=>"");}if($K){foreach($K
-as$w=>$X){if(!$Z)$K[$w]=null;$l[$w]=array("field"=>$w,"null"=>($w!=driver()->primary),"auto_increment"=>($w==driver()->primary));}}}if($_POST["save"]){$ui=array();foreach((array)$_POST["fields"]as$w=>$X)$ui[bracket_escape($w,true)]=$X;$K=$ui+($K?$K:array());}edit_form($a,$l,$K,$Jl,$j,$H,$al);}elseif(isset($_GET["create"])){function
-referencable_primary($Hj){$J=array();foreach(table_status('',true)as$Gk=>$R){if($Gk!=$Hj&&!$R["dependent"]&&fk_support($R)){foreach(fields($Gk)as$k){if($k["primary"]){if($J[$Gk]){unset($J[$Gk]);break;}$J[$Gk]=$k;}}}}return$J;}$a=$_GET["create"];$Xh=driver()->partitionBy;$bi=($Xh&&$a!=""?driver()->partitionsInfo($a):array());$Vi=referencable_primary($a);$Nd=array();foreach($Vi
-as$Gk=>$k)$Nd[str_replace("`","``",$Gk)."`".str_replace("`","``",$k["field"])]=$Gk;$Hh=array();$S=array();$ah=false;if($a!=""){$Hh=fields($a);$S=table_status1($a);$ah=(count($S)<2);}$wa=($a==""||driver()->supportsAlterTable($S));$K=$_POST;$K["fields"]=(array)$K["fields"];if($K["auto_increment_col"])$K["fields"][$K["auto_increment_col"]]["auto_increment"]=true;if($_POST&&!$j)save_settings(array("comments"=>$_POST["comments"],"defaults"=>$_POST["defaults"]));if($_POST&&!process_fields($K["fields"])&&!$j){if($_POST["drop"])queries_redirect(substr(ME,0,-1),lang(195),drop_tables(array($a)));else{$l=array();$ta=array();$Ql=false;$Ld=array();$Gh=reset($Hh);$qa=" FIRST";foreach($K["fields"]as$k){$n=$Nd[$k["type"]];$xl=($n!==null?$Vi[$n]:$k);if($k["field"]!=""){if(!$k["generated"])$k["default"]=null;$Ii=process_field($k,$xl);$ta[]=array($k["orig"],$Ii,$qa);if(!$Gh||$Ii!==process_field($Gh,$Gh)){$l[]=array($k["orig"],$Ii,$qa);if($k["orig"]!=""||$qa)$Ql=true;}if($n!==null)$Ld[idf_escape($k["field"])]=($a!=""&&JUSH!="sqlite"?"ADD":" ").format_foreign_key(array('table'=>$Nd[$k["type"]],'source'=>array($k["field"]),'target'=>array($xl["field"]),'on_delete'=>$k["on_delete"],),object_name("FOREIGN",trim($K["name"]),array($k["field"])));$qa=" AFTER ".idf_escape($k["field"]);}elseif($k["orig"]!=""){$Ql=true;$l[]=array($k["orig"]);}if($k["orig"]!=""){$Gh=next($Hh);if(!$Gh)$qa="";}}$Zh=array();if(in_array($K["partition_by"],$Xh)){foreach($K
-as$w=>$X){if(preg_match('~^partition~',$w))$Zh[$w]=$X;}foreach($Zh["partition_names"]as$w=>$B){if($B==""){unset($Zh["partition_names"][$w]);unset($Zh["partition_values"][$w]);}}$Zh["partition_names"]=array_values($Zh["partition_names"]);$Zh["partition_values"]=array_values($Zh["partition_values"]);if($Zh==$bi)$Zh=array();}elseif(preg_match("~partitioned~",$S["Create_options"]))$Zh=null;$rg=lang(196);if($a==""){cookie("adminer_engine",$K["Engine"]);$rg=lang(197);}$B=trim($K["name"]);$_=ME.(support("table")?"table=":"select=").url_escape($B);$I=alter_table($a,$B,(JUSH=="sqlite"&&($Ql||$Ld)?$ta:$l),$Ld,($K["Comment"]!=$S["Comment"]?$K["Comment"]:null),($K["Engine"]&&$K["Engine"]!=$S["Engine"]?$K["Engine"]:""),($K["Collation"]&&$K["Collation"]!=$S["Collation"]?$K["Collation"]:""),($K["Auto_increment"]!=""?number($K["Auto_increment"]):""),$Zh);if($I&&!Queries::$queries&&$a!=""&&!$l&&!$Ld)redirect($_);queries_redirect($_,$rg,$I);}}$nk=($a!=""?"alter":"create");page_header(($a!=""?lang(44):lang(77)),$j,array("table"=>$a),h($a),$ah,doc_link(array('sql'=>"$nk-table.html",'mariadb'=>($a!=""?"$nk-table":""),)));if(!$_POST){$_l=driver()->types();$K=array("Engine"=>$_COOKIE["adminer_engine"],"fields"=>array(array("field"=>"","type"=>(isset($_l["int"])?"int":(isset($_l["integer"])?"integer":"")),"on_update"=>"")),"partition_names"=>array(""),);if($a!=""){$K=$S;$K["name"]=$a;$K["fields"]=array();if(!$_GET["auto_increment"])$K["Auto_increment"]="";foreach($Hh
-as$k){if($k["generated"])$k["default"]=ltrim($k["default"]);$k["generated"]=$k["generated"]?:(isset($k["default"])?"DEFAULT":"");$K["fields"][]=$k;}if($Xh){$K+=$bi;$K["partition_names"][]="";$K["partition_values"][]="";}}}$tb=flat_collations();$Wc=driver()->engines();foreach($Wc
-as$Vc){if(!strcasecmp($Vc,$K["Engine"])){$K["Engine"]=$Vc;break;}}$cg=max_input_vars(12,20);if($cg){$we=(count($K["fields"])>$cg?"":" hidden");echo"<p".($we?" id='max-fields' data-columns='$cg'":"")." class='error$we'>".max_input_vars_error()."\n";}echo'
+on_upload_progress($Vl);echo'>
+';$md="<input type='submit' value='".lang(181)."' title='Ctrl+Enter'>";if(!isset($_GET["import"])){$Pi=$_GET["sql"];if($_POST)$Pi=$_POST["query"];elseif($_GET["history"]=="all")$Pi=$Be;elseif($_GET["history"]!="")$Pi=idx($Be[$_GET["history"]],0);echo"<p>";textarea("query",$Pi,20,80,JUSH,$dd);echo($_POST?"":script("qs('textarea').focus();")),"<p>";adminer()->sqlPrintAfter();echo"$md\n",lang(182).": <input type='number' name='limit' class='size' value='".h($_POST?$_POST["limit"]:$_GET["limit"])."'>\n";}else{$le=(extension_loaded("zlib")?"[.gz]":"");echo"<fieldset><legend>".lang(183)."</legend><div>",($Vl?input_hidden(ini_get("session.upload_progress.name"),$Vl):""),"SQL$le: ".file_input(" name='sql_file[]' multiple","\n$md"),($Vl?" <progress class='jsonly hidden' max='1' value='0'></progress>":""),"</div></fieldset>\n";$Ne=adminer()->importServerPath();if($Ne)echo"<fieldset><legend>".lang(184)."</legend><div>",lang(185,"<code>".h($Ne)."$le</code>")," <input type='submit' name='webfile' value='".lang(186)."'>","</div></fieldset>\n";adminer()->importPrint();echo"<p>";}echo
+checkbox("error_stops",1,($_POST?$_POST["error_stops"]:isset($_GET["import"])||$_GET["error_stops"]),lang(187))."\n",checkbox("only_errors",1,($_POST?$_POST["only_errors"]:isset($_GET["import"])||$_GET["only_errors"]),lang(188))."\n",input_token();if(!isset($_GET["import"])&&$Be){print_fieldset("history",lang(189),$_GET["history"]!="");for($X=end($Be);$X;$X=prev($Be)){$w=key($Be);list($Pi,$jl,$Qc)=$X;echo'<div><a href="'.h(ME."sql=&history=$w").'" class="hover">'.lang(14)."</a>"." <span class='time' title='".@date('Y-m-d',$jl)."'>".@date("H:i:s",$jl)."</span>"." <code class='sql jush-".JUSH."'>".shorten_utf8(preg_replace('~\s+~',' ',ltrim(preg_replace("~^(?:$Sf).*~m",'',$Pi))),80,"</code>").($Qc?" <span class='time'>($Qc)</span>":"")."</div>\n";}echo"<input type='submit' name='clear' value='".lang(190)."'>\n","<a href='".h(ME."sql=&history=all")."'>".lang(191)."</a>\n","</div></fieldset>\n";}echo'</form>
+';}elseif(isset($_GET["edit"])){$a=$_GET["edit"];$l=fields($a);$Z=(isset($_GET["select"])?($_POST["check"]&&count($_POST["check"])==1?where_check($_POST["check"][0],$l):""):where($_GET,$l));$Sl=(isset($_GET["select"])?$_POST["edit"]:$Z);foreach($l
+as$B=>$k){if((!$Sl&&!isset($k["privileges"]["insert"]))||adminer()->fieldName($k)=="")unset($l[$B]);}if($_POST&&!$j&&!isset($_GET["select"])){$_=relative_uri((string)$_POST["referer"]);if($_POST["insert"])$_=($Sl?null:relative_uri());elseif(!preg_match('~^.+&select=.+$~',$_))$_=ME."select=".url_escape($a);$v=indexes($a);$Ml=unique_array($_GET["where"],$v);$Ui="\nWHERE $Z";if(isset($_POST["delete"]))queries_redirect($_,lang(192),driver()->delete($a,$Ui,$Ml?0:1));else{$P=array();foreach($l
+as$B=>$k){$X=process_input($k);if($X!==false&&$X!==null)$P[idf_escape($B)]=$X;}if($Sl){if(!$P)redirect($_);queries_redirect($_,lang(193),driver()->update($a,$P,$Ui,$Ml?0:1));if(is_ajax()){page_headers();page_messages($j);exit;}}else{$I=driver()->insert($a,$P);$Hf=($I?last_id($I):0);queries_redirect($_,lang(194,($Hf?" $Hf":"")),$I);}}}$K=null;$H="";$jl="";if($Z){$N=array();$Mj=array("*");foreach($l
+as$B=>$k){if(isset($k["privileges"]["select"])){$Ba=($_POST["clone"]&&$k["auto_increment"]?"''":convert_field($k));$c=($Ba?"$Ba AS ":"").idf_escape($B);$N[]=$c;if($Ba)$Mj[]=$c;}}$K=array();if(!support("table")){$N=array("*");$Mj=$N;}if($N){$tk=microtime(true);$I=driver()->select($a,$N,array($Z),$N,array(),(isset($_GET["select"])?2:1));$H=str_replace("SELECT ".implode(", ",$N),"SELECT ".implode(", ",$Mj),driver()->query);$jl=format_time($tk);if(!$I)$j=adminer()->error();else{$K=$I->fetch_assoc();if(!$K)$K=false;}if(isset($_GET["select"])&&(!$K||$I->fetch_assoc()))$K=null;}}if(!$l&&driver()->primary!=""){if(!$Z){$I=driver()->select($a,array("*"),array(),array("*"));$K=($I?$I->fetch_assoc():false);if(!$K)$K=array(driver()->primary=>"");}if($K){foreach($K
+as$w=>$X){if(!$Z)$K[$w]=null;$l[$w]=array("field"=>$w,"null"=>($w!=driver()->primary),"auto_increment"=>($w==driver()->primary));}}}if($_POST["save"]){$zi=array();foreach((array)$_POST["fields"]as$w=>$X)$zi[bracket_escape($w,true)]=$X;$K=$zi+($K?$K:array());}edit_form($a,$l,$K,$Sl,$j,$H,$jl);}elseif(isset($_GET["create"])){function
+referencable_primary($Oj){$J=array();foreach(table_status('',true)as$Pk=>$R){if($Pk!=$Oj&&!$R["dependent"]&&fk_support($R)){foreach(fields($Pk)as$k){if($k["primary"]){if($J[$Pk]){unset($J[$Pk]);break;}$J[$Pk]=$k;}}}}return$J;}$a=$_GET["create"];$ci=driver()->partitionBy;$gi=($ci&&$a!=""?driver()->partitionsInfo($a):array());$cj=referencable_primary($a);$Qd=array();foreach($cj
+as$Pk=>$k)$Qd[str_replace("`","``",$Pk)."`".str_replace("`","``",$k["field"])]=$Pk;$Lh=array();$S=array();$dh=false;if($a!=""){$Lh=fields($a);$S=table_status1($a);$dh=(count($S)<2);}$wa=($a==""||driver()->supportsAlterTable($S));$K=$_POST;$K["fields"]=(array)$K["fields"];if($K["auto_increment_col"])$K["fields"][$K["auto_increment_col"]]["auto_increment"]=true;if($_POST&&!$j)save_settings(array("comments"=>$_POST["comments"],"defaults"=>$_POST["defaults"]));if($_POST&&!process_fields($K["fields"])&&!$j){if($_POST["drop"])queries_redirect(substr(ME,0,-1),lang(195),drop_tables(array($a)));else{$l=array();$ta=array();$Zl=false;$Od=array();$Kh=reset($Lh);$qa=" FIRST";foreach($K["fields"]as$k){$n=$Qd[$k["type"]];$Fl=($n!==null?$cj[$n]:$k);if($k["field"]!=""){if(!$k["generated"])$k["default"]=null;$k["default_sql"]=($k["generated"]=="DEFAULT SQL");$Ni=process_field($k,$Fl);$ta[]=array($k["orig"],$Ni,$qa);if(!$Kh||$Ni!==process_field($Kh,$Kh)){$l[]=array($k["orig"],$Ni,$qa);if($k["orig"]!=""||$qa||(JUSH=="sqlite"&&$k["comment"]!=""))$Zl=true;}if($n!==null)$Od[idf_escape($k["field"])]=($a!=""&&JUSH!="sqlite"?"ADD":" ").format_foreign_key(array('table'=>$Qd[$k["type"]],'source'=>array($k["field"]),'target'=>array($Fl["field"]),'on_delete'=>$k["on_delete"],),object_name("FOREIGN",trim($K["name"]),array($k["field"])));$qa=" AFTER ".idf_escape($k["field"]);}elseif($k["orig"]!=""){$Zl=true;$l[]=array($k["orig"]);}if($k["orig"]!=""){$Kh=next($Lh);if(!$Kh)$qa="";}}$ei=array();if(in_array($K["partition_by"],$ci)){foreach($K
+as$w=>$X){if(preg_match('~^partition~',$w))$ei[$w]=$X;}foreach($ei["partition_names"]as$w=>$B){if($B==""){unset($ei["partition_names"][$w]);unset($ei["partition_values"][$w]);}}$ei["partition_names"]=array_values($ei["partition_names"]);$ei["partition_values"]=array_values($ei["partition_values"]);if($ei==$gi)$ei=array();}elseif(preg_match("~partitioned~",$S["Create_options"]))$ei=null;$tg=lang(196);if($a==""){cookie("adminer_engine",$K["Engine"]);$tg=lang(197);}$B=trim($K["name"]);$_=ME.(support("table")?"table=":"select=").url_escape($B);$xb=($K["Comment"]!=$S["Comment"]?$K["Comment"]:null);$Xc=($K["Engine"]&&$K["Engine"]!=$S["Engine"]?$K["Engine"]:"");$I=alter_table($a,$B,(JUSH=="sqlite"&&($Zl||$Od||$xb!==null||$Xc)?$ta:$l),$Od,$xb,$Xc,($K["Collation"]&&$K["Collation"]!=$S["Collation"]?$K["Collation"]:""),($K["Auto_increment"]!=""?number($K["Auto_increment"]):""),$ei);if($I&&!Queries::$queries&&$a!=""&&!$l&&!$Od)redirect($_);queries_redirect($_,$tg,$I);}}$vk=($a!=""?"alter":"create");page_header(($a!=""?lang(44):lang(77)),$j,array("table"=>$a),h($a),$dh,doc_link(array('sql'=>"$vk-table.html",'mariadb'=>($a!=""?"$vk-table":""),)));if(!$_POST){$Il=driver()->types();$K=array("Engine"=>$_COOKIE["adminer_engine"],"fields"=>array(array("field"=>"","type"=>(isset($Il["int"])?"int":(isset($Il["integer"])?"integer":"")),"on_update"=>"")),"partition_names"=>array(""),);if($a!=""){$K=$S;$K["name"]=$a;$K["fields"]=array();if(!$_GET["auto_increment"])$K["Auto_increment"]="";foreach($Lh
+as$k){if($k["generated"])$k["default"]=ltrim($k["default"]);$k["generated"]=$k["generated"]?:(isset($k["default"])?($k["default_sql"]?"DEFAULT SQL":"DEFAULT"):"");$K["fields"][]=$k;}if($ci){$K+=$gi;$K["partition_names"][]="";$K["partition_values"][]="";}}}$tb=flat_collations();$Yc=driver()->engines();foreach($Yc
+as$Xc){if(!strcasecmp($Xc,$K["Engine"])){$K["Engine"]=$Xc;break;}}$eg=max_input_vars(12,20);if($eg){$ze=(count($K["fields"])>$eg?"":" hidden");echo"<p".($ze?" id='max-fields' data-columns='$eg'":"")." class='error$ze'>".max_input_vars_error()."\n";}echo'
 <form action="" method="post" id="form">
 <p>
 ';if(support("columns")||$a==""){echo
-lang(198).": <input name='name'".($a==""&&!$_POST?" autofocus":"")." data-maxlength='64' value='".h($K["name"])."' autocapitalize='off'>\n",(!$wa?h($S["Engine"])."\n":($Wc?html_select("Engine",array(""=>"(".lang(199).")")+$Wc,$K["Engine"],on('change','helpClose').on_help_value())."\n":""));if($tb)echo"<datalist id='collations'>".optionlist($tb)."</datalist>\n",(preg_match("~sqlite|mssql~",JUSH)?"":"<input list='collations' name='Collation' value='".h($K["Collation"])."' placeholder='(".lang(120).")'>\n");echo"<input type='submit' value='".lang(18)."'>\n";}if(support("columns")&&$wa){echo"<div class='scrollable'>\n","<table id='edit-fields' class='nowrap'>\n";edit_fields($K["fields"],$tb,"TABLE",$Nd);echo"</table>\n",script("editFields();"),"</div>\n<p>\n",lang(51).": <input type='number' name='Auto_increment' class='size' value='".h($K["Auto_increment"])."'>\n",checkbox("defaults",1,($_POST?$_POST["defaults"]:get_setting("defaults")),lang(200),on('click','columnShowClick',6),"jsonly");$zb=($_POST?$_POST["comments"]:get_setting("comments"));if(support("comment")){echo
+lang(198).": <input name='name'".($a==""&&!$_POST?" autofocus":"")." data-maxlength='64' value='".h($K["name"])."' autocapitalize='off'>\n",(!$wa?h($S["Engine"])."\n":($Yc?html_select("Engine",array(""=>"(".lang(199).")")+$Yc,$K["Engine"],on('change','helpClose').on_help_value())."\n":""));if($tb)echo"<datalist id='collations'>".optionlist($tb)."</datalist>\n",(preg_match("~sqlite|mssql~",JUSH)?"":"<input list='collations' name='Collation' value='".h($K["Collation"])."' placeholder='(".lang(121).")'>\n");echo"<input type='submit' value='".lang(18)."'>\n";}if(support("columns")&&$wa){echo"<div class='scrollable'>\n","<table id='edit-fields' class='nowrap'>\n";edit_fields($K["fields"],$tb,"TABLE",$Qd);echo"</table>\n",script("editFields();"),"</div>\n<p>\n",lang(51).": <input type='number' name='Auto_increment' class='size' value='".h($K["Auto_increment"])."'>\n",checkbox("defaults",1,($_POST?$_POST["defaults"]:get_setting("defaults")),lang(200),on('click','columnShowClick',6),"jsonly");$zb=($_POST?$_POST["comments"]:get_setting("comments"));if(support("comment")){echo
 checkbox("comments",1,$zb,lang(50),on('click','editingCommentsClick',true),"jsonly").' ';$b=" name='Comment' data-maxlength='".(min_version(5.5)?2048:60)."'".($zb?"":" class='hidden'");echo
 adminer()->commentInput('TABLE',$b,$K["Comment"]);}echo'<p>
 <input type=\'submit\' value=\'',lang(18),'\'>
 ';}echo'
-';if($a!="")echo'<input type=\'submit\' name=\'drop\' value=\'',lang(145),'\'',confirm(lang(201,$a)),'>
-';if($Xh&&(JUSH=='sql'||$a=="")){$Yh=preg_match('~RANGE|LIST~',$K["partition_by"]);print_fieldset("partition",lang(202),$K["partition_by"]);echo"<p>".html_select("partition_by",array_merge(array(""),$Xh),$K["partition_by"],on('change','partitionByChange').on_help_value('.','PARTITION BY $&'))."\n","(<input name='partition' value='".h($K["partition"])."'>)\n",lang(203).": <input type='number' name='partitions' class='size".($Yh||!$K["partition_by"]?" hidden":"")."' value='".h($K["partitions"])."'>\n","<table id='partition-table'".($Yh?"":" class='hidden'").">\n","<thead><tr><th>".lang(204)."<th>".lang(205)."<tbody>\n";foreach($K["partition_names"]as$w=>$X)echo'<tr>','<td><input name="partition_names[]" value="'.h($X).'" autocapitalize="off"'.($w==count($K["partition_names"])-1?on('input','partitionNameChange'):'').'>','<td><input name="partition_values[]" value="'.h(idx($K["partition_values"],$w)).'">';echo"</table>\n</div></fieldset>\n";}echo
+';if($a!="")echo'<input type=\'submit\' name=\'drop\' value=\'',lang(146),'\'',confirm(lang(201,$a)),'>
+';if($ci&&(JUSH=='sql'||$a=="")){$di=preg_match('~RANGE|LIST~',$K["partition_by"]);print_fieldset("partition",lang(202),$K["partition_by"]);echo"<p>".html_select("partition_by",array_merge(array(""),$ci),$K["partition_by"],on('change','partitionByChange').on_help_value('.','PARTITION BY $&'))."\n","(<input name='partition' value='".h($K["partition"])."'>)\n",lang(203).": <input type='number' name='partitions' class='size".($di||!$K["partition_by"]?" hidden":"")."' value='".h($K["partitions"])."'>\n","<table id='partition-table'".($di?"":" class='hidden'").">\n","<thead><tr><th>".lang(204)."<th>".lang(205)."<tbody>\n";foreach($K["partition_names"]as$w=>$X)echo'<tr>','<td><input name="partition_names[]" value="'.h($X).'" autocapitalize="off"'.($w==count($K["partition_names"])-1?on('input','partitionNameChange'):'').'>','<td><input name="partition_values[]" value="'.h(idx($K["partition_values"],$w)).'">';echo"</table>\n</div></fieldset>\n";}echo
 input_token(),'</form>
-';}elseif(isset($_GET["indexes"])){$a=$_GET["indexes"];$Se=array("PRIMARY","UNIQUE","INDEX");$S=table_status1($a,true);$Qe=driver()->indexAlgorithms($S);if(preg_match('~MyISAM|M?aria'.(min_version(5.6,'10.0.5')?'|InnoDB':'').'~i',$S["Engine"]))$Se[]="FULLTEXT";if(preg_match('~MyISAM|M?aria'.(min_version(5.7,'10.2.2')?'|InnoDB':'').'~i',$S["Engine"]))$Se[]="SPATIAL";if(min_version('',11.7)&&preg_match('~MyISAM|InnoDB~i',$S["Engine"]))$Se[]="VECTOR";$v=indexes($a);$l=fields($a);$Ci=array();if(JUSH=="mongo"){$Ci=$v["_id_"];unset($Se[0]);unset($v["_id_"]);}$K=$_POST;if($K)save_settings(array("index_options"=>$K["options"]));if($_POST&&!$j&&!$_POST["add"]&&!$_POST["drop_col"]){$va=array();foreach($K["indexes"]as$u){$B=$u["name"];if(in_array($u["type"],$Se)){$d=array();$Mf=array();$oc=array();$vh=array();$Re=(support("partial_indexes")?$u["partial"]:"");$Pe=(in_array($u["algorithm"],$Qe)?$u["algorithm"]:"");$P=array();ksort($u["columns"]);foreach($u["columns"]as$w=>$c){if($c!=""){$x=idx($u["lengths"],$w);$mc=idx($u["descs"],$w);$uh=idx($u["opclasses"],$w);$P[]=($l[$c]?idf_escape($c):$c).($x?"(".(+$x).")":"").($uh!=""?" ".idf_escape($uh):"").($mc?" DESC":"");$d[]=$c;$Mf[]=($x?:null);$oc[]=$mc;$vh[]="$uh";}}$kd=$v[$B];if($kd){ksort($kd["columns"]);ksort($kd["lengths"]);ksort($kd["descs"]);if($u["type"]==$kd["type"]&&array_values($kd["columns"])===$d&&(!$kd["lengths"]||array_values($kd["lengths"])===$Mf)&&array_values($kd["descs"])===$oc&&(!$kd["opclasses"]||array_values($kd["opclasses"])===$vh)&&$kd["partial"]==$Re&&(!$Qe||$kd["algorithm"]==$Pe)){unset($v[$B]);continue;}}if($d)$va[]=array($u["type"],$B,$P,$Pe,$Re);}}foreach($v
-as$B=>$kd)$va[]=array($kd["type"],$B,"DROP");if(!$va)redirect(ME."table=".url_escape($a));queries_redirect(ME."table=".url_escape($a),lang(206),alter_indexes($a,$va));}page_header(lang(152),$j,array("table"=>$a),h($a),false,doc_link(array('sql'=>"create-index.html",)));$_d=array_keys($l);if($_POST["add"]){foreach($K["indexes"]as$w=>$u){if($u["columns"][count($u["columns"])]!="")$K["indexes"][$w]["columns"][]="";}$u=end($K["indexes"]);if($u["type"]||array_filter($u["columns"],'strlen'))$K["indexes"][]=array("columns"=>array(1=>""));}if(!$K){foreach($v
-as$w=>$u){$v[$w]["name"]=$w;$v[$w]["columns"][]="";}$v[]=array("columns"=>array(1=>""));$K["indexes"]=$v;}$Mf=(JUSH=="sql"||JUSH=="mssql");$vh=driver()->indexOpclasses();$Vj=($_POST?$_POST["options"]:get_setting("index_options"));$Ng=array();foreach($Se
-as$U)$Ng[$U]=str_replace("{table}",$a,adminer()->namePattern($U));echo'
+';}elseif(isset($_GET["indexes"])){$a=$_GET["indexes"];$Ve=array("PRIMARY","UNIQUE","INDEX");$S=table_status1($a,true);$Te=driver()->indexAlgorithms($S);if(preg_match('~MyISAM|M?aria'.(min_version(5.6,'10.0.5')?'|InnoDB':'').'~i',$S["Engine"]))$Ve[]="FULLTEXT";if(preg_match('~MyISAM|M?aria'.(min_version(5.7,'10.2.2')?'|InnoDB':'').'~i',$S["Engine"]))$Ve[]="SPATIAL";if(min_version('',11.7)&&preg_match('~MyISAM|InnoDB~i',$S["Engine"]))$Ve[]="VECTOR";$v=indexes($a);$l=fields($a);$Hi=array();if(JUSH=="mongo"){$Hi=$v["_id_"];unset($Ve[0]);unset($v["_id_"]);}$K=$_POST;if($K)save_settings(array("index_options"=>$K["options"]));if($_POST&&!$j&&!$_POST["add"]&&!$_POST["drop_col"]){$va=array();foreach($K["indexes"]as$u){$B=$u["name"];if(in_array($u["type"],$Ve)){$d=array();$Of=array();$pc=array();$yh=array();$Ue=(support("partial_indexes")?$u["partial"]:"");$Se=(in_array($u["algorithm"],$Te)?$u["algorithm"]:"");$P=array();ksort($u["columns"]);foreach($u["columns"]as$w=>$c){if($c!=""){$x=idx($u["lengths"],$w);$nc=idx($u["descs"],$w);$xh=idx($u["opclasses"],$w);$P[]=($l[$c]?idf_escape($c):$c).($x?"(".(+$x).")":"").($xh!=""?" ".idf_escape($xh):"").($nc?" DESC":"");$d[]=$c;$Of[]=($x?:null);$pc[]=$nc;$yh[]="$xh";}}$nd=$v[$B];if($nd){ksort($nd["columns"]);ksort($nd["lengths"]);ksort($nd["descs"]);if($u["type"]==$nd["type"]&&array_values($nd["columns"])===$d&&(!$nd["lengths"]||array_values($nd["lengths"])===$Of)&&array_values($nd["descs"])===$pc&&(!$nd["opclasses"]||array_values($nd["opclasses"])===$yh)&&$nd["partial"]==$Ue&&(!$Te||$nd["algorithm"]==$Se)&&!$nd["invalid"]){unset($v[$B]);continue;}}if($d)$va[]=array($u["type"],$B,$P,$Se,$Ue);}}foreach($v
+as$B=>$nd)$va[]=array($nd["type"],$B,"DROP");if(!$va)redirect(ME."table=".url_escape($a));queries_redirect(ME."table=".url_escape($a),lang(206),alter_indexes($a,$va));}page_header(lang(152),$j,array("table"=>$a),h($a),false,doc_link(array('sql'=>"create-index.html",)));$Cd=array_keys($l);if($_POST["add"]){foreach($K["indexes"]as$w=>$u){if($u["columns"][count($u["columns"])]!="")$K["indexes"][$w]["columns"][]="";}$u=end($K["indexes"]);if($u["type"]||array_filter($u["columns"],'strlen'))$K["indexes"][]=array("columns"=>array(1=>""));}if(!$K){foreach($v
+as$w=>$u){$v[$w]["name"]=$w;$v[$w]["columns"][]="";}$v[]=array("columns"=>array(1=>""));$K["indexes"]=$v;}$Of=(JUSH=="sql"||JUSH=="mssql");$yh=driver()->indexOpclasses();$ck=($_POST?$_POST["options"]:get_setting("index_options"));$Qg=array();foreach($Ve
+as$U)$Qg[$U]=str_replace("{table}",$a,adminer()->namePattern($U));echo'
 <form action="" method="post">
 <div class="scrollable">
 <table class="nowrap odds">
 <thead><tr>
-<th id="label-type">',lang(207);$Ie=" class='idxopts".($Vj?"":" hidden")."'";if($Qe)echo"<th id='label-algorithm'$Ie>".lang(208).doc_link(array('sql'=>'create-index.html#create-index-storage-engine-index-types','mariadb'=>'storage-engine-index-types/',));echo'<th><input type="submit" hidden>',lang(209).($Mf?"<span$Ie> (".lang(210).")</span>":"");if($Mf||support("descidx"))echo
-checkbox("options",1,$Vj,lang(126),on('click','indexOptionsShow'),"jsonly")."\n";echo'<th id="label-name">',lang(211);if(support("partial_indexes"))echo"<th id='label-condition'$Ie>".lang(212);echo'<td><noscript>',icon("plus","add[0]","+",lang(127)),'</noscript>
+<th id="label-type">',lang(207);$Le=" class='idxopts".($ck?"":" hidden")."'";if($Te)echo"<th id='label-algorithm'$Le>".lang(208).doc_link(array('sql'=>'create-index.html#create-index-storage-engine-index-types','mariadb'=>'storage-engine-index-types/',));echo'<th><input type="submit" hidden>',lang(209).($Of?"<span$Le> (".lang(210).")</span>":"");if($Of||support("descidx"))echo
+checkbox("options",1,$ck,lang(127),on('click','indexOptionsShow'),"jsonly")."\n";echo'<th id="label-name">',lang(211);if(support("partial_indexes"))echo"<th id='label-condition'$Le>".lang(212);echo'<td><noscript>',icon("plus","add[0]","+",lang(128)),'</noscript>
 <tbody>
-';if($Ci){echo"<tr><td>PRIMARY<td>";foreach($Ci["columns"]as$w=>$c)echo
-select_input(" disabled",array_combine($_d,$_d),$c),"<label><input disabled type='checkbox'>".lang(59)."</label> ";echo"<td><td>\n";}$rf=1;foreach($K["indexes"]as$u){if(!$_POST["drop_col"]||$rf!=key($_POST["drop_col"])){echo"<tr><td>".html_select("indexes[$rf][type]",array(-1=>"")+$Se,$u["type"],on('change','indexesChangeType',$Ng),"label-type");if($Qe)echo"<td$Ie>".html_select("indexes[$rf][algorithm]",array_merge(array(""),$Qe),$u['algorithm'],"","label-algorithm");echo"<td>";ksort($u["columns"]);$r=1;foreach($u["columns"]as$w=>$c){echo"<span>".select_input(" name='indexes[$rf][columns][$r]' title='".lang(48)."'".on('change','indexesChangeColumn',$Ng),($l&&($c==""||$l[$c])?array_combine($_d,$_d):array()),$c)," <span$Ie>",($Mf?"<input type='number' name='indexes[$rf][lengths][$r]' class='size' value='".h(idx($u["lengths"],$w))."' title='".lang(125)."'>":"");if($vh){$uh=idx($u["opclasses"],$w);echo
-html_select("indexes[$rf][opclasses][$r]",array(""=>"(".lang(213).")")+array_combine($vh,$vh)+($uh!=""?array($uh=>$uh):array()),$uh),'';}echo(support("descidx")?checkbox("indexes[$rf][descs][$r]",1,idx($u["descs"],$w),lang(59)):""),"<br>","</span></span>";$r++;}echo"<td><input name='indexes[$rf][name]' value='".h($u["name"])."' autocapitalize='off' aria-labelledby='label-name'>\n";if(support("partial_indexes"))echo"<td$Ie><input name='indexes[$rf][partial]' value='".h($u["partial"])."' autocapitalize='off' aria-labelledby='label-condition'>\n";echo"<td>".icon("cross","drop_col[$rf]","x",lang(129),on('click','editingRemoveRow','indexes$1[type]'));}$rf++;}echo'</table>
+';if($Hi){echo"<tr><td>PRIMARY<td>";foreach($Hi["columns"]as$w=>$c)echo
+select_input(" disabled",array_combine($Cd,$Cd),$c),"<label><input disabled type='checkbox'>".lang(59)."</label> ";echo"<td><td>\n";}$tf=1;foreach($K["indexes"]as$u){if(!$_POST["drop_col"]||$tf!=key($_POST["drop_col"])){echo"<tr><td>".html_select("indexes[$tf][type]",array(-1=>"")+$Ve,$u["type"],on('change','indexesChangeType',$Qg),"label-type");if($Te)echo"<td$Le>".html_select("indexes[$tf][algorithm]",array_merge(array(""),$Te),$u['algorithm'],"","label-algorithm");echo"<td>";ksort($u["columns"]);$r=1;foreach($u["columns"]as$w=>$c){echo"<span>".select_input(" name='indexes[$tf][columns][$r]' title='".lang(48)."'".on('change','indexesChangeColumn',$Qg),($l&&($c==""||$l[$c])?array_combine($Cd,$Cd):array()),$c)," <span$Le>",($Of?"<input type='number' name='indexes[$tf][lengths][$r]' class='size' value='".h(idx($u["lengths"],$w))."' title='".lang(126)."'>":"");if($yh){$xh=idx($u["opclasses"],$w);echo
+html_select("indexes[$tf][opclasses][$r]",array(""=>"(".lang(213).")")+array_combine($yh,$yh)+($xh!=""?array($xh=>$xh):array()),$xh),'';}echo(support("descidx")?checkbox("indexes[$tf][descs][$r]",1,idx($u["descs"],$w),lang(59)):""),"<br>","</span></span>";$r++;}echo"<td><input name='indexes[$tf][name]' value='".h($u["name"])."' autocapitalize='off' aria-labelledby='label-name'>\n";if(support("partial_indexes"))echo"<td$Le><input name='indexes[$tf][partial]' value='".h($u["partial"])."' autocapitalize='off' aria-labelledby='label-condition'>\n";echo"<td>".icon("cross","drop_col[$tf]","x",lang(130),on('click','editingRemoveRow','indexes$1[type]')),(idx($v[$u["name"]],"invalid")?" <span class='error'>INVALID</span>":""),"\n";}$tf++;}echo'</table>
 </div>
 <p>
 <input type=\'submit\' value=\'',lang(18),'\'>
-',input_token(),'</form>
-';}elseif(isset($_GET["database"])){$K=$_POST;if($_POST&&!$j&&!$_POST["add"]){$B=trim($K["name"]);if($_POST["drop"]){$_GET["db"]="";queries_redirect(remove_from_uri("db|database"),lang(214),drop_databases(array(DB)));}elseif($B!==DB){if(DB!=""){$_GET["db"]=$B;queries_redirect(preg_replace('~\bdb=[^&]*&~','',ME)."db=".url_escape($B),lang(215),rename_database($B,(string)$K["collation"]));}else{$g=explode("\n",str_replace("\r","",$B));$vk=true;$Df="";foreach($g
-as$h){if(count($g)==1||$h!=""){if(!create_database($h,(string)$K["collation"]))$vk=false;$Df=$h;}}restart_session();set_session("dbs",null);queries_redirect(preg_replace('~&db=[^&]*~','',ME)."db=".url_escape($Df),lang(216),$vk);}}else{if(!$K["collation"])redirect(substr(ME,0,-1));query_redirect("ALTER DATABASE ".idf_escape($B).(preg_match('~^[a-z0-9_]+$~i',$K["collation"])?" COLLATE $K[collation]":""),substr(ME,0,-1),lang(217));}}$nk=(DB!=""?"alter":"create");page_header(DB!=""?lang(67):lang(133),$j,array(),h(DB),false,doc_link(array('sql'=>"$nk-database.html",'mariadb'=>(DB!=""?"":"$nk-database"),)));$tb=collations();$B=DB;if($_POST)$B=$K["name"];elseif(DB!="")$K["collation"]=db_collation(DB,$tb);elseif(JUSH=="sql"){foreach(get_vals("SHOW GRANTS")as$ae){if(preg_match('~ ON (`(([^\\\\`]|``|\\\\.)*)%`\.\*)?~',$ae,$A)&&$A[1]){$B=stripcslashes(idf_unescape("`$A[2]`"));break;}}}echo'
+';if(support("concurrent_indexes"))echo
+checkbox("concurrently",1,$_POST["concurrently"],"concurrently").''."\n";echo
+input_token(),'</form>
+';}elseif(isset($_GET["database"])){$K=$_POST;if($_POST&&!$j&&!$_POST["add"]){$B=trim($K["name"]);if($_POST["drop"]){$_GET["db"]="";queries_redirect(remove_from_uri("db|database"),lang(214),drop_databases(array(DB)));}elseif($B!==DB){if(DB!=""){$_GET["db"]=$B;queries_redirect(preg_replace('~\bdb=[^&]*&~','',ME)."db=".url_escape($B),lang(215),rename_database($B,(string)$K["collation"]));}else{$g=explode("\n",str_replace("\r","",$B));$Ck=true;$Ff="";foreach($g
+as$h){if(count($g)==1||$h!=""){if(!create_database($h,(string)$K["collation"]))$Ck=false;$Ff=$h;}}restart_session();set_session("dbs",null);queries_redirect(preg_replace('~&db=[^&]*~','',ME)."db=".url_escape($Ff),lang(216),$Ck);}}else{if(!$K["collation"])redirect(substr(ME,0,-1));query_redirect("ALTER DATABASE ".idf_escape($B).(preg_match('~^[a-z0-9_]+$~i',$K["collation"])?" COLLATE $K[collation]":""),substr(ME,0,-1),lang(217));}}$vk=(DB!=""?"alter":"create");page_header(DB!=""?lang(67):lang(134),$j,array(),h(DB),false,doc_link(array('sql'=>"$vk-database.html",'mariadb'=>(DB!=""?"":"$vk-database"),)));$tb=collations();$B=DB;if($_POST)$B=$K["name"];elseif(DB!="")$K["collation"]=db_collation(DB,$tb);elseif(JUSH=="sql"){foreach(get_vals("SHOW GRANTS")as$de){if(preg_match('~ ON (`(([^\\\\`]|``|\\\\.)*)%`\.\*)?~',$de,$A)&&$A[1]){$B=stripcslashes(idf_unescape("`$A[2]`"));break;}}}echo'
 <form action="" method="post">
 <p>
-',($_POST["add"]||strpos($B,"\n")?'<textarea autofocus name="name" rows="10" cols="40">'.h($B).'</textarea><br>':'<input name="name" autofocus value="'.h($B).'" data-maxlength="64" autocapitalize="off">')."\n",($tb?html_select("collation",array(""=>"(".lang(120).")")+$tb,$K["collation"]).doc_link(array('sql'=>"charset-charsets.html",'mariadb'=>"supported-character-sets-and-collations/",)):"")."\n",'<input type=\'submit\' value=\'',lang(18),'\'>
-';if(DB!="")echo"<input type='submit' name='drop' value='".lang(145)."'".confirm(lang(201,DB)).">\n";elseif(!$_POST["add"]&&$_GET["db"]=="")echo
-icon("plus","add[0]","+",lang(127))."\n";echo
+',($_POST["add"]||strpos($B,"\n")?"<textarea autofocus name='name' rows='10' cols='40'>\n".h($B).'</textarea><br>':'<input name="name" autofocus value="'.h($B).'" data-maxlength="64" autocapitalize="off">')."\n",($tb?"<datalist id='collations'>".optionlist(flat_collations())."</datalist>"."<input list='collations' name='collation' value='".h($K["collation"])."' placeholder='(".lang(121).")'>".doc_link(array('sql'=>"charset-charsets.html",'mariadb'=>"supported-character-sets-and-collations/",)):"")."\n",'<input type=\'submit\' value=\'',lang(18),'\'>
+';if(DB!="")echo"<input type='submit' name='drop' value='".lang(146)."'".confirm(lang(201,DB)).">\n";elseif(!$_POST["add"]&&$_GET["db"]=="")echo
+icon("plus","add[0]","+",lang(128))."\n";echo
 input_token(),'</form>
-';}elseif(isset($_GET["call"])){$ca=($_GET["name"]?:$_GET["call"]);$sj=(isset($_GET["callf"])?"FUNCTION":"PROCEDURE");$nj=routine($_GET["call"],$sj);$of=(idx($nj["returns"],"type")=="trigger");page_header(($of?lang(160):lang(218)).": ".h($ca),$j,"#routines","",!$nj,(isset($_GET["callf"])?"":doc_link(array('sql'=>"call.html",))));$Le=array();$Mh=array();foreach($nj["fields"]as$r=>$k){if(substr($k["inout"],-3)=="OUT"&&JUSH=='sql')$Mh[$r]="@".idf_escape($k["field"])." AS ".idf_escape($k["field"]);if(!$k["inout"]||preg_match('~^(IN|OUTPUT)~',$k["inout"]))$Le[]=$r;}if(!$j&&$_POST){$Za=array();foreach($nj["fields"]as$w=>$k){$X="";if(in_array($w,$Le)){$X=process_input($k);if($X===false)$X="''";if(isset($Mh[$w]))connection()->query("SET @".idf_escape($k["field"])." = $X");}if(isset($Mh[$w]))$Za[]="@".idf_escape($k["field"]);elseif(in_array($w,$Le))$Za[]=$X;}$_a=implode(", ",$Za);$H=(isset($_GET["callf"])||JUSH!="mssql"?(isset($_GET["callf"])?"SELECT ":"CALL ").(idx($nj["returns"],"type")=="record"?"* FROM ":"").table($ca)."($_a)":"EXEC ".table($ca).($_a!=""?" $_a":""));$mk=microtime(true);$I=connection()->multi_query($H);$oa=connection()->affected_rows;echo
-adminer()->selectQuery($H,$mk,!$I);if(!$I)echo"<p class='error'>".adminer()->error()."\n";else{$f=connect();if($f)$f->select_db(DB);do{$I=connection()->store_result();if(is_object($I))print_select_result($I,$f);else
-echo"<p class='message'>".lang(219,$oa)." <span class='time'>".@date("H:i:s")."</span>\n";}while(connection()->next_result());if($Mh)print_select_result(connection()->query("SELECT ".implode(", ",$Mh)));}}if($of){$ul=driver()->routineTriggers($_GET["call"]);if($ul){echo"<table>\n";foreach($ul
+';}elseif(isset($_GET["call"])){$ca=($_GET["name"]?:$_GET["call"]);$zj=(isset($_GET["callf"])?"FUNCTION":"PROCEDURE");$uj=routine($_GET["call"],$zj);$qf=(idx($uj["returns"],"type")=="trigger");page_header(($qf?lang(160):lang(218)).": ".h($ca),$j,"#routines","",!$uj,(isset($_GET["callf"])?"":doc_link(array('sql'=>"call.html",))));$Oe=array();$Qh=array();foreach($uj["fields"]as$r=>$k){if(substr($k["inout"],-3)=="OUT"&&JUSH=='sql')$Qh[$r]="@".idf_escape($k["field"])." AS ".idf_escape($k["field"]);if(!$k["inout"]||preg_match('~^(IN|OUTPUT)~',$k["inout"]))$Oe[]=$r;}if(!$j&&$_POST){$Za=array();foreach($uj["fields"]as$w=>$k){$X="";if(in_array($w,$Oe)){$X=process_input($k);if($X===false)$X="''";if(isset($Qh[$w]))connection()->query("SET @".idf_escape($k["field"])." = $X");}if(isset($Qh[$w]))$Za[]="@".idf_escape($k["field"]);elseif(in_array($w,$Oe))$Za[]=$X;}$_a=implode(", ",$Za);$H=(isset($_GET["callf"])||JUSH!="mssql"?(isset($_GET["callf"])?"SELECT ":"CALL ").(idx($uj["returns"],"type")=="record"?"* FROM ":"").table($ca)."($_a)":"EXEC ".table($ca).($_a!=""?" $_a":""));$tk=microtime(true);$I=connection()->multi_query($H);$oa=connection()->affected_rows;echo
+adminer()->selectQuery($H,$tk,!$I);if(!$I)echo"<p class='error'>".adminer()->error()."\n";else{$f=connect();if($f)$f->select_db(DB);do{$I=connection()->store_result();if(is_object($I))print_select_result($I,$f);else
+echo"<p class='message'>".lang(219,$oa)." <span class='time'>".@date("H:i:s")."</span>\n";}while(connection()->next_result());if($Qh)print_select_result(connection()->query("SELECT ".implode(", ",$Qh)));}}if($qf){$Cl=driver()->routineTriggers($_GET["call"]);if($Cl){echo"<table>\n";foreach($Cl
 as$K){$z=preg_replace('~&ns=[^&]*~',"&ns=".url_escape($K["ns"]),ME);echo"<tr><th>".h($K["trigger"])."<td><a href='".h($z."table=".url_escape($K["table"])."#triggers")."'>".($K["ns"]!=$_GET["ns"]?"<b>".h($K["ns"])."</b>.":"").h($K["table"])."</a>"."<td class='hover'><a href='".h($z."trigger=".url_escape($K["table"])."&name=".url_escape($K["trigger"]))."'>".lang(156)."</a>\n";}echo"</table>\n";}}else{echo'<form action="" method="post">
-';if($Le){echo"<table class='layout'>\n";foreach($Le
-as$w){$k=$nj["fields"][$w];$B=$k["field"];echo"<tr><th>".adminer()->fieldName($k);$Y=idx($_POST["fields"],$B);if($Y!=""){if($k["type"]=="set")$Y=implode(",",$Y);}input($k,$Y,idx($_POST["function"],$B,""));echo"\n";}echo"</table>\n";}echo'<p>
+';if($Oe){echo"<table class='layout'>\n";foreach($Oe
+as$w){$k=$uj["fields"][$w];$B=$k["field"];echo"<tr><th>".adminer()->fieldName($k);$Y=idx($_POST["fields"],$B);if($Y!=""){if($k["type"]=="set")$Y=implode(",",$Y);}input($k,$Y,idx($_POST["function"],$B,""));echo"\n";}echo"</table>\n";}echo'<p>
 <input type=\'submit\' value=\'',lang(218),'\'>
 ',input_token(),'</form>
 ';}echo'
-',adminer()->commentValue($sj,$nj['comment']);}elseif(isset($_GET["foreign"])){$a=$_GET["foreign"];$B=$_GET["name"];$K=$_POST;if($_POST&&!$j&&!$_POST["add"]&&!$_POST["change"]&&!$_POST["change-js"]){if(!$_POST["drop"]){$K["source"]=array_filter($K["source"],'strlen');ksort($K["source"]);$Rk=array();foreach($K["source"]as$w=>$X)$Rk[$w]=$K["target"][$w];$K["target"]=$Rk;}$Cb=object_name("FOREIGN",$a,$K["source"]);$Qa=false;if(JUSH=="sqlite")$I=recreate_table($a,$a,array(),array(),array(" $B"=>($K["drop"]?"":" ".format_foreign_key($K,$Cb))));else{$va="ALTER TABLE ".table($a);$Fc="$va DROP ".(JUSH=="sql"?"FOREIGN KEY ":"CONSTRAINT ").idf_escape($B?:'');if($K["drop"])$I=queries($Fc);else{$ja=" ADD".format_foreign_key($K,$Cb);if($B=="")$I=queries($va.$ja);elseif(JUSH=="pgsql"||(JUSH=="sql"&&$Cb!=$B))$I=queries("$Fc,$ja");else{$Qa=support("transaction_ddl")&&driver()->begin();$I=($Qa||idx(foreign_keys($a),$B)?queries($Fc):true)&&queries($va.$ja)&&(!$Qa||driver()->commit());}}}queries_redirect(ME."table=".url_escape($a),($K["drop"]?lang(220):($B!=""?lang(221):lang(222))),$I);if($Qa)driver()->rollback();if(!$K["drop"])$j=lang(223);}$ah=false;if(!$_POST&&$B!=""){$Nd=foreign_keys($a);$K=idx($Nd,$B,array());$ah=!$K;}page_header(($B!=""?lang(224):lang(157)),$j,array("table"=>$a),h($B!=""?$B:$a),$ah,doc_link(array('sql'=>"innodb-foreign-key-constraints.html",'mariadb'=>"foreign-keys/",)));if($_POST){ksort($K["source"]);if($_POST["change"]||$_POST["change-js"])$K["target"]=array();else$K["source"][]="";}elseif($B!="")$K["source"][]="";else{$K["table"]=$a;$K["source"]=array("");}echo'
+',adminer()->commentValue($zj,$uj['comment']);}elseif(isset($_GET["foreign"])){$a=$_GET["foreign"];$B=$_GET["name"];$K=$_POST;if($_POST&&!$j&&!$_POST["add"]&&!$_POST["change"]&&!$_POST["change-js"]){if(!$_POST["drop"]){$K["source"]=array_filter($K["source"],'strlen');ksort($K["source"]);$al=array();foreach($K["source"]as$w=>$X)$al[$w]=$K["target"][$w];$K["target"]=$al;}$Qa=false;if(JUSH=="sqlite")$I=recreate_table($a,$a,array(),array(),array(" $B"=>($K["drop"]?"":" ".format_foreign_key($K))));else{$Cb=$K["constraint"];$va="ALTER TABLE ".table($a);$Gc="$va DROP ".(JUSH=="sql"?"FOREIGN KEY ":"CONSTRAINT ").idf_escape($B?:'');if($K["drop"])$I=queries($Gc);else{$ja=" ADD".format_foreign_key($K,$Cb);if($B=="")$I=queries($va.$ja);elseif(JUSH=="pgsql"||(JUSH=="sql"&&$Cb!=$B))$I=queries("$Gc,$ja");else{$Qa=support("transaction_ddl")&&driver()->begin();$I=($Qa||idx(foreign_keys($a),$B)?queries($Gc):true)&&queries($va.$ja)&&(!$Qa||driver()->commit());}}}queries_redirect(ME."table=".url_escape($a),($K["drop"]?lang(220):($B!=""?lang(221):lang(222))),$I);if($Qa)driver()->rollback();if(!$K["drop"])$j=lang(223);}$dh=false;if(!$_POST&&$B!=""){$Qd=foreign_keys($a);$K=idx($Qd,$B,array());$dh=!$K;}$Pg=str_replace("{table}",$a,adminer()->namePattern("FOREIGN"));$Sg="^".str_replace('\{columns\}','.*',preg_quote($Pg))."$";page_header(($B!=""?lang(224):lang(157)),$j,array("table"=>$a),h($B!=""?$B:$a),$dh,doc_link(array('sql'=>"innodb-foreign-key-constraints.html",'mariadb'=>"foreign-keys/",)));if($_POST){ksort($K["source"]);if($_POST["change"]||$_POST["change-js"])$K["target"]=array();else$K["source"][]="";}elseif($B!=""){$K["source"][]="";$K["constraint"]=$B;}else{$K["table"]=$a;$K["source"]=array("");$K["constraint"]=str_replace("{columns}","",$Pg);}echo'
 <form action="" method="post">
-';$dk=array_keys(fields($a));if($K["db"]!="")connection()->select_db($K["db"]);if($K["ns"]!=""){$Ih=get_schema();set_schema($K["ns"]);}$Ui=array_keys(array_filter(table_status('',true),function(array$S){return!$S["dependent"]&&fk_support($S);}));$Rk=array_keys(fields(in_array($K["table"],$Ui)?$K["table"]:reset($Ui)));$b=on('change','foreignChange');echo"<p><label>".lang(225).": ".html_select("table",$Ui,$K["table"],$b)."</label>\n";if(JUSH!="sqlite"){$dc=array();foreach(adminer()->databases()as$h){if(!information_schema($h))$dc[]=$h;}echo"<label>".lang(78).": ".html_select("db",$dc,$K["db"]!=""?$K["db"]:$_GET["db"],$b)."</label>";}echo
+';$kk=array_keys(fields($a));if($K["db"]!="")connection()->select_db($K["db"]);$Mh=null;if($K["ns"]!=""){$Mh=get_schema();set_schema($K["ns"]);}$bj=array_keys(array_filter(table_status('',true),function(array$S){return!$S["dependent"]&&fk_support($S);}));$al=array_keys(fields(in_array($K["table"],$bj)?$K["table"]:reset($bj)));$b=on('change','foreignChange');echo"<p><label>".lang(225).": ".html_select("table",$bj,$K["table"],$b)."</label>\n";if(JUSH!="sqlite"){$Nj=($K["db"]!=""?$K["db"]:DB);$dc=array();foreach(adminer()->databases()as$h){if(!driver()->isSystem($h)||$h==$Nj||$h==DB)$dc[]=$h;}echo"<label>".lang(78).": ".html_select("db",$dc,$Nj,$b)."</label>";}echo
 input_hidden("change-js"),'<noscript><p><input type=\'submit\' name=\'change\' value=\'',lang(226),'\'></noscript>
-<table>
+<table',on('change','foreignName',$Sg,$Pg),'>
 <thead><tr><th id="label-source">',lang(154),'<th id="label-target">',lang(155),'<tbody>
-';$rf=0;foreach($K["source"]as$w=>$X){echo"<tr>","<td>".html_select("source[".(+$w)."]",array(-1=>"")+$dk,$X,($rf==count($K["source"])-1?on('change','foreignAddRow'):""),"label-source"),"<td>".html_select("target[".(+$w)."]",$Rk,idx($K["target"],$w),"","label-target");$rf++;}echo'</table>
+';$tf=0;foreach($K["source"]as$w=>$X){echo"<tr>","<td>".html_select("source[".(+$w)."]",array(-1=>"")+$kk,$X,($tf==count($K["source"])-1?on('change','foreignAddRow'):""),"label-source"),"<td>".html_select("target[".(+$w)."]",$al,idx($K["target"],$w),"","label-target");$tf++;}echo'</table>
 <p>
-<label>',lang(122),': ',html_select("on_delete",array(-1=>"")+explode("|",driver()->onActions),$K["on_delete"]),'</label>
-<label>',lang(121),': ',html_select("on_update",array(-1=>"")+explode("|",driver()->onActions),$K["on_update"]),'</label>
+<label>',lang(123),': ',html_select("on_delete",array(-1=>"")+explode("|",driver()->onActions),$K["on_delete"]),'</label>
+<label>',lang(122),': ',html_select("on_update",array(-1=>"")+explode("|",driver()->onActions),$K["on_update"]),'</label>
 ',(support("deferrable")?html_select("deferrable",array('NOT DEFERRABLE','DEFERRABLE','DEFERRABLE INITIALLY DEFERRED'),$K["deferrable"]):''),'<p>
 <input type=\'submit\' value=\'',lang(18),'\'>
 <noscript><p><input type=\'submit\' name=\'add\' value=\'',lang(227),'\'></noscript>
-';if($B!="")echo'<input type=\'submit\' name=\'drop\' value=\'',lang(145),'\'',confirm(lang(201,$B)),'>
-';echo
+';if($B!="")echo'<input type=\'submit\' name=\'drop\' value=\'',lang(146),'\'',confirm(lang(201,$B)),'>
+';if(JUSH!="sqlite"){print_fieldset("options",lang(127),$K["constraint"]!=$B&&!preg_match("($Sg)",$K["constraint"]));echo"<label>".lang(211).": <input name='constraint' value='".h($K["constraint"])."' autocapitalize='off'></label>\n","</div></fieldset>\n";}echo
 input_token(),'</form>
-';}elseif(isset($_GET["view"])){$a=$_GET["view"];$K=$_POST;$Jh="VIEW";if(JUSH=="pgsql"&&$a!=""){$pk=table_status1($a);$Jh=strtoupper($pk["Engine"]);}if($_POST&&!$j){$B=trim($K["name"]);$Ba=" AS\n$K[select]";$_=ME."table=".url_escape($B);$rg=lang(228);$U=($_POST["materialized"]?"MATERIALIZED VIEW":"VIEW");if(!$_POST["drop"]&&$a==$B&&JUSH!="sqlite"&&$U=="VIEW"&&$Jh=="VIEW")query_redirect((JUSH=="mssql"?"ALTER":"CREATE OR REPLACE")." VIEW ".table($B).$Ba,$_,$rg);else{$Vk="adminer_".uniqid();drop_create("DROP $Jh ".table($a),"CREATE $U ".table($B).$Ba,"DROP $U ".table($B),"CREATE $U ".table($Vk).$Ba,"DROP $U ".table($Vk),($_POST["drop"]?substr(ME,0,-1):$_),lang(229),$rg,lang(230),$a,$B);}}$ah=false;if(!$_POST&&$a!=""){$K=view($a);$ah=!$K["select"];$K["name"]=$a;$K["materialized"]=($Jh!="VIEW");if(!$j)$j=adminer()->error();}page_header(($a!=""?lang(43):lang(231)),$j,array("table"=>$a),h($a),$ah,doc_link(array('sql'=>"create-view.html",)));echo'
+';}elseif(isset($_GET["view"])){$a=$_GET["view"];$K=$_POST;$Nh="VIEW";if(JUSH=="pgsql"&&$a!=""){$xk=table_status1($a);$Nh=strtoupper($xk["Engine"]);}if($_POST&&!$j){$B=trim($K["name"]);$Ba=" AS\n$K[select]";$_=ME."table=".url_escape($B);$tg=lang(228);$U=($_POST["materialized"]?"MATERIALIZED VIEW":"VIEW");if(!$_POST["drop"]&&$a==$B&&JUSH!="sqlite"&&$U=="VIEW"&&$Nh=="VIEW")query_redirect((JUSH=="mssql"?"ALTER":"CREATE OR REPLACE")." VIEW ".table($B).$Ba,$_,$tg);else{$el="adminer_".uniqid();drop_create("DROP $Nh ".table($a),"CREATE $U ".table($B).$Ba,"DROP $U ".table($B),"CREATE $U ".table($el).$Ba,"DROP $U ".table($el),($_POST["drop"]?substr(ME,0,-1):$_),lang(229),$tg,lang(230),$a,$B);}}$dh=false;if(!$_POST&&$a!=""){$K=view($a);$dh=!$K["select"];$K["name"]=$a;$K["materialized"]=($Nh!="VIEW");if(!$j)$j=adminer()->error();}page_header(($a!=""?lang(43):lang(231)),$j,array("table"=>$a),h($a),$dh,doc_link(array('sql'=>"create-view.html",)));echo'
 <form action="" method="post">
 <p>',lang(211),': <input name="name" value="',h($K["name"]),'" data-maxlength="64" autocapitalize="off">
 ',(support("materializedview")?" ".checkbox("materialized",1,$K["materialized"],lang(148)):""),'<p>';textarea("select",$K["select"]);echo'<p>
 <input type=\'submit\' value=\'',lang(18),'\'>
-';if($a!="")echo'<input type=\'submit\' name=\'drop\' value=\'',lang(145),'\'',confirm(lang(201,$a)),'>
+';if($a!="")echo'<input type=\'submit\' name=\'drop\' value=\'',lang(146),'\'',confirm(lang(201,$a)),'>
 ';echo
 input_token(),'</form>
-';}elseif(isset($_GET["event"])){$aa=$_GET["event"];$df=array("YEAR","QUARTER","MONTH","DAY","HOUR","MINUTE","WEEK","SECOND","YEAR_MONTH","DAY_HOUR","DAY_MINUTE","DAY_SECOND","HOUR_MINUTE","HOUR_SECOND","MINUTE_SECOND");$qk=array("ENABLED"=>"ENABLE","DISABLED"=>"DISABLE","SLAVESIDE_DISABLED"=>"DISABLE ON SLAVE");$K=$_POST;if($_POST&&!$j){if($_POST["drop"])query_redirect("DROP EVENT ".idf_escape($aa),substr(ME,0,-1),lang(232));elseif(in_array($K["INTERVAL_FIELD"],$df)&&isset($qk[$K["STATUS"]])){$wj="\nON SCHEDULE ".($K["INTERVAL_VALUE"]?"EVERY ".q($K["INTERVAL_VALUE"])." $K[INTERVAL_FIELD]".($K["STARTS"]?" STARTS ".q($K["STARTS"]):"").($K["ENDS"]?" ENDS ".q($K["ENDS"]):""):"AT ".q($K["STARTS"]))." ON COMPLETION".($K["ON_COMPLETION"]?"":" NOT")." PRESERVE";queries_redirect(substr(ME,0,-1),($aa!=""?lang(233):lang(234)),queries(($aa!=""?"ALTER EVENT ".idf_escape($aa).$wj.($aa!=$K["EVENT_NAME"]?"\nRENAME TO ".idf_escape($K["EVENT_NAME"]):""):"CREATE EVENT ".idf_escape($K["EVENT_NAME"]).$wj)."\n".$qk[$K["STATUS"]]." COMMENT ".q($K["EVENT_COMMENT"]).rtrim(" DO\n$K[EVENT_DEFINITION]",";").";"));}}$ah=false;if(!$K&&$aa!=""){$L=get_rows("SELECT * FROM information_schema.EVENTS WHERE EVENT_SCHEMA = ".q(DB)." AND EVENT_NAME = ".q($aa));$ah=!$L;$K=reset($L);}page_header(($aa!=""?lang(235).": ".h($aa):lang(236)),$j,"#events","",$ah,doc_link(array('sql'=>"create-event.html")));echo'
+';}elseif(isset($_GET["event"])){$aa=$_GET["event"];$gf=array("YEAR","QUARTER","MONTH","DAY","HOUR","MINUTE","WEEK","SECOND","YEAR_MONTH","DAY_HOUR","DAY_MINUTE","DAY_SECOND","HOUR_MINUTE","HOUR_SECOND","MINUTE_SECOND");$yk=array("ENABLED"=>"ENABLE","DISABLED"=>"DISABLE","SLAVESIDE_DISABLED"=>"DISABLE ON SLAVE");$K=$_POST;if($_POST&&!$j){if($_POST["drop"])query_redirect("DROP EVENT ".idf_escape($aa),substr(ME,0,-1),lang(232));elseif(in_array($K["INTERVAL_FIELD"],$gf)&&isset($yk[$K["STATUS"]])){$Cj="\nON SCHEDULE ".($K["INTERVAL_VALUE"]?"EVERY ".q($K["INTERVAL_VALUE"])." $K[INTERVAL_FIELD]".($K["STARTS"]?" STARTS ".q($K["STARTS"]):"").($K["ENDS"]?" ENDS ".q($K["ENDS"]):""):"AT ".q($K["STARTS"]))." ON COMPLETION".($K["ON_COMPLETION"]?"":" NOT")." PRESERVE";queries_redirect(substr(ME,0,-1),($aa!=""?lang(233):lang(234)),queries(($aa!=""?"ALTER EVENT ".idf_escape($aa).$Cj.($aa!=$K["EVENT_NAME"]?"\nRENAME TO ".idf_escape($K["EVENT_NAME"]):""):"CREATE EVENT ".idf_escape($K["EVENT_NAME"]).$Cj)."\n".$yk[$K["STATUS"]]." COMMENT ".q($K["EVENT_COMMENT"]).rtrim(" DO\n$K[EVENT_DEFINITION]",";").";"));}}$dh=false;if(!$K&&$aa!=""){$L=get_rows("SELECT * FROM information_schema.EVENTS WHERE EVENT_SCHEMA = ".q(DB)." AND EVENT_NAME = ".q($aa));$dh=!$L;$K=reset($L);}page_header(($aa!=""?lang(235).": ".h($aa):lang(236)),$j,"#events","",$dh,doc_link(array('sql'=>"create-event.html")));echo'
 <form action="" method="post">
 <table class="layout">
 <tr><th>',lang(211),'<td><input name="EVENT_NAME" value="',h($K["EVENT_NAME"]),'" data-maxlength="64" autocapitalize="off">
 <tr><th title="datetime">',lang(237),'<td><input name="STARTS" value="',h("$K[EXECUTE_AT]$K[STARTS]"),'">
 <tr><th title="datetime">',lang(238),'<td><input name="ENDS" value="',h($K["ENDS"]),'">
-<tr><th>',lang(239),'<td><input type="number" name="INTERVAL_VALUE" value="',h($K["INTERVAL_VALUE"]),'" class="size"> ',html_select("INTERVAL_FIELD",$df,$K["INTERVAL_FIELD"]),'<tr><th>',lang(136),'<td>',html_select("STATUS",$qk,$K["STATUS"]),'<tr><th>',lang(50),'<td><input name="EVENT_COMMENT" value="',h($K["EVENT_COMMENT"]),'" data-maxlength="64">
+<tr><th>',lang(239),'<td><input type="number" name="INTERVAL_VALUE" value="',h($K["INTERVAL_VALUE"]),'" class="size"> ',html_select("INTERVAL_FIELD",$gf,$K["INTERVAL_FIELD"]),'<tr><th>',lang(137),'<td>',html_select("STATUS",$yk,$K["STATUS"]),'<tr><th>',lang(50),'<td><input name="EVENT_COMMENT" value="',h($K["EVENT_COMMENT"]),'" data-maxlength="64">
 <tr><th><td>',checkbox("ON_COMPLETION","PRESERVE",$K["ON_COMPLETION"]=="PRESERVE",lang(240)),'</table>
 <p>';textarea("EVENT_DEFINITION",$K["EVENT_DEFINITION"]);echo'<p>
 <input type=\'submit\' value=\'',lang(18),'\'>
-';if($aa!="")echo'<input type=\'submit\' name=\'drop\' value=\'',lang(145),'\'',confirm(lang(201,$aa)),'>
+';if($aa!="")echo'<input type=\'submit\' name=\'drop\' value=\'',lang(146),'\'',confirm(lang(201,$aa)),'>
 ';echo
 input_token(),'</form>
-';}elseif(isset($_GET["procedure"])){$ca=($_GET["name"]?:$_GET["procedure"]);$nj=(isset($_GET["function"])?"FUNCTION":"PROCEDURE");$K=$_POST;$K["fields"]=(array)$K["fields"];if($_POST&&!process_fields($K["fields"])&&!$j){foreach($K["fields"]as$w=>$k){if($k["field"]=="")unset($K["fields"][$w]);}$ph=routine($_GET["procedure"],$nj);$nh=($ph?routine_id($ca,$ph):"");$Tg=routine_id($K["name"],$K);$Mb=create_routine($nj,$K);$_=substr(ME,0,-1);$rg=lang(241);if(!$_POST["drop"]&&$nh==$Tg&&connection()->flavor!="mysql")queries_redirect($_,$rg,queries(substr_replace($Mb,(JUSH=="mssql"?' OR ALTER':' OR REPLACE'),6,0)));else{$Vk="adminer_".uniqid();drop_create("DROP $nj $nh",$Mb,"DROP $nj $Tg",create_routine($nj,array("name"=>$Vk)+$K),"DROP $nj ".routine_id($Vk,$K),$_,lang(242),$rg,lang(243),$ca,$K["name"]);}}$ah=false;if(!$_POST&&$ca!=""){$K=routine($_GET["procedure"],$nj);$ah=!$K;$K["name"]=$ca;}$qj=strtolower($nj);page_header(($ca!=""?(isset($_GET["function"])?lang(161):lang(244)).": ".h($ca):(isset($_GET["function"])?lang(245):lang(246))),$j,"#routines","",$ah,doc_link(array('sql'=>"create-procedure.html",'mariadb'=>"create-$qj/",)));if(!$_POST&&$ca=="")$K["language"]="sql";$tb=(JUSH=="sql"?flat_collations():array());$oj=routine_languages();echo($tb?"<datalist id='collations'>".optionlist($tb)."</datalist>":""),'
+';}elseif(isset($_GET["procedure"])){$ca=($_GET["name"]?:$_GET["procedure"]);$uj=(isset($_GET["function"])?"FUNCTION":"PROCEDURE");$K=$_POST;$K["fields"]=(array)$K["fields"];if($_POST&&!process_fields($K["fields"])&&!$j){foreach($K["fields"]as$w=>$k){if($k["field"]=="")unset($K["fields"][$w]);}$sh=routine($_GET["procedure"],$uj);$qh=($sh?routine_id($ca,$sh):"");$Wg=routine_id($K["name"],$K);$Mb=create_routine($uj,$K);$_=substr(ME,0,-1);$tg=lang(241);if(!$_POST["drop"]&&$qh==$Wg&&connection()->flavor!="mysql")queries_redirect($_,$tg,queries(substr_replace($Mb,(JUSH=="mssql"?' OR ALTER':' OR REPLACE'),6,0)));else{$el="adminer_".uniqid();drop_create("DROP $uj $qh",$Mb,"DROP $uj $Wg",create_routine($uj,array("name"=>$el)+$K),"DROP $uj ".routine_id($el,$K),$_,lang(242),$tg,lang(243),$ca,$K["name"]);}}$dh=false;if(!$_POST&&$ca!=""){$K=routine($_GET["procedure"],$uj);$dh=!$K;$K["name"]=$ca;}$xj=strtolower($uj);page_header(($ca!=""?(isset($_GET["function"])?lang(161):lang(244)).": ".h($ca):(isset($_GET["function"])?lang(245):lang(246))),$j,"#routines","",$dh,doc_link(array('sql'=>"create-procedure.html",'mariadb'=>"create-$xj/",)));if(!$_POST&&$ca=="")$K["language"]="sql";$tb=(JUSH=="sql"?flat_collations():array());$vj=routine_languages();echo($tb?"<datalist id='collations'>".optionlist($tb)."</datalist>":""),'
 <form action="" method="post" id="form">
 <p>',lang(211),': <input name="name" value="',h($K["name"]),'" data-maxlength="64" autocapitalize="off">
-',($oj?"<label>".lang(24).": ".html_select("language",array_keys($oj),$K["language"],on('change','routineLanguage',$oj))."</label>\n":""),'<input type=\'submit\' value=\'',lang(18),'\'>
+',($vj?"<label>".lang(24).": ".html_select("language",array_keys($vj),$K["language"],on('change','routineLanguage',$vj))."</label>\n":""),'<input type=\'submit\' value=\'',lang(18),'\'>
 <div class="scrollable">
 <table id="edit-fields" class="nowrap">
-';edit_fields($K["fields"],$tb,$nj);if(isset($_GET["function"])){echo"<tr><td>".lang(247);edit_type("returns",(array)$K["returns"],$tb,array(),(JUSH=="pgsql"?array("void","trigger"):array()));}echo'</table>
+';edit_fields($K["fields"],$tb,$uj);if(isset($_GET["function"])){echo"<tr><td>".lang(247);edit_type("returns",(array)$K["returns"],$tb,array(),(JUSH=="pgsql"?array("void","trigger"):array()));}echo'</table>
 ',script("editFields();"),'</div>
-<p>';textarea("definition",$K["definition"],20,80,($oj[$K["language"]]?:JUSH));echo'<p>
+<p>';textarea("definition",$K["definition"],20,80,($vj[$K["language"]]?:JUSH));echo'<p>
 <input type=\'submit\' value=\'',lang(18),'\'>
-';if($ca!="")echo'<input type=\'submit\' name=\'drop\' value=\'',lang(145),'\'',confirm(lang(201,$ca)),'>
-';$rj=routine_options($nj);if($rj){$_h=false;foreach($rj
-as$w=>$bm){$i=($bm?reset($bm):"");$K["options"][$w]=idx($K["options"],$w,$i);if($K["options"][$w]!=$i)$_h=true;}print_fieldset("options",lang(126),$_h);echo"<table class='layout'>\n";foreach($rj
-as$w=>$bm){$zf="label-option-$w";$dl=str_replace("_"," ",$w);$N=array();foreach($bm
-as$Y)$N[$Y]=(strpos($Y,"$dl ")===0?substr($Y,strlen($dl)+1):$Y);echo"<tr><th id='$zf'>$dl<td>".($N?html_select("options[$w]",$N,$K["options"][$w],"",$zf):"<input name='options[$w]' value='".h($K["options"][$w])."' aria-labelledby='$zf' autocapitalize='off'>")."\n";}echo"</table>\n</div></fieldset>\n";}echo
+';if($ca!="")echo'<input type=\'submit\' name=\'drop\' value=\'',lang(146),'\'',confirm(lang(201,$ca)),'>
+';$yj=routine_options($uj);if($yj){$Dh=false;foreach($yj
+as$w=>$km){$i=($km?reset($km):"");$K["options"][$w]=idx($K["options"],$w,$i);if($K["options"][$w]!=$i)$Dh=true;}print_fieldset("options",lang(127),$Dh);echo"<table class='layout'>\n";foreach($yj
+as$w=>$km){$Af="label-option-$w";$ml=str_replace("_"," ",$w);$N=array();foreach($km
+as$Y)$N[$Y]=(strpos($Y,"$ml ")===0?substr($Y,strlen($ml)+1):$Y);echo"<tr><th id='$Af'>$ml<td>".($N?html_select("options[$w]",$N,$K["options"][$w],"",$Af):"<input name='options[$w]' value='".h($K["options"][$w])."' aria-labelledby='$Af' autocapitalize='off'>")."\n";}echo"</table>\n</div></fieldset>\n";}echo
 input_token(),'</form>
-';}elseif(isset($_GET["check"])){$a=$_GET["check"];$B="$_GET[name]";$K=$_POST;if($K&&!$j){$_=ME."table=".url_escape($a);$ug=lang(248);$sg=lang(249);$tg=lang(250);if(JUSH=="sqlite")queries_redirect($_,($K["drop"]?$ug:($B!=""?$sg:$tg)),recreate_table($a,$a,array(),array(),array(),"",array(),"$B",($K["drop"]?"":$K["clause"])));else{$va="ALTER TABLE ".table($a);$gb=" CHECK ($K[clause])";$Vk="adminer_".uniqid();drop_create("$va DROP CONSTRAINT ".idf_escape($B),"$va ADD".($K["name"]!=""?" CONSTRAINT ".idf_escape($K["name"]):"").$gb,"$va DROP CONSTRAINT ".idf_escape($K["name"]),"$va ADD CONSTRAINT ".idf_escape($Vk).$gb,"$va DROP CONSTRAINT ".idf_escape($Vk),$_,$ug,$sg,$tg,$B,$K["name"]);}}$ah=false;if(!$K){$jb=driver()->checkConstraints($a);$ah=($B!=""&&!$jb[$B]);$K=array("name"=>($B!=""?$B:object_name("CHECK",$a,array())),"clause"=>$jb[$B]);}page_header(($B!=""?lang(251):lang(159)),$j,array("table"=>$a),h($B!=""?$B:$a),$ah,doc_link(array('sql'=>"create-table-check-constraints.html",'mariadb'=>"constraint/",)));echo'
+';}elseif(isset($_GET["check"])){$a=$_GET["check"];$B="$_GET[name]";$K=$_POST;if($K&&!$j){$_=ME."table=".url_escape($a);$wg=lang(248);$ug=lang(249);$vg=lang(250);if(JUSH=="sqlite"&&!(min_version(3.53)&&($B==""||idx(driver()->checkConstraints($a),$B)!=$B))){$ja=($K["drop"]?"":($K["name"]!=""?"CONSTRAINT ".idf_escape($K["name"])." ":"")."CHECK ($K[clause])");queries_redirect($_,($K["drop"]?$wg:($B!=""?$ug:$vg)),recreate_table($a,$a,array(),array(),array(),"",array(),"$B",$ja));}else{$va="ALTER TABLE ".table($a);$gb=" CHECK ($K[clause])";$el="adminer_".uniqid();drop_create("$va DROP CONSTRAINT ".idf_escape($B),"$va ADD".($K["name"]!=""?" CONSTRAINT ".idf_escape($K["name"]):"").$gb,"$va DROP CONSTRAINT ".idf_escape($K["name"]),"$va ADD CONSTRAINT ".idf_escape($el).$gb,"$va DROP CONSTRAINT ".idf_escape($el),$_,$wg,$ug,$vg,$B,$K["name"]);}}$dh=false;if(!$K){$jb=driver()->checkConstraints($a);$dh=($B!=""&&!$jb[$B]);$K=array("name"=>($B==""?object_name("CHECK",$a,array()):($jb[$B]!=$B?$B:"")),"clause"=>$jb[$B]);}page_header(($B!=""?lang(251):lang(159)),$j,array("table"=>$a),h($B!=""?$B:$a),$dh,doc_link(array('sql'=>"create-table-check-constraints.html",'mariadb'=>"constraint/",)));echo'
 <form action="" method="post">
-';if(JUSH!="sqlite")echo'<p>'.lang(211).': <input name="name" value="'.h($K["name"]).'" data-maxlength="64" autocapitalize="off">';echo'<p>';textarea("clause",$K["clause"]);echo'<p><input type=\'submit\' value=\'',lang(18),'\'>
-';if($B!="")echo'<input type=\'submit\' name=\'drop\' value=\'',lang(145),'\'',confirm(lang(201,$B)),'>
+<p><label>',lang(211),': <input name="name" value="',h($K["name"]),'" data-maxlength="64" autocapitalize="off"></label>
+<p>';textarea("clause",$K["clause"]);echo'<p><input type=\'submit\' value=\'',lang(18),'\'>
+';if($B!="")echo'<input type=\'submit\' name=\'drop\' value=\'',lang(146),'\'',confirm(lang(201,$B)),'>
 ';echo
 input_token(),'</form>
-';}elseif(isset($_GET["trigger"])){$a=$_GET["trigger"];$B="$_GET[name]";$tl=trigger_options();$K=trigger($B,$a);$ah=($B!=""&&!$K);$Mg=str_replace("{table}",$a,adminer()->namePattern("TRIGGER"));$K+=array("Trigger"=>strtr($Mg,array("{timing}"=>"b","{event}"=>"i","{columns}"=>"","{type}"=>"row")));if($_POST){if(!$j&&in_array($_POST["Timing"],$tl["Timing"])&&in_array($_POST["Event"],$tl["Event"])&&in_array($_POST["Type"],$tl["Type"])){$rh=" ON ".table($a);$Fc="DROP TRIGGER ".idf_escape($B).(JUSH=="pgsql"?$rh:"");$_=ME."table=".url_escape($a);if($_POST["drop"])query_redirect($Fc,$_,lang(252));else{if($B!="")queries($Fc);queries_redirect($_,($B!=""?lang(253):lang(254)),queries(create_trigger($rh,$_POST)));if($B!="")queries(create_trigger($rh,$K+array("Type"=>reset($tl["Type"]))));}}$K=$_POST;}page_header(($B!=""?lang(255):lang(162)),$j,array("table"=>$a),h($B!=""?$B:$a),$ah,doc_link(array('sql'=>"create-trigger.html",)));$Pg=strtr(preg_quote($Mg),array('\{timing\}'=>'[abi]','\{event\}'=>'[iud]*','\{columns\}'=>'.*','\{type\}'=>'(row|statement)'));$sl=on('change','triggerChange',"^$Pg$",$Mg);$gh=on('input','triggerChange',"^$Pg$",$Mg);echo'
+';}elseif(isset($_GET["trigger"])){$a=$_GET["trigger"];$B="$_GET[name]";$Bl=trigger_options();$K=trigger($B,$a);$dh=($B!=""&&!$K);$Pg=str_replace("{table}",$a,adminer()->namePattern("TRIGGER"));$K+=array("Trigger"=>strtr($Pg,array("{timing}"=>"b","{event}"=>"i","{columns}"=>"","{type}"=>"row")));if($_POST){if(!$j&&in_array($_POST["Timing"],$Bl["Timing"])&&in_array($_POST["Event"],$Bl["Event"])&&in_array($_POST["Type"],$Bl["Type"])){$uh=" ON ".table($a);$Gc="DROP TRIGGER ".idf_escape($B).(JUSH=="pgsql"?$uh:"");$_=ME."table=".url_escape($a);if($_POST["drop"])query_redirect($Gc,$_,lang(252));else{if($B!="")queries($Gc);queries_redirect($_,($B!=""?lang(253):lang(254)),queries(create_trigger($uh,$_POST)));if($B!="")queries(create_trigger($uh,$K+array("Type"=>reset($Bl["Type"]))));}}$K=$_POST;}page_header(($B!=""?lang(255):lang(162)),$j,array("table"=>$a),h($B!=""?$B:$a),$dh,doc_link(array('sql'=>"create-trigger.html",)));$Sg=strtr(preg_quote($Pg),array('\{timing\}'=>'[abi]','\{event\}'=>'[iud]*','\{columns\}'=>'.*','\{type\}'=>'(row|statement)'));$Al=on('change','triggerChange',"^$Sg$",$Pg);$jh=on('input','triggerChange',"^$Sg$",$Pg);echo'
 <form action="" method="post" id="form">
 <table class="layout">
-<tr><th>',lang(256),'<td>',html_select("Timing",$tl["Timing"],$K["Timing"],$sl),'<tr><th>',lang(257),'<td>',html_select("Event",$tl["Event"],$K["Event"],$sl),(in_array("UPDATE OF",$tl["Event"])?" <input name='Of' value='".h($K["Of"])."' class='hidden'$gh>":""),'<tr><th>',lang(49),'<td>',html_select("Type",$tl["Type"],$K["Type"],$sl),'<tr><th>',lang(211),'<td><input name="Trigger" value="',h($K["Trigger"]),'" data-maxlength="64" autocapitalize="off">
+<tr><th>',lang(256),'<td>',html_select("Timing",$Bl["Timing"],$K["Timing"],$Al),'<tr><th>',lang(257),'<td>',html_select("Event",$Bl["Event"],$K["Event"],$Al),(in_array("UPDATE OF",$Bl["Event"])?" <input name='Of' value='".h($K["Of"])."' class='hidden'$jh>":""),'<tr><th>',lang(49),'<td>',html_select("Type",$Bl["Type"],$K["Type"],$Al),'<tr><th>',lang(211),'<td><input name="Trigger" value="',h($K["Trigger"]),'" data-maxlength="64" autocapitalize="off">
 </table>
 ',script("fire(qs('#form')['Timing'], 'change');"),'<p>';textarea("Statement",$K["Statement"]);echo'<p>
 <input type=\'submit\' value=\'',lang(18),'\'>
-';if($B!="")echo'<input type=\'submit\' name=\'drop\' value=\'',lang(145),'\'',confirm(lang(201,$B)),'>
+';if($B!="")echo'<input type=\'submit\' name=\'drop\' value=\'',lang(146),'\'',confirm(lang(201,$B)),'>
 ';echo
 input_token(),'</form>
 ';}elseif(isset($_GET["user"])){function
-grant($ae,array$Gi,$d,$rh){if(!$Gi)return
-true;if($Gi==array("ALL PRIVILEGES","GRANT OPTION"))return($ae=="GRANT"?queries("$ae ALL PRIVILEGES$rh WITH GRANT OPTION"):queries("$ae ALL PRIVILEGES$rh")&&queries("$ae GRANT OPTION$rh"));return
-queries("$ae ".preg_replace('~(GRANT OPTION)\([^)]*\)~','\1',implode("$d, ",$Gi).$d).$rh);}$ea=$_GET["user"];$Gi=array(""=>array("All privileges"=>""));foreach(get_rows("SHOW PRIVILEGES")as$K){foreach(explode(",",($K["Privilege"]=="Grant option"?"":$K["Context"]))as$Gb)$Gi[$Gb=="File access on server"?"Server Admin":$Gb][$K["Privilege"]]=$K["Comment"];}unset($Gi["Server Admin"]["Usage"]);foreach($Gi["Tables"]as$w=>$X)unset($Gi["Databases"][$w]);$Sg=array();if($_POST){foreach($_POST["objects"]as$w=>$X)$Sg[$X]=(array)$Sg[$X]+idx($_POST["grants"],$w,array());}$be=array();$I=(isset($_GET["host"])?connection()->query("SHOW GRANTS FOR ".q($ea)."@".q($_GET["host"])):null);$ah=(isset($_GET["host"])&&!$I);if($I){while($K=$I->fetch_row()){if(preg_match('~GRANT (.*) ON (.*) TO ~',$K[0],$A)&&preg_match_all('~ *([^(,]*[^ ,(])( *\([^)]+\))?~',$A[1],$Zf,PREG_SET_ORDER)){foreach($Zf
-as$X){if($X[1]!="USAGE")$be["$A[2]$X[2]"][$X[1]]=true;if(preg_match('~ WITH GRANT OPTION~',$K[0]))$be["$A[2]$X[2]"]["GRANT OPTION"]=true;}}}}if($_POST&&!$j){$qh=(isset($_GET["host"])?q($ea)."@".q($_GET["host"]):"''");if($_POST["drop"])query_redirect("DROP USER $qh",ME."privileges=",lang(258));else{$Wg=q($_POST["user"])."@".q($_POST["host"]);$di=$_POST["pass"];$Ob=false;$I=true;if($qh!=$Wg){$Ob=queries("CREATE USER $Wg IDENTIFIED BY ".($_POST["hashed"]?"PASSWORD ":"").q($di));$I=$Ob;}elseif($di!="")$I=queries("SET PASSWORD FOR $Wg = ".(min_version(8,99)||$_POST["hashed"]?q($di):"PASSWORD(".q($di).")"));if($I){$jj=array();foreach($Sg
-as$eh=>$ae){if(isset($_GET["grant"]))$ae=array_filter($ae);$ae=array_keys($ae);if(isset($_GET["grant"]))$jj=array_diff(array_keys(array_filter($Sg[$eh],'strlen')),$ae);elseif($qh==$Wg){$mh=array_keys((array)$be[$eh]);$jj=array_diff($mh,$ae);$ae=array_diff($ae,$mh);unset($be[$eh]);}if(preg_match('~^(.+)\s*(\(.*\))?$~U',$eh,$A)&&(!grant("REVOKE",$jj,$A[2]," ON $A[1] FROM $Wg")||!grant("GRANT",$ae,$A[2]," ON $A[1] TO $Wg"))){$I=false;break;}}}if($I&&isset($_GET["host"])){if($qh!=$Wg)queries("DROP USER $qh");elseif(!isset($_GET["grant"])){foreach($be
-as$eh=>$jj){if(preg_match('~^(.+)(\(.*\))?$~U',$eh,$A))grant("REVOKE",array_keys($jj),$A[2]," ON $A[1] FROM $Wg");}}}if($I&&!Queries::$queries)redirect(ME."privileges=");queries_redirect(ME."privileges=",(isset($_GET["host"])?lang(259):lang(260)),$I);if($Ob)connection()->query("DROP USER $Wg");}}page_header((isset($_GET["host"])?lang(33).": ".h("$ea@$_GET[host]"):lang(171)),$j,array("privileges"=>array('',lang(71))),"",$ah,doc_link(array('sql'=>"grant.html",'mariadb'=>"grant")));$K=$_POST;if($K)$be=$Sg;else{$K=$_GET+array("host"=>get_val("SELECT SUBSTRING_INDEX(CURRENT_USER, '@', -1)"));$be[(DB==""||$be?"":idf_escape(addcslashes(DB,"%_\\"))).".*"]=array();}echo'<form action="" method="post">
+grant($de,array$Li,$d,$uh){if(!$Li)return
+true;if($Li==array("ALL PRIVILEGES","GRANT OPTION"))return($de=="GRANT"?queries("$de ALL PRIVILEGES$uh WITH GRANT OPTION"):queries("$de ALL PRIVILEGES$uh")&&queries("$de GRANT OPTION$uh"));return
+queries("$de ".preg_replace('~(GRANT OPTION)\([^)]*\)~','\1',implode("$d, ",$Li).$d).$uh);}$ea=$_GET["user"];$Li=array(""=>array("All privileges"=>""));foreach(get_rows("SHOW PRIVILEGES")as$K){foreach(explode(",",($K["Privilege"]=="Grant option"?"":$K["Context"]))as$Gb)$Li[$Gb=="File access on server"?"Server Admin":$Gb][$K["Privilege"]]=$K["Comment"];}unset($Li["Server Admin"]["Usage"]);foreach($Li["Tables"]as$w=>$X)unset($Li["Databases"][$w]);$Vg=array();if($_POST){foreach($_POST["objects"]as$w=>$X)$Vg[$X]=(array)$Vg[$X]+idx($_POST["grants"],$w,array());}$ee=array();$I=(isset($_GET["host"])?connection()->query("SHOW GRANTS FOR ".q($ea)."@".q($_GET["host"])):null);$dh=(isset($_GET["host"])&&!$I);if($I){while($K=$I->fetch_row()){if(preg_match('~GRANT (.*) ON (.*) TO ~',$K[0],$A)&&preg_match_all('~ *([^(,]*[^ ,(])( *\([^)]+\))?~',$A[1],$bg,PREG_SET_ORDER)){foreach($bg
+as$X){if($X[1]!="USAGE")$ee["$A[2]$X[2]"][$X[1]]=true;if(preg_match('~ WITH GRANT OPTION~',$K[0]))$ee["$A[2]$X[2]"]["GRANT OPTION"]=true;}}}}if($_POST&&!$j){$th=(isset($_GET["host"])?q($ea)."@".q($_GET["host"]):"''");if($_POST["drop"])query_redirect("DROP USER $th",ME."privileges=",lang(258));else{$Zg=q($_POST["user"])."@".q($_POST["host"]);$ii=$_POST["pass"];$Ob=false;$I=true;if($th!=$Zg){$Ob=queries("CREATE USER $Zg IDENTIFIED BY ".($_POST["hashed"]?"PASSWORD ":"").q($ii));$I=$Ob;}elseif($ii!="")$I=queries("SET PASSWORD FOR $Zg = ".(min_version(8,99)||$_POST["hashed"]?q($ii):"PASSWORD(".q($ii).")"));if($I){$qj=array();foreach($Vg
+as$hh=>$de){if(isset($_GET["grant"]))$de=array_filter($de);$de=array_keys($de);if(isset($_GET["grant"]))$qj=array_diff(array_keys(array_filter($Vg[$hh],'strlen')),$de);elseif($th==$Zg){$ph=array_keys((array)$ee[$hh]);$qj=array_diff($ph,$de);$de=array_diff($de,$ph);unset($ee[$hh]);}if(preg_match('~^(.+)\s*(\(.*\))?$~U',$hh,$A)&&(!grant("REVOKE",$qj,$A[2]," ON $A[1] FROM $Zg")||!grant("GRANT",$de,$A[2]," ON $A[1] TO $Zg"))){$I=false;break;}}}if($I&&isset($_GET["host"])){if($th!=$Zg)queries("DROP USER $th");elseif(!isset($_GET["grant"])){foreach($ee
+as$hh=>$qj){if(preg_match('~^(.+)(\(.*\))?$~U',$hh,$A))grant("REVOKE",array_keys($qj),$A[2]," ON $A[1] FROM $Zg");}}}if($I&&!Queries::$queries)redirect(ME."privileges=");queries_redirect(ME."privileges=",(isset($_GET["host"])?lang(259):lang(260)),$I);if($Ob)connection()->query("DROP USER $Zg");}}page_header((isset($_GET["host"])?lang(33).": ".h("$ea@$_GET[host]"):lang(171)),$j,array("privileges"=>array('',lang(71))),"",$dh,doc_link(array('sql'=>"grant.html",'mariadb'=>"grant")));$K=$_POST;if($K)$ee=$Vg;else{$K=$_GET+array("host"=>get_val("SELECT SUBSTRING_INDEX(CURRENT_USER, '@', -1)"));$ee[(DB==""||$ee?"":idf_escape(addcslashes(DB,"%_\\"))).".*"]=array();}echo'<form action="" method="post">
 <table class="layout">
 <tr><th>',lang(31),'<td><input name="host" data-maxlength="60" value="',h($K["host"]),'" autocapitalize="off">
 <tr><th>',lang(33),'<td><input name="user" data-maxlength="80" value="',h($K["user"]),'" autocapitalize="off">
 <tr><th>',lang(34),'<td><input name="pass" id="pass" value="',h($K["pass"]),'" autocomplete="new-password">
 ',($K["hashed"]?"":script("typePassword(qs('#pass'));")),(min_version(8,99)?"":checkbox("hashed",1,$K["hashed"],lang(261),on('click','hashedClick'))),'</table>
 
-',"<table class='odds'>\n","<thead><tr><th colspan='2'>".lang(71);$r=0;foreach($be
-as$eh=>$ae){echo'<th>'.($eh!="*.*"?"<input name='objects[$r]' value='".h($eh)."' size='10' autocapitalize='off'>":input_hidden("objects[$r]","*.*")."*.*");$r++;}echo"<tbody>\n";foreach(array(""=>"","Server Admin"=>lang(31),"Databases"=>lang(35),"Tables"=>lang(150),"Procedures"=>lang(262),)as$Gb=>$mc){foreach((array)$Gi[$Gb]as$Fi=>$xb){echo"<tr><td".($mc?">$mc<td":" colspan='2'").' lang="en" title="'.h($xb).'">'.h($Fi);$r=0;foreach($be
-as$eh=>$ae){$B="'grants[$r][".h(strtoupper($Fi))."]'";$Y=$ae[strtoupper($Fi)];if($Gb=="Server Admin"&&$eh!=(isset($be["*.*"])?"*.*":".*"))echo"<td>";elseif(isset($_GET["grant"]))echo"<td><select name=$B><option><option value='1'".($Y?" selected":"").">".lang(263)."<option value='0'".($Y=="0"?" selected":"").">".lang(264)."</select>";else
-echo"<td align='center'><label class='block'>","<input type='checkbox' name=$B value='1'".($Y?" checked":"").($Fi=="All privileges"?" id='grants-$r-all'":($Fi=="Grant option"?"":on('click','grantsClick',"grants-$r-all"))).">","</label>";$r++;}}}echo"</table>\n",'<p>
+',"<table class='odds'>\n","<thead><tr><th colspan='2'>".lang(71);$r=0;foreach($ee
+as$hh=>$de){echo'<th>'.($hh!="*.*"?"<input name='objects[$r]' value='".h($hh)."' size='10' autocapitalize='off'>":input_hidden("objects[$r]","*.*")."*.*");$r++;}echo"<tbody>\n";foreach(array(""=>"","Server Admin"=>lang(31),"Databases"=>lang(35),"Tables"=>lang(150),"Procedures"=>lang(262),)as$Gb=>$nc){foreach((array)$Li[$Gb]as$Ki=>$xb){echo"<tr><td".($nc?">$nc<td":" colspan='2'").' lang="en" title="'.h($xb).'">'.h($Ki);$r=0;foreach($ee
+as$hh=>$de){$B="'grants[$r][".h(strtoupper($Ki))."]'";$Y=$de[strtoupper($Ki)];if($Gb=="Server Admin"&&$hh!=(isset($ee["*.*"])?"*.*":".*"))echo"<td>";elseif(isset($_GET["grant"]))echo"<td><select name=$B><option><option value='1'".($Y?" selected":"").">".lang(263)."<option value='0'".($Y=="0"?" selected":"").">".lang(264)."</select>";else
+echo"<td align='center'><label class='block'>","<input type='checkbox' name=$B value='1'".($Y?" checked":"").($Ki=="All privileges"?" id='grants-$r-all'":($Ki=="Grant option"?"":on('click','grantsClick',"grants-$r-all"))).">","</label>";$r++;}}}echo"</table>\n",'<p>
 <input type=\'submit\' value=\'',lang(18),'\'>
-';if(isset($_GET["host"]))echo'<input type=\'submit\' name=\'drop\' value=\'',lang(145),'\'',confirm(lang(201,"$ea@$_GET[host]")),'>
+';if(isset($_GET["host"]))echo'<input type=\'submit\' name=\'drop\' value=\'',lang(146),'\'',confirm(lang(201,"$ea@$_GET[host]")),'>
 ';echo
 input_token(),'</form>
-';}elseif(isset($_GET["processlist"])){if(support("kill")){if($_POST&&!$j){$yf=0;foreach((array)$_POST["kill"]as$X){if(adminer()->killProcess($X))$yf++;}queries_redirect(ME."processlist=",lang(265,$yf),$yf||!$_POST["kill"]);}}page_header(lang(134),$j);echo'
+';}elseif(isset($_GET["processlist"])){if(support("kill")){if($_POST&&!$j){$_f=0;foreach((array)$_POST["kill"]as$X){if(adminer()->killProcess($X))$_f++;}queries_redirect(ME."processlist=",lang(265,$_f),$_f||!$_POST["kill"]);}}page_header(lang(135),$j);echo'
 <form action="" method="post">
 <div class="scrollable">
 <table class="nowrap checkable odds"',on('click','tableClick').on('dblclick','tableClick'),'>
 ';$r=-1;foreach(adminer()->processList()as$r=>$K){if(!$r){echo"<thead><tr lang='en'>".(support("kill")?"<td class='hover'>":"");foreach($K
 as$w=>$X)echo"<th>$w".doc_link(array('sql'=>"show-processlist.html#processlist_".strtolower($w),));echo"<tbody>\n";}echo"<tr>".(support("kill")?"<td class='hover'>".checkbox("kill[]",$K[JUSH=="sql"?"Id":"pid"],0):"");foreach($K
-as$w=>$X)echo"<td>".($X!=""&&((JUSH=="sql"&&$w=="Info"&&preg_match("~Query|Killed~",$K["Command"]))||(JUSH=="pgsql"&&$w=="query")||(JUSH=="oracle"&&$w=="sql_text"))?"<code class='jush-".JUSH."' data-full='".h($X)."'>".shorten_utf8($X,100,"</code>").' <a href="'.h(($K["db"]!=""?preg_replace('~&db=[^&]*~','',ME)."db=".url_escape($K["db"])."&":ME)."sql=".url_escape($X)).'">'.lang(266).'</a>'.' '.copy_icon():h($X));echo"\n";}echo'</table>
+as$w=>$X)echo"<td>".($X!=""&&((JUSH=="sql"&&$w=="Info"&&preg_match("~Query|Killed~",$K["Command"]))||(JUSH=="pgsql"&&$w=="query")||(JUSH=="oracle"&&$w=="sql_text"))?"<code class='sql jush-".JUSH."' data-full='".h($X)."'>".shorten_utf8($X,100,"</code>").' <a href="'.h(($K["db"]!=""?preg_replace('~&db=[^&]*~','',ME)."db=".url_escape($K["db"])."&":ME)."sql=".url_escape($X)).'">'.lang(266).'</a>'.' '.copy_icon():h($X));echo"\n";}echo'</table>
 </div>
 <p>
 ',script("copyCode(qsl('table'));");if(support("kill"))echo
 format_number($r+1)."/".lang(267,max_connections()),"<p><input type='submit' value='".lang(268)."'>\n";echo
 input_token(),'</form>
-',script("tableCheck();");}elseif($_GET["select"]!=""){$a=$_GET["select"];$S=table_status1($a);$v=indexes($a);$l=fields($a);$Nd=column_foreign_keys($a);$lh=$S["Oid"];$lj=array();$d=array();$Bj=array();$Bh=array();$Yk=null;foreach($l
-as$w=>$k){$B=adminer()->fieldName($k);$Og=html_entity_decode(strip_tags($B),ENT_QUOTES);if(isset($k["privileges"]["select"])&&$B!=""){$d[$w]=$Og;if(is_shortable($k))$Yk=adminer()->selectLengthProcess();}if(isset($k["privileges"]["where"])&&$B!="")$Bj[$w]=$Og;if(isset($k["privileges"]["order"])&&$B!="")$Bh[$w]=$Og;$lj+=$k["privileges"];}list($N,$q)=adminer()->selectColumnsProcess($d,$v);$N=array_unique($N);$q=array_unique($q);$kf=count($q)<count($N);$Z=adminer()->selectSearchProcess($l,$v,$S);$D=adminer()->selectOrderProcess($l,$v);$y=adminer()->selectLimitProcess();if($_GET["val"]&&is_ajax()){header("Content-Type: text/plain; charset=utf-8");foreach($_GET["val"]as$El=>$K){$Ba=convert_field($l[key($K)]);$N=array($Ba?:idf_escape(key($K)));$Z[]=where_check(bracket_escape($El,true),$l);$J=driver()->select($a,$N,$Z,$N);if($J)echo
-first($J->fetch_row());}exit;}$Ci=$Gl=array();foreach($v
-as$u){if($u["type"]=="PRIMARY"){$Ci=array_flip($u["columns"]);$Gl=($N?$Ci:array());foreach($Gl
-as$w=>$X){if(in_array(idf_escape($w),$N))unset($Gl[$w]);}break;}}if($lh&&!$Ci){$Ci=$Gl=array($lh=>0);$v[]=array("type"=>"PRIMARY","columns"=>array($lh));}if($_POST&&!$j){$mm=$Z;if(!$_POST["all"]&&is_array($_POST["check"])){$jb=array();foreach($_POST["check"]as$gb)$jb[]=where_check($gb,$l);$mm[]="((".implode(") OR (",$jb)."))";}$om=$mm;$mm=($mm?"\nWHERE ".implode(" AND ",$mm):"");if($_POST["export"]){save_settings(array("output"=>$_POST["output"],"format"=>$_POST["format"]),"adminer_import");dump_headers($a);adminer()->dumpTable($a,"");$Ej=($N?:array("*"));$Ib=convert_fields($d,$l,$N);if($Ib)$Ej[]=substr($Ib,2);$H="";if(is_array($_POST["check"])&&!$Ci){$Sd=implode(", ",$Ej)."\nFROM ".table($a);$ee=($q&&$kf?"\nGROUP BY ".implode(", ",$q):"").($D?"\nORDER BY ".implode(", ",$D):"");$Bl=array();foreach($_POST["check"]as$X)$Bl[]="(SELECT".limit($Sd,"\nWHERE ".($Z?implode(" AND ",$Z)." AND ":"").where_check($X,$l).$ee,1).")";$H=implode(" UNION ALL ",$Bl);}adminer()->dumpData($a,"table",$H,$Ej,$om,($kf?$q:array()),$D);adminer()->dumpFooter();exit;}if(!adminer()->selectEmailProcess($Z,$Nd)){if($_POST["save"]||$_POST["delete"]){$I=true;$oa=0;$Qa=false;$P=array();if(!$_POST["delete"]){foreach($l
-as$B=>$X){$t=bracket_escape($B);if(isset($_POST["fields"][$t])||$_FILES["fields-$t"]){$X=process_input($l[$B]);if($X!==null&&($_POST["clone"]||$X!==false))$P[idf_escape($B)]=($X!==false?$X:idf_escape($B));}}}if($_POST["delete"]||$P){$H=($_POST["clone"]?"INTO ".table($a)." (".implode(", ",array_keys($P)).")\nSELECT ".implode(", ",$P)."\nFROM ".table($a):"");if($_POST["all"]||($Ci&&is_array($_POST["check"]))||$kf){$I=($_POST["delete"]?driver()->delete($a,$mm):($_POST["clone"]?queries("INSERT $H$mm".driver()->insertReturning($a)):driver()->update($a,$P,$mm)));$oa=connection()->affected_rows;if(is_object($I))$oa+=$I->num_rows;}else{$Qa=count((array)$_POST["check"])>1&&driver()->begin();foreach((array)$_POST["check"]as$X){$lm="\nWHERE ".($Z?implode(" AND ",$Z)." AND ":"").where_check($X,$l);$I=($_POST["delete"]?driver()->delete($a,$lm,1):($_POST["clone"]?queries("INSERT".limit1($a,$H,$lm)):driver()->update($a,$P,$lm,1)));if(!$I)break;$oa+=connection()->affected_rows;}if($Qa&&$I&&!driver()->commit())$I=false;}}$rg=lang(172,$oa);if($_POST["clone"]&&$I&&$oa==1){$Ff=last_id($I);if($Ff)$rg=lang(194," $Ff");}queries_redirect(remove_from_uri($_POST["all"]&&$_POST["delete"]?"page|next":""),$rg,$I);if($Qa)driver()->rollback();if(!$_POST["delete"]){$ui=(array)$_POST["fields"];edit_form($a,array_intersect_key($l,$ui),$ui,!$_POST["clone"],$j);page_footer();exit;}}elseif(!$_POST["import"]){$I=true;$oa=0;$Qa=count((array)$_POST["val"])>1&&driver()->begin();foreach((array)$_POST["val"]as$El=>$K){$P=array();foreach($K
-as$w=>$X){$w=bracket_escape($w,true);$P[idf_escape($w)]=(preg_match('~char|text~',$l[$w]["type"])||$X!=""?adminer()->processInput($l[$w],$X):"NULL");}$I=driver()->update($a,$P," WHERE ".($Z?implode(" AND ",$Z)." AND ":"").where_check(bracket_escape($El,true),$l),($kf||$Ci?0:1)," ");if(!$I)break;$oa+=connection()->affected_rows;}if($Qa)$I=$I&&driver()->commit();queries_redirect(remove_from_uri(),lang(172,$oa),$I);if($Qa)driver()->rollback();}else{save_settings(array("format"=>$_POST["separator"]),"adminer_import");$Ad=get_file("csv_file",true);if(!is_string($Ad))$j=upload_error($Ad);elseif(!preg_match('~~u',$Ad))$j=lang(269);else{$ub=array_keys($l);$Jj=($_POST["separator"]=="csv"?",":($_POST["separator"]=="tsv"?"\t":";"));$Sb=parse_csv($Ad,$Jj);$oa=count($Sb);driver()->begin();$L=array();foreach($Sb
-as$w=>$bm){if(!$w&&!array_diff($bm,$ub)){$ub=$bm;$oa--;}else{$P=array();foreach($bm
-as$r=>$qb)$P[idf_escape($ub[$r])]=($qb==""&&$l[$ub[$r]]["null"]?"NULL":q(csv_value($qb)));$L[]=$P;}}$I=(!$L||driver()->insertUpdate($a,$L,$Ci));if($I)driver()->commit();queries_redirect(remove_from_uri("page|next"),lang(270,$oa),$I);driver()->rollback();}}}}$Gk=adminer()->tableName($S);if(is_ajax()){page_headers();ob_start();}else
-page_header(lang(53).": $Gk",$j,array(),"",(!$l&&support("table")),($l?doc_link(array(JUSH=>driver()->tableHelp($a,is_view($S)))):""));$P=null;if(isset($lj["insert"])||!support("table")){$P="";foreach((array)$_GET["where"]as$X){$Y=$X["val"];if(is_array($Y))$Y=(count($Y)==1&&preg_match('~^val-(.*)~s',reset($Y),$A)?$A[1]:"");if($X["col"]!=""&&$Y!=""&&($X["op"]=="="||(!$X["op"]&&(is_array($X["val"])||!preg_match('~[_%]~',$Y)))))$P
-.="&set[".url_escape(bracket_escape($X["col"]))."]=".url_escape($Y);}}adminer()->selectLinks($S,$P);if(!$d&&support("table"))echo"<p class='error'>".lang(271)."\n";else{echo"<form action='' id='form'>\n","<div hidden>";hidden_fields_get();echo(DB!=""?input_hidden("db",DB).(isset($_GET["ns"])?input_hidden("ns",$_GET["ns"]):""):""),input_hidden("select",$a),"</div>\n";adminer()->selectColumnsPrint($N,$d);adminer()->selectSearchPrint($Z,$Bj,$v,$S);adminer()->selectOrderPrint($D,$Bh,$v);adminer()->selectLimitPrint($y);if($Yk!==null)adminer()->selectLengthPrint($Yk);adminer()->selectActionPrint($v);echo"</form>\n";foreach((array)$_GET["where"]as$X){if($X["op"]=="SQL"&&!in_array($_SERVER["HTTP_SEC_FETCH_SITE"],array("","same-origin"))){echo"<p class='error'>".lang(115).' '.lang(116)."\n";page_footer();exit;}}$E=$_GET["page"];$Qd=null;if($E=="last"){$Qd=get_val(count_rows($a,$Z,$kf,$q));$E=floor(max(0,intval($Qd)-1)/$y);}$Dj=$N;$de=$q;if(!$Dj){$Dj[]="*";$Ib=convert_fields($d,$l,$N);if($Ib)$Dj[]=substr($Ib,2);}foreach($N
-as$w=>$X){$k=$l[idf_unescape($X)];if($k&&($Ba=convert_field($k)))$Dj[$w]="$Ba AS $X";}if(JUSH=="pgsql"||JUSH=="mssql"){foreach((array)$_GET["columns"]as$w=>$X){if(isset($Dj[$w])&&$X["fun"])$Dj[$w].=" AS ".idf_escape(apply_sql_function($X["fun"],($X["col"]!=""?$X["col"]:"*")));}}if(!$kf&&$Gl){foreach($Gl
-as$w=>$X){$Dj[]=idf_escape($w);if($de)$de[]=idf_escape($w);}}$I=driver()->select($a,$Dj,$Z,$de,$D,$y,$E,true);if(!is_object($I))echo"<p class='error'>".(adminer()->error()?:lang(26))."\n";else{if(JUSH=="mssql"&&$E)$I->seek($y*$E);$Sc=array();$L=array();while($K=$I->fetch_assoc()){if($E&&JUSH=="oracle")unset($K["RNUM"]);$L[]=$K;}$oe=($y&&(support("cursor")?$_GET["next"]!="":count($L)>=$y));if(is_ajax()&&$oe)header("X-Next-Page: ".pagination_href($E+1));if($_GET["modify"]&&$L){$ig=max_input_vars(count($L[0])+1,20);echo($ig&&count($L)>$ig?"<p class='error'>".max_input_vars_error()."\n":"");}echo"<form action='' method='post' enctype='multipart/form-data'".on_upload_progress($Ml).">\n";if($_GET["page"]!="last"&&$y&&$q&&$kf&&JUSH=="sql")$Qd=get_val(" SELECT FOUND_ROWS()");if(!$L)echo"<p class='message'>".lang(16)."\n";else{$Ma=adminer()->backwardKeys($a,$Gk);$ij=array();reset($N);foreach($L[0]as$w=>$X){if(!isset($Gl[$w])){$X=idx($_GET["columns"],key($N))?:array();$ij[$w]=array("fun"=>$X["fun"],"col"=>($N?$X["col"]:$w));next($N);}}echo"<div class='scrollable'>","<table id='table' class='nowrap checkable odds'".on('click','tableClick').on('dblclick','tableClick').on('keydown','editingKeydown').">\n","<thead><tr>".(!$q&&$N?"":"<td class='hover check sticky'><input type='checkbox' id='all-page' class='jsonly' title='".lang(272)."'".on('click','formCheck','^check').">");$Qg=array();$Ri=1;foreach($ij
-as$w=>$X){$k=$l[$X["col"]];$B=($k?adminer()->fieldName($k,$Ri):($X["fun"]?($X["col"]!=""?h($X["col"]):"*"):h($w)));if($B!=""){$Ri++;$Qg[$w]=$B;$c=idf_escape($w);$Ce=remove_from_uri('(order|desc)[^=]*|page|next').'&order[0]='.url_escape($w);$mc="&desc[0]=1";$ak=preg_replace('~ DESC( NULLS LAST)?$~','',$D[0]);$ck=($ak==$c||$ak==$w);echo"<th id='th[".h(bracket_escape($w))."]'".($ck?" aria-sort='".($ak==$D[0]?"ascending":"descending")."'":"").">";$Wd=apply_sql_function(h($X["fun"]),$B);$bk=isset($k["privileges"]["order"])||$X["fun"];echo($bk?"<a href='".h($Ce.($ck&&$ak==$D[0]?$mc:''))."'>$Wd</a>":$Wd);$qg=($bk?"<a href='".h($Ce.$mc)."' title='".lang(59)."' class='text'> ↓</a>":'');if(!$X["fun"]&&isset($k["privileges"]["where"]))$qg
-.="<a href='#fieldset-search' title='".lang(56)."' class='text jsonly'".on('click','selectSearch',$w)."> =</a>";echo($qg?"<span class='column'>$qg</span>":"");}}$Mf=array();if($_GET["modify"]){foreach($L
+',script("tableCheck();");}elseif($_GET["select"]!=""){$a=$_GET["select"];$S=table_status1($a);$v=indexes($a);$l=fields($a);$Qd=column_foreign_keys($a);$oh=$S["Oid"];$sj=array();$d=array();$Ij=array();$Fh=array();$hl=null;foreach($l
+as$w=>$k){$B=adminer()->fieldName($k);$Rg=html_entity_decode(strip_tags($B),ENT_QUOTES);if(isset($k["privileges"]["select"])&&$B!=""){$d[$w]=$Rg;if(is_shortable($k))$hl=adminer()->selectLengthProcess();}if(isset($k["privileges"]["where"])&&$B!="")$Ij[$w]=$Rg;if(isset($k["privileges"]["order"])&&$B!="")$Fh[$w]=$Rg;$sj+=$k["privileges"];}list($N,$q)=adminer()->selectColumnsProcess($d,$v);$N=array_unique($N);$q=array_unique($q);$nf=count($q)<count($N);$Z=adminer()->selectSearchProcess($l,$v,$S);$D=adminer()->selectOrderProcess($l,$v);$y=adminer()->selectLimitProcess();if($_GET["val"]&&is_ajax()){header("Content-Type: text/plain; charset=utf-8");foreach($_GET["val"]as$Nl=>$K){$Ba=convert_field($l[key($K)]);$N=array($Ba?:idf_escape(key($K)));$Z[]=where_check(bracket_escape($Nl,true),$l);$J=driver()->select($a,$N,$Z,$N);if($J)echo
+first($J->fetch_row());}exit;}$Hi=$Pl=array();foreach($v
+as$u){if($u["type"]=="PRIMARY"){$Hi=array_flip($u["columns"]);$Pl=($N?$Hi:array());foreach($Pl
+as$w=>$X){if(in_array(idf_escape($w),$N))unset($Pl[$w]);}break;}}if($oh&&!$Hi){$Hi=$Pl=array($oh=>0);$v[]=array("type"=>"PRIMARY","columns"=>array($oh));}if($_POST&&!$j){$vm=$Z;if(!$_POST["all"]&&is_array($_POST["check"])){$jb=array();foreach($_POST["check"]as$gb)$jb[]=where_check($gb,$l);$vm[]="((".implode(") OR (",$jb)."))";}$xm=$vm;$vm=($vm?"\nWHERE ".implode(" AND ",$vm):"");if($_POST["export"]){save_settings(array("output"=>$_POST["output"],"format"=>$_POST["format"]),"adminer_import");dump_headers($a);adminer()->dumpTable($a,"");$Lj=($N?:array("*"));$Ib=convert_fields($d,$l,$N);if($Ib)$Lj[]=substr($Ib,2);$H="";if(is_array($_POST["check"])&&!$Hi){$Vd=implode(", ",$Lj)."\nFROM ".table($a);$he=($q&&$nf?"\nGROUP BY ".implode(", ",$q):"").($D?"\nORDER BY ".implode(", ",$D):"");$Kl=array();foreach($_POST["check"]as$X)$Kl[]="(SELECT".limit($Vd,"\nWHERE ".($Z?implode(" AND ",$Z)." AND ":"").where_check($X,$l).$he,1).")";$H=implode(" UNION ALL ",$Kl);}adminer()->dumpData($a,"table",$H,$Lj,$xm,($nf?$q:array()),$D);adminer()->dumpFooter();exit;}if(!adminer()->selectEmailProcess($Z,$Qd)){if($_POST["save"]||$_POST["delete"]){$I=true;$oa=0;$Qa=false;$P=array();if(!$_POST["delete"]){foreach($l
+as$B=>$X){$t=bracket_escape($B);if(isset($_POST["fields"][$t])||$_FILES["fields-$t"]){$X=process_input($l[$B]);if($X!==null&&($_POST["clone"]||$X!==false))$P[idf_escape($B)]=($X!==false?$X:idf_escape($B));}}}if($_POST["delete"]||$P){$H=($_POST["clone"]?"INTO ".table($a)." (".implode(", ",array_keys($P)).")\nSELECT ".implode(", ",$P)."\nFROM ".table($a):"");if($_POST["all"]||($Hi&&is_array($_POST["check"]))||$nf){$I=($_POST["delete"]?driver()->delete($a,$vm):($_POST["clone"]?queries("INSERT $H$vm".driver()->insertReturning($a)):driver()->update($a,$P,$vm)));$oa=connection()->affected_rows;if(is_object($I))$oa+=$I->num_rows;}else{$Qa=count((array)$_POST["check"])>1&&driver()->begin();foreach((array)$_POST["check"]as$X){$um="\nWHERE ".($Z?implode(" AND ",$Z)." AND ":"").where_check($X,$l);$I=($_POST["delete"]?driver()->delete($a,$um,1):($_POST["clone"]?queries("INSERT".limit1($a,$H,$um)):driver()->update($a,$P,$um,1)));if(!$I)break;$oa+=connection()->affected_rows;}if($Qa&&$I&&!driver()->commit())$I=false;}}$tg=lang(172,$oa);if($_POST["clone"]&&$I&&$oa==1){$Hf=last_id($I);if($Hf)$tg=lang(194," $Hf");}queries_redirect(remove_from_uri($_POST["all"]&&$_POST["delete"]?"page|next":""),$tg,$I);if($Qa)driver()->rollback();if(!$_POST["delete"]){$zi=(array)$_POST["fields"];edit_form($a,array_intersect_key($l,$zi),$zi,!$_POST["clone"],$j);page_footer();exit;}}elseif(!$_POST["import"]){$I=true;$oa=0;$Qa=count((array)$_POST["val"])>1&&driver()->begin();foreach((array)$_POST["val"]as$Nl=>$K){$P=array();foreach($K
+as$w=>$X){$w=bracket_escape($w,true);$P[idf_escape($w)]=(preg_match('~char|text~',$l[$w]["type"])||$X!=""?adminer()->processInput($l[$w],$X):"NULL");}$I=driver()->update($a,$P," WHERE ".($Z?implode(" AND ",$Z)." AND ":"").where_check(bracket_escape($Nl,true),$l),($nf||$Hi?0:1)," ");if(!$I)break;$oa+=connection()->affected_rows;}if($Qa)$I=$I&&driver()->commit();queries_redirect(remove_from_uri(),lang(172,$oa),$I);if($Qa)driver()->rollback();}else{save_settings(array("format"=>$_POST["separator"]),"adminer_import");$Dd=get_file("csv_file",true);if(!is_string($Dd))$j=upload_error($Dd);elseif(!preg_match('~~u',$Dd))$j=lang(269);else{$ub=array_keys($l);$Qj=($_POST["separator"]=="csv"?",":($_POST["separator"]=="tsv"?"\t":";"));$Sb=parse_csv($Dd,$Qj);$oa=count($Sb);driver()->begin();$L=array();foreach($Sb
+as$w=>$km){if(!$w&&!array_diff($km,$ub)){$ub=$km;$oa--;}else{$P=array();foreach($km
+as$r=>$qb)$P[idf_escape($ub[$r])]=($qb==""&&$l[$ub[$r]]["null"]?"NULL":q(csv_value($qb)));$L[]=$P;}}$I=(!$L||driver()->insertUpdate($a,$L,$Hi));if($I)driver()->commit();queries_redirect(remove_from_uri("page|next"),lang(270,$oa),$I);driver()->rollback();}}}}$Pk=adminer()->tableName($S);if(is_ajax()){page_headers();ob_start();}else
+page_header(lang(53).": $Pk",$j,array(),"",(!$l&&support("table")),($l?doc_link(array(JUSH=>driver()->tableHelp($a,is_view($S)))):""));$P=null;if(isset($sj["insert"])||!support("table")){$P="";foreach((array)$_GET["where"]as$X){$Y=$X["val"];if(is_array($Y))$Y=(count($Y)==1&&preg_match('~^val-(.*)~s',reset($Y),$A)?$A[1]:"");if($X["col"]!=""&&$Y!=""&&($X["op"]=="="||(!$X["op"]&&(is_array($X["val"])||!preg_match('~[_%]~',$Y)))))$P
+.="&set[".url_escape(bracket_escape($X["col"]))."]=".url_escape($Y);}}adminer()->selectLinks($S,$P);if(!$d&&support("table"))echo"<p class='error'>".lang(271)."\n";else{echo"<form action='' id='form'>\n","<div hidden>";hidden_fields_get();echo(DB!=""?input_hidden("db",DB).(isset($_GET["ns"])?input_hidden("ns",$_GET["ns"]):""):""),input_hidden("select",$a),"</div>\n";adminer()->selectColumnsPrint($N,$d);adminer()->selectSearchPrint($Z,$Ij,$v,$S);adminer()->selectOrderPrint($D,$Fh,$v);adminer()->selectLimitPrint($y);if($hl!==null)adminer()->selectLengthPrint($hl);adminer()->selectActionPrint($v);echo"</form>\n";foreach((array)$_GET["where"]as$X){if($X["op"]=="SQL"&&!in_array($_SERVER["HTTP_SEC_FETCH_SITE"],array("","same-origin"))){echo"<p class='error'>".lang(116).' '.lang(117)."\n";page_footer();exit;}}$E=$_GET["page"];$Td=null;if($E=="last"){$Td=get_val(count_rows($a,$Z,$nf,$q));$E=floor(max(0,intval($Td)-1)/$y);}$Kj=$N;$ge=$q;if(!$Kj){$Kj[]="*";$Ib=convert_fields($d,$l,$N);if($Ib)$Kj[]=substr($Ib,2);}foreach($N
+as$w=>$X){$k=$l[idf_unescape($X)];if($k&&($Ba=convert_field($k)))$Kj[$w]="$Ba AS $X";}if(JUSH=="pgsql"||JUSH=="mssql"){foreach((array)$_GET["columns"]as$w=>$X){if(isset($Kj[$w])&&$X["fun"])$Kj[$w].=" AS ".idf_escape(apply_sql_function($X["fun"],($X["col"]!=""?$X["col"]:"*")));}}if(!$nf&&$Pl){foreach($Pl
+as$w=>$X){$Kj[]=idf_escape($w);if($ge)$ge[]=idf_escape($w);}}$I=driver()->select($a,$Kj,$Z,$ge,$D,$y,$E,true);if(!is_object($I))echo"<p class='error'>".(adminer()->error()?:lang(26))."\n";else{if(JUSH=="mssql"&&$E)$I->seek($y*$E);$Tc=array();$L=array();while($K=$I->fetch_assoc()){if($E&&JUSH=="oracle")unset($K["RNUM"]);$L[]=$K;}$re=($y&&(support("cursor")?$_GET["next"]!="":count($L)>=$y));if(is_ajax()&&$re)header("X-Next-Page: ".pagination_href($E+1));if($_GET["modify"]&&$L){$kg=max_input_vars(count($L[0])+1,20);echo($kg&&count($L)>$kg?"<p class='error'>".max_input_vars_error()."\n":"");}echo"<form action='' method='post' enctype='multipart/form-data'".on_upload_progress($Vl).">\n";if($_GET["page"]!="last"&&$y&&$q&&$nf&&JUSH=="sql")$Td=get_val(" SELECT FOUND_ROWS()");if(!$L)echo"<p class='message'>".lang(16)."\n";else{$Ma=adminer()->backwardKeys($a,$Pk);$pj=array();reset($N);foreach($L[0]as$w=>$X){if(!isset($Pl[$w])){$X=idx($_GET["columns"],key($N))?:array();$pj[$w]=array("fun"=>$X["fun"],"col"=>($N?$X["col"]:$w));next($N);}}echo"<div class='scrollable'>","<table id='table' class='nowrap checkable odds'".on('click','tableClick').on('dblclick','tableClick').on('keydown','editingKeydown').">\n","<thead><tr>".(!$q&&$N?"":"<td class='hover check sticky'><input type='checkbox' id='all-page' class='jsonly' title='".lang(272)."'".on('click','formCheck','^check').">");$Tg=array();$Yi=1;foreach($pj
+as$w=>$X){$k=$l[$X["col"]];$B=($k?adminer()->fieldName($k,$Yi):($X["fun"]?($X["col"]!=""?h($X["col"]):"*"):h($w)));if($B!=""){$Yi++;$Tg[$w]=$B;$c=idf_escape($w);$Fe=remove_from_uri('(order|desc)[^=]*|page|next').'&order[0]='.url_escape($w);$nc="&desc[0]=1";$hk=preg_replace('~ DESC( NULLS LAST)?$~','',$D[0]);$jk=($hk==$c||$hk==$w);echo"<th id='th[".h(bracket_escape($w))."]'".($jk?" aria-sort='".($hk==$D[0]?"ascending":"descending")."'":"").">";$Zd=apply_sql_function(h($X["fun"]),$B);$ik=isset($k["privileges"]["order"])||$X["fun"];echo($ik?"<a href='".h($Fe.($jk&&$hk==$D[0]?$nc:''))."'>$Zd</a>":$Zd),doc_link(array(JUSH=>$k["doc"]));$sg=($ik?"<a href='".h($Fe.$nc)."' title='".lang(59)."' class='text'> ↓</a>":'');if(!$X["fun"]&&isset($k["privileges"]["where"]))$sg
+.="<a href='#fieldset-search' title='".lang(56)."' class='text jsonly'".on('click','selectSearch',$w)."> =</a>";echo($sg?"<span class='column'>$sg</span>":"");}}$Of=array();if($_GET["modify"]){foreach($L
 as$K){foreach($K
-as$w=>$X)$Mf[$w]=max($Mf[$w],min(40,utf8_length((string)$X)));}}$ye=array();$xe=array();foreach((array)$_GET["where"]as$X){$X+=array("col"=>"","op"=>"","val"=>"");$qb=$X["col"];$Aj=$X["val"];if(!is_array($Aj)&&($Aj!=""||preg_match('~NULL$~',$X["op"]))&&(!$X["op"]||in_array($X["op"],adminer()->operators($S)))){$Of=strtr(preg_quote($Aj),array("%"=>".*?","_"=>"."));$ji=array("LIKE %%"=>$Of,"ILIKE %%"=>$Of,"REGEXP"=>$Aj)+(JUSH=="pgsql"?array("~"=>$Aj,"~*"=>$Aj):array())+($qb!=""?array():array("="=>'^'.preg_quote($Aj).'\z',"IN"=>'^(?:'.implode("|",array_map('preg_quote',array_map('trim',explode(",",$Aj)))).')\z',"LIKE"=>"^$Of\\z","ILIKE"=>"^$Of\\z","FIND_IN_SET"=>'(?<=^|,)'.preg_quote($Aj).'(?=,|\z)',));foreach(($qb!=""?array($qb=>$l[$qb]):$l)as$B=>$k){if($qb!=""||is_searchable($k,$X)){$th=$X["op"]?:(!preg_match('~'.text_type().'~',$k["type"])?"IN":(preg_match('~%~',$Aj)?"LIKE":"LIKE %%"));if(isset($ji[$th])){$mb=preg_match('~^ILIKE|\*$~',$th)||($th!="~"&&preg_match('~^(sql|mssql|sqlite)$~',JUSH));$ye[$B][]="(?".($mb?"i":"").":$ji[$th])";}elseif($th=="IS NULL"&&$qb=="")$xe[$B]=true;}}}}echo($Ma?"<th>".lang(273):"")."<tbody>\n";if(is_ajax())ob_end_clean();foreach(adminer()->rowDescriptions($L,$Nd)as$Kg=>$K){$Dl=unique_array($L[$Kg],$v);if(!$Dl){$Dl=array();foreach($L[$Kg]as$w=>$X){if(!in_array(idx(idx($ij,$w,array()),"fun"),driver()->grouping))$Dl[$w]=$X;}}$El="";$r=0;foreach($Dl
-as$w=>$X){$hj=idx($ij,$w,array());if($N&&$hj&&!isset($l[$hj["col"]]))continue;$Wd=idx($hj,"fun","");$qb=($Wd?$hj["col"]:$w);$k=(array)$l[$qb];$jf=is_blob($k);if(!$Wd&&strlen($X)>64&&driver()->md5(idf_escape($qb),$k)){$Wd="md5";$X=md5($jf?(string)driver()->value($X,$k):$X);}if($Wd){$El
-.="&fun[$r]=".url_escape($Wd)."&col[$r]=".url_escape($qb).($X!==null?"&val[$r]=".url_escape($X===false?"f":$X):"");$r++;}else$El
-.="&".($X!==null?"where[".url_escape(bracket_escape($qb))."]=".url_escape($X===false?"f":$X):"null[]=".url_escape($qb));}echo"<tr>".(!$q&&$N?"":"<td class='hover check sticky'>".($kf||information_schema(DB)?"":"<a href='".h(ME."edit=".url_escape($a).$El)."' class='edit'>".lang(274)."</a> ").checkbox("check[]",substr($El,1),in_array(substr($El,1),(array)$_POST["check"])));foreach($K
-as$w=>$X){if(isset($Qg[$w])){$Wd=$ij[$w]["fun"];$qb=$ij[$w]["col"];$k=(array)$l[$w];if($X!=""&&(!isset($Sc[$w])||$Sc[$w]!=""))$Sc[$w]=(is_mail($X)?$Qg[$w]:"");$z="";if(is_blob($k)&&$X!="")$z=ME.'download='.url_escape($a).'&field='.url_escape($w).$El;if(!$z&&$X!==null){foreach((array)$Nd[$w]as$n){if(count($Nd[$w])==1||end($n["source"])==$w){$z="";foreach($n["source"]as$r=>$dk)$z
-.=where_link($r,$n["target"][$r],$L[$Kg][$dk]);$z=($n["db"]!=""?preg_replace('~&db=[^&]*~',"&db=".url_escape($n["db"]),ME):ME).'select='.url_escape($n["table"]).$z;if($n["ns"]!="")$z=preg_replace('~&ns=[^&]*~',"&ns=".url_escape($n["ns"]),$z);if(count($n["source"])==1)break;}}}if($Wd=="count"&&$qb==""){$z=ME."select=".url_escape($a);$r=0;foreach((array)$_GET["where"]as$W){if(!array_key_exists($W["col"],$Dl))$z
-.=where_link($r++,$W["col"],$W["val"],$W["op"]);}foreach($Dl
-as$uf=>$W){if(idx(idx($ij,$uf,array()),"fun")){$z="";break;}$z
-.=where_link($r++,$uf,$W);}}$De=select_value($X,$z,$k,$Yk,($Wd?array():idx($ye,$w,array())));if($X===null&&!$Wd&&isset($xe[$w]))$De="<mark>$De</mark>";$t=bracket_escape($El);$s=h("val[$t][".bracket_escape($w)."]");$wi=idx(idx($_POST["val"],$t),bracket_escape($w));$Jl=idx($k["privileges"],"update")&&!is_identity_always($k);$Nc=$L[$Kg][$w];$Oc=!is_array($K[$w])&&!is_blob($k)&&is_utf8($Nc)&&!$Wd&&!$k["generated"]&&$Jl;$U=($Wd=="min"||$Wd=="max"?$l[$qb]["type"]:$k["type"]);$Xk=preg_match('~text|json|lob~',$U);$lf=preg_match(number_type(),$U)||preg_match('~^(avg|ceil|char_length|count|count distinct|floor|len|length|round|sum|time_to_sec)$~',$Wd);echo"<td id='$s'".($lf&&($X===null||is_numeric(strip_tags($De))||$U=="money")?" class='number'":"");if(($_GET["modify"]&&$Oc&&$Nc!==null)||$wi!==null){$je=h($wi!==null?$wi:$Nc);echo">".($Xk?"<textarea name='$s' cols='30' rows='".(substr_count($Nc,"\n")+1)."'>$je</textarea>":"<input name='$s' value='$je' size='$Mf[$w]'>");}else{$Wf=strpos($De,"<i>…</i>");$Mc=adminer()->editVal($Nc,$k);echo($Jl?" data-text='".($Wf?2:($Xk?1:0))."'".($Oc?"":" data-warning='".lang(275)."'").($Oc&&!$Wf&&html_entity_decode(strip_tags($De),ENT_QUOTES,"UTF-8")!==$Mc?" data-value='".h($Mc)."'":""):"").">$De";}}}if($Ma)echo"<td>";adminer()->backwardKeysPrint($Ma,$L[$Kg]);echo"</tr>\n";}if(is_ajax())exit;echo"</table>\n","</div>\n";}if(!is_ajax()){$na=get_settings("adminer_import");if($L||$E||$oe){$id=true;if($_GET["page"]!="last"){if(!$y||(count($L)<$y&&($L||!$E)))$Qd=($E?$E*$y:0)+count($L);elseif(JUSH!="sql"||!$kf){$Qd=($kf?null:found_rows($S,$Z));$id=!driver()->hasEstimatedRows();if($Qd===null||(!$id&&$Qd<max(1e4,2*($E+1)*$y))){$Qd=first(slow_query(count_rows($a,$Z,$kf,$q)));$id=true;}}}if(!support("cursor"))$oe=(($Qd===false?count($L)+1:$Qd-$E*$y)>$y);$Ph=($y&&($oe||$E));if($Ph)echo($oe?'<p><a href="'.h(pagination_href($E+1)).'" class="loadmore"'.on('click','selectLoadMore',lang(276)).'>'.lang(277).'</a>':''),"\n";echo"<div class='footer'><div>\n";if($Ph){$gg=($Qd===false?$E+($L?(count($L)>=$y?2:1):0):floor(($Qd-1)/$y));echo"<fieldset><legend>".lang(278)."</legend>";if(!support("cursor")){echo
-pagination(0,$E).($E>5?" …":"");for($r=max(1,$E-4);$r<min($gg,$E+5);$r++)echo
-pagination($r,$E);if($gg>0)echo($E+5<$gg?" …":""),($id&&$Qd!==false?pagination($gg,$E):" <a href='".h(remove_from_uri("page")."&page=last")."' title='~$gg'>".lang(279)."</a>");}else
+as$w=>$X)$Of[$w]=max($Of[$w],min(40,utf8_length((string)$X)));}}$Ae=array();$_e=array();foreach((array)$_GET["where"]as$X){$X+=array("col"=>"","op"=>"","val"=>"");$qb=$X["col"];$Hj=$X["val"];if(!is_array($Hj)&&($Hj!=""||preg_match('~NULL$~',$X["op"]))&&(!$X["op"]||in_array($X["op"],adminer()->operators($S)))){$Qf=strtr(preg_quote($Hj),array("%"=>".*?","_"=>"."));$oi=array("LIKE %%"=>$Qf,"ILIKE %%"=>$Qf,"REGEXP"=>$Hj)+(JUSH=="pgsql"?array("~"=>$Hj,"~*"=>$Hj):array())+($qb!=""?array():array("="=>'^'.preg_quote($Hj).'\z',"IN"=>'^(?:'.implode("|",array_map('preg_quote',array_map('trim',explode(",",$Hj)))).')\z',"LIKE"=>"^$Qf\\z","ILIKE"=>"^$Qf\\z","FIND_IN_SET"=>'(?<=^|,)'.preg_quote($Hj).'(?=,|\z)',));foreach(($qb!=""?array($qb=>$l[$qb]):$l)as$B=>$k){if($qb!=""||is_searchable($k,$X)){$wh=$X["op"]?:(!preg_match('~'.text_type().'~',$k["type"])?"IN":(preg_match('~%~',$Hj)?"LIKE":"LIKE %%"));if(isset($oi[$wh])){$mb=preg_match('~^ILIKE|\*$~',$wh)||($wh!="~"&&preg_match('~^(sql|mssql|sqlite)$~',JUSH));$Ae[$B][]="(?".($mb?"i":"").":$oi[$wh])";}elseif($wh=="IS NULL"&&$qb=="")$_e[$B]=true;}}}}echo($Ma?"<th>".lang(273):"")."<tbody>\n";if(is_ajax())ob_end_clean();foreach(adminer()->rowDescriptions($L,$Qd)as$Ng=>$K){$Ml=unique_array($L[$Ng],$v);if(!$Ml){$Ml=array();foreach($L[$Ng]as$w=>$X){if(!in_array(idx(idx($pj,$w,array()),"fun"),driver()->grouping))$Ml[$w]=$X;}}$Nl="";$r=0;foreach($Ml
+as$w=>$X){$oj=idx($pj,$w,array());if($N&&$oj&&!isset($l[$oj["col"]]))continue;$Zd=idx($oj,"fun","");$qb=($Zd?$oj["col"]:$w);$k=(array)$l[$qb];$mf=is_blob($k);if(!$Zd&&strlen($X)>64&&driver()->md5(idf_escape($qb),$k)){$Zd="md5";$X=md5($mf?(string)driver()->value($X,$k):$X);}if($Zd){$Nl
+.="&fun[$r]=".url_escape($Zd)."&col[$r]=".url_escape($qb).($X!==null?"&val[$r]=".url_escape($X===false?"f":$X):"");$r++;}else$Nl
+.="&".($X!==null?"where[".url_escape(bracket_escape($qb))."]=".url_escape($X===false?"f":$X):"null[]=".url_escape($qb));}echo"<tr>".(!$q&&$N?"":"<td class='hover check sticky'>".($nf||information_schema(DB)?"":"<a href='".h(ME."edit=".url_escape($a).$Nl)."' class='edit'>".lang(274)."</a> ").checkbox("check[]",substr($Nl,1),in_array(substr($Nl,1),(array)$_POST["check"])));foreach($K
+as$w=>$X){if(isset($Tg[$w])){$Zd=$pj[$w]["fun"];$qb=$pj[$w]["col"];$k=(array)$l[$w];if($X!=""&&(!isset($Tc[$w])||$Tc[$w]!=""))$Tc[$w]=(is_mail($X)?$Tg[$w]:"");$z="";if(is_blob($k)&&$X!="")$z=ME.'download='.url_escape($a).'&field='.url_escape($w).$Nl;if(!$z&&$X!==null){foreach((array)$Qd[$w]as$n){if(count($Qd[$w])==1||end($n["source"])==$w){$z="";foreach($n["source"]as$r=>$kk)$z
+.=where_link($r,$n["target"][$r],$L[$Ng][$kk]);$z=($n["db"]!=""?preg_replace('~&db=[^&]*~',"&db=".url_escape($n["db"]),ME):ME).'select='.url_escape($n["table"]).$z;if($n["ns"]!="")$z=preg_replace('~&ns=[^&]*~',"&ns=".url_escape($n["ns"]),$z);if(count($n["source"])==1)break;}}}if($Zd=="count"&&$qb==""){$z=ME."select=".url_escape($a);$r=0;foreach((array)$_GET["where"]as$W){if(!array_key_exists($W["col"],$Ml))$z
+.=where_link($r++,$W["col"],$W["val"],$W["op"]);}foreach($Ml
+as$wf=>$W){if(idx(idx($pj,$wf,array()),"fun")){$z="";break;}$z
+.=where_link($r++,$wf,$W);}}$Ge=select_value($X,$z,$k,$hl,($Zd?array():idx($Ae,$w,array())));if($X===null&&!$Zd&&isset($_e[$w]))$Ge="<mark>$Ge</mark>";$t=bracket_escape($Nl);$s=h("val[$t][".bracket_escape($w)."]");$Ai=idx(idx($_POST["val"],$t),bracket_escape($w));$Sl=idx($k["privileges"],"update")&&!is_identity_always($k);$Oc=$L[$Ng][$w];$Pc=!is_array($K[$w])&&!is_blob($k)&&is_utf8($Oc)&&!$Zd&&!$k["generated"]&&$Sl;$U=($Zd=="min"||$Zd=="max"?$l[$qb]["type"]:$k["type"]);$gl=preg_match('~text|json|lob~',$U);$of=preg_match(number_type(),$U)||preg_match('~^(avg|ceil|char_length|count|count distinct|floor|len|length|round|sum|time_to_sec)$~',$Zd);echo"<td id='$s'".($of&&($X===null||is_numeric(strip_tags($Ge))||$U=="money")?" class='number'":"");if(($_GET["modify"]&&$Pc&&$Oc!==null)||$Ai!==null){$me=h($Ai!==null?$Ai:$Oc);echo">".($gl?"<textarea name='$s' cols='30' rows='".(substr_count($Oc,"\n")+1)."'>\n$me</textarea>":"<input name='$s' value='$me' size='$Of[$w]'>");}else{$Yf=strpos($Ge,"<i>…</i>");$Nc=adminer()->editVal($Oc,$k);echo($Sl?" data-text='".($Yf?2:($gl?1:0))."'".($Pc?"":" data-warning='".lang(275)."'").($Pc&&!$Yf&&html_entity_decode(strip_tags($Ge),ENT_QUOTES,"UTF-8")!==$Nc?" data-value='".h($Nc)."'":""):"").">$Ge";}}}if($Ma)echo"<td>";adminer()->backwardKeysPrint($Ma,$L[$Ng]);echo"</tr>\n";}if(is_ajax())exit;echo"</table>\n","</div>\n";}if(!is_ajax()){$na=get_settings("adminer_import");if($L||$E||$re){$ld=true;if($_GET["page"]!="last"){if(!$y||(count($L)<$y&&($L||!$E)))$Td=($E?$E*$y:0)+count($L);elseif(JUSH!="sql"||!$nf){$Td=($nf?null:found_rows($S,$Z));$ld=!driver()->hasEstimatedRows();if($Td===null||(!$ld&&$Td<max(1e4,2*($E+1)*$y))){$Td=first(slow_query(count_rows($a,$Z,$nf,$q)));$ld=true;}}}if(!support("cursor"))$re=(($Td===false?count($L)+1:$Td-$E*$y)>$y);$Th=($y&&($re||$E));if($Th)echo($re?'<p><a href="'.h(pagination_href($E+1)).'" class="loadmore"'.on('click','selectLoadMore',lang(276)).'>'.lang(277).'</a>':''),"\n";echo"<div class='footer'><div>\n";if($Th){$ig=($Td===false?$E+($L?(count($L)>=$y?2:1):0):floor(($Td-1)/$y));echo"<fieldset><legend>".lang(278)."</legend>";if(!support("cursor")){echo
+pagination(0,$E).($E>5?" …":"");for($r=max(1,$E-4);$r<min($ig,$E+5);$r++)echo
+pagination($r,$E);if($ig>0)echo($E+5<$ig?" …":""),($ld&&$Td!==false?pagination($ig,$E):" <a href='".h(remove_from_uri("page")."&page=last")."' title='~$ig'>".lang(279)."</a>");}else
 echo
-pagination(0,$E).($E>1?" …":""),($E?pagination($E,$E):""),($oe?pagination($E+1,$E)." …":"");echo"</fieldset>\n";}echo"<fieldset>","<legend>".lang(280)."</legend>";$uc=($id?"":"~ ").$Qd;$zf=($Qd!==false?($id?"":"~ ").lang(176,$Qd):"");echo
-checkbox("all",1,0,$zf,on('click','countRows',$uc))."\n","</fieldset>\n";if(adminer()->selectCommandPrint())echo'<fieldset',($_GET["modify"]?'':" title='".lang(177)."'"),'>
+pagination(0,$E).($E>1?" …":""),($E?pagination($E,$E):""),($re?pagination($E+1,$E)." …":"");echo"</fieldset>\n";}echo"<fieldset>","<legend>".lang(280)."</legend>";$vc=($ld?"":"~ ").$Td;$Af=($Td!==false?($ld?"":"~ ").lang(176,$Td):"");echo
+checkbox("all",1,0,$Af,on('click','countRows',$vc))."\n","</fieldset>\n";if(adminer()->selectCommandPrint())echo'<fieldset',($_GET["modify"]?'':" title='".lang(177)."'"),'>
 <legend><a href=\'',h($_GET["modify"]?remove_from_uri("modify"):relative_uri()."&modify=1"),'\'>',lang(281),'</a></legend><div>
 <input type=\'submit\' id=\'save\' value=\'',lang(18),'\'',($_GET["modify"]||$_POST["val"]?'':" class='jsonly' disabled"),'>
 </div></fieldset>
 
-<fieldset><legend>',lang(144),' <span id="selected"></span></legend><div>
+<fieldset><legend>',lang(145),' <span id="selected"></span></legend><div>
 <input type=\'submit\' name=\'edit\' value=\'',lang(14),'\'>
 <input type=\'submit\' name=\'clone\' value=\'',lang(266),'\'>
 <input type=\'submit\' name=\'delete\' value=\'',lang(22),'\'',confirm(),'>
 </div></fieldset>
-';$Od=adminer()->dumpFormat();foreach((array)$_GET["columns"]as$c){if($c["fun"]||($c["col"]!=""&&!isset($l[$c["col"]]))){unset($Od['sql']);break;}}if($Od){print_fieldset("export",lang(76)." <span id='selected2'></span>");$Nh=adminer()->dumpOutput();echo($Nh?html_select("output",$Nh,$na["output"])." ":""),html_select("format",$Od,$na["format"])," <input type='submit' name='export' value='".lang(76)."'>\n","</div></fieldset>\n";}adminer()->selectEmailPrint(array_filter($Sc,'strlen'),$d);echo"</div></div>\n";}if(adminer()->selectImportPrint())echo"<p>","<a href='#import' class='toggle'>".lang(75)."</a>","<span id='import'".($_POST["import"]?"":" class='hidden'").">: ",($Ml?input_hidden(ini_get("session.upload_progress.name"),$Ml):""),file_input(" name='csv_file'"," ".html_select("separator",array("csv"=>"CSV,","csv;"=>"CSV;","tsv"=>"TSV"),$na["format"])." <input type='submit' name='import' value='".lang(75)."'>".($Ml?" <progress class='jsonly hidden' max='1' value='0'></progress>":"")),"</span>";echo
-input_token(),"</form>\n",(!$q&&$N?"":script("tableCheck();"));}}}if(is_ajax()){ob_end_clean();exit;}}elseif(isset($_GET["variables"])){$pk=isset($_GET["status"]);page_header($pk?lang(136):lang(135));$cm=($pk?adminer()->showStatus():adminer()->showVariables());if(!$cm)echo"<p class='message'>".lang(16)."\n";else{echo"<table>\n";foreach($cm
-as$K){echo"<tr>";$w=array_shift($K);echo"<th><code class='jush-".JUSH.($pk?"status":"set")."'>".h($w)."</code>";foreach($K
-as$X)echo"<td>".nl_br(h($X));}echo"</table>\n";}}elseif(isset($_GET["script"])){header("Content-Type: application/json; charset=utf-8");if($_GET["script"]=="db"){$yk=array("Data_length"=>0,"Index_length"=>0,"Data_free"=>0);foreach(table_status()as$B=>$S){json_row("Comment-$B",h($S["Comment"]).($S["Error"]?" <span class='error'>".h($S["Error"])."</span>":""));if(!is_view($S)||preg_match('~materialized~i',$S["Engine"])){foreach(array("Engine","Collation")as$w)json_row("$w-$B",h($S[$w]));foreach(array_keys($yk+array("Auto_increment"=>0,"Rows"=>0))as$w){if(array_key_exists($w,$S))json_row("$w-$B",format_status($S,$w));if($S[$w]!=""&&isset($yk[$w]))$yk[$w]+=($S["Engine"]!="InnoDB"||$w!="Data_free"?$S[$w]:0);}}}if(function_exists('Adminer\db_status'))$yk=db_status();foreach($yk
-as$w=>$X)json_row("sum-$w",adminer()->formatSizeValue($X));json_row("");}elseif($_GET["script"]=="kill"){if(!$j)connection()->query("KILL ".number($_POST["kill"]));}else{foreach(count_tables(adminer()->databases(false))as$h=>$X){json_row("tables-$h",format_number($X));json_row("size-$h",db_size($h));}json_row("");}exit;}else{if(!isset($_GET["select"])&&support("single_table")){$T=tables_list();if($T)redirect(ME.(support("table")?"table=":"select=").url_escape(key($T)));}$ng=ME.(isset($_GET["select"])?"select=&":"");$Pk=array_merge((array)$_POST["tables"],(array)$_POST["views"]);if($Pk&&!$j&&!$_POST["search"]){$I=true;$rg="";if(JUSH=="sql"&&$_POST["tables"]&&count($_POST["tables"])>1&&($_POST["drop"]||$_POST["truncate"]||$_POST["copy"]))queries("SET foreign_key_checks = 0");if($_POST["truncate"]){if($_POST["tables"])$I=truncate_tables($_POST["tables"]);$rg=lang(282);}elseif($_POST["move"]){$I=move_tables((array)$_POST["tables"],(array)$_POST["views"],$_POST["target"]);$rg=lang(283);}elseif($_POST["copy"]){$I=copy_tables((array)$_POST["tables"],(array)$_POST["views"],$_POST["target"]);$rg=lang(284);}elseif($_POST["drop"]){if($_POST["views"])$I=drop_views($_POST["views"]);if($I&&$_POST["tables"])$I=drop_tables($_POST["tables"]);$rg=lang(285);}elseif(JUSH=="sqlite"&&$_POST["check"]){foreach((array)$_POST["tables"]as$R){foreach(get_rows("PRAGMA integrity_check(".q($R).")")as$K)$rg
-.="<b>".h($R)."</b>: ".h($K["integrity_check"])."<br>";}}elseif(JUSH=="mssql"&&$_POST["check"]){foreach((array)$_POST["tables"]as$R){foreach(get_rows("DBCC CHECKTABLE (".q(table($R)).") WITH TABLERESULTS")as$K)$rg
-.="<b>".h($R)."</b>: ".h($K["MessageText"])."<br>";}}elseif(JUSH!="sql"){$I=(JUSH=="sqlite"?queries("VACUUM"):apply_queries("VACUUM".($_POST["optimize"]?" ANALYZE":""),(array)$_POST["tables"]));$rg=lang(286);}elseif(!$_POST["tables"])$rg=lang(13);elseif($I=queries(($_POST["optimize"]?"OPTIMIZE":($_POST["check"]?"CHECK":($_POST["repair"]?"REPAIR":"ANALYZE")))." TABLE ".implode(", ",array_map('Adminer\idf_escape',$_POST["tables"])))){while($K=$I->fetch_assoc())$rg
-.="<b>".h($K["Table"])."</b>: ".h($K["Msg_text"])."<br>";}queries_redirect(relative_uri(),$rg,$I);}page_header(($_GET["ns"]==""?lang(35).": ".h(DB):lang(168).": ".h($_GET["ns"])),$j,true);if(adminer()->homepage()){if($_GET["ns"]!==""){$D=$_GET["order"];$Td=($D||support("fast_status"));echo"<div>\n","<h3 id='tables-views'>".lang(287)."</h3>\n";$Ok=($Td?table_status():tables_list());if(!$Ok)echo"<p class='message'>".lang(13)."\n";else{echo"<form action='' method='post'>\n";if(support("table")){echo"<fieldset><legend>".lang(288)." <span id='selected2'></span></legend><div>",html_select("op",adminer()->operators(),idx($_POST,"op",JUSH=="elastic"?"should":"LIKE %%"))," <input type='search' name='query' value='".h($_POST["query"])."'".on('keydown','submitKeydown','search').">"," <input type='submit' name='search' value='".lang(56)."'>\n","</div></fieldset>\n";if(!$j&&$_POST["search"]&&$_POST["query"]!=""){$_GET["where"][0]["op"]=$_POST["op"];search_tables();}}echo"<div class='scrollable'>\n","<table class='nowrap checkable odds'".on('click','tableClick').on('dblclick','tableClick').">\n",'<thead><tr>','<td class="hover"><input id="check-all" type="checkbox" class="jsonly" title="'.lang(170).'"'.on('click','formCheck','^(tables|views)\[').'>','<th class="sticky"'.(!$D&&JUSH!='sqlite'?" aria-sort='ascending'":'').'><a href="'.h(substr($ng,0,-1)).'">'.lang(150).'</a>';$d=array("Engine"=>array(lang(289).doc_link(array('sql'=>'storage-engines.html'))));if(collations())$d["Collation"]=array(lang(140).doc_link(array('sql'=>'charset-charsets.html','mariadb'=>'supported-character-sets-and-collations/')));if(function_exists('Adminer\alter_table'))$d["Data_length"]=array(lang(290).doc_link(array('sql'=>'show-table-status.html',)),"create",lang(44),);if(support("indexes"))$d["Index_length"]=array(lang(291).doc_link(array('sql'=>'show-table-status.html',)),"indexes",lang(153),);$d["Data_free"]=array(lang(292).doc_link(array('sql'=>'show-table-status.html')),"edit",lang(45));if(function_exists('Adminer\alter_table'))$d["Auto_increment"]=array(lang(51).doc_link(array('sql'=>'example-auto-increment.html','mariadb'=>'auto_increment/')),"auto_increment=1&create",lang(44),);$d["Rows"]=array(lang(293).doc_link(array('sql'=>'show-table-status.html',)),"select",lang(41),);if(support("comment"))$d["Comment"]=array(lang(50).doc_link(array('sql'=>'show-table-status.html',)),);$Ca=array('Engine','Collation','Comment');foreach($d
-as$w=>$c)echo"<th".($D==$w?" aria-sort='".(in_array($w,$Ca)?"ascending":"descending")."'":"")."><a href='".h($ng)."order=$w'>$c[0]</a>";echo"<tbody>\n";if($D){uasort($Ok,function($ga,$Ja)use($D,$Ca){$J=($ga[$D]<$Ja[$D]?-1:($ga[$D]>$Ja[$D]?1:0));return(in_array($D,$Ca)?$J:-$J);});}$T=0;$yk=array("Data_length"=>0,"Index_length"=>0,"Data_free"=>0);foreach($Ok
-as$B=>$pk){$fm=($Td?is_view($pk):$pk!==null&&!preg_match('~table|sequence~i',$pk));$pk=($Td?$pk:array('Engine'=>$pk));$s=h("Table-".$B);echo'<tr><td class="hover">'.checkbox(($fm?"views[]":"tables[]"),$B,in_array("$B",$Pk,true),"","","",$s),'<th class="sticky">'.(support("table")||support("indexes")?"<a href='".h(ME)."table=".url_escape($B)."' title='".lang(42)."' id='$s'>".h($B).'</a>':h($B));if($fm&&!preg_match('~materialized~i',$pk['Engine'])){$dl=lang(149);echo'<td colspan="'.(count($d)-(support("comment")?2:1)).'">'.(support("view")?"<a href='".h(ME)."view=".url_escape($B)."' title='".lang(43)."'>$dl</a>":$dl),"<td align='right'><a href='".h(ME)."select=".url_escape($B)."' title='".lang(41)."'>?</a>";if(support("comment"))echo'<td>'.h($pk['Comment']);}else{if($Td){foreach(array_keys($yk)as$w)$yk[$w]+=($pk["Engine"]!="InnoDB"||$w!="Data_free"?idx($pk,$w):0);}foreach($d
-as$w=>$c){$s=" id='$w-".h($B)."'";echo($c[1]?"<td align='right'><a href='".h(ME."$c[1]=").url_escape($B)."'$s title='$c[2]'>".format_status($pk,$w)."</a>":"<td$s>".h(idx($pk,$w,'?')).($w=="Comment"&&$pk["Error"]?" <span class='error'>".h($pk["Error"])."</span>":""));}$T++;}echo"\n";}echo"<tr><td class='hover'><th class='sticky'>".lang(267,count($Ok)),"<td>".h(JUSH=="sql"?get_val("SELECT @@default_storage_engine"):""),(collations()?"<td>".h(db_collation(DB,collations())):'');if($Td&&function_exists('Adminer\db_status'))$yk=db_status();foreach($yk
-as$w=>$xk)echo($d[$w]?"<td align='right' id='sum-$w'>".($Td?adminer()->formatSizeValue($xk):""):"");echo"\n","</table>\n",($Td?'':script("ajaxSetHtml('".js_escape(ME)."script=db');")),"</div>\n";if(!information_schema(DB)){$Yl="<input type='submit' value='".lang(294)."'".on_help("VACUUM")."> ";$yh="<input type='submit' name='optimize' value='".lang(295)."'".on_help(JUSH=="sql"?"OPTIMIZE TABLE":"VACUUM ANALYZE")."> ";$Di=(JUSH=="sqlite"?$Yl."<input type='submit' name='check' value='".lang(296)."'".on_help("PRAGMA integrity_check")."> ":(JUSH=="pgsql"?$Yl.$yh:(JUSH=="mssql"?"<input type='submit' name='check' value='".lang(296)."'".on_help("DBCC CHECKTABLE")."> ":(JUSH=="sql"?"<input type='submit' value='".lang(297)."'".on_help("ANALYZE TABLE")."> ".$yh."<input type='submit' name='check' value='".lang(296)."'".on_help("CHECK TABLE")."> "."<input type='submit' name='repair' value='".lang(298)."'".on_help("REPAIR TABLE")."> ":"")))).(function_exists('Adminer\truncate_tables')?"<input type='submit' name='truncate' value='".lang(299)."'".confirm().on_help(JUSH=="sqlite"?"DELETE":"TRUNCATE".(JUSH=="pgsql"?"":" TABLE"))."> ":"").(function_exists('Adminer\drop_tables')?"<input type='submit' name='drop' value='".lang(145)."'".confirm().on_help("DROP TABLE").">":"");echo($Di?"<div class='footer'><div>\n<fieldset><legend>".lang(144)." <span id='selected'></span></legend><div>$Di\n</div></fieldset>\n":"");$g=(support("scheme")?adminer()->schemas():adminer()->databases());if(count($g)!=1&&function_exists('Adminer\move_tables')){echo"<fieldset><legend>".lang(300)." <span id='selected3'></span></legend><div>";$h=(isset($_POST["target"])?$_POST["target"]:(support("scheme")?$_GET["ns"]:DB));echo($g?html_select("target",$g,$h):'<input name="target" value="'.h($h).'" autocapitalize="off">'),"</label> <input type='submit' name='move' value='".lang(128)."'>",(support("copy")?" <input type='submit' name='copy' value='".lang(23)."'> ".checkbox("overwrite",1,$_POST["overwrite"],lang(301)):""),"</div></fieldset>\n";}echo"<input type='hidden' name='all' value=''".on('click','countTables',$T).">\n",input_token(),"</div></div>\n";}echo"</form>\n",script("tableCheck();");}echo(function_exists('Adminer\alter_table')?"<p class='links hover'><a href='".h(ME)."create='>".lang(77)."</a>\n":''),(support("view")?"<a href='".h(ME)."view='>".lang(231)."</a>\n":""),"</div>\n";if(support("routine")){echo"<div>\n","<h3 id='routines'>".lang(72)."</h3>\n";$tj=routines();if($tj){echo"<table class='odds'>\n",'<thead><tr><th>'.lang(211).'<th>'.lang(49).'<th>'.lang(247)."<td class='hover'><tbody>\n";foreach($tj
+';$Rd=adminer()->dumpFormat();foreach((array)$_GET["columns"]as$c){if($c["fun"]||($c["col"]!=""&&!isset($l[$c["col"]]))){unset($Rd['sql']);break;}}if($Rd){print_fieldset("export",lang(76)." <span id='selected2'></span>");$Rh=adminer()->dumpOutput();echo($Rh?html_select("output",$Rh,$na["output"])." ":""),html_select("format",$Rd,$na["format"])," <input type='submit' name='export' value='".lang(76)."'>\n","</div></fieldset>\n";}adminer()->selectEmailPrint(array_filter($Tc,'strlen'),$d);echo"</div></div>\n";}if(adminer()->selectImportPrint())echo"<p>","<a href='#import' class='toggle'>".lang(75)."</a>","<span id='import'".($_POST["import"]?"":" class='hidden'").">: ",($Vl?input_hidden(ini_get("session.upload_progress.name"),$Vl):""),file_input(" name='csv_file'"," ".html_select("separator",array("csv"=>"CSV,","csv;"=>"CSV;","tsv"=>"TSV"),$na["format"])." <input type='submit' name='import' value='".lang(75)."'>".($Vl?" <progress class='jsonly hidden' max='1' value='0'></progress>":"")),"</span>";echo
+input_token(),"</form>\n",(!$q&&$N?"":script("tableCheck();"));}}}if(is_ajax()){ob_end_clean();exit;}}elseif(isset($_GET["variables"])){$xk=isset($_GET["status"]);page_header($xk?lang(137):lang(136));$lm=($xk?adminer()->showStatus():adminer()->showVariables());if(!$lm)echo"<p class='message'>".lang(16)."\n";else{echo"<table>\n";foreach($lm
+as$K){echo"<tr>";$w=array_shift($K);echo"<th><code class='jush-".JUSH.($xk?"status":"set")."'>".h($w)."</code>";foreach($K
+as$X)echo"<td>".nl_br(h($X));}echo"</table>\n";}}elseif(isset($_GET["script"])){header("Content-Type: application/json; charset=utf-8");if($_GET["script"]=="db"){$Fk=array("Data_length"=>0,"Index_length"=>0,"Data_free"=>0);foreach(table_status()as$B=>$S){json_row("Comment-$B",h($S["Comment"]).($S["Error"]?" <span class='error'>".h($S["Error"])."</span>":""));if(!is_view($S)||preg_match('~materialized~i',$S["Engine"])){foreach(array("Engine","Collation")as$w)json_row("$w-$B",h($S[$w]));foreach(array_keys($Fk+array("Auto_increment"=>0,"Rows"=>0))as$w){if(array_key_exists($w,$S))json_row("$w-$B",format_status($S,$w));if($S[$w]!=""&&isset($Fk[$w]))$Fk[$w]+=($S["Engine"]!="InnoDB"||$w!="Data_free"?$S[$w]:0);}}}if(function_exists('Adminer\db_status'))$Fk=db_status();foreach($Fk
+as$w=>$X)json_row("sum-$w",adminer()->formatSizeValue($X));json_row("");}elseif($_GET["script"]=="kill"){if(!$j)connection()->query("KILL ".number($_POST["kill"]));}else{foreach(count_tables(adminer()->databases(false))as$h=>$X){json_row("tables-$h",format_number($X));json_row("size-$h",db_size($h));}json_row("");}exit;}else{if(!isset($_GET["select"])&&support("single_table")){$T=tables_list();if($T)redirect(ME.(support("table")?"table=":"select=").url_escape(key($T)));}$pg=ME.(isset($_GET["select"])?"select=&":"");$Yk=array_merge((array)$_POST["tables"],(array)$_POST["views"]);if($Yk&&!$j&&!$_POST["search"]){$I=true;$tg="";if(JUSH=="sql"&&$_POST["tables"]&&count($_POST["tables"])>1&&($_POST["drop"]||$_POST["truncate"]||$_POST["copy"]))queries("SET foreign_key_checks = 0");if($_POST["truncate"]){if($_POST["tables"])$I=truncate_tables($_POST["tables"]);$tg=lang(282);}elseif($_POST["move"]){$I=move_tables((array)$_POST["tables"],(array)$_POST["views"],$_POST["target"]);$tg=lang(283);}elseif($_POST["copy"]){$I=copy_tables((array)$_POST["tables"],(array)$_POST["views"],$_POST["target"]);$tg=lang(284);}elseif($_POST["drop"]){if($_POST["views"])$I=drop_views($_POST["views"]);if($I&&$_POST["tables"])$I=drop_tables($_POST["tables"]);$tg=lang(285);}elseif(JUSH=="sqlite"&&$_POST["check"]){foreach((array)$_POST["tables"]as$R){foreach(get_rows("PRAGMA integrity_check(".q($R).")")as$K)$tg
+.="<b>".h($R)."</b>: ".h($K["integrity_check"])."<br>";}}elseif(JUSH=="mssql"&&$_POST["check"]){foreach((array)$_POST["tables"]as$R){foreach(get_rows("DBCC CHECKTABLE (".q(table($R)).") WITH TABLERESULTS")as$K)$tg
+.="<b>".h($R)."</b>: ".h($K["MessageText"])."<br>";}}elseif(JUSH!="sql"){$I=(JUSH=="sqlite"?queries("VACUUM"):apply_queries("VACUUM".($_POST["optimize"]?" ANALYZE":""),(array)$_POST["tables"]));$tg=lang(286);}elseif(!$_POST["tables"])$tg=lang(13);elseif($I=queries(($_POST["optimize"]?"OPTIMIZE":($_POST["check"]?"CHECK":($_POST["repair"]?"REPAIR":"ANALYZE")))." TABLE ".implode(", ",array_map('Adminer\idf_escape',$_POST["tables"])))){while($K=$I->fetch_assoc())$tg
+.="<b>".h($K["Table"])."</b>: ".h($K["Msg_text"])."<br>";}queries_redirect(relative_uri(),$tg,$I);}page_header(($_GET["ns"]==""?lang(35).": ".h(DB):lang(168).": ".h($_GET["ns"])),$j,true);if(adminer()->homepage()){if($_GET["ns"]!==""){$D=$_GET["order"];$Wd=($D||support("fast_status"));echo"<div>\n","<h3 id='tables-views'>".lang(287)."</h3>\n";$Xk=($Wd?table_status():tables_list());if(!$Xk)echo"<p class='message'>".lang(13)."\n";else{echo"<form action='' method='post'>\n";if(support("table")){echo"<fieldset><legend>".lang(288)." <span id='selected2'></span></legend><div>",html_select("op",adminer()->operators(),idx($_POST,"op",JUSH=="elastic"?"should":"LIKE %%"))," <input type='search' name='query' value='".h($_POST["query"])."'".on('keydown','submitKeydown','search').">"," <input type='submit' name='search' value='".lang(56)."'>\n","</div></fieldset>\n";if(!$j&&$_POST["search"]&&$_POST["query"]!=""){$_GET["where"][0]["op"]=$_POST["op"];search_tables();}}echo"<div class='scrollable'>\n","<table class='nowrap checkable odds'".on('click','tableClick').on('dblclick','tableClick').">\n",'<thead><tr>','<td class="hover"><input id="check-all" type="checkbox" class="jsonly" title="'.lang(170).'"'.on('click','formCheck','^(tables|views)\[').'>','<th class="sticky"'.(!$D&&JUSH!='sqlite'?" aria-sort='ascending'":'').'><a href="'.h(substr($pg,0,-1)).'">'.lang(150).'</a>';$d=array("Engine"=>array(lang(289).doc_link(array('sql'=>'storage-engines.html'))));if(collations())$d["Collation"]=array(lang(141).doc_link(array('sql'=>'charset-charsets.html','mariadb'=>'supported-character-sets-and-collations/')));if(function_exists('Adminer\alter_table'))$d["Data_length"]=array(lang(290).doc_link(array('sql'=>'show-table-status.html',)),"create",lang(44),);if(support("indexes"))$d["Index_length"]=array(lang(291).doc_link(array('sql'=>'show-table-status.html',)),"indexes",lang(153),);$d["Data_free"]=array(lang(292).doc_link(array('sql'=>'show-table-status.html')),"edit",lang(45));if(function_exists('Adminer\alter_table'))$d["Auto_increment"]=array(lang(51).doc_link(array('sql'=>'example-auto-increment.html','mariadb'=>'auto_increment/')),"auto_increment=1&create",lang(44),);$d["Rows"]=array(lang(293).doc_link(array('sql'=>'show-table-status.html',)),"select",lang(41),);if(support("comment"))$d["Comment"]=array(lang(50).doc_link(array('sql'=>'show-table-status.html',)),);$Ca=array('Engine','Collation','Comment');foreach($d
+as$w=>$c)echo"<th".($D==$w?" aria-sort='".(in_array($w,$Ca)?"ascending":"descending")."'":"")."><a href='".h($pg)."order=$w'>$c[0]</a>";echo"<tbody>\n";if($D){uasort($Xk,function($ga,$Ja)use($D,$Ca){$J=($ga[$D]<$Ja[$D]?-1:($ga[$D]>$Ja[$D]?1:0));return(in_array($D,$Ca)?$J:-$J);});}$T=0;$Fk=array("Data_length"=>0,"Index_length"=>0,"Data_free"=>0);foreach($Xk
+as$B=>$xk){$om=($Wd?is_view($xk):$xk!==null&&!preg_match('~table|sequence~i',$xk));$xk=($Wd?$xk:array('Engine'=>$xk));$s=h("Table-".$B);echo'<tr><td class="hover">'.checkbox(($om?"views[]":"tables[]"),$B,in_array("$B",$Yk,true),"","","",$s),'<th class="sticky">'.(support("table")||support("indexes")?"<a href='".h(ME)."table=".url_escape($B)."' title='".lang(42)."' id='$s'>".h($B).'</a>':h($B));if($om&&!preg_match('~materialized~i',$xk['Engine'])){$ml=lang(149);echo'<td colspan="'.(count($d)-(support("comment")?2:1)).'">'.(support("view")?"<a href='".h(ME)."view=".url_escape($B)."' title='".lang(43)."'>$ml</a>":$ml),"<td align='right'><a href='".h(ME)."select=".url_escape($B)."' title='".lang(41)."'>?</a>";if(support("comment"))echo'<td>'.h($xk['Comment']);}else{if($Wd){foreach(array_keys($Fk)as$w)$Fk[$w]+=($xk["Engine"]!="InnoDB"||$w!="Data_free"?idx($xk,$w):0);}foreach($d
+as$w=>$c){$s=" id='$w-".h($B)."'";echo($c[1]?"<td align='right'>".($w=="Index_length"&&$xk["invalid_index"]?"<span class='error'>INVALID</span> ":"")."<a href='".h(ME."$c[1]=").url_escape($B)."'$s title='$c[2]'>".format_status($xk,$w)."</a>":"<td$s>".h(idx($xk,$w,'?')).($w=="Comment"&&$xk["Error"]?" <span class='error'>".h($xk["Error"])."</span>":""));}$T++;}echo"\n";}echo"<tr><td class='hover'><th class='sticky'>".lang(267,count($Xk)),"<td>".h(JUSH=="sql"?get_val("SELECT @@default_storage_engine"):""),(collations()?"<td>".h(db_collation(DB,collations())):'');if($Wd&&function_exists('Adminer\db_status'))$Fk=db_status();foreach($Fk
+as$w=>$Ek)echo($d[$w]?"<td align='right' id='sum-$w'>".($Wd?adminer()->formatSizeValue($Ek):""):"");echo"\n","</table>\n",($Wd?'':script("ajaxSetHtml('".js_escape(ME)."script=db');")),"</div>\n";if(!information_schema(DB)){$hm="<input type='submit' value='".lang(294)."'".on_help("VACUUM")."> ";$Ah="<input type='submit' name='optimize' value='".lang(295)."'".on_help(JUSH=="sql"?"OPTIMIZE TABLE":"VACUUM ANALYZE")."> ";$Ii=(JUSH=="sqlite"?$hm."<input type='submit' name='check' value='".lang(296)."'".on_help("PRAGMA integrity_check")."> ":(JUSH=="pgsql"?$hm.$Ah:(JUSH=="mssql"?"<input type='submit' name='check' value='".lang(296)."'".on_help("DBCC CHECKTABLE")."> ":(JUSH=="sql"?"<input type='submit' value='".lang(297)."'".on_help("ANALYZE TABLE")."> ".$Ah."<input type='submit' name='check' value='".lang(296)."'".on_help("CHECK TABLE")."> "."<input type='submit' name='repair' value='".lang(298)."'".on_help("REPAIR TABLE")."> ":"")))).(function_exists('Adminer\truncate_tables')?"<input type='submit' name='truncate' value='".lang(299)."'".confirm().on_help(JUSH=="sqlite"?"DELETE":"TRUNCATE".(JUSH=="pgsql"?"":" TABLE"))."> ":"").(function_exists('Adminer\drop_tables')?"<input type='submit' name='drop' value='".lang(146)."'".confirm().on_help("DROP TABLE").">":"");echo($Ii?"<div class='footer'><div>\n<fieldset><legend>".lang(145)." <span id='selected'></span></legend><div>$Ii\n</div></fieldset>\n":"");$g=(support("scheme")?adminer()->schemas():adminer()->databases());if(count($g)!=1&&function_exists('Adminer\move_tables')){echo"<fieldset><legend>".lang(300)." <span id='selected3'></span></legend><div>";$h=(isset($_POST["target"])?$_POST["target"]:(support("scheme")?$_GET["ns"]:DB));echo($g?html_select("target",$g,$h):'<input name="target" value="'.h($h).'" autocapitalize="off">'),"</label> <input type='submit' name='move' value='".lang(129)."'>",(support("copy")?" <input type='submit' name='copy' value='".lang(23)."'> ".checkbox("overwrite",1,$_POST["overwrite"],lang(301)):""),"</div></fieldset>\n";}echo"<input type='hidden' name='all' value=''".on('click','countTables',$T).">\n",input_token(),"</div></div>\n";}echo"</form>\n",script("tableCheck();");}echo(function_exists('Adminer\alter_table')?"<p class='links hover'><a href='".h(ME)."create='>".lang(77)."</a>\n":''),(support("view")?"<a href='".h(ME)."view='>".lang(231)."</a>\n":""),"</div>\n";if(support("routine")){echo"<div>\n","<h3 id='routines'>".lang(72)."</h3>\n";$_j=routines();if($_j){echo"<table class='odds'>\n",'<thead><tr><th>'.lang(211).'<th>'.lang(49).'<th>'.lang(247)."<td class='hover'><tbody>\n";foreach($_j
 as$K){$B=($K["SPECIFIC_NAME"]==$K["ROUTINE_NAME"]?"":"&name=".url_escape($K["ROUTINE_NAME"]));echo'<tr>','<th><a href="'.h(ME.($K["ROUTINE_TYPE"]!="PROCEDURE"?'callf=':'call=').url_escape($K["SPECIFIC_NAME"]).$B).'"'.' title="'.($K["DTD_IDENTIFIER"]=="trigger"?lang(160):lang(218)).'">'.h($K["ROUTINE_NAME"]).'</a>','<td>'.h($K["ROUTINE_TYPE"]),'<td>'.h($K["DTD_IDENTIFIER"]),'<td class="hover"><a href="'.h(ME.($K["ROUTINE_TYPE"]!="PROCEDURE"?'function=':'procedure=').url_escape($K["SPECIFIC_NAME"]).$B).'">'.lang(156)."</a>";}echo"</table>\n";}echo'<p class="links hover">'.(support("procedure")?'<a href="'.h(ME).'procedure=">'.lang(246).'</a>':'').'<a href="'.h(ME).'function=">'.lang(245)."</a>\n","</div>\n";}if(support("event")){echo"<div>\n","<h3 id='events'>".lang(74)."</h3>\n";$L=get_rows("SHOW EVENTS");if($L){echo"<table>\n","<thead><tr><th>".lang(211)."<th>".lang(302)."<th>".lang(237)."<th>".lang(238)."<td class='hover'><tbody>\n";foreach($L
-as$K)echo"<tr>","<th>".h($K["Name"]),"<td>".($K["Execute at"]?lang(303)."<td>".h($K["Execute at"]):lang(239)." ".h($K["Interval value"])." ".h($K["Interval field"])."<td>".h($K["Starts"])),"<td>".h($K["Ends"]),'<td class="hover"><a href="'.h(ME).'event='.url_escape($K["Name"]).'">'.lang(156).'</a>';echo"</table>\n";$fd=get_val("SELECT @@event_scheduler");if($fd&&$fd!="ON")echo"<p class='error'><code class='jush-sqlset'>event_scheduler</code>: ".h($fd)."\n";}echo'<p class="links hover"><a href="'.h(ME).'event=">'.lang(236)."</a>\n","</div>\n";}}}}page_footer();
+as$K)echo"<tr>","<th>".h($K["Name"]),"<td>".($K["Execute at"]?lang(303)."<td>".h($K["Execute at"]):lang(239)." ".h($K["Interval value"])." ".h($K["Interval field"])."<td>".h($K["Starts"])),"<td>".h($K["Ends"]),'<td class="hover"><a href="'.h(ME).'event='.url_escape($K["Name"]).'">'.lang(156).'</a>';echo"</table>\n";$id=get_val("SELECT @@event_scheduler");if($id&&$id!="ON")echo"<p class='error'><code class='jush-sqlset'>event_scheduler</code>: ".h($id)."\n";}echo'<p class="links hover"><a href="'.h(ME).'event=">'.lang(236)."</a>\n","</div>\n";}}}}page_footer();
