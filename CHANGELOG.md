@@ -4,7 +4,7 @@ Changelog
 Version 4.0.5
 -----------------------
 
-Vendor-Update 6.2.0 → 6.3.0
+* Vendor-Update 6.2.0 → 6.3.0 (u. a. Sicherheitsfix: die CSRF-Prüfung wird nicht mehr übersprungen, wenn Login-Daten mitgeschickt werden – Regression aus 6.0.1; neue Suche nach Tabellen und Datenbanken per Strg+K bzw. ⌘K; lange JSON-Werte werden beim Bearbeiten ohne PCRE-JIT nicht mehr durch NULL ersetzt; Datei-Uploads bis `max_allowed_packet`; Weiterleitung nach POST per HTTP 303)
 
 
 Version 4.0.4
